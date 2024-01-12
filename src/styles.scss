@@ -1,0 +1,43 @@
+/* You can add global styles to this file, and also import other style files */
+
+
+/* Import ng-zorro styles */
+@import "../node_modules/ng-zorro-antd/style/index.min.css"; /* Import base styles */
+@import "../node_modules/ng-zorro-antd/button/style/index.min.css";  /* Import one component's styles */
+
+@import "assets/styles/global.scss";
+
+:root{
+  transition-duration: 0.3s;
+  animation-duration: 0.3s;
+}
+
+body{
+  font-family: 'Lato';
+}
+
+/* .ant-popover-inner-content{
+  padding: 0!important;
+} */
+.ant-modal{
+  .ant-modal-content {
+    .ant-modal-close-x{
+      width: 40px;
+      height: 40px;
+      background-color: #477AD2;
+      color: white;
+      position: absolute;
+      top: -20px;
+      right: -20px;
+      border-radius: 50%;
+      .anticon{
+        position: absolute;
+        top: 30%;
+        left: 30%;
+      }
+    }
+    .ant-modal-footer{
+      display: none !important;
+    }
+  }
+}

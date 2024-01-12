@@ -1,0 +1,89 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { environment } from '../../environments/environment.development';
+
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+
+@Injectable({
+   providedIn: 'root'
+})
+export class AuthService {
+   public url = environment.url;
+   // private token: string = ''; descomentar esta linea y eliminar linea 16
+   private token: string = 'pruebatoken';
+
+   constructor (private httpClient: HttpClient, private router: Router) {}
+
+   // Llama al api para iniciar sesión y solo se debe usar en el LoginComponent
+   public login (user: any): Observable<any> {
+      return this.httpClient.post(`${this.url}auth/login/`, user).pipe(
+         map((resp: any) => {
+            this.saveToken(resp.token, resp.expiresIn);
+            this.saveUserLogged(resp.user);
+            return resp;
+         })
+      );
+   }
+
+   // Guarda el token en el storage
+   private saveToken (token: string, expiration: string) {
+      if (token != null) {
+         this.token = token;
+         localStorage.setItem('token', token);
+         localStorage.setItem('expire', expiration);
+      } else {
+         this.token = '';
+      }
+   }
+
+   // Guarda en storage los datos del usuario logueado
+   private saveUserLogged (user: any) {
+      const userLogged: any = {
+         id: user.id,
+         name: user.name,
+         email: user.email
+      };
+      localStorage.setItem('userLogged', JSON.stringify(userLogged));
+   }
+
+   // obtiene en token del local storage para validarlo
+   public getStorageToken () {
+      if (localStorage.getItem('token')) {
+         const isToken: any = localStorage.getItem('token')!;
+         this.token = isToken;
+         return this.token;
+      }
+      return (this.token = '');
+   }
+
+   // Esta funcion valida fecha de expiracion del token, para dar acceso al sistema
+   public isAuthenticated (): boolean {
+      return this.token.length > 0; // Eliminas esta linea y descomentar todas las de abajo
+
+      // this.getStorageToken();
+      // if (localStorage.getItem('token') && localStorage.getItem('expire')) {
+      //    let res: boolean = true;
+      //    const expirationDate = localStorage.getItem('expire')!;
+      //    const today = new Date();
+      //    const expiration = new Date(expirationDate.toString());
+      //    if (today > expiration) {
+      //       res = false;
+      //       return res;
+      //    }
+      //    return res;
+      // } else {
+      //    return false;
+      // }
+   }
+
+   // Llamar esta funcion en cualquier lado, para limpiar cache y cerrar sesión
+   public logout () {
+      localStorage.removeItem('token');
+      localStorage.removeItem('expire');
+      localStorage.removeItem('userLogged');
+      localStorage.clear();
+      this.router.navigateByUrl('login');
+   }
+}
