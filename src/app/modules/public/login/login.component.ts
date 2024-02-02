@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { EventManagerService } from '../../../services/events-manager/event-manager.service';
 
 @Component({
    selector: 'app-login',
@@ -17,6 +18,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 export class LoginComponent implements OnInit {
    loader: boolean = false;
    isSubmitData: boolean = false;
+   passwordVisible: boolean = false;
 
    loginForm!: FormGroup;
    constructor (
@@ -28,7 +30,9 @@ export class LoginComponent implements OnInit {
       this.createForm();
    }
 
-   ngOnInit (): void {}
+   ngOnInit (): void {
+      // this.authService.logout();
+   }
 
    //  Crea e Inicializa el formulario
    createForm () {
@@ -50,21 +54,22 @@ export class LoginComponent implements OnInit {
          return;
       }
       this.isSubmitData = true;
-      const payload: any = this.loginForm.value;
 
-      setTimeout(() => {
-         this.isSubmitData = false;
-         this.router.navigateByUrl('home');
-      }, 2000);
-      // this.authService.login(payload).subscribe({
-      //    next: (res: any) => {
-      //       this.isSubmitData = false;
-      //       this.router.navigateByUrl('home');
-      //    },
-      //    error: (error: any) => {
-      //       this.isSubmitData = false;
-      //    },
-      //    complete: () => {}
-      // });
+      const { email, password } = this.loginForm.value;
+      const payload: any = {
+         email,
+         contrasena: password
+      };
+
+      this.authService.login(payload).subscribe({
+         next: (res: any) => {
+            this.isSubmitData = false;
+            this.router.navigateByUrl('home');
+         },
+         error: (error: any) => {
+            this.isSubmitData = false;
+         },
+         complete: () => {}
+      });
    }
 }

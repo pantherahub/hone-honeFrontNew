@@ -1,0 +1,40 @@
+.generalContainer {
+    height: auto;
+}
+
+.container-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 200px);
+    width: 100%;
+    gap: 2rem;
+    justify-content: center;
+}
+
+.custom-file-upload {
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    // justify-content: center;
+
+    img {
+        width: 50px;
+        align-self: center;
+    }
+}
+
+::ng-deep {
+
+    .ant-card-body {
+        background: #7CB305;
+        color: #fff;
+    }
+}
+
+@media only screen and (max-width: 524px) {
+    .container-grid {
+        grid-template-columns: repeat(auto-fill, 45%);
+        gap: 1rem;
+    }
+}
+

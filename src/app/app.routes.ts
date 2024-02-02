@@ -3,12 +3,18 @@ import { HomeComponent } from './modules/private/home/home.component';
 import { LoginComponent } from './modules/public/login/login.component';
 import { authGuard } from './guards/auth.guard';
 import { PageNotFoundComponent } from './modules/public/page-not-found/page-not-found.component';
+import { ListDocumentsComponent } from './modules/private/documents/list-documents/list-documents.component';
 
 export const routes: Routes = [
    //   PRIVATE ROUTES
    {
       path: 'home',
       component: HomeComponent,
+      canActivate: [ authGuard ]
+   },
+   {
+      path: 'cargar-documentos/:id',
+      component: ListDocumentsComponent,
       canActivate: [ authGuard ]
    },
    //   PUBLIC ROUTES

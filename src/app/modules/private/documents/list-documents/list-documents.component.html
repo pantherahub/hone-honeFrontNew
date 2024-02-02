@@ -1,0 +1,115 @@
+<div class="layout">
+
+    <header>
+        <div class="container">
+            <div class="user-data">
+                <span>{{clientSelected.razonSocial ? clientSelected.razonSocial : ''}}</span>
+                <span>{{clientSelected.typeProvider ? clientSelected.typeProvider : ''}}</span>
+                <span>Cedula: {{clientSelected.identificacion ? clientSelected.identificacion : ''}}</span>
+            </div>
+            <div class="logo">
+                <img src="../../../../../assets/img/logo-hone.png" alt="Logo">
+            </div>
+        </div>
+    </header>
+
+    <section id="download-documents">
+        <div class="download-documents" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
+
+            <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
+                Documentos obligatorios a diligenciar
+            </h2>
+
+            <div nz-col>
+                <button nz-button nzType="primary" class="btn-primary ml-3" [disabled]="false" nzJustify="center"
+                    nzAlign="middle" (click)="downloadDocuments()" [nzLoading]="loadBtnDownload">
+                    Descargar
+                </button>
+            </div>
+
+        </div>
+    </section>
+
+    @if (loadingData) {
+    <div class="centerContent">
+        <nz-spin nzSimple [nzSize]="'large'" nzTip="Cargando datos..."></nz-spin>
+    </div>
+    }
+    @if (!loadingData) {
+    <section class="custom-tabs">
+        <nz-tabset nzCentered (nzSelectChange)="tabChange([$event])">
+            <nz-tab [nzTitle]="templateWarning">
+                <ng-template #templateWarning>
+                    <section class="title-tabs" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[24,32]">
+                        <nz-progress nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
+                            [nzPercent]="percentData.remaining" nzType="circle"
+                            [nzStrokeColor]="'#FFA940'"></nz-progress>
+                        <button nz-col nz-button nzType="primary" class="btn-warning ml-3" [disabled]="false"
+                            nzJustify="center" nzAlign="middle">
+                            Documentos Por Cargar
+                        </button>
+                    </section>
+                </ng-template>
+                <ng-template nz-tab>
+                    <app-remaining-documents></app-remaining-documents>
+                </ng-template>
+            </nz-tab>
+
+            <nz-tab [nzTitle]="templateSuccess">
+                <ng-template #templateSuccess>
+                    <section class="title-tabs" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[24,32]">
+
+                        <nz-progress nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
+                            [nzPercent]="percentData.uploaded" nzType="circle"
+                            [nzStrokeColor]="'#5B8C00'"></nz-progress>
+
+                        <button nz-col nz-button nzType="primary" class="btn-success ml-3" [disabled]="false"
+                            nzJustify="center" nzAlign="middle">
+                            Documentos Cargados
+                        </button>
+                    </section>
+                </ng-template>
+                <ng-template nz-tab>
+                    <app-uploaded-documents></app-uploaded-documents>
+                </ng-template>
+            </nz-tab>
+
+            <nz-tab [nzTitle]="templateDanger">
+                <ng-template #templateDanger>
+                    <section class="title-tabs" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[24,32]">
+
+                        <nz-progress nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
+                            [nzPercent]="percentData.expired" nzType="circle" [nzStrokeColor]="'#D4380D'"></nz-progress>
+
+                        <button nz-col nz-button nzType="primary" class="btn-danger ml-3" [disabled]="false"
+                            nzJustify="center" nzAlign="middle">
+                            Documentos Vencidos
+                        </button>
+                    </section>
+                </ng-template>
+                <ng-template nz-tab>
+                    <app-expired-documents></app-expired-documents>
+                </ng-template>
+            </nz-tab>
+        </nz-tabset>
+    </section>
+    }
+
+    <section id="download-documents">
+        <div class="download-documents" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
+
+            <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
+                Deseas agregar documentos a otra empresa afiliada
+            </h2>
+
+            <div nz-col>
+                <button nz-button nzType="primary" class="btn-primary ml-3" [disabled]="false" nzJustify="center"
+                    nzAlign="middle" (click)="navigateHome()">
+                    Agregar
+                </button>
+            </div>
+
+        </div>
+    </section>
+
+</div>

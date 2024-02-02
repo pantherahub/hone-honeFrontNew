@@ -5,23 +5,27 @@ import { environment } from '../../environments/environment.development';
 
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { EventManagerService } from './events-manager/event-manager.service';
 
 @Injectable({
    providedIn: 'root'
 })
 export class AuthService {
    public url = environment.url;
-   // private token: string = ''; descomentar esta linea y eliminar linea 16
-   private token: string = 'pruebatoken';
+   private token: string = ''; // descomentar esta linea y eliminar linea 16
 
-   constructor (private httpClient: HttpClient, private router: Router) {}
+   constructor (
+      private httpClient: HttpClient,
+      private router: Router,
+      private eventManagerService: EventManagerService
+   ) {}
 
    // Llama al api para iniciar sesión y solo se debe usar en el LoginComponent
    public login (user: any): Observable<any> {
-      return this.httpClient.post(`${this.url}auth/login/`, user).pipe(
+      return this.httpClient.post(`${this.url}login`, user).pipe(
          map((resp: any) => {
-            this.saveToken(resp.token, resp.expiresIn);
-            this.saveUserLogged(resp.user);
+            this.saveToken(resp.token, resp.expir);
+            this.saveUserLogged(resp.usuario);
             return resp;
          })
       );
@@ -45,7 +49,7 @@ export class AuthService {
          name: user.name,
          email: user.email
       };
-      localStorage.setItem('userLogged', JSON.stringify(userLogged));
+      localStorage.setItem('userLogged', JSON.stringify(user));
    }
 
    // obtiene en token del local storage para validarlo
@@ -60,22 +64,23 @@ export class AuthService {
 
    // Esta funcion valida fecha de expiracion del token, para dar acceso al sistema
    public isAuthenticated (): boolean {
-      return this.token.length > 0; // Eliminas esta linea y descomentar todas las de abajo
+      // return this.token.length > 0; // Eliminas esta linea y descomentar todas las de abajo
 
-      // this.getStorageToken();
-      // if (localStorage.getItem('token') && localStorage.getItem('expire')) {
-      //    let res: boolean = true;
-      //    const expirationDate = localStorage.getItem('expire')!;
-      //    const today = new Date();
-      //    const expiration = new Date(expirationDate.toString());
-      //    if (today > expiration) {
-      //       res = false;
-      //       return res;
-      //    }
-      //    return res;
-      // } else {
-      //    return false;
-      // }
+      this.getStorageToken();
+
+      if (localStorage.getItem('token') && localStorage.getItem('expire')) {
+         let res: boolean = true;
+         const expirationDate = localStorage.getItem('expire')!;
+         const today = new Date();
+         const expiration = new Date(expirationDate.toString());
+         if (today > expiration) {
+            res = false;
+            return res;
+         }
+         return res;
+      } else {
+         return false;
+      }
    }
 
    // Llamar esta funcion en cualquier lado, para limpiar cache y cerrar sesión

@@ -1,0 +1,36 @@
+<div class="generalContainer">
+
+
+    @if (loadingData) {
+    <div class="centerContent">
+        <nz-spin nzSimple [nzSize]="'large'" nzTip="Cargando datos..."></nz-spin>
+    </div>
+    } @else {
+    @if (!loadingData && documentList.length > 0) {
+
+
+    <div class="container-grid">
+
+        @for (item of documentList; track $index) {
+        <label id="upload" class="custom-file-upload btn rounded">
+            <input type="file" name="file" id="upload-file" accept=".pdf,.png, .jpeg, .jpg" class="custom-file-input"
+                (change)="loadFiles($event, item)" hidden>
+            <img src="../../../../../assets/img/warning.png" alt="" srcset="">
+            {{item.NameDocument}}
+        </label>
+        }
+    </div>
+    } @else{
+
+
+    <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
+
+        <h2 nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24">
+            No hay Documentos
+        </h2>
+    </div>
+    }
+    }
+
+
+</div>

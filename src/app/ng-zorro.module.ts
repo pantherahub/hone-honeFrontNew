@@ -11,7 +11,7 @@ import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzMessageModule } from 'ng-zorro-antd/message';
 import { NzNotificationModule } from 'ng-zorro-antd/notification';
-import { NzImageModule } from "ng-zorro-antd/image";
+import { NzImageModule } from 'ng-zorro-antd/image';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzCascaderModule } from 'ng-zorro-antd/cascader';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
@@ -36,65 +36,64 @@ import { NzAnchorModule } from 'ng-zorro-antd/anchor';
 import { NzStatisticModule } from 'ng-zorro-antd/statistic';
 import { NzListModule } from 'ng-zorro-antd/list';
 import { NzTimelineModule } from 'ng-zorro-antd/timeline';
-import { NzToolTipModule } from 'ng-zorro-antd/tooltip'
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NzPaginationModule } from 'ng-zorro-antd/pagination';
 import { NzCalendarModule } from 'ng-zorro-antd/calendar';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
-
+import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzBadgeModule } from 'ng-zorro-antd/badge';
 
 @NgModule({
-  declarations: [],
-  imports: [
-    CommonModule,
-  ],
-  exports: [
-    NzButtonModule,
-    NzCheckboxModule,
-    NzFormModule,
-    NzI18nModule,
-    NzIconModule,
-    NzInputModule,
-    NzInputNumberModule,
-    NzLayoutModule,
-    NzMessageModule,
-    NzNotificationModule,
-    NzImageModule,
-    NzMenuModule,
-    NzSelectModule,
-    NzCascaderModule,
-    NzDatePickerModule,
-    NzTypographyModule,
-    NzDropDownModule,
-    NzDividerModule,
-    NzTagModule,
-    NzSwitchModule,
-    NzPopoverModule,
-    NzCardModule,
-    NzAvatarModule,
-    NzAlertModule,
-    NzUploadModule,
-    NzSpinModule,
-    NzModalModule,
-    NzRadioModule,
-    NzTableModule,
-    NzSkeletonModule,
-    NzEmptyModule,
-    NzPopconfirmModule,
-    NzAnchorModule,
-    NzStatisticModule,
-    NzListModule,
-    NzTimelineModule,
-    NzToolTipModule,
-    FormsModule,
-    ReactiveFormsModule,
-    NzPaginationModule,
-    NzCalendarModule,
-    NzTabsModule,
-    NzCollapseModule,
-    NzBadgeModule
-  ]
+   declarations: [],
+   imports: [ CommonModule ],
+   exports: [
+      NzButtonModule,
+      NzCheckboxModule,
+      NzFormModule,
+      NzI18nModule,
+      NzIconModule,
+      NzInputModule,
+      NzInputNumberModule,
+      NzLayoutModule,
+      NzMessageModule,
+      NzNotificationModule,
+      NzImageModule,
+      NzMenuModule,
+      NzSelectModule,
+      NzCascaderModule,
+      NzDatePickerModule,
+      NzTypographyModule,
+      NzDropDownModule,
+      NzDividerModule,
+      NzTagModule,
+      NzSwitchModule,
+      NzPopoverModule,
+      NzCardModule,
+      NzAvatarModule,
+      NzAlertModule,
+      NzUploadModule,
+      NzSpinModule,
+      NzModalModule,
+      NzRadioModule,
+      NzTableModule,
+      NzSkeletonModule,
+      NzEmptyModule,
+      NzPopconfirmModule,
+      NzAnchorModule,
+      NzStatisticModule,
+      NzListModule,
+      NzTimelineModule,
+      NzToolTipModule,
+      FormsModule,
+      ReactiveFormsModule,
+      NzPaginationModule,
+      NzCalendarModule,
+      NzTabsModule,
+      NzCollapseModule,
+      NzBadgeModule,
+      NzProgressModule
+   ]
 })
-export class NgZorroModule { }
+export class NgZorroModule {}

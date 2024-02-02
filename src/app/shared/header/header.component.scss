@@ -1,0 +1,17 @@
+.container {
+    background: rgba(0, 21, 41, 1);
+    color: #fff;
+    height: 80px;
+}
+
+.user-section {
+    display: flex;
+    gap: 1rem;
+    justify-content: end;
+    width: 100%;
+}
+
+.row {
+    margin: 0 !important;
+    height: 100%;
+}

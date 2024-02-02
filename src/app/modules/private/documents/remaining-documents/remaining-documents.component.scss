@@ -1,0 +1,38 @@
+.generalContainer {
+    height: auto;
+}
+
+.container-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 200px);
+    width: 100%;
+    gap: 2rem;
+    justify-content: center;
+    grid-auto-rows: 200px;
+}
+
+.custom-file-upload {
+    border: 1px solid #D9D9D9;
+    background: #FAFAFA;
+    padding: 1rem;
+    width: 100%;
+    cursor: pointer;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: #00000073;
+    
+    img {
+        width: 50px;
+        align-self: center;    
+    }
+}
+
+@media only screen and (max-width: 524px) {
+    .container-grid {
+        grid-template-columns: repeat(auto-fill, 45%);
+        gap: 1rem;
+        grid-auto-rows: 150px;
+    }
+}
