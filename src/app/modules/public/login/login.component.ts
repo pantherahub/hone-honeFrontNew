@@ -30,9 +30,7 @@ export class LoginComponent implements OnInit {
       this.createForm();
    }
 
-   ngOnInit (): void {
-      // this.authService.logout();
-   }
+   ngOnInit (): void {}
 
    //  Crea e Inicializa el formulario
    createForm () {

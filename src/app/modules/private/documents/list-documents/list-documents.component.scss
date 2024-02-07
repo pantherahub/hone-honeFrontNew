@@ -43,9 +43,15 @@
 .download-documents {
     width: 80%;
     margin: 3rem auto !important;
-    padding: 1rem;
-
+    // padding: 1rem;
+    height: 70px;
     -webkit-box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.45);
     -moz-box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.45);
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.45);
+}
+
+.custom-btn {
+    background-color: #1890FF;
+    border-color: #1890FF;
+    border-radius: 5px;
 }

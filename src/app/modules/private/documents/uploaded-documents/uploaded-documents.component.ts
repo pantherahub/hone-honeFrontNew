@@ -8,6 +8,7 @@ import { NzModalService } from 'ng-zorro-antd/modal';
 import { PipesModule } from '../../../../pipes/pipes.module';
 
 import { PdfViewerModule } from 'ng2-pdf-viewer';
+import { ModalEditDocumentComponent } from '../modal-edit-document/modal-edit-document.component';
 
 @Component({
    selector: 'app-uploaded-documents',
@@ -165,5 +166,36 @@ export class UploadedDocumentsComponent implements OnInit {
    resetValues () {
       this.currentItem = {};
       this.previewFile = '';
+   }
+
+   /**
+    * Abre una ventana modal para las confirmaciones de peticion
+    * @param message - recibe el mensaje que se mostrará en pantalla
+    * @param documentType - recibe el tipo de documento que desea editar
+    */
+   editDocumentModal (message: string, documentType: any): void {
+      const modal = this.modalService.create<ModalEditDocumentComponent, any>({
+         nzContent: ModalEditDocumentComponent,
+         nzCentered: true,
+         nzClosable: true,
+         // nzData: {
+         //    labelReturnButton: 'Entendido',
+         //    labelRedirectButton,
+         //    labelRedirectButton2
+         // },
+         nzFooter: null
+      });
+      const instance = modal.getContentComponent();
+
+      instance.message = message;
+      instance.documentType = documentType;
+
+      // Return a result when opened
+      modal.afterOpen.subscribe(() => {});
+      // Return a result when closed
+      modal.afterClose.subscribe((result: any) => {
+         if (result) {
+         }
+      });
    }
 }

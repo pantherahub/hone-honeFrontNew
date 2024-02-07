@@ -1,0 +1,83 @@
+<section class="container-form">
+
+
+    <section class="form-section">
+
+
+        <form nz-form [formGroup]="documentForm" class="form-login">
+
+            <!-- Campo Usuario / email -->
+            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24">
+                <nz-form-item nz-row>
+                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
+                        [nzXl]="24">
+                        dato 1
+                    </nz-form-label>
+
+                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
+                        [nzErrorTip]="emailErrorTip">
+                        <ng-template #emailErrorTip>
+                            <p *ngIf="documentForm.controls['email'].hasError('required')">¡El usuario es
+                                obligatorio!
+                            </p>
+                        </ng-template>
+                        <input nz-input placeholder="" formControlName="email">
+                    </nz-form-control>
+
+                </nz-form-item>
+            </div>
+
+            <!-- Campo contraseña -->
+            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24">
+                <nz-form-item nz-row>
+                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
+                        [nzXl]="24">
+                        dato 2
+                    </nz-form-label>
+
+                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
+                        [nzErrorTip]="emailErrorTip">
+                        <ng-template #emailErrorTip>
+                            <p *ngIf="documentForm.controls['email'].hasError('required')">¡El usuario es
+                                obligatorio!
+                            </p>
+                        </ng-template>
+                        <input nz-input placeholder="" formControlName="email">
+                    </nz-form-control>
+
+
+
+                </nz-form-item>
+            </div>
+
+
+            <!-- Campo documento -->
+            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24">
+                <!-- <div class="row-doc">
+                    <img src="../../../../../assets/img/folder.png" alt="" srcset="">
+                    <span>Clic para cargar</span>
+                </div> -->
+                <span *ngIf="loadFile">{{loadedFile ? loadedFile.name : ''}}</span>
+                <label id="upload" class="row-doc btn rounded">
+                    <input type="file" name="file" id="upload-file" accept=".pdf,.png, .jpeg, .jpg"
+                        class="custom-file-input" (change)="loadFile($event)" hidden>
+                    <img src="../../../../../assets/img/folder.png" alt="" srcset="">
+                    Clic para cargar
+                </label>
+            </div>
+
+            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
+                style="text-align: center; margin-top: 3rem;">
+                <button nz-button nzType="primary" class="btn-primary custom-btn ml-3" [disabled]="false"
+                    [nzLoading]="loader" (click)="submitRequest()" nz-popover nzPopoverTitle="" nzJustify="center"
+                    nzAlign="middle" [nzPopoverContent]="enablePopoverMessage">
+                    <ng-template #enablePopoverMessage>
+                        <span>Haga clic para guardar los datos</span>
+                    </ng-template>
+                    Actualizar
+                </button>
+            </div>
+
+        </form>
+    </section>
+</section>
