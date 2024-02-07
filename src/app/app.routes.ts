@@ -1,9 +1,10 @@
-import { Routes } from '@angular/router';
+import { Routes, RouterModule } from '@angular/router';
 import { HomeComponent } from './modules/private/home/home.component';
 import { LoginComponent } from './modules/public/login/login.component';
 import { authGuard } from './guards/auth.guard';
 import { PageNotFoundComponent } from './modules/public/page-not-found/page-not-found.component';
 import { ListDocumentsComponent } from './modules/private/documents/list-documents/list-documents.component';
+import { NgModule } from '@angular/core';
 
 export const routes: Routes = [
    //   PRIVATE ROUTES
@@ -36,5 +37,19 @@ export const routes: Routes = [
       path: '**',
       pathMatch: 'full',
       redirectTo: 'page-not-found'
-   },
+   }
 ];
+
+@NgModule({
+   imports: [
+      RouterModule.forRoot(routes, {
+         useHash: true,
+         /* Activa las anclas en angular */
+         anchorScrolling: 'enabled',
+         /* Restaura el scroll a la posición inicial */
+         scrollPositionRestoration: 'enabled'
+      })
+   ],
+   exports: [ RouterModule ]
+})
+export class AppRoutingModule {}
