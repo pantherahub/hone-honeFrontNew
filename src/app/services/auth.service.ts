@@ -89,6 +89,7 @@ export class AuthService {
       localStorage.removeItem('expire');
       localStorage.removeItem('userLogged');
       localStorage.clear();
+      this.eventManagerService.showMenu.set(false);
       this.router.navigateByUrl('login');
    }
 }

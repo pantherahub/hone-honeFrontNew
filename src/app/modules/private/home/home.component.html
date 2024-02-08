@@ -33,10 +33,13 @@
                 </div>
             </div> -->
 
-        <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="12" [nzLg]="12" class="gutter-row">
+        <div nz-col [nzXs]="24" [nzSm]="12" [nzMd]="12" [nzLg]="12" class="gutter-row">
             <div nz-row nzJustify="center" class="card-custom" (click)="changeOptionClient(item)">
-                <img nz-col src="../../../../assets/img/no-foto.png" alt="">
-                <span nz-col>{{item.clientHoneSolutions}}</span>
+                <img nz-col [src]="item.url ? item.url : defaultImageUrl" alt="">
+
+                <!-- @if (item.url.length <= 0) {  -->
+                <span nz-col>{{ item.url ? '' : item.clientHoneSolutions}}</span>
+                <!-- } -->
             </div>
         </div>
         }

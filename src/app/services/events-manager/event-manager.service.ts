@@ -8,7 +8,8 @@ export class EventManagerService {
    userLogged = signal<UserInterface>({});
    clientSelected = signal({});
 
-   getPercentApi = signal<boolean>(false)
+   getPercentApi = signal<boolean>(false);
+   showMenu = signal<boolean>(false);
 
    constructor () {}
 

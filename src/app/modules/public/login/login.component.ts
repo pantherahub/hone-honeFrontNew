@@ -25,7 +25,8 @@ export class LoginComponent implements OnInit {
       private authService: AuthService,
       public router: Router,
       private formBuilder: FormBuilder,
-      private messageService: NzMessageService
+      private messageService: NzMessageService,
+      private eventManager: EventManagerService
    ) {
       this.createForm();
    }
@@ -62,6 +63,7 @@ export class LoginComponent implements OnInit {
       this.authService.login(payload).subscribe({
          next: (res: any) => {
             this.isSubmitData = false;
+            this.eventManager.showMenu.set(true);
             this.router.navigateByUrl('home');
          },
          error: (error: any) => {

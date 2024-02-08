@@ -5,17 +5,20 @@ import { ClientProviderService } from '../../../services/clients/client-provider
 import { NgZorroModule } from '../../../ng-zorro.module';
 import { EventManagerService } from '../../../services/events-manager/event-manager.service';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
    selector: 'app-home',
    standalone: true,
-   imports: [ NgZorroModule ],
+   imports: [ NgZorroModule, CommonModule ],
    templateUrl: './home.component.html',
    styleUrl: './home.component.scss'
 })
 export class HomeComponent implements OnInit {
    clientList: ClientInterface[] = [];
    loadingData: boolean = false;
+
+   defaultImageUrl: string = '../../../../assets/img/no-foto.png';
 
    user = this.eventManager.userLogged();
 
