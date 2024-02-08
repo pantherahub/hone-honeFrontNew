@@ -19,6 +19,7 @@ import { NzUploadFile } from 'ng-zorro-antd/upload';
 export class RemainingDocumentsComponent implements OnInit {
    loading: boolean = false;
    clientSelected: any = this.eventManager.clientSelected();
+   counterApi: any = this.eventManager.getPercentApi();
    loadingData: boolean = false;
 
    documentList: DocumentInterface[] = [];
@@ -91,7 +92,7 @@ export class RemainingDocumentsComponent implements OnInit {
          next: (res: any) => {
             this.loadingData = false;
             this.getDocumentsToUpload();
-            this.eventManager.getPercentApi.set(true);
+            this.eventManager.getPercentApi.set(this.counterApi + 1);
          },
          error: (error: any) => {
             this.loadingData = false;

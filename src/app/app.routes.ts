@@ -5,17 +5,20 @@ import { authGuard } from './guards/auth.guard';
 import { PageNotFoundComponent } from './modules/public/page-not-found/page-not-found.component';
 import { ListDocumentsComponent } from './modules/private/documents/list-documents/list-documents.component';
 import { NgModule } from '@angular/core';
+import { AdminLayoutComponent } from './views/admin-layout/admin-layout.component';
 
 export const routes: Routes = [
    //   PRIVATE ROUTES
    {
       path: 'home',
-      component: HomeComponent,
+      component: AdminLayoutComponent,
+      children: [ { path: '', component: HomeComponent } ],
       canActivate: [ authGuard ]
    },
    {
       path: 'cargar-documentos/:id',
-      component: ListDocumentsComponent,
+      component: AdminLayoutComponent,
+      children: [ { path: '', component: ListDocumentsComponent } ],
       canActivate: [ authGuard ]
    },
    //   PUBLIC ROUTES

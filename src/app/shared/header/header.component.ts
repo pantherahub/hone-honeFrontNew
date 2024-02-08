@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, effect } from '@angular/core';
 
 import { NgZorroModule } from '../../ng-zorro.module';
 import { EventManagerService } from '../../services/events-manager/event-manager.service';
@@ -17,12 +17,16 @@ export class HeaderComponent implements OnInit {
    public user = this.eventManager.userLogged();
    visible: boolean = false;
 
-   constructor () {}
+   constructor () {
+      // effect(() => {
+      //    this.user = this.eventManager.userLogged();
+      // });
+   }
 
    ngOnInit (): void {}
 
    /**
-    * Hace visible el menú 
+    * Hace visible el menú
     */
    clickMe (): void {
       this.visible = false;

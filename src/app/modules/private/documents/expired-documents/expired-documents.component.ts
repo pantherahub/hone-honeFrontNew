@@ -18,6 +18,7 @@ import { NzModalService } from 'ng-zorro-antd/modal';
 export class ExpiredDocumentsComponent implements OnInit {
    loading: boolean = false;
    clientSelected: any = this.eventManager.clientSelected();
+   counterApi: any = this.eventManager.getPercentApi();
    loadingData: boolean = false;
    previewVisible: boolean = false;
    isImage: boolean = false;
@@ -99,7 +100,6 @@ export class ExpiredDocumentsComponent implements OnInit {
          next: (res: any) => {
             this.loadingData = false;
             this.getExpiredDocuments();
-            this.eventManager.getPercentApi.set(true);
          },
          error: (error: any) => {
             this.loadingData = false;
@@ -127,7 +127,7 @@ export class ExpiredDocumentsComponent implements OnInit {
                next: (res: any) => {
                   this.loadingData = false;
                   this.getExpiredDocuments();
-                  this.eventManager.getPercentApi.set(true);
+                  this.eventManager.getPercentApi.set(this.counterApi + 1);
                },
                error: (error: any) => {
                   this.loadingData = false;

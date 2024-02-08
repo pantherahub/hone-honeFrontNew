@@ -14,11 +14,7 @@ export class AuthService {
    public url = environment.url;
    private token: string = ''; // descomentar esta linea y eliminar linea 16
 
-   constructor (
-      private httpClient: HttpClient,
-      private router: Router,
-      private eventManagerService: EventManagerService
-   ) {}
+   constructor (private httpClient: HttpClient, private router: Router, private eventManager: EventManagerService) {}
 
    // Llama al api para iniciar sesión y solo se debe usar en el LoginComponent
    public login (user: any): Observable<any> {
@@ -44,12 +40,15 @@ export class AuthService {
 
    // Guarda en storage los datos del usuario logueado
    private saveUserLogged (user: any) {
+      localStorage.removeItem('userLogged');
       const userLogged: any = {
          id: user.id,
          name: user.name,
          email: user.email
       };
       localStorage.setItem('userLogged', JSON.stringify(user));
+
+      this.eventManager.userLogged.set(user);
    }
 
    // obtiene en token del local storage para validarlo
@@ -89,7 +88,6 @@ export class AuthService {
       localStorage.removeItem('expire');
       localStorage.removeItem('userLogged');
       localStorage.clear();
-      this.eventManagerService.showMenu.set(false);
       this.router.navigateByUrl('login');
    }
 }

@@ -24,26 +24,24 @@
     }
 
     @if (!loadingData) {
-    <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[24,32]">
+    <div class="container-grid">
         @for (item of clientList; track $index) {
-        <!-- <div nz-col class="gutter-row">
-                <div class="card-custom" routerLink="/home/dias-libres/vacaciones">
-                    <img src="../../../../assets/img/no-foto.png" alt="">
-                    <span>{{item.clientHoneSolutions}}</span>
-                </div>
-            </div> -->
-
-        <div nz-col [nzXs]="24" [nzSm]="12" [nzMd]="12" [nzLg]="12" class="gutter-row">
-            <div nz-row nzJustify="center" class="card-custom" (click)="changeOptionClient(item)">
-                <img nz-col [src]="item.url ? item.url : defaultImageUrl" alt="">
-
-                <!-- @if (item.url.length <= 0) {  -->
-                <span nz-col>{{ item.url ? '' : item.clientHoneSolutions}}</span>
-                <!-- } -->
-            </div>
+        <div class="card-custom" (click)="changeOptionClient(item)">
+            <img [src]="item.url ? item.url : defaultImageUrl" alt="">
+            <span>{{ item.url ? '' : item.clientHoneSolutions}}</span>
         </div>
         }
     </div>
+    <!-- <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[24,32]">
+        @for (item of clientList; track $index) {
+        <div nz-col [nzXs]="24" [nzSm]="12" [nzMd]="12" [nzLg]="12" class="gutter-row">
+            <div nz-row nzJustify="center" class="card-custom" (click)="changeOptionClient(item)">
+                <img nz-col [src]="item.url ? item.url : defaultImageUrl" alt="">
+                <span nz-col>{{ item.url ? '' : item.clientHoneSolutions}}</span>
+            </div>
+        </div>
+        }
+    </div> -->
     }
 
 

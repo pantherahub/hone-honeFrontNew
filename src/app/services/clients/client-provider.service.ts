@@ -14,7 +14,7 @@ export class ClientProviderService {
    constructor (private httpClient: HttpClient, private router: Router) {}
 
    // Llama al api para obtener lista de clientes por id prestador
-   public getClientListByProviderId (idProvider: number): Observable<ClientInterface> {
+   public getClientListByProviderId (idProvider: any): Observable<ClientInterface> {
       return this.httpClient.get(`${this.url}getHoneProvider/${idProvider}`);
    }
 }

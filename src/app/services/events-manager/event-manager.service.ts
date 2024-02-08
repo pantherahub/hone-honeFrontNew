@@ -7,9 +7,7 @@ import { UserInterface } from '../../models/user.interface';
 export class EventManagerService {
    userLogged = signal<UserInterface>({});
    clientSelected = signal({});
-
-   getPercentApi = signal<boolean>(false);
-   showMenu = signal<boolean>(false);
+   getPercentApi = signal<number>(0);
 
    constructor () {}
 

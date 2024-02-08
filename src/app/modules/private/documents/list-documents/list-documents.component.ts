@@ -29,7 +29,7 @@ export class ListDocumentsComponent implements OnInit {
       private router: Router
    ) {
       effect(() => {
-         this.callApi = this.eventManager.getPercentApi();
+         this.callApi = this.eventManager.getPercentApi();         
          if (this.callApi) {
             this.getDocumentPercent();
          }
@@ -52,7 +52,7 @@ export class ListDocumentsComponent implements OnInit {
     * Obtiene desde un api el porcentaje de documentos cargado, sin cargas y vencidos
     */
    getDocumentPercent () {
-      this.loadingData = false;
+      this.loadingData = true;
       const { idProvider, idTypeProvider, idClientHoneSolutions } = this.clientSelected;
       this.documentService.getPercentDocuments(idProvider, idTypeProvider, idClientHoneSolutions).subscribe({
          next: (res: any) => {

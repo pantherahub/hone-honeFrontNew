@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, effect } from '@angular/core';
 import { ClientInterface } from '../../../models/client.interface';
 import { ClientProviderService } from '../../../services/clients/client-provider.service';
 
@@ -28,6 +28,7 @@ export class HomeComponent implements OnInit {
       private router: Router
    ) {
       localStorage.removeItem('clientSelected');
+      this.eventManager.clientSelected.set({});
    }
 
    ngOnInit (): void {
@@ -39,7 +40,7 @@ export class HomeComponent implements OnInit {
     */
    getClientList () {
       this.loadingData = true;
-      this.clientService.getClientListByProviderId(5926).subscribe({
+      this.clientService.getClientListByProviderId(this.user.id).subscribe({
          next: (res: any) => {
             console.log(res);
             this.clientList = res;
@@ -56,7 +57,6 @@ export class HomeComponent implements OnInit {
     * Redirecciona a la lista de documentos por cargar del cliente seleccionado
     */
    changeOptionClient (item: any) {
-      console.log(item);
       localStorage.setItem('clientSelected', JSON.stringify(item));
       this.eventManager.getDataClient();
       this.router.navigateByUrl(`/cargar-documentos/${item.idClientHoneSolutions}`);

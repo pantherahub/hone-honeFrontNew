@@ -6,7 +6,6 @@ import { Router } from '@angular/router';
 
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { EventManagerService } from '../../../services/events-manager/event-manager.service';
 
 @Component({
    selector: 'app-login',
@@ -25,8 +24,7 @@ export class LoginComponent implements OnInit {
       private authService: AuthService,
       public router: Router,
       private formBuilder: FormBuilder,
-      private messageService: NzMessageService,
-      private eventManager: EventManagerService
+      private messageService: NzMessageService
    ) {
       this.createForm();
    }
@@ -63,7 +61,6 @@ export class LoginComponent implements OnInit {
       this.authService.login(payload).subscribe({
          next: (res: any) => {
             this.isSubmitData = false;
-            this.eventManager.showMenu.set(true);
             this.router.navigateByUrl('home');
          },
          error: (error: any) => {

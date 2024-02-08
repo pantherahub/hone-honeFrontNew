@@ -20,6 +20,8 @@ import { ModalEditDocumentComponent } from '../modal-edit-document/modal-edit-do
 export class UploadedDocumentsComponent implements OnInit {
    loading: boolean = false;
    clientSelected: any = this.eventManager.clientSelected();
+   counterApi: any = this.eventManager.getPercentApi();
+
    loadingData: boolean = false;
    previewVisible: boolean = false;
    isImage: boolean = false;
@@ -100,7 +102,6 @@ export class UploadedDocumentsComponent implements OnInit {
          next: (res: any) => {
             this.loadingData = false;
             this.getUploadedDocuments();
-            this.eventManager.getPercentApi.set(true);
          },
          error: (error: any) => {
             this.loadingData = false;
@@ -127,7 +128,7 @@ export class UploadedDocumentsComponent implements OnInit {
                next: (res: any) => {
                   this.loadingData = false;
                   this.getUploadedDocuments();
-                  this.eventManager.getPercentApi.set(true);
+                  this.eventManager.getPercentApi.set(this.counterApi + 1);
                },
                error: (error: any) => {
                   this.loadingData = false;
