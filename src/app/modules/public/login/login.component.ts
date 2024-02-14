@@ -5,7 +5,7 @@ import { AuthService } from '../../../services/auth.service';
 import { Router } from '@angular/router';
 
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
-import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 
 @Component({
    selector: 'app-login',
@@ -24,7 +24,7 @@ export class LoginComponent implements OnInit {
       private authService: AuthService,
       public router: Router,
       private formBuilder: FormBuilder,
-      private messageService: NzMessageService
+      private notificationService: NzNotificationService
    ) {
       this.createForm();
    }
@@ -65,8 +65,19 @@ export class LoginComponent implements OnInit {
          },
          error: (error: any) => {
             this.isSubmitData = false;
+            this.createNotificacion('error', 'Error', 'Lo sentimos, hubo un error en el servidor.')
          },
          complete: () => {}
       });
+   }
+
+   /**
+    * Crea una notificacion de alerta
+    * @param type - string recibe el tipo de notificacion (error, success, warning, info)
+    * @param title - string recibe el titulo de la notificacion
+    * @param message - string recibe el mensaje de la notificacion
+    */
+   createNotificacion (type: string, title: string, message: string) {
+      this.notificationService.create(type, title, message);
    }
 }

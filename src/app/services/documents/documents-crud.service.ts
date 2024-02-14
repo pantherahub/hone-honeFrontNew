@@ -33,6 +33,10 @@ export class DocumentsCrudService {
 
    // Sube los documentos al servidor
    public uploadDocuments (idProvider: number, payload: any): Observable<any> {
+      const headers = {
+         'Content-Type': 'multipart/form-data',
+         accept: 'application/json'
+      };
       return this.httpClient.post(`${this.url}uploadsDocuments/${idProvider}`, payload);
    }
 

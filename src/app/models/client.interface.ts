@@ -1,7 +1,8 @@
 export interface ClientInterface {
    clientHoneSolutions?: string;
    idClientHoneSolutions?: number;
-   url?: null;
+   url?: string;
+   urlHeader?: string;
    idProvider?: number;
    identificacion?: string;
    razonSocial?: string;

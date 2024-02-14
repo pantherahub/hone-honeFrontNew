@@ -8,7 +8,9 @@
                 <span>Cedula: {{clientSelected.identificacion ? clientSelected.identificacion : ''}}</span>
             </div>
             <div class="logo">
-                <img src="../../../../../assets/img/logo-hone.png" alt="Logo">
+                <!-- <img src="../../../../../assets/img/logo-hone.png" alt="Logo"> -->
+                <img [src]="clientSelected ? clientSelected.urlHeader : '../../../../../assets/img/logo-hone.png' "
+                    alt="Logo">
             </div>
         </div>
     </header>
@@ -21,8 +23,8 @@
             </h2>
 
             <div nz-col>
-                <button nz-button nzType="primary" class="btn-primary custom-btn ml-3" [disabled]="false" nzJustify="center"
-                    nzAlign="middle" (click)="downloadDocuments()" [nzLoading]="loadBtnDownload">
+                <button nz-button nzType="primary" class="btn-primary custom-btn ml-3" [disabled]="false"
+                    nzJustify="center" nzAlign="middle" (click)="downloadDocuments()" [nzLoading]="loadBtnDownload">
                     Descargar
                 </button>
             </div>
@@ -103,13 +105,24 @@
             </h2>
 
             <div nz-col>
-                <button nz-button nzType="primary" class="btn-primary custom-btn ml-3" [disabled]="false" nzJustify="center"
-                    nzAlign="middle" (click)="navigateHome()">
+                <button nz-button nzType="primary" class="btn-primary custom-btn ml-3" [disabled]="false"
+                    nzJustify="center" nzAlign="middle" (click)="navigateHome()">
                     Agregar
                 </button>
             </div>
 
         </div>
     </section>
+
+    <div class="float-button">
+        <!-- <button nz-button nzType="primary" class="btn-primary custom-btn ml-3" [disabled]="false" nzJustify="center"
+            nzAlign="middle" (click)="openTicketModal()">
+            abrir
+        </button> -->
+
+        <div class="image-container" (click)="openTicketModal()">
+            <img src="../../../../../assets/img/support.png" alt="" srcset="">
+        </div>
+    </div>
 
 </div>

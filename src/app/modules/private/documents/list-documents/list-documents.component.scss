@@ -56,3 +56,32 @@
     border-color: #1890FF;
     border-radius: 5px;
 }
+
+.logo {
+    img {
+        max-width: 120px;
+    }
+}
+
+.float-button {
+    position: fixed;
+    bottom: 50px;
+    right: 25px;
+}
+
+.image-container {
+    border: 1px solid #00000066;
+    border-radius: 100%;
+    padding: 5px;
+
+    width: 80px;
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+
+    img {
+        width: 75%;
+        object-fit: contain;
+    }
+}

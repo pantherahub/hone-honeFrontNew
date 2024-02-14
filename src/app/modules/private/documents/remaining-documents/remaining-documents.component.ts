@@ -3,7 +3,7 @@ import { DocumentsCrudService } from '../../../../services/documents/documents-c
 import { DocumentInterface } from '../../../../models/client.interface';
 import { EventManagerService } from '../../../../services/events-manager/event-manager.service';
 import { NgZorroModule } from '../../../../ng-zorro.module';
-import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { Observable, Observer } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
@@ -24,7 +24,11 @@ export class RemainingDocumentsComponent implements OnInit {
 
    documentList: DocumentInterface[] = [];
 
-   constructor (private eventManager: EventManagerService, private documentService: DocumentsCrudService) {}
+   constructor (
+      private eventManager: EventManagerService,
+      private documentService: DocumentsCrudService,
+      private notificationService: NzNotificationService
+   ) {}
 
    ngOnInit (): void {
       this.getDocumentsToUpload();
@@ -38,7 +42,6 @@ export class RemainingDocumentsComponent implements OnInit {
       const { idProvider, idTypeProvider, idClientHoneSolutions } = this.clientSelected;
       this.documentService.getDocumentsToUpload(idProvider, idTypeProvider, idClientHoneSolutions).subscribe({
          next: (res: any) => {
-            console.log(res);
             this.documentList = res;
             this.loadingData = false;
          },
@@ -81,7 +84,7 @@ export class RemainingDocumentsComponent implements OnInit {
       const body = {
          posicion: 0,
          nombre: file.name,
-         documento: item.idDocument,
+         documento: item.idTypeDocuments,
          nombredcoumentos: item.NameDocument,
          fechavencimiento: today,
          idUser: idProvider
@@ -91,13 +94,25 @@ export class RemainingDocumentsComponent implements OnInit {
       this.documentService.uploadDocuments(idProvider, fileToUpload).subscribe({
          next: (res: any) => {
             this.loadingData = false;
+            this.createNotificacion('success', 'Carga exitosa', 'El documento se subió de manera satisfactoria');
             this.getDocumentsToUpload();
             this.eventManager.getPercentApi.set(this.counterApi + 1);
          },
          error: (error: any) => {
             this.loadingData = false;
+            this.createNotificacion('error', 'Error', 'Lo sentimos, hubo un error en el servidor.');
          },
          complete: () => {}
       });
+   }
+
+   /**
+    * Crea una notificacion de alerta
+    * @param type - string recibe el tipo de notificacion (error, success, warning, info)
+    * @param title - string recibe el titulo de la notificacion
+    * @param message - string recibe el mensaje de la notificacion
+    */
+   createNotificacion (type: string, title: string, message: string) {
+      this.notificationService.create(type, title, message);
    }
 }

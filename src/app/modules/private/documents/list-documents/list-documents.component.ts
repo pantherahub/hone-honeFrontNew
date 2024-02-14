@@ -7,6 +7,8 @@ import { RemainingDocumentsComponent } from '../remaining-documents/remaining-do
 import { ExpiredDocumentsComponent } from '../expired-documents/expired-documents.component';
 import { UploadedDocumentsComponent } from '../uploaded-documents/uploaded-documents.component';
 import { Router } from '@angular/router';
+import { ContactTicketComponent } from '../../../../shared/modals/contact-ticket/contact-ticket.component';
+import { NzModalService } from 'ng-zorro-antd/modal';
 
 @Component({
    selector: 'app-list-documents',
@@ -26,10 +28,11 @@ export class ListDocumentsComponent implements OnInit {
    constructor (
       private eventManager: EventManagerService,
       private documentService: DocumentsCrudService,
-      private router: Router
+      private router: Router,
+      private modalService: NzModalService
    ) {
       effect(() => {
-         this.callApi = this.eventManager.getPercentApi();         
+         this.callApi = this.eventManager.getPercentApi();
          if (this.callApi) {
             this.getDocumentPercent();
          }
@@ -111,5 +114,28 @@ export class ListDocumentsComponent implements OnInit {
 
    navigateHome () {
       this.router.navigateByUrl('/home');
+   }
+
+   /**
+    * Abre una ventana modal para solicitar ticket
+    */
+   openTicketModal (): void {
+      const modal = this.modalService.create<ContactTicketComponent, any>({
+         nzContent: ContactTicketComponent,
+         nzCentered: true,
+         nzClosable: true,
+         // nzFooter: null
+      });
+      const instance = modal.getContentComponent();
+
+      // instance.message = message;
+
+      // Return a result when opened
+      modal.afterOpen.subscribe(() => {});
+      // Return a result when closed
+      modal.afterClose.subscribe((result: any) => {
+         if (result) {
+         }
+      });
    }
 }
