@@ -13,6 +13,7 @@ import { environment } from '../../../../environments/environment';
    selector: 'app-login',
    standalone: true,
    imports: [ NgZorroModule, CommonModule, RecaptchaModule ],
+
    templateUrl: './login.component.html',
    styleUrl: './login.component.scss'
 })
@@ -20,9 +21,11 @@ export class LoginComponent implements OnInit {
    loader: boolean = false;
    isSubmitData: boolean = false;
    passwordVisible: boolean = false;
-   passValidation: boolean = false;
+   captchaValidation: boolean = false;
+   showError: boolean = false;
    siteKey = environment.PUBLIC_PASS_KEY;
    loginForm!: FormGroup;
+
    constructor (
       private authService: AuthService,
       public router: Router,
@@ -56,10 +59,11 @@ export class LoginComponent implements OnInit {
          return;
       }
 
-      if (environment.production && !this.passValidation) {
+      if (!this.captchaValidation) {
+         this.showError = true;
          return;
       }
-
+      this.showError = false;
       this.isSubmitData = true;
 
       const { email, password } = this.loginForm.value;
@@ -92,11 +96,13 @@ export class LoginComponent implements OnInit {
    }
 
    resolved (captchaResponse: any) {
-      this.passValidation = true;
-      console.log(`Resolved captcha with response: ${captchaResponse}`);
+      this.captchaValidation = true;
+      this.showError = false;
    }
 
    errored () {
+      this.captchaValidation = false;
+      this.showError = true;
       console.warn(`reCAPTCHA error encountered`);
    }
 }
