@@ -1,7 +1,7 @@
 export const environment = {
    production: false,
-   // url: 'https://backpruebashone.azurewebsites.net/api/',
-   url: 'https://honesolutionsbackproduction.azurewebsites.net/api/',
+   url: 'https://backpruebashone.azurewebsites.net/api/',
+   // url: 'https://honesolutionsbackproduction.azurewebsites.net/api/',
    PASS_ENC: '123456',
 
    PUBLIC_PASS_KEY:'6LfAw3opAAAAAJc3UghB3C04qOh2MeFC3WOKWOOK',

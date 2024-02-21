@@ -21,7 +21,7 @@ export class LoginComponent implements OnInit {
    isSubmitData: boolean = false;
    passwordVisible: boolean = false;
    passValidation: boolean = false;
-   siteKey = environment.PUBLIC_PASS_KEY || '';
+   siteKey = environment.PUBLIC_PASS_KEY;
    loginForm!: FormGroup;
    constructor (
       private authService: AuthService,
