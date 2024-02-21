@@ -6,11 +6,13 @@ import { Router } from '@angular/router';
 
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { RecaptchaModule } from 'ng-recaptcha';
+import { environment } from '../../../../environments/environment';
 
 @Component({
    selector: 'app-login',
    standalone: true,
-   imports: [ NgZorroModule, CommonModule ],
+   imports: [ NgZorroModule, CommonModule, RecaptchaModule ],
    templateUrl: './login.component.html',
    styleUrl: './login.component.scss'
 })
@@ -18,7 +20,8 @@ export class LoginComponent implements OnInit {
    loader: boolean = false;
    isSubmitData: boolean = false;
    passwordVisible: boolean = false;
-
+   passValidation: boolean = false;
+   siteKey = environment.PUBLIC_PASS_KEY || '';
    loginForm!: FormGroup;
    constructor (
       private authService: AuthService,
@@ -29,7 +32,9 @@ export class LoginComponent implements OnInit {
       this.createForm();
    }
 
-   ngOnInit (): void {}
+   ngOnInit (): void {
+      console.log('environment prod: ', environment.production);
+   }
 
    //  Crea e Inicializa el formulario
    createForm () {
@@ -50,6 +55,11 @@ export class LoginComponent implements OnInit {
          });
          return;
       }
+
+      if (environment.production && !this.passValidation) {
+         return;
+      }
+
       this.isSubmitData = true;
 
       const { email, password } = this.loginForm.value;
@@ -65,7 +75,7 @@ export class LoginComponent implements OnInit {
          },
          error: (error: any) => {
             this.isSubmitData = false;
-            this.createNotificacion('error', 'Error', 'Lo sentimos, hubo un error en el servidor.')
+            this.createNotificacion('error', 'Error', 'Lo sentimos, hubo un error en el servidor.');
          },
          complete: () => {}
       });
@@ -79,5 +89,14 @@ export class LoginComponent implements OnInit {
     */
    createNotificacion (type: string, title: string, message: string) {
       this.notificationService.create(type, title, message);
+   }
+
+   resolved (captchaResponse: any) {
+      this.passValidation = true;
+      console.log(`Resolved captcha with response: ${captchaResponse}`);
+   }
+
+   errored () {
+      console.warn(`reCAPTCHA error encountered`);
    }
 }

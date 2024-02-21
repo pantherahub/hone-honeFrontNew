@@ -1,112 +1,118 @@
-
 <nz-layout style="height: 100%;">
 
-<header>
-    <div class="container">
-        <div class="logo">
-            <img src="../../../../assets/img/logo-hone.png" alt="Logo">
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="../../../../assets/img/logo-hone.png" alt="Logo">
+            </div>
+            <!-- <div class="menu-icon">&#9776;</div> -->
+            <nav>
+                <ul>
+                    <li><a href="#">Nosotros</a></li>
+                    <li><a href="#">Nuestros servicios</a></li>
+                    <li><a href="#">Lissom</a></li>
+                </ul>
+            </nav>
+            <button nz-button nzType="primary" class="btn-primary ml-3" [disabled]="false" nzJustify="center"
+                nzAlign="middle">
+                Loggin
+            </button>
         </div>
-        <!-- <div class="menu-icon">&#9776;</div> -->
-        <nav>
-            <ul>
-                <li><a href="#">Nosotros</a></li>
-                <li><a href="#">Nuestros servicios</a></li>
-                <li><a href="#">Lissom</a></li>
-            </ul>
-        </nav>
-        <button nz-button nzType="primary" class="btn-primary ml-3" [disabled]="false" nzJustify="center" nzAlign="middle">
-            Loggin
-        </button>
-    </div>
-</header>
+    </header>
 
 
 
-<section class="container-form">
+    <section class="container-form">
 
 
-    <section class="form-section">
+        <section class="form-section">
 
-        <div class="container-img">
-            <img src="../../../../assets/img/login/image-login-1.png" alt="">
-        </div>
-
-        <form nz-form [formGroup]="loginForm" class="form-login">
-
-            <!-- Campo Usuario / email -->
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24">
-                <nz-form-item nz-row>
-                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
-                        [nzXl]="24">
-                        Usuario
-                    </nz-form-label>
-
-                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="emailErrorTip">
-                        <ng-template #emailErrorTip>
-                            <p *ngIf="loginForm.controls['email'].hasError('required')">¡El usuario es
-                                obligatorio!
-                            </p>
-                        </ng-template>
-                        <input nz-input placeholder="" formControlName="email">
-                    </nz-form-control>
-
-                </nz-form-item>
+            <div class="container-img">
+                <img src="../../../../assets/img/login/image-login-1.png" alt="">
             </div>
 
-            <!-- Campo contraseña -->
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24">
-                <nz-form-item nz-row>
-                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
-                        [nzXl]="24">
-                        Contraseña
-                    </nz-form-label>
+            <form nz-form [formGroup]="loginForm" class="form-login">
 
-                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="passwordErrorTip">
-                        <ng-template #passwordErrorTip>
-                            <p *ngIf="loginForm.controls['password'].hasError('required')">¡La contraseña es
-                                obligatoria!
-                            </p>
-                        </ng-template>
-                        <!-- <input nz-input placeholder="" formControlName="password"
+                <!-- Campo Usuario / email -->
+                <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24">
+                    <nz-form-item nz-row>
+                        <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
+                            [nzXl]="24">
+                            Usuario
+                        </nz-form-label>
+
+                        <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
+                            [nzErrorTip]="emailErrorTip">
+                            <ng-template #emailErrorTip>
+                                <p *ngIf="loginForm.controls['email'].hasError('required')">¡El usuario es
+                                    obligatorio!
+                                </p>
+                            </ng-template>
+                            <input nz-input placeholder="" formControlName="email">
+                        </nz-form-control>
+
+                    </nz-form-item>
+                </div>
+
+                <!-- Campo contraseña -->
+                <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24">
+                    <nz-form-item nz-row>
+                        <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
+                            [nzXl]="24">
+                            Contraseña
+                        </nz-form-label>
+
+                        <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
+                            [nzErrorTip]="passwordErrorTip">
+                            <ng-template #passwordErrorTip>
+                                <p *ngIf="loginForm.controls['password'].hasError('required')">¡La contraseña es
+                                    obligatoria!
+                                </p>
+                            </ng-template>
+                            <!-- <input nz-input placeholder="" formControlName="password"
                             [type]="passwordVisible ? 'text' : 'password'"> -->
 
                             <nz-input-group [nzSuffix]="suffixTemplate">
-                                <input [type]="passwordVisible ? 'text' : 'password'" nz-input placeholder="input password"
-                                    formControlName="password"/>
+                                <input [type]="passwordVisible ? 'text' : 'password'" nz-input
+                                    placeholder="input password" formControlName="password" />
                             </nz-input-group>
                             <ng-template #suffixTemplate>
-                                <span style="cursor: pointer" nz-icon [nzType]="passwordVisible ? 'eye-invisible' : 'eye'"
+                                <span style="cursor: pointer" nz-icon
+                                    [nzType]="passwordVisible ? 'eye-invisible' : 'eye'"
                                     (click)="passwordVisible = !passwordVisible"></span>
                             </ng-template>
-                    </nz-form-control>
+                        </nz-form-control>
 
-                   
 
-                </nz-form-item>
-            </div>
 
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                style="text-align: center; margin-top: 3rem;">
-                <button nz-button nzType="primary" class="btn-primary ml-3" [disabled]="false"
-                    [nzLoading]="isSubmitData" (click)="submitRequest()" nz-popover nzPopoverTitle="" nzJustify="center"
-                    nzAlign="middle" [nzPopoverContent]="enablePopoverMessage">
-                    <ng-template #enablePopoverMessage>
-                        <span>Haga clic para iniciar sesión</span>
-                    </ng-template>
-                    Iniciar sesión
-                </button>
-            </div>
+                    </nz-form-item>
+                </div>
 
-        </form>
+                <!-- Campo re-captcha -->
+                <re-captcha (resolved)="resolved($event)" [siteKey]="siteKey" (errored)="errored()"
+                    errorMode="handled"></re-captcha>
+
+
+                <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
+                    style="text-align: center; margin-top: 3rem;">
+                    <button nz-button nzType="primary" class="btn-primary ml-3" [disabled]="false"
+                        [nzLoading]="isSubmitData" (click)="submitRequest()" nz-popover nzPopoverTitle=""
+                        nzJustify="center" nzAlign="middle" [nzPopoverContent]="enablePopoverMessage">
+                        <ng-template #enablePopoverMessage>
+                            <span>Haga clic para iniciar sesión</span>
+                        </ng-template>
+                        Iniciar sesión
+                    </button>
+                </div>
+
+            </form>
+        </section>
+
+        <div class="container-img-footer">
+            <img src="../../../../assets/img/login/hone-login.png" alt="">
+        </div>
+
     </section>
 
-    <div class="container-img-footer">
-        <img src="../../../../assets/img/login/hone-login.png" alt="">
-    </div>
 
-</section>
-
-    
 </nz-layout>
