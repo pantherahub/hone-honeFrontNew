@@ -79,6 +79,12 @@ export class LoginComponent implements OnInit {
          },
          error: (error: any) => {
             this.isSubmitData = false;
+            
+            if (error.status == 401) {
+               this.createNotificacion('error', 'Error', error.error.message);
+               return;
+            }
+
             this.createNotificacion('error', 'Error', 'Lo sentimos, hubo un error en el servidor.');
          },
          complete: () => {}
