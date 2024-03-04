@@ -85,3 +85,11 @@
         object-fit: contain;
     }
 }
+
+::ng-deep{
+    .ant-progress-inner {
+        width: 95px !important;
+        height: 100px !important;
+        font-size: 21px !important;
+    }
+} 
