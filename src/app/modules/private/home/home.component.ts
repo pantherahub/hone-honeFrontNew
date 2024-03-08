@@ -42,7 +42,6 @@ export class HomeComponent implements OnInit {
       this.loadingData = true;
       this.clientService.getClientListByProviderId(this.user.id).subscribe({
          next: (res: any) => {
-            console.log(res);
             this.clientList = res;
             this.loadingData = false;
          },

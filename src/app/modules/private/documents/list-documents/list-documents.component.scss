@@ -51,6 +51,20 @@
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.45);
 }
 
+.container-documents {
+    margin: 3rem auto !important;
+    padding: 0 2rem;
+    // height: 70px;
+    gap: 1rem;
+}
+
+.item-container-documents {
+    -webkit-box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.45);
+    -moz-box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.45);
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.45);
+    min-height: 60px;
+}
+
 .custom-btn {
     background-color: #1890FF;
     border-color: #1890FF;
@@ -86,10 +100,10 @@
     }
 }
 
-::ng-deep{
+::ng-deep {
     .ant-progress-inner {
         width: 95px !important;
         height: 100px !important;
         font-size: 21px !important;
     }
-} 
+}

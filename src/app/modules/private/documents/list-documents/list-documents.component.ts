@@ -59,7 +59,6 @@ export class ListDocumentsComponent implements OnInit {
       const { idProvider, idTypeProvider, idClientHoneSolutions } = this.clientSelected;
       this.documentService.getPercentDocuments(idProvider, idTypeProvider, idClientHoneSolutions).subscribe({
          next: (res: any) => {
-            console.log(res);
             this.percentData = res;
             this.loadingData = false;
          },
@@ -96,6 +95,13 @@ export class ListDocumentsComponent implements OnInit {
    }
 
    /**
+    * Valida el tipo de prestador y descarga un paquete de documentos
+    */
+   downloadDocumentsAxa () {
+      this.saveAs(`assets/documents-provider/Adocumentos-axa.zip`, `Documentos para diligenciar axa.zip`);
+   }
+
+   /**
     * Recibe la url de donde se toman los documentos locales y los descarga
     * @param url - ruta de los assets a descargar
     * @param name - nombre del archivo que se muestra en la descarga
@@ -123,7 +129,7 @@ export class ListDocumentsComponent implements OnInit {
       const modal = this.modalService.create<ContactTicketComponent, any>({
          nzContent: ContactTicketComponent,
          nzCentered: true,
-         nzClosable: true,
+         nzClosable: true
          // nzFooter: null
       });
       const instance = modal.getContentComponent();
