@@ -49,4 +49,10 @@ export class DocumentsCrudService {
    public deleteDocument (idDocument: any): Observable<any> {
       return this.httpClient.delete(`${this.url}deleteDocument/${idDocument}`);
    }
+
+   downloadFile(filename: string) {
+      return this.httpClient.get( 'http://localhost:4200/' + filename, {
+        responseType: 'arraybuffer'
+      });
+    }
 }
