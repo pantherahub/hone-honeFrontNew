@@ -1,0 +1,90 @@
+<section id="header">
+    <div class="header-title">
+        <h1>Información representante legal</h1>
+        <p class="header-text">
+            Estos datos son necesarios e indispensables para la firma de su contrato, por lo que agradecemos, porfavor completar los siguientes campos.</p>
+    </div>
+</section>
+
+<section class="container-form">
+    <form nz-form nz-row [formGroup]="contactsProvider" class="form-ticket" nzJustify="center" nzAlign="middle"
+        [nzGutter]="[12,12]">
+
+        <!-- Campo Nombre -->
+        <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="12" [nzXl]="12" [nzXXl]="12">
+            <nz-form-item nz-row>
+                <nz-form-label class="form-label" [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24">
+                    <strong>Nombre</strong>
+                </nz-form-label>
+
+                <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
+                    [nzErrorTip]="nameErrorTip">
+                    <ng-template #nameErrorTip>
+                        <p *ngIf="contactsProvider.controls['name'].hasError('required')">¡Este campo es
+                            obligatorio!
+                        </p>
+                    </ng-template>
+                    <input nz-input placeholder="Nombre" formControlName="name">
+                </nz-form-control>
+            </nz-form-item>
+        </div>
+
+        <!-- Campo Apellido -->
+        <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="12" [nzXl]="12" [nzXXl]="12">
+            <nz-form-item nz-row>
+                <nz-form-label class="form-label" [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24">
+                    <strong>Apellido</strong>
+                </nz-form-label>
+
+                <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
+                    [nzErrorTip]="lastnameErrorTip">
+                    <ng-template #lastnameErrorTip>
+                        <p *ngIf="contactsProvider.controls['SurName'].hasError('required')">¡Este campo es
+                            obligatorio!
+                        </p>
+                    </ng-template>
+                    <input nz-input placeholder="Apellido" formControlName="SurName">
+                </nz-form-control>
+            </nz-form-item>
+        </div>
+
+        <!-- Campo Correo -->
+        <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="12" [nzXl]="12" [nzXXl]="12">
+            <nz-form-item nz-row>
+                <nz-form-label class="form-label" [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24">
+                    <strong>Correo Electrónico:</strong>
+                </nz-form-label>
+
+                <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
+                    [nzErrorTip]="emailErrorTip">
+                    <ng-template #emailErrorTip>
+                        <p *ngIf="contactsProvider.controls['email'].hasError('required')">¡Este campo es
+                            obligatorio!
+                        </p>
+                        <p *ngIf="contactsProvider.controls['email'].hasError('pattern')">¡El correo no es válido!
+                        </p>
+                    </ng-template>
+                    <input nz-input placeholder="Email" formControlName="email">
+                </nz-form-control>
+            </nz-form-item>
+        </div>
+
+    </form>
+
+</section>
+
+<section id="footer">
+    <div class="footer">
+        <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
+            style="text-align: center; margin-top: 3rem;">
+            <button nz-button nzType="primary" class="btn-primary custom-btn ml-3" [disabled]="false"
+                [nzLoading]="loader" (click)="submitContactsProvider()" nz-popover nzPopoverTitle="" nzJustify="center"
+                nzAlign="middle" [nzPopoverContent]="enablePopoverMessage">
+                <ng-template #enablePopoverMessage>
+                    <span>Haga clic para actualizar los datos y cerrar</span>
+                </ng-template>
+                Actualizar
+            </button>
+        </div>
+    </div>
+</section>

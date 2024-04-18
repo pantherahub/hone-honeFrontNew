@@ -9,11 +9,13 @@ import { UploadedDocumentsComponent } from '../uploaded-documents/uploaded-docum
 import { Router } from '@angular/router';
 import { ContactTicketComponent } from '../../../../shared/modals/contact-ticket/contact-ticket.component';
 import { NzModalService } from 'ng-zorro-antd/modal';
+import { ContactsProviderComponent } from '../../../../shared/modals/contacts-provider/contacts-provider.component';
+import { ContactsProviderServicesService } from '../../../../services/contacts-provider/contacts-provider.services.service';
 
 @Component({
    selector: 'app-list-documents',
    standalone: true,
-   imports: [ NgZorroModule, RemainingDocumentsComponent, ExpiredDocumentsComponent, UploadedDocumentsComponent ],
+   imports: [NgZorroModule, RemainingDocumentsComponent, ExpiredDocumentsComponent, UploadedDocumentsComponent],
    templateUrl: './list-documents.component.html',
    styleUrl: './list-documents.component.scss'
 })
@@ -23,13 +25,16 @@ export class ListDocumentsComponent implements OnInit {
    loadingData: boolean = false;
    loadBtnDownload: boolean = false;
 
+   contactsOfProviders: any = [];
+
    percentData: PercentInterface = {};
 
-   constructor (
+   constructor(
       private eventManager: EventManagerService,
       private documentService: DocumentsCrudService,
       private router: Router,
-      private modalService: NzModalService
+      private modalService: NzModalService,
+      private contactProvider: ContactsProviderServicesService
    ) {
       effect(() => {
          this.callApi = this.eventManager.getPercentApi();
@@ -38,9 +43,10 @@ export class ListDocumentsComponent implements OnInit {
          }
       });
    }
-
-   ngOnInit (): void {
+   
+   ngOnInit(): void {
       this.getDocumentPercent();
+      this.getContactsByIDProvider(this.clientSelected.idProvider);
    }
 
    /**
@@ -49,12 +55,12 @@ export class ListDocumentsComponent implements OnInit {
     * recibe un arreglo de eventos, en el cual esta el index y la informacion del tab
     * @params event: any
     */
-   tabChange (event: any) {}
+   tabChange(event: any) { }
 
    /**
     * Obtiene desde un api el porcentaje de documentos cargado, sin cargas y vencidos
     */
-   getDocumentPercent () {
+   getDocumentPercent() {
       this.loadingData = true;
       const { idProvider, idTypeProvider, idClientHoneSolutions } = this.clientSelected;
       this.documentService.getPercentDocuments(idProvider, idTypeProvider, idClientHoneSolutions).subscribe({
@@ -65,14 +71,35 @@ export class ListDocumentsComponent implements OnInit {
          error: (error: any) => {
             this.loadingData = false;
          },
-         complete: () => {}
+         complete: () => { }
+      });
+   }
+
+   /**
+   * Retorna los contactos por prestador y abre el modal para actualizar y cerrar, 
+   * y se hace el llamando de this.getContactsByIDProvider(this.clientSelected.idProvider); en el  ngOnInit() para que funcione
+   */
+   getContactsByIDProvider(idProvider: any) {
+      const client = this.clientSelected.idClientHoneSolutions === 4;
+      this.contactProvider.getContactById(idProvider).subscribe((data: any) => {
+         this.contactsOfProviders = data.contacts;
+         const contactWithOccupation15 = this.contactsOfProviders.find((contact: any) => contact.idOccupation === 15);
+         if (contactWithOccupation15) {
+            if (client) {
+               this.openContactsProvider();
+            }
+         } else {
+            if (client) {
+               this.openContactsProvider();
+            }
+         }
       });
    }
 
    /**
     * Valida el tipo de prestador y descarga un paquete de documentos
     */
-   downloadDocuments () {
+   downloadDocuments() {
       if (this.clientSelected.idTypeProvider == 3 || this.clientSelected.idTypeProvider == 6) {
          this.saveAs(
             `assets/documents-provider/A.Persona-Juridica.zip`,
@@ -97,7 +124,7 @@ export class ListDocumentsComponent implements OnInit {
    /**
     * Valida el tipo de prestador y descarga un paquete de documentos
     */
-   downloadDocumentsAxa () {
+   downloadDocumentsAxa() {
       this.saveAs(`assets/documents-provider/documentos-axa.zip`, `Documentos para diligenciar axa.zip`);
    }
 
@@ -106,7 +133,7 @@ export class ListDocumentsComponent implements OnInit {
     * @param url - ruta de los assets a descargar
     * @param name - nombre del archivo que se muestra en la descarga
     */
-   saveAs (url: any, name: any) {
+   saveAs(url: any, name: any) {
       this.loadBtnDownload = true;
       const link = document.createElement('a');
       link.setAttribute('type', 'hidden');
@@ -118,14 +145,14 @@ export class ListDocumentsComponent implements OnInit {
       this.loadBtnDownload = false;
    }
 
-   navigateHome () {
+   navigateHome() {
       this.router.navigateByUrl('/home');
    }
 
    /**
     * Abre una ventana modal para solicitar ticket
     */
-   openTicketModal (): void {
+   openTicketModal(): void {
       const modal = this.modalService.create<ContactTicketComponent, any>({
          nzContent: ContactTicketComponent,
          nzCentered: true,
@@ -137,7 +164,35 @@ export class ListDocumentsComponent implements OnInit {
       // instance.message = message;
 
       // Return a result when opened
-      modal.afterOpen.subscribe(() => {});
+      modal.afterOpen.subscribe(() => { });
+      // Return a result when closed
+      modal.afterClose.subscribe((result: any) => {
+         if (result) {
+         }
+      });
+   }
+
+   /**
+   * Abre una ventana modal para actualizar el nombre del representante legal, 
+   * donde se puede abrir mediante funcion del mismo modal de contacts-provider
+   * y tambien se abre por defecto o automaticamente cuando elija allianz
+   */
+   openContactsProvider() {
+      const modal = this.modalService.create<ContactsProviderComponent, any>({
+         nzContent: ContactsProviderComponent,
+         nzCentered: true,
+         nzClosable: false, //en false para ocultar la X del modal y que no pueda cerrarlo
+         // nzFooter: null
+         nzMaskClosable: false, // Para evitar que se cierre al hacer clic fuera del modal
+         nzOnOk: () => console.log('OK'),
+         nzOnCancel: () => console.log('Cancelar') // Maneja el evento de cancelación
+      });
+      const instance = modal.getContentComponent();
+
+      // instance.message = message;
+
+      // Return a result when opened
+      modal.afterOpen.subscribe(() => { });
       // Return a result when closed
       modal.afterClose.subscribe((result: any) => {
          if (result) {
