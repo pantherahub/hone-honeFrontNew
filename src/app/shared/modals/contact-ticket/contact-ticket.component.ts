@@ -21,10 +21,7 @@ export class ContactTicketComponent implements AfterContentChecked, OnInit {
    requestForm!: FormGroup;
 
    loadedFile: any;
-   identificacion: any;
-   razonSocial: any;
-   cliente: any;
-
+  
    @Input() message?: string;
 
    user = this.eventManager.userLogged();
@@ -42,9 +39,7 @@ export class ContactTicketComponent implements AfterContentChecked, OnInit {
       this.createForm();
    }
    ngOnInit(): void {
-      this.identificacion = this.clientSelected.identificacion;
-      this.razonSocial = this.clientSelected.razonSocial;
-      this.cliente = this.clientSelected.clientHoneSolutions;
+     
    }
 
    ngAfterContentChecked(): void { }
@@ -132,7 +127,7 @@ export class ContactTicketComponent implements AfterContentChecked, OnInit {
       const { name, lastname, identification, email, phone, address, observation } = this.requestForm.value;
 
       const observaciones = `
-      Información del usuario que genera caso:  Nombre: ${this.razonSocial } ,   identificacion: ${this.identificacion} ,   cliente: ${this.cliente}
+      Información del usuario que genera caso:  Nombre: ${this.clientSelected.razonSocial} ,   identificacion: ${this.clientSelected.identificacion} ,   cliente: ${this.clientSelected.clientHoneSolutions}
       <br>
       Datos reportados del usuario:
       <br> Nombre: ${name},  <br> Apellido: ${lastname},  <br> Identificación: ${identification},  <br> Teléfono: ${phone},  

@@ -25,7 +25,6 @@ export class ListDocumentsComponent implements OnInit {
    loadingData: boolean = false;
    loadBtnDownload: boolean = false;
 
-   idProvider: any = 0;
    contactsOfProviders: any = [];
 
    percentData: PercentInterface = {};
@@ -44,13 +43,10 @@ export class ListDocumentsComponent implements OnInit {
          }
       });
    }
-   cole: any;
+   
    ngOnInit(): void {
       this.getDocumentPercent();
-
-      this.idProvider = this.clientSelected.idProvider;
-
-      this.getContactsByIDProvider(this.idProvider);
+      this.getContactsByIDProvider(this.clientSelected.idProvider);
    }
 
    /**
@@ -80,9 +76,9 @@ export class ListDocumentsComponent implements OnInit {
    }
 
    /**
-   * Retorna los contactos por prestador y abre el modal para actualizar y cerrar,
+   * Retorna los contactos por prestador y abre el modal para actualizar y cerrar, 
+   * y se hace el llamando de this.getContactsByIDProvider(this.clientSelected.idProvider); en el  ngOnInit() para que funcione
    */
-
    getContactsByIDProvider(idProvider: any) {
       const client = this.clientSelected.idClientHoneSolutions === 4;
       this.contactProvider.getContactById(idProvider).subscribe((data: any) => {
@@ -178,15 +174,15 @@ export class ListDocumentsComponent implements OnInit {
 
    /**
    * Abre una ventana modal para actualizar el nombre del representante legal, 
-   * DIDIER a petición de Jose queda por defecto para que se abra automaticamente cuando elija allianz
+   * donde se puede abrir mediante funcion del mismo modal de contacts-provider
+   * y tambien se abre por defecto o automaticamente cuando elija allianz
    */
    openContactsProvider() {
       const modal = this.modalService.create<ContactsProviderComponent, any>({
          nzContent: ContactsProviderComponent,
          nzCentered: true,
-         nzClosable: false,
+         nzClosable: false, //en false para ocultar la X del modal y que no pueda cerrarlo
          // nzFooter: null
-         // nzClosable: false, // Para desactivar el botón de cerrar del modal
          nzMaskClosable: false, // Para evitar que se cierre al hacer clic fuera del modal
          nzOnOk: () => console.log('OK'),
          nzOnCancel: () => console.log('Cancelar') // Maneja el evento de cancelación
