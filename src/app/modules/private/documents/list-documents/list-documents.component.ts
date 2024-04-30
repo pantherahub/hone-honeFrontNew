@@ -43,7 +43,7 @@ export class ListDocumentsComponent implements OnInit {
          }
       });
    }
-   
+
    ngOnInit(): void {
       this.getDocumentPercent();
       this.getContactsByIDProvider(this.clientSelected.idProvider);
@@ -126,6 +126,13 @@ export class ListDocumentsComponent implements OnInit {
     */
    downloadDocumentsAxa() {
       this.saveAs(`assets/documents-provider/documentos-axa.zip`, `Documentos para diligenciar axa.zip`);
+   }
+
+   /**
+   * Valida el tipo de prestador y descarga un paquete de documentos
+   */
+   downloadDocumentsBmi() {
+      this.saveAs(`assets/documents-provider/documentos-bmi.zip`, `Documentos para diligenciar bmi.zip`);
    }
 
    /**
