@@ -132,7 +132,7 @@ export class ListDocumentsComponent implements OnInit {
    * Valida el tipo de prestador y descarga un paquete de documentos
    */
    downloadDocumentsBmi() {
-      this.saveAs(`assets/documents-provider/documentos-bmi.zip`, `Documentos para diligenciar bmi.zip`);
+      this.saveAs(`assets/documents-provider/documentos-mundial-de-seguros.zip`, `Documentos para diligenciar mundial-de-seguros.zip`);
    }
 
    /**
