@@ -1,0 +1,166 @@
+<section id="header">
+    <div class="header-title">
+        <h2>Actualización de información</h2>
+    </div>
+</section>
+
+<section class="container-form">
+
+
+
+    <form nz-form nz-row [formGroup]="requestForm" class="form-ticket" nzJustify="center" nzAlign="middle"
+        [nzGutter]="[12,12]">
+
+        <!-- Campo Nombre -->
+        <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="12" [nzXl]="12" [nzXXl]="12">
+            <nz-form-item nz-row>
+                <nz-form-label class="form-label" [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24">
+                    Nombre
+                </nz-form-label>
+
+                <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
+                    [nzErrorTip]="nameErrorTip">
+                    <ng-template #nameErrorTip>
+                        <p *ngIf="requestForm.controls['name'].hasError('required')">¡Este campo es
+                            obligatorio!
+                        </p>
+                    </ng-template>
+                    <input nz-input placeholder="Nombre" formControlName="name">
+                </nz-form-control>
+            </nz-form-item>
+        </div>
+
+
+        <!-- Campo Apellido -->
+        <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="12" [nzXl]="12" [nzXXl]="12">
+            <nz-form-item nz-row>
+                <nz-form-label class="form-label" [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24">
+                    Apellido
+                </nz-form-label>
+
+                <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
+                    [nzErrorTip]="lastnameErrorTip">
+                    <ng-template #lastnameErrorTip>
+                        <p *ngIf="requestForm.controls['lastname'].hasError('required')">¡Este campo es
+                            obligatorio!
+                        </p>
+                    </ng-template>
+                    <input nz-input placeholder="Apellido" formControlName="lastname">
+                </nz-form-control>
+            </nz-form-item>
+        </div>
+
+
+        <!-- Campo identificacion -->
+        <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="12" [nzXl]="12" [nzXXl]="12">
+            <nz-form-item nz-row>
+                <nz-form-label class="form-label" [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24">
+                    Identificación
+                </nz-form-label>
+
+                <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
+                    [nzErrorTip]="identificationErrorTip">
+                    <ng-template #identificationErrorTip>
+                        <p *ngIf="requestForm.controls['identification'].hasError('required')">¡Este campo es
+                            obligatorio!
+                        </p>
+                    </ng-template>
+                    <input nz-input placeholder="Identificación" formControlName="identification"
+                        (keypress)="keyPressCode($event)">
+                </nz-form-control>
+            </nz-form-item>
+        </div>
+
+
+        <!-- Campo Correo -->
+        <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="12" [nzXl]="12" [nzXXl]="12">
+            <nz-form-item nz-row>
+                <nz-form-label class="form-label" [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24">
+                    Email
+                </nz-form-label>
+
+                <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
+                    [nzErrorTip]="emailErrorTip">
+                    <ng-template #emailErrorTip>
+                        <p *ngIf="requestForm.controls['email'].hasError('required')">¡Este campo es
+                            obligatorio!
+                        </p>
+                        <p *ngIf="requestForm.controls['email'].hasError('pattern')">¡El correo no es válido!
+                        </p>
+                    </ng-template>
+                    <input nz-input placeholder="Email" formControlName="email">
+                </nz-form-control>
+            </nz-form-item>
+        </div>
+
+
+        <!-- Campo Celular -->
+        <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="12" [nzXl]="12" [nzXXl]="12">
+            <nz-form-item nz-row>
+                <nz-form-label class="form-label" [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24">
+                    Celular
+                </nz-form-label>
+
+                <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
+                    [nzErrorTip]="phoneErrorTip">
+                    <ng-template #phoneErrorTip>
+                        <p *ngIf="requestForm.controls['phone'].hasError('required')">¡Este campo es
+                            obligatorio!
+                        </p>
+                    </ng-template>
+                    <input nz-input placeholder="Celular" formControlName="phone" (keypress)="keyPressCode($event)">
+                </nz-form-control>
+            </nz-form-item>
+        </div>
+
+
+        <!-- Campo Direccion -->
+        <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="12" [nzXl]="12" [nzXXl]="12">
+            <nz-form-item nz-row>
+                <nz-form-label class="form-label" [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24">
+                    Dirección
+                </nz-form-label>
+
+                <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
+                    [nzErrorTip]="addressErrorTip">
+                    <ng-template #addressErrorTip>
+                        <p *ngIf="requestForm.controls['address'].hasError('required')">¡Este campo es
+                            obligatorio!
+                        </p>
+                    </ng-template>
+                    <input nz-input placeholder="Dirección" formControlName="address">
+                </nz-form-control>
+            </nz-form-item>
+        </div>
+
+
+        <!-- Campo observation -->
+        <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24">
+            <nz-form-item nz-row>
+                <nz-form-label class="form-label" [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24">
+                    Observación
+                </nz-form-label>
+
+                <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
+                    [nzErrorTip]="observationErrorTip">
+                    <ng-template #observationErrorTip>
+                        <p *ngIf="requestForm.controls['observation'].hasError('required')">¡Este campo es
+                            obligatorio!
+                        </p>
+                    </ng-template>
+                    <textarea rows="4" nz-input placeholder="Ingresar la observación que tenga a su disposición"
+                        formControlName="observation"></textarea>
+                </nz-form-control>
+            </nz-form-item>
+        </div>
+
+    </form>
+
+</section>
+
+<section id="footer">
+    <div class="footer">
+        <button nz-button nzType="default" (click)="destroyModal()">Cancelar</button>
+        <button nz-button nzType="primary" (click)="submitData()" [nzLoading]="loader">Enviar datos</button>
+    </div>
+</section>

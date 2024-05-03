@@ -1,0 +1,64 @@
+<div class="generalContainer">
+
+
+    @if (loadingData) {
+    <div class="centerContent">
+        <nz-spin nzSimple [nzSize]="'large'" nzTip="Cargando datos..."></nz-spin>
+    </div>
+    } @else {
+    @if (!loadingData && documentList.length > 0) {
+
+
+    <div class="container-grid">
+
+        @for (item of documentList; track $index) {
+
+        <div class="custom-file-upload">
+            <nz-card [nzTitle]="item.NameDocument" [nzActions]="[actionSetting, actionEdit, actionDelete]">
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <span>{{item.nameDocument}}</span>
+                    <span>{{item.dateAdd | date: 'dd/MM/yyyy'}}</span>
+                </div>
+            </nz-card>
+
+            <ng-template #actionSetting>
+                <a (click)="viewFile(item)">
+                    <span nz-icon nzType="eye"></span>
+                </a>
+            </ng-template>
+            <ng-template #actionEdit>
+                <a (click)="editDocumentModal(item)">
+                    <span nz-icon nzType="edit"></span>
+                </a>
+            </ng-template>
+            <ng-template #actionDelete>
+                <a (click)="deleteDocument(item)">
+                    <span nz-icon nzType="delete"></span>
+                </a>
+            </ng-template>
+        </div>
+        }
+
+        <nz-modal [nzVisible]="previewVisible" [nzTitle]="currentItem ? currentItem.NameDocument : 'No especifica'"
+            [nzContent]="modalContent" [nzFooter]="null" (nzOnCancel)="previewVisible = false">
+            <ng-template #modalContent>
+                <img *ngIf="isImage" [src]="previewFile" [ngStyle]="{ width: '100%' }" />
+                <pdf-viewer *ngIf="!isImage" [src]="previewFile" [render-text]="true" [original-size]="false"
+                    style="width: 100%; height: 500px"></pdf-viewer>
+            </ng-template>
+        </nz-modal>
+    </div>
+    } @else{
+
+
+    <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
+
+        <h2 nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24">
+            No hay Documentos
+        </h2>
+    </div>
+    }
+    }
+
+
+</div>

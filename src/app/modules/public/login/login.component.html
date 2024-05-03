@@ -1,21 +1,26 @@
+<!-- <nz-layout style="height: 100%;"> -->
+
 <header>
     <div class="container">
         <div class="logo">
             <img src="../../../../assets/img/logo-hone.png" alt="Logo">
         </div>
+        <!-- <div class="menu-icon">&#9776;</div> -->
         <nav>
             <ul>
-                <li><a href="#">Nosotros</a></li>
-                <li><a href="#">Nuestros servicios</a></li>
+                <li><a href="https://www.hone-solutions.com/nosotros">Nosotros</a></li>
+                <li><a href="https://www.hone-solutions.com/services">Nuestros servicios</a></li>
                 <li><a href="#">Lissom</a></li>
             </ul>
         </nav>
-        <button nz-button nzType="primary" class="btn-primary ml-3" [disabled]="false" [nzLoading]="isSubmitData"
-            nzJustify="center" nzAlign="middle">
+        <button nz-button nzType="primary" class="btn-primary ml-3" [disabled]="false" nzJustify="center"
+            nzAlign="middle">
             Loggin
         </button>
     </div>
 </header>
+
+
 
 <section class="container-form">
 
@@ -23,7 +28,7 @@
     <section class="form-section">
 
         <div class="container-img">
-            <img src="../../../../assets/img/login/image-login-1.png" alt="">
+            <img src="../../../../assets/img/login/login-hone.jpg" alt="">
         </div>
 
         <form nz-form [formGroup]="loginForm" class="form-login">
@@ -64,11 +69,25 @@
                                 obligatoria!
                             </p>
                         </ng-template>
-                        <input nz-input placeholder="" formControlName="password">
+                        <nz-input-group [nzSuffix]="suffixTemplate">
+                            <input [type]="passwordVisible ? 'text' : 'password'" nz-input placeholder=""
+                                formControlName="password" />
+                        </nz-input-group>
+                        <ng-template #suffixTemplate>
+                            <span style="cursor: pointer" nz-icon [nzType]="passwordVisible ? 'eye-invisible' : 'eye'"
+                                (click)="passwordVisible = !passwordVisible"></span>
+                        </ng-template>
                     </nz-form-control>
 
                 </nz-form-item>
             </div>
+
+            <!-- Campo re-captcha -->
+            <re-captcha (resolved)="resolved($event)" siteKey="6Ld-8nopAAAAAIw0RV8-HYPQdgzUdjeYn7gvIApc"
+                (errored)="errored()" errorMode="handled"></re-captcha>
+
+            <p style="color: red;" *ngIf="showError">¡Debes validar que no eres un robot!</p>
+
 
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
                 style="text-align: center; margin-top: 3rem;">
@@ -90,3 +109,6 @@
     </div>
 
 </section>
+
+
+<!-- </nz-layout> -->

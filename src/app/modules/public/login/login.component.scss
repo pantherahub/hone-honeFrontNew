@@ -1,7 +1,6 @@
-
 .container-form {
     width: 100%;
-    height: 100%;
+    height: auto;
     display: flex;
     flex-direction: column;
     background-image: url('../../../../assets/img/login/background-login.png');
@@ -26,6 +25,7 @@
     img {
         width: 100%;
         height: fit-content;
+        border-radius: 20px;
     }
 }
 
@@ -84,9 +84,11 @@ nav ul li {
 nav a {
     text-decoration: none;
     color: rgba(0, 0, 0, 1);
-    font-weight: 300;
-    font-size: 20px;
+    font-weight: normal;
+    font-size: 16px;
     transition: color 0.3s ease;
+    font-family: 'Montserrat', sans-serif;
+
 }
 
 nav a:hover {
@@ -121,8 +123,24 @@ nav a:hover {
     }
 
     .menu-icon {
-        display: block;
+        display: block !important;
         font-size: 24px;
         cursor: pointer;
     }
+
+    .container-img-footer {
+        text-align: end;
+        margin-inline: 1rem;
+        margin-top: 2rem;
+
+        img {
+            max-width: 150px;
+        }
+    }
+}
+
+.menu-icon {
+    display: none;
+    font-size: 24px;
+    cursor: pointer;
 }

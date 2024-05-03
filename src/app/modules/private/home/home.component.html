@@ -1,1 +1,49 @@
-<p>home works!</p>
+<div class="generalContainer">
+    <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[24,32]">
+
+        <div nz-col class="gutter-row">
+            <div nz-row nzJustify="center" class="banner-home">
+                <h1 nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24">
+                    Bienvenido(a) a tu gestor documental <br>
+                </h1>
+                <span nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24">{{user.name ? user.name : 'No reporta
+                    nombre'}}</span>
+                <p nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24">
+                    ¿En cual de nuestras empresas deseas actualizar tus documentos?
+                </p>
+
+            </div>
+        </div>
+    </div>
+
+    @if (loadingData) {
+
+    <div class="centerContent">
+        <nz-spin nzSimple [nzSize]="'large'" nzTip="Cargando datos..."></nz-spin>
+    </div>
+    }
+
+    @if (!loadingData) {
+    <div class="container-grid">
+        @for (item of clientList; track $index) {
+        <div class="card-custom" (click)="changeOptionClient(item)">
+            <img [src]="item.url ? item.url : defaultImageUrl" alt="">
+            <span>{{ item.url ? '' : item.clientHoneSolutions}}</span>
+        </div>
+        }
+    </div>
+    <!-- <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[24,32]">
+        @for (item of clientList; track $index) {
+        <div nz-col [nzXs]="24" [nzSm]="12" [nzMd]="12" [nzLg]="12" class="gutter-row">
+            <div nz-row nzJustify="center" class="card-custom" (click)="changeOptionClient(item)">
+                <img nz-col [src]="item.url ? item.url : defaultImageUrl" alt="">
+                <span nz-col>{{ item.url ? '' : item.clientHoneSolutions}}</span>
+            </div>
+        </div>
+        }
+    </div> -->
+    }
+
+
+
+</div>

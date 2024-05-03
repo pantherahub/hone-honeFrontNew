@@ -1,0 +1,22 @@
+.container {
+    // background: rgba(0, 21, 41, 1);
+    background-color: #5DBFBC66;
+    color: #000;
+    height: 80px;
+}
+
+.user-section {
+    display: flex;
+    gap: 1rem;
+    justify-content: end;
+    width: 100%;
+
+    img {
+        cursor: pointer;
+    }
+}
+
+.row {
+    margin: 0 !important;
+    height: 100%;
+}
