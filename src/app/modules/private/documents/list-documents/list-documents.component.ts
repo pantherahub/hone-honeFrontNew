@@ -131,9 +131,11 @@ export class ListDocumentsComponent implements OnInit {
    /**
    * Valida el tipo de prestador y descarga un paquete de documentos
    */
-   downloadDocumentsBmi() {
+   downloadDocumentsMundialSeguros() {
       this.saveAs(`assets/documents-provider/documentos-mundial-de-seguros.zip`, `Documentos para diligenciar mundial-de-seguros.zip`);
    }
+
+   downloadDocumentsBmi(){}
 
    /**
     * Recibe la url de donde se toman los documentos locales y los descarga
