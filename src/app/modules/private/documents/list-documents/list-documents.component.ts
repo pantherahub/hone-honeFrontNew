@@ -134,8 +134,16 @@ export class ListDocumentsComponent implements OnInit {
    downloadDocumentsMundialSeguros() {
       this.saveAs(`assets/documents-provider/documentos-mundial-de-seguros.zip`, `Documentos para diligenciar mundial-de-seguros.zip`);
    }
-
-   downloadDocumentsBmi(){}
+   /**
+   * Descarga Excel de BMI
+   */
+   downloadExcelFareBmi() {
+      this.saveAs(`assets/documents-provider/excel-bmi/Anexo_Tarifas_2024`, `Anexo_Tarifas_2024`);
+   }
+   /**
+      * Descarga Excel de BMI
+      */
+   downloadDocumentsBmi() { }
 
    /**
     * Recibe la url de donde se toman los documentos locales y los descarga
