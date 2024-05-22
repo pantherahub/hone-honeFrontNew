@@ -138,7 +138,9 @@ export class ListDocumentsComponent implements OnInit {
    * Descarga Excel de BMI
    */
    downloadExcelFareBmi() {
-      this.saveAs(`assets/documents-provider/excel-bmi/Anexo_Tarifas_2024.xlsx`, `Anexo_Tarifas_2024.xlsx`);
+      if (this.clientSelected.idTypeProvider == 7 ) {        
+         this.saveAs(`assets/documents-provider/excel-bmi/Anexo_Tarifas_2024.xlsx`, `Anexo_Tarifas_2024.xlsx`);
+      } 
    }
    /**
       * Descarga Excel de BMI
