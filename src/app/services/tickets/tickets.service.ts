@@ -13,6 +13,6 @@ export class TicketsService {
 
    // Sube los documentos al servidor
    public postTicket (idRole: any, payload: any): Observable<any> {
-      return this.httpClient.post(`${this.url}tickestSelect?idRol=${idRole}`, payload);
+      return this.httpClient.post(`${this.url}ticket/create`, payload);
    }
 }
