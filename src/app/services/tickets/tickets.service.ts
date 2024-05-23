@@ -10,8 +10,7 @@ export class TicketsService {
    public url = environment.urlNewBack;
 
    constructor (private httpClient: HttpClient) {}
-
-   // Sube los documentos al servidor
+   
    public postTicket (idRole: any, payload: any): Observable<any> {
       return this.httpClient.post(`${this.url}ticket/create`, payload);
    }
