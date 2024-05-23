@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
    providedIn: 'root'
 })
 export class TicketsService {
-   public url = environment.url;
+   public url = environment.urlNewBack;
 
    constructor (private httpClient: HttpClient) {}
 
