@@ -78,25 +78,21 @@ export class ContactTicketComponent implements AfterContentChecked, OnInit {
       }
 
       this.loader = true;
-      const payload = new FormData();
-
+      
       const data: Object = {
-         tipoSolicitud: 1,
-         nombreSolicitud: 'Solicitud prestador',
-         observaciones: this.getObservations(),
-         idusuarios: this.user.id,
+         requestName: 'Solicitud prestador',
+         employeeCode: this.user?.id,
+         description: this.getObservations(),
+         typeRequest: 1,
+         userId: this.user.id,
          email: this.user.email,
-         fechaSolicitud: new Date().toISOString(),
-         fechaMaxima: new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000).toISOString()
+         idClientHone: this.clientSelected.idClientHoneSolutions,
+         requestDate: new Date().toISOString(),
+         maxDate: new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+         idRole: this.user?.roles?.idRoles,
       };
 
-      for (const [key, value] of Object.entries(data)) {
-         if (value != null && value.toString().trim() != '') {
-            payload.append(key, value);
-         }
-      }
-
-      this.postTicket(payload);
+      this.postTicket(data);
    }
 
    /**
