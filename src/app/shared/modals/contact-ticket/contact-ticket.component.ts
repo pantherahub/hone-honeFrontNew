@@ -78,7 +78,7 @@ export class ContactTicketComponent implements AfterContentChecked, OnInit {
       }
 
       this.loader = true;
-      const payload = new FormData();
+      
       const data: Object = {
          requestName: 'Solicitud prestador',
          employeeCode: this.user?.id,
@@ -92,13 +92,7 @@ export class ContactTicketComponent implements AfterContentChecked, OnInit {
          idRole: this.user?.roles?.idRoles,
       };
 
-      for (const [key, value] of Object.entries(data)) {
-         if (value != null && value.toString().trim() != '') {
-            payload.append(key, value);
-         }
-      }
-
-      this.postTicket(payload);
+      this.postTicket(data);
    }
 
    /**
