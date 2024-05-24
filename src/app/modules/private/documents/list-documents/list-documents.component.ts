@@ -24,10 +24,11 @@ export class ListDocumentsComponent implements OnInit {
    callApi: any = this.eventManager.getPercentApi();
    loadingData: boolean = false;
    loadBtnDownload: boolean = false;
-
+   hiddenCard: boolean = false;
    contactsOfProviders: any = [];
 
    percentData: PercentInterface = {};
+  
 
    constructor(
       private eventManager: EventManagerService,
@@ -42,12 +43,17 @@ export class ListDocumentsComponent implements OnInit {
             this.getDocumentPercent();
          }
       });
+     
+      if (this.clientSelected.idTypeProvider ==7) {
+         this.hiddenCard = true;
+      }
    }
 
    ngOnInit(): void {
       this.getDocumentPercent();
       this.getContactsByIDProvider(this.clientSelected.idProvider);
    }
+
 
    /**
     * Cambia el titulo de la pagina de autogestion por el nombre que obtenga del tab seleccionado
@@ -138,9 +144,9 @@ export class ListDocumentsComponent implements OnInit {
    * Descarga Excel de BMI
    */
    downloadExcelFareBmi() {
-      if (this.clientSelected.idTypeProvider == 7 ) {        
+      if (this.clientSelected.idTypeProvider == 7) {
          this.saveAs(`assets/documents-provider/excel-bmi/Anexo_Tarifas_2024.xlsx`, `Anexo_Tarifas_2024.xlsx`);
-      } 
+      }
    }
    /**
       * Descarga Excel de BMI

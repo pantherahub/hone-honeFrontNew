@@ -1,6 +1,7 @@
 .container {
     // background: rgba(0, 21, 41, 1);
-    background-color: #5DBFBC66;
+    // background-color: #5DBFBC66;
+    background-color: #ffffff;
     color: #000;
     height: 80px;
 }
@@ -19,4 +20,26 @@
 .row {
     margin: 0 !important;
     height: 100%;
+    border-bottom: 7px solid #4747c5;
 }
+
+.container-logo-hone {
+    position: relative;
+    display: flex;
+    top: -25px;
+
+}
+
+.logo-hone {
+    height: 95px;
+}
+
+.container-header-name-avatar{
+    position: relative !important;
+    display: flex;
+    top: -20px;
+}
+
+// .container-header{
+//     position: absolute;
+// }

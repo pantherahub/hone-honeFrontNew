@@ -5,7 +5,8 @@
             <div class="user-data">
                 <span>{{clientSelected.razonSocial ? clientSelected.razonSocial : ''}}</span>
                 <span>{{clientSelected.typeProvider ? clientSelected.typeProvider : ''}}</span>
-                <span>Cedula: {{clientSelected.identificacion ? clientSelected.identificacion : ''}}</span>
+                <!-- <span>Cedula: {{clientSelected.identificacion ? clientSelected.identificacion : ''}}</span> -->
+                <span>{{clientSelected.identificacion ? clientSelected.identificacion : ''}}</span>
             </div>
             <div class="logo">
                 <img [src]="clientSelected ? clientSelected.urlHeader : '../../../../../assets/img/logo-hone.png' "
@@ -26,7 +27,8 @@
                     </h2>
 
                     <div nz-col>
-                        <img src="../../../../../assets/img/carbon_download.png" alt="Logo" style="width: 50px;"  (click)="downloadDocuments()">                       
+                        <img src="../../../../../assets/img/carbon_download.png" alt="Logo" style="width: 50px;"
+                            (click)="downloadDocuments()">
                     </div>
                 </div>
             </div>
@@ -52,10 +54,10 @@
                         Representante legal
                     </h2>
 
-                    <div nz-col >                       
-                            <img src="../../../../../assets/img/icon-park.png" alt="Logo" style="width: 50px;">                       
+                    <div nz-col>
+                        <img src="../../../../../assets/img/icon-park.png" alt="Logo" style="width: 50px;">
                     </div>
-                    
+
                 </div>
             </div>
 
@@ -66,7 +68,7 @@
     @if (clientSelected.idClientHoneSolutions == 8) {
 
     <section id="download-documents">
-         <div class="container-documents" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
+        <div class="container-documents" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
 
             <div class="item-container-documents" nz-col [nzXs]="24" [nzSm]="24" [nzMd]="12" [nzLg]="12" [nzXl]="12"
                 [nzXXl]="12">
@@ -76,13 +78,14 @@
                     </h2>
 
                     <div nz-col>
-                        <img src="../../../../../assets/img/carbon_download.png" alt="Logo" style="width: 50px;"  (click)="downloadDocumentsAxa()">                      
+                        <img src="../../../../../assets/img/carbon_download.png" alt="Logo" style="width: 50px;"
+                            (click)="downloadDocumentsAxa()">
                     </div>
                 </div>
             </div>
 
             <div class="item-container-documents" nz-col [nzXs]="24" [nzSm]="24" [nzMd]="8" [nzLg]="8" [nzXl]="8"
-            [nzXXl]="8">
+                [nzXXl]="8">
                 <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
                     <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
                         Capacitación modelo de atención
@@ -101,87 +104,93 @@
     }
     @if (clientSelected.idClientHoneSolutions == 10) {
 
-        <section id="download-documents">
-            <div class="container-documents" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
+    <section id="download-documents">
+        <div class="container-documents" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
 
-                <div class="item-container-documents" nz-col [nzXs]="24" [nzSm]="24" [nzMd]="12" [nzLg]="12" [nzXl]="12"
-                    [nzXXl]="12">
-                    <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-                        <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
-                            Documentos obligatorios a diligenciar
-                        </h2>
+            <div class="item-container-documents" nz-col [nzXs]="24" [nzSm]="24" [nzMd]="12" [nzLg]="12" [nzXl]="12"
+                [nzXXl]="12">
+                <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
+                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
+                        Documentos obligatorios a diligenciar
+                    </h2>
 
-                        <div nz-col>
-                            <img src="../../../../../assets/img/carbon_download.png" alt="Logo" style="width: 50px;"  (click)="downloadDocumentsMundialSeguros()">                      
-                        </div>
+                    <div nz-col>
+                        <img src="../../../../../assets/img/carbon_download.png" alt="Logo" style="width: 50px;"
+                            (click)="downloadDocumentsMundialSeguros()">
                     </div>
                 </div>
-
-                <div class="item-container-documents" nz-col [nzXs]="24" [nzSm]="24" [nzMd]="8" [nzLg]="8" [nzXl]="8"
-                [nzXXl]="8">
-                    <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-                        <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
-                            Capacitación modelo de atención
-                        </h2>
-
-                        <div nz-col>
-                            <a href="https://www.aulavirtual.hone-solutions.com/" target="_blank">
-                                <img src="../../../../../assets/img/allian-gorro.gif" alt="Logo" style="width: 50px;">
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
             </div>
-        </section>
+
+            <div class="item-container-documents" nz-col [nzXs]="24" [nzSm]="24" [nzMd]="8" [nzLg]="8" [nzXl]="8"
+                [nzXXl]="8">
+                <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
+                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
+                        Capacitación modelo de atención
+                    </h2>
+
+                    <div nz-col>
+                        <a href="https://www.aulavirtual.hone-solutions.com/" target="_blank">
+                            <img src="../../../../../assets/img/allian-gorro.gif" alt="Logo" style="width: 50px;">
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
     }
     @if (clientSelected.idClientHoneSolutions == 12) {
 
-        <section id="download-documents">
-            <div class="container-documents" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
+    <section id="download-documents">
+        <div class="container-documents" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
 
-                <div class="item-container-documents" nz-col [nzXs]="24" [nzSm]="24" [nzMd]="6" [nzLg]="6" [nzXl]="6"
-                    [nzXXl]="12">
-                    <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-                        <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="16" [nzXXl]="16">
-                            Tarifa 2024
-                        </h2>
+            @if (hiddenCard){
+            <div class="item-container-documents" nz-col [nzXs]="24" [nzSm]="24" [nzMd]="5" [nzLg]="5" [nzXl]="5"
+                [nzXXl]="12">
+                <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
+                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="16" [nzXXl]="16">
+                        Tarifa 2024
+                    </h2>
 
-                        <div nz-col> 
-                            <img src="../../../../../assets/img/carbon_download.png" alt="Logo" style="width: 50px;"  (click)="downloadExcelFareBmi()">                      
-                        </div>
+                    <div nz-col>
+                        <img src="../../../../../assets/img/carbon_download.png" alt="Logo" style="width: 50px;"
+                            (click)="downloadExcelFareBmi()">
                     </div>
                 </div>
-                <div class="item-container-documents" nz-col [nzXs]="24" [nzSm]="24" [nzMd]="8" [nzLg]="8" [nzXl]="8"
-                    [nzXXl]="12">
-                    <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-                        <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
-                            Documentos obligatorios a diligenciar
-                        </h2>
-
-                        <div nz-col>
-                            <img src="../../../../../assets/img/carbon_download.png" alt="Logo" style="width: 50px;"  (click)="downloadDocumentsBmi()">                      
-                        </div>
-                    </div>
-                </div>
-
-                <div class="item-container-documents" nz-col [nzXs]="24" [nzSm]="24" [nzMd]="8" [nzLg]="8" [nzXl]="8"
-                [nzXXl]="8">
-                    <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-                        <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
-                            Capacitación modelo de atención
-                        </h2>
-
-                        <div nz-col>
-                            <a href="https://www.aulavirtual.hone-solutions.com/" target="_blank">
-                                <img src="../../../../../assets/img/allian-gorro.gif" alt="Logo" style="width: 50px;">
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
             </div>
-        </section>
+            }
+
+            <div class="item-container-documents" nz-col [nzXs]="24" [nzSm]="24" [nzMd]="8" [nzLg]="8" [nzXl]="8"
+                [nzXXl]="12">
+                <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
+                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
+                        Documentos obligatorios a diligenciar
+                    </h2>
+
+                    <div nz-col>
+                        <img src="../../../../../assets/img/carbon_download.png" alt="Logo" style="width: 50px;"
+                            (click)="downloadDocumentsBmi()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="item-container-documents" nz-col [nzXs]="24" [nzSm]="24" [nzMd]="8" [nzLg]="8" [nzXl]="8"
+                [nzXXl]="8">
+                <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
+                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
+                        Capacitación modelo de atención
+                    </h2>
+
+                    <div nz-col>
+                        <a href="https://www.aulavirtual.hone-solutions.com/" target="_blank">
+                            <img src="../../../../../assets/img/allian-gorro.gif" alt="Logo" style="width: 50px;">
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
     }
 
 
