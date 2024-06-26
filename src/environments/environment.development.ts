@@ -1,6 +1,8 @@
 export const environment = {
    production: false,
    // url: 'https://backpruebashone.azurewebsites.net/api/',
+   // urlNewBack: 'http://localhost:8080/',
+   // url: 'http://localhost:8080/api/',
    url: 'https://honesolutionsbackproduction.azurewebsites.net/api/',
    urlNewBack: 'https://honesolutionsbacknew.azurewebsites.net/',
    PASS_ENC: '123456',
