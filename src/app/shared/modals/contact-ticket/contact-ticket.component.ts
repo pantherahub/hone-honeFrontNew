@@ -90,6 +90,7 @@ export class ContactTicketComponent implements AfterContentChecked, OnInit {
          requestDate: new Date().toISOString(),
          maxDate: new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000).toISOString(),
          idRole: this.user?.roles?.idRoles,
+         userLogged: this.user.id
       };
 
       this.postTicket(data);
