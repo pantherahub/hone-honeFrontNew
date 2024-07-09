@@ -1,18 +1,20 @@
 import { Component, AfterContentChecked, Input, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { NZ_MODAL_DATA, NzModalRef } from 'ng-zorro-antd/modal';
+import { NZ_MODAL_DATA, NzModalModule, NzModalRef } from 'ng-zorro-antd/modal';
 import { NgZorroModule } from '../../../ng-zorro.module';
 import { CommonModule } from '@angular/common';
 import { EventManagerService } from '../../../services/events-manager/event-manager.service';
 import { TicketsService } from '../../../services/tickets/tickets.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { mailRegexpValidation } from '../../../utils/constant';
+import { NzModalService } from 'ng-zorro-antd/modal';
+import { ResponseCreateTicketComponent } from '../response-create-ticket/response-create-ticket.component';
 
 @Component({
    selector: 'app-contact-ticket',
    standalone: true,
-   imports: [NgZorroModule, CommonModule],
+   imports: [NgZorroModule, CommonModule, NzModalModule],
    templateUrl: './contact-ticket.component.html',
    styleUrl: './contact-ticket.component.scss'
 })
@@ -21,7 +23,7 @@ export class ContactTicketComponent implements AfterContentChecked, OnInit {
    requestForm!: FormGroup;
 
    loadedFile: any;
-  
+
    @Input() message?: string;
 
    user = this.eventManager.userLogged();
@@ -34,12 +36,13 @@ export class ContactTicketComponent implements AfterContentChecked, OnInit {
       private formBuilder: FormBuilder,
       private notificationService: NzNotificationService,
       private eventManager: EventManagerService,
-      private ticketService: TicketsService
+      private ticketService: TicketsService,
+      private modalService: NzModalService,
    ) {
       this.createForm();
    }
    ngOnInit(): void {
-     
+
    }
 
    ngAfterContentChecked(): void { }
@@ -78,7 +81,7 @@ export class ContactTicketComponent implements AfterContentChecked, OnInit {
       }
 
       this.loader = true;
-      
+
       const data: Object = {
          requestName: 'Solicitud prestador',
          employeeCode: this.user?.id,
@@ -105,13 +108,13 @@ export class ContactTicketComponent implements AfterContentChecked, OnInit {
       const idRole = this.user ? this.user.roles!.idRoles : 0;
       this.ticketService.postTicket(idRole, payload).subscribe({
          next: (res: any) => {
-            this.loader = false;
-            this.createNotificacion('success', 'Ticket creado', 'El ticket se creó correctamente.');
+            this.loader = false;        
+            this.openSuccessModal();
             this.#modal.destroy();
          },
          error: (error: any) => {
-            this.loader = false;
-            this.createNotificacion('error', 'Error', 'Lo sentimos, hubo un error en el servidor.');
+            this.loader = false;          
+            this.openErrorModal();
          },
          complete: () => { }
       });
@@ -152,4 +155,30 @@ export class ContactTicketComponent implements AfterContentChecked, OnInit {
       if (charCode != 43 && charCode > 31 && (charCode < 48 || charCode > 57)) { return false; }
       return true;
    }
+   /**
+   * abre el modal con la notificación de que el ticket fue creado con exito
+   */
+   openSuccessModal() {      
+      const modal = this.modalService.create<ResponseCreateTicketComponent, any>({
+         nzContent: ResponseCreateTicketComponent,
+         nzCentered: true,
+         nzClosable: false,
+         nzFooter: null,  // Para ocultar los botones por defecto del modal
+         nzMaskClosable: false, // Para evitar que se cierre al hacer clic fuera del modal
+         // nzOnOk: () => console.log('OK'),
+         // nzOnCancel: () => console.log('Cancelar') // Maneja el evento de cancelación
+      });
+   }
+   /**
+   * abre el modal con la notificación de que hubo error al crear el ticket
+   */
+   openErrorModal() {
+      this.modalService.create({
+         // nzTitle: 'Error',
+         nzContent: `<p>Lo sentimos, hubo un error en el servidor.</p>`,
+         nzFooter: null  // Para ocultar los botones por defecto del modal
+      });
+   }
+
+
 }

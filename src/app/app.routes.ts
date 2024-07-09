@@ -6,6 +6,7 @@ import { PageNotFoundComponent } from './modules/public/page-not-found/page-not-
 import { ListDocumentsComponent } from './modules/private/documents/list-documents/list-documents.component';
 import { NgModule } from '@angular/core';
 import { AdminLayoutComponent } from './views/admin-layout/admin-layout.component';
+import { ComplianceDocumentationComponent } from './modules/private/documents/compliance-documentation/compliance-documentation.component';
 
 export const routes: Routes = [
    //   PRIVATE ROUTES
@@ -19,6 +20,12 @@ export const routes: Routes = [
       path: 'cargar-documentos/:id',
       component: AdminLayoutComponent,
       children: [ { path: '', component: ListDocumentsComponent } ],
+      canActivate: [ authGuard ]
+   },
+   {
+      path: 'cumplimiento-documentos/:id',
+      component: AdminLayoutComponent,
+      children: [ { path: '', component: ComplianceDocumentationComponent } ],
       canActivate: [ authGuard ]
    },
    //   PUBLIC ROUTES
