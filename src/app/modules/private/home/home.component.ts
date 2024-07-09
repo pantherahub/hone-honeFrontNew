@@ -58,6 +58,7 @@ export class HomeComponent implements OnInit {
    changeOptionClient (item: any) {
       localStorage.setItem('clientSelected', JSON.stringify(item));
       this.eventManager.getDataClient();
-      this.router.navigateByUrl(`/cargar-documentos/${item.idClientHoneSolutions}`);
+      // this.router.navigateByUrl(`/cargar-documentos/${item.idClientHoneSolutions}`);
+      this.router.navigateByUrl(`/cumplimiento-documentos/${item.idClientHoneSolutions}`);
    }
 }
