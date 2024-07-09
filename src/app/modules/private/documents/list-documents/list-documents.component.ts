@@ -181,8 +181,9 @@ export class ListDocumentsComponent implements OnInit {
       const modal = this.modalService.create<ContactTicketComponent, any>({
          nzContent: ContactTicketComponent,
          nzCentered: true,
-         nzClosable: true
+         nzClosable: true,
          // nzFooter: null
+         nzMaskClosable: false, // Para evitar que se cierre al hacer clic fuera del modal
       });
       const instance = modal.getContentComponent();
 
