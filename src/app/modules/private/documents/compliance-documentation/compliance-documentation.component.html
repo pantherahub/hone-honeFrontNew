@@ -1,5 +1,4 @@
 <div class="layout">
-
     <header>
         <div class="container">
             <div class="user-data">
@@ -7,114 +6,116 @@
                     CUMPLIMIENTO DOCUMENTACIÓN
                 </span>
             </div>
-
         </div>
     </header>
+
     @if (loadingData) {
-    <div class="centerContent">
-        <nz-spin nzSimple [nzSize]="'large'" nzTip="Cargando datos..."></nz-spin>
-    </div>
+        <div class="centerContent">
+            <nz-spin nzSimple [nzSize]="'large'" nzTip="Cargando datos..."></nz-spin>
+        </div>
     }
+
     @if (!loadingData) {
-    <section>
-        <div class="container-icons" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-            <div class="fixed-icons" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-                <div class="container-img1" nz-row nzJustify="center" nzAlign="middle"
-                    [style.opacity]="this.percentData.uploaded === 100 ? '1' : '0.5'">
-                    <img [src]=" '../../../../../assets/document-compliance/documentos.png' " alt="container-imgs"
-                        [class.complete]="this.percentData.uploaded === 100">
-                    <span class="text-span">Documentos
-                        <span class="percent" [style.color]="this.percentData.uploaded === 100 ? '#08f610' : '#f00816'">
-                            {{this.percentData.uploaded}}%
+        <section>
+            <div class="container-icons" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
+                <div class="fixed-icons" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
+                    <div class="container-img1" nz-row nzJustify="center" nzAlign="middle"
+                        [style.opacity]="this.percentData.uploaded === 100 ? '1' : '0.5'">
+                        <img [src]=" '../../../../../assets/document-compliance/documentos.png' " alt="container-imgs"
+                            [class.complete]="this.percentData.uploaded === 100">
+                        <span class="text-span">Documentos
+                            <span class="percent" [style.color]="this.percentData.uploaded === 100 ? '#08f610' : '#f00816'">
+                                {{this.percentData.uploaded}}%
+                            </span>
                         </span>
-                    </span>
-                </div>
+                    </div>
 
-                <div class="container-img2" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-                    <img [src]=" '../../../../../assets/document-compliance/firma-prestador.png' " alt="container-imgs"
-                        nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
-                    <span class="text-span">Firma Contrato Prestador</span>
-                </div>
+                    <div class="container-img2" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
+                        <img [src]=" '../../../../../assets/document-compliance/firma-prestador.png' " alt="container-imgs"
+                            nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
+                        <span class="text-span">Firma Contrato Prestador</span>
+                    </div>
 
-                <div class="container-img3" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-                    <img [src]=" '../../../../../assets/document-compliance/firma-contrato.png' " alt="container-imgs"
-                        nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
-                    <span class="text-span">Firma Contrato R/L</span>
-                </div>
+                    <div class="container-img3" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
+                        <img [src]=" '../../../../../assets/document-compliance/firma-contrato.png' " alt="container-imgs"
+                            nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
+                        <span class="text-span">Firma Contrato R/L</span>
+                    </div>
 
-                <div class="container-img4" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-                    <img [src]=" '../../../../../assets/document-compliance/capacitacion.png' " alt="container-imgs"
-                        nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
-                    <span class="text-span">Capacitación</span>
-                </div>
+                    <div class="container-img4" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
+                        <img [src]=" '../../../../../assets/document-compliance/capacitacion.png' " alt="container-imgs"
+                            nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
+                        <span class="text-span">Capacitación</span>
+                    </div>
 
-                <div class="container-img5" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-                    <img [src]=" '../../../../../assets/document-compliance/creacion-publicacion.png' "
-                        alt="container-imgs" nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18"
-                        [nzXXl]="18">
-                    <span class="text-span">Creación y Publicación</span>
+                    <div class="container-img5" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
+                        <img [src]=" '../../../../../assets/document-compliance/creacion-publicacion.png' "
+                            alt="container-imgs" nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18"
+                            [nzXXl]="18">
+                        <span class="text-span">Creación y Publicación</span>
+                    </div>
                 </div>
             </div>
-        </div>
 
-    </section>
+        </section>
     }
+
     @if (!loadingData && this.percentData.uploaded === 100) {
-    <section>
-        <div class="icon-job">
-            <div class="container-img6" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-                <img [src]=" '../../../../../assets/document-compliance/buen-trabajo.png' " alt="container-imgs" nz-col
-                    [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
+        <section>
+            <div class="icon-job">
+                <div class="container-img6" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
+                    <img [src]=" '../../../../../assets/document-compliance/buen-trabajo.png' " alt="container-imgs" nz-col
+                        [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
+                </div>            
+            </div>
+        </section>
+    }
 
-            </div>
-            
-        </div>
-    </section>
-    }
     @if (!loadingData && this.percentData.uploaded !== 100) {
-    <section>
-        <div class="icon-job">
-            <div class="container-img7" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-                <img [src]=" '../../../../../assets/document-compliance/mal-trabajo.png' " alt="container-imgs" nz-col
-                    [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
+        <section>
+            <div class="icon-job">
+                <div class="container-img7" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
+                    <img [src]=" '../../../../../assets/document-compliance/mal-trabajo.png' " alt="container-imgs" nz-col
+                        [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
     }
+
     @if (!loadingData && this.percentData.uploaded === 100) {
-    <section id="download-documents">
-        <div class="download-documents" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-            <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
-                TU PROCESO DE DOCUMENTACIÓN ESTA COMPLETO, QUEREMOS AGRADECER TU COMPROMISO
-            </h2>
+        <section id="download-documents">
+            <div class="download-documents" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
+                <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
+                    TU PROCESO DE DOCUMENTACIÓN ESTA COMPLETO, QUEREMOS AGRADECER TU COMPROMISO
+                </h2>
 
-            <div nz-col>
-                <button nz-button nzType="primary" class="btn-primary custom-btn ml-3" [disabled]="false"
-                    nzJustify="center" nzAlign="middle" (click)="goPage()">
-                    OK
-                </button>
+                <div nz-col>
+                    <button nz-button nzType="primary" class="btn-primary custom-btn ml-3" [disabled]="false"
+                        nzJustify="center" nzAlign="middle" (click)="goPage()">
+                        OK
+                    </button>
+                </div>
             </div>
-
-        </div>
-    </section>
+        </section>
     }
+
     @if (!loadingData && this.percentData.uploaded !== 100) {
-    <section id="download-documents">
-        <div class="download-documents" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
+        <section id="download-documents">
+            <div class="download-documents" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
 
-            <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
-                TU PROCESO AÚN NO ESTA COMPLETO, ES IMPORTANTE QUE COMPLETES TODO TU PROCESO
-            </h2>
+                <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
+                    TU PROCESO AÚN NO ESTA COMPLETO, ES IMPORTANTE QUE COMPLETES TODO TU PROCESO
+                </h2>
 
-            <div nz-col>
-                <button nz-button nzType="primary" class="btn-primary custom-btn ml-3" [disabled]="false"
-                    nzJustify="center" nzAlign="middle" (click)="goPage()">
-                    OK
-                </button>
+                <div nz-col>
+                    <button nz-button nzType="primary" class="btn-primary custom-btn ml-3" [disabled]="false"
+                        nzJustify="center" nzAlign="middle" (click)="goPage()">
+                        OK
+                    </button>
+                </div>
+
             </div>
-
-        </div>
-    </section>
+        </section>
     }
 
 </div>
