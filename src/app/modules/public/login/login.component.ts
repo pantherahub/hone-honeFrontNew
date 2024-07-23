@@ -23,6 +23,7 @@ export class LoginComponent implements OnInit {
    passwordVisible: boolean = false;
    captchaValidation: boolean = false;
    showError: boolean = false;
+   showButton: boolean = false;
    siteKey = environment.PUBLIC_PASS_KEY;
    loginForm!: FormGroup;
 
