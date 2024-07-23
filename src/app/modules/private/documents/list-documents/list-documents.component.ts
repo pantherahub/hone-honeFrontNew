@@ -11,11 +11,13 @@ import { ContactTicketComponent } from '../../../../shared/modals/contact-ticket
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { ContactsProviderComponent } from '../../../../shared/modals/contacts-provider/contacts-provider.component';
 import { ContactsProviderServicesService } from '../../../../services/contacts-provider/contacts-provider.services.service';
+import { AssistanceProvidersComponent } from '../../../../shared/forms/assistance-forms/assistance-providers/assistance-providers.component';
+import { ProviderAssistanceComponent } from '../../../../shared/modals/provider-assistance/provider-assistance.component';
 
 @Component({
    selector: 'app-list-documents',
    standalone: true,
-   imports: [NgZorroModule, RemainingDocumentsComponent, ExpiredDocumentsComponent, UploadedDocumentsComponent],
+   imports: [NgZorroModule, RemainingDocumentsComponent, ExpiredDocumentsComponent, UploadedDocumentsComponent, AssistanceProvidersComponent],
    templateUrl: './list-documents.component.html',
    styleUrl: './list-documents.component.scss'
 })
@@ -135,11 +137,27 @@ export class ListDocumentsComponent implements OnInit {
    }
 
    /**
-   * Valida el tipo de prestador y descarga un paquete de documentos
+   * Valida el tipo de prestador y descarga un paquete de documentos de mundial de seguros
    */
    downloadDocumentsMundialSeguros() {
-      this.saveAs(`assets/documents-provider/documentos-mundial-de-seguros.zip`, `Documentos para diligenciar mundial-de-seguros.zip`);
+      this.saveAs(`assets/documents-provider/SARLAFT.zip`, `Documentos para diligenciar SARLAFT.zip`);
    }
+
+   /**
+   * Valida el tipo de prestador y descarga un paquete de documentos de mundial de seguros
+   */
+   downloadDocumentsMundialSegurosPoliticSegurity() {
+      this.saveAs(`assets/documents-provider/Politicas-de-Seguridad.zip`, `Documentos para diligenciar Politicas-de-Seguridad.zip`);
+   }
+
+   /**
+   * Valida el tipo de prestador y descarga un paquete de documentos de mundial de seguros
+   */
+   downloadDocumentsMundialSegurosPoliticTratamient() {
+      this.saveAs(`assets/documents-provider/docs-mundial-tratamiento.zip`, `Documentos para diligenciar docs-mundial-tratamiento.zip`);
+   }
+   
+
    /**
    * Descarga Excel de BMI
    */
@@ -208,6 +226,33 @@ export class ListDocumentsComponent implements OnInit {
          nzContent: ContactsProviderComponent,
          nzCentered: true,
          nzClosable: false, //en false para ocultar la X del modal y que no pueda cerrarlo
+         // nzFooter: null
+         nzMaskClosable: false, // Para evitar que se cierre al hacer clic fuera del modal
+         nzOnOk: () => console.log('OK'),
+         nzOnCancel: () => console.log('Cancelar') // Maneja el evento de cancelación
+      });
+      const instance = modal.getContentComponent();
+
+      // instance.message = message;
+
+      // Return a result when opened
+      modal.afterOpen.subscribe(() => { });
+      // Return a result when closed
+      modal.afterClose.subscribe((result: any) => {
+         if (result) {
+         }
+      });
+   }
+   /**
+   * Abre una ventana modal para actualizar el nombre del representante legal, 
+   * donde se puede abrir mediante funcion del mismo modal de contacts-provider
+   * y tambien se abre por defecto o automaticamente cuando elija allianz
+   */
+   openModalProviderAssistance() {
+      const modal = this.modalService.create<ProviderAssistanceComponent, any>({
+         nzContent: ProviderAssistanceComponent,
+         nzCentered: true,
+         nzClosable: true, //en false para ocultar la X del modal y que no pueda cerrarlo
          // nzFooter: null
          nzMaskClosable: false, // Para evitar que se cierre al hacer clic fuera del modal
          nzOnOk: () => console.log('OK'),

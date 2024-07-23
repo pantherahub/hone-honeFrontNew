@@ -6,17 +6,19 @@
             <img src="../../../../assets/img/logo-hone.png" alt="Logo">
         </div>
         <!-- <div class="menu-icon">&#9776;</div> -->
-        <nav>
+        <nav class="nav-items">
             <ul>
                 <li><a href="https://www.hone-solutions.com/nosotros">Nosotros</a></li>
                 <li><a href="https://www.hone-solutions.com/services">Nuestros servicios</a></li>
                 <li><a href="#">Lissom</a></li>
             </ul>
         </nav>
-        <button nz-button nzType="primary" class="btn-primary ml-3" [disabled]="false" nzJustify="center"
-            nzAlign="middle">
-            Loggin
-        </button>
+        @if(showButton){
+            <button nz-button nzType="primary" class="btn-primary ml-3" [disabled]="false" nzJustify="center"
+                nzAlign="middle">
+                Loggin
+            </button>
+        }
     </div>
 </header>
 

@@ -1,0 +1,12 @@
+@if (showForm) {
+<section class="container-form">
+    <app-assistance-providers></app-assistance-providers>
+    <div class="footer">
+        <button nz-button nzType="primary" (click)="submitForm()" [nzLoading]="loader">Capacitarme</button>
+    </div>
+</section>
+}@else {
+    <section class="container-form">
+        <h1>Pagina no encontrada</h1>
+    </section>
+}
