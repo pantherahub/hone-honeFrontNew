@@ -7,6 +7,7 @@ import { ListDocumentsComponent } from './modules/private/documents/list-documen
 import { NgModule } from '@angular/core';
 import { AdminLayoutComponent } from './views/admin-layout/admin-layout.component';
 import { ComplianceDocumentationComponent } from './modules/private/documents/compliance-documentation/compliance-documentation.component';
+import { ProviderAssistancessComponent } from './modules/public/provider-assistancess/provider-assistancess.component';
 
 export const routes: Routes = [
    //   PRIVATE ROUTES
@@ -37,6 +38,10 @@ export const routes: Routes = [
       path: 'page-not-found',
       component: PageNotFoundComponent
    },
+   {
+      path: 'page-form-assistance',
+      component: ProviderAssistancessComponent
+   },
    //   DEFAULT ROUTES
    {
       path: '',
@@ -47,6 +52,11 @@ export const routes: Routes = [
       path: '**',
       pathMatch: 'full',
       redirectTo: 'page-not-found'
+   },
+   {
+      path: '**',
+      pathMatch: 'full',
+      redirectTo: 'page-form-assistance'
    }
 ];
 
