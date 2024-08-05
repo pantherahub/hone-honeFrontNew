@@ -8,9 +8,16 @@ import { NgModule } from '@angular/core';
 import { AdminLayoutComponent } from './views/admin-layout/admin-layout.component';
 import { ComplianceDocumentationComponent } from './modules/private/documents/compliance-documentation/compliance-documentation.component';
 import { ProviderAssistancessComponent } from './modules/public/provider-assistancess/provider-assistancess.component';
+import { TutorialVideoComponent } from './modules/private/tutorials/tutorial-video/tutorial-video.component';
 
 export const routes: Routes = [
    //   PRIVATE ROUTES
+   {
+      path: 'tutorial',
+      component: AdminLayoutComponent,
+      children: [ { path: '', component: TutorialVideoComponent } ],
+      canActivate: [ authGuard ]
+   },
    {
       path: 'home',
       component: AdminLayoutComponent,

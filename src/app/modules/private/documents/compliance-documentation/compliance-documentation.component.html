@@ -19,16 +19,30 @@
     <section>
         <div class="container-icons" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
             <div class="fixed-icons" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-                <div class="container-img1" nz-row nzJustify="center" nzAlign="middle"
-                    [style.opacity]="this.percentData.uploaded === 100 ? '1' : '0.5'">
-                    <img [src]=" '../../../../../assets/document-compliance/documentos.png' " alt="container-imgs"
-                        [class.complete]="this.percentData.uploaded === 100">
-                    <span class="text-span">Documentos
-                        <span class="percent" [style.color]="this.percentData.uploaded === 100 ? '#08f610' : '#f00816'">
+
+                @if(this.percentData.uploaded === 100){
+                    <div class="container-img1" nz-row nzJustify="center" nzAlign="middle">
+                    <img [src]=" '../../../../../assets/document-compliance/documentos.png' " alt="container-imgs">
+                    <span class="text-span">                        
+                        <img [src]=" '../../../../../assets/document-compliance/agregar.png' " alt="container-imgs">
+                        Documentos
+                        <span class="percent" [style.color]=" '#08f610' ">
                             {{this.percentData.uploaded}}%
                         </span>
                     </span>
                 </div>
+                }@else {
+                    <div class="container-img1" nz-row nzJustify="center" nzAlign="middle">
+                        <img [src]=" '../../../../../assets/document-compliance/documentos.png' " alt="container-imgs">
+                        <span class="text-span">
+                            <img [src]=" '../../../../../assets/document-compliance/borrar.png' " alt="container-imgs">
+                            Documentos
+                            <span class="percent" [style.color]=" '#f00816' ">
+                                {{this.percentData.uploaded}}%                                
+                            </span>
+                        </span>
+                    </div>
+                }
 
                 <div class="container-img2" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
                     <img [src]=" '../../../../../assets/document-compliance/firma-prestador.png' " alt="container-imgs"
@@ -43,17 +57,20 @@
                 </div>
 
                 @if(this.response.length === 0 || this.response.length === null || this.response.length === undefined || this.response.length === '' ){
-                    <div class="container-img4" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]" [style.opacity]="'0.5'"   (click)="openModalProviderAssistance()">
+                    <div class="container-img4" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]" >
                         <img [src]=" '../../../../../assets/document-compliance/capacitacion.png' " alt="container-imgs"
                             nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
-                        <span class="text-span">Capacitación</span>
+                        <span class="text-span">Capacitación
+                            <img [src]=" '../../../../../assets/document-compliance/borrar.png' " alt="container-imgs">
+                        </span>
                     </div>
                 }@else {
-                    <div class="container-img4" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]"
-                        [style.opacity]="this.providerAssistance.attended === 1 ? '1' : '0.5'"   (click)="openModalProviderAssistance()">
+                    <div class="container-img4" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]"  >
                         <img [src]=" '../../../../../assets/document-compliance/capacitacion.png' " alt="container-imgs"
                             nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
-                        <span class="text-span">Capacitación</span>
+                        <span class="text-span">Capacitación
+                            <img [src]=" '../../../../../assets/document-compliance/agregar.png' " alt="container-imgs">
+                        </span>
                     </div>
                 }
 
