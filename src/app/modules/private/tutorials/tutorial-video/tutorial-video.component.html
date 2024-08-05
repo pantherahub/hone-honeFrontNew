@@ -1,0 +1,19 @@
+<section id="video-load">
+    <div class="video-load" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[24,24]">
+
+        <h2 nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24">
+            <div class="video-container">
+                <iframe width="560px" height="315px" src="https://www.youtube.com/embed/-qZcZVEpEQU" frameborder="0"
+                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </h2>
+
+        <div nz-col>
+            <button nz-button nzType="primary" class="btn-primary custom-btn ml-3" [disabled]="false"
+                nzJustify="center" nzAlign="middle" (click)="closeVideo()">
+                Cerrar y Continuar
+            </button>
+        </div>
+
+    </div>
+</section>

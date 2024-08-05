@@ -76,7 +76,7 @@ export class LoginComponent implements OnInit {
       this.authService.login(payload).subscribe({
          next: (res: any) => {
             this.isSubmitData = false;
-            this.router.navigateByUrl('home');
+            this.router.navigateByUrl('tutorial');
          },
          error: (error: any) => {
             this.isSubmitData = false;

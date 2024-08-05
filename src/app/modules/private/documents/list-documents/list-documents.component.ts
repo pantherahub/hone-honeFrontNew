@@ -146,17 +146,10 @@ export class ListDocumentsComponent implements OnInit {
    /**
    * Valida el tipo de prestador y descarga un paquete de documentos de mundial de seguros
    */
-   downloadDocumentsMundialSegurosPoliticSegurity() {
-      this.saveAs(`assets/documents-provider/Politicas-de-Seguridad.zip`, `Documentos para diligenciar Politicas-de-Seguridad.zip`);
+   downloadDocumentsMundialSegurosInformative() {
+      this.saveAs(`assets/documents-provider/documentos-informativos-seguros-mundial.zip`, `Documentos informativos documentos-informativos-seguros-mundial.zip`);
    }
 
-   /**
-   * Valida el tipo de prestador y descarga un paquete de documentos de mundial de seguros
-   */
-   downloadDocumentsMundialSegurosPoliticTratamient() {
-      this.saveAs(`assets/documents-provider/docs-mundial-tratamiento.zip`, `Documentos para diligenciar docs-mundial-tratamiento.zip`);
-   }
-   
 
    /**
    * Descarga Excel de BMI

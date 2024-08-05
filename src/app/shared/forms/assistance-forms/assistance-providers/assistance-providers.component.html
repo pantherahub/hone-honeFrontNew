@@ -52,7 +52,7 @@
                 </nz-form-control>
             </nz-form-item>
         </div>
-
+        
         <!-- Campo ciudad -->
         <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="12" [nzXl]="12" [nzXXl]="12">
             <nz-form-item nz-row>
@@ -133,7 +133,7 @@
         </div>
 
         <!-- Campo Especialidad -->
-        <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24">
+        <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="12" [nzXl]="12" [nzXXl]="12">
             <nz-form-item nz-row>
                 <nz-form-label class="form-label" [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24">
                     <span> <span class="asterisco">*</span>  Especialidad</span>
@@ -147,6 +147,19 @@
                         </p>
                     </ng-template>                    
                     <input nz-input placeholder="Especialidad" formControlName="speciality">
+                </nz-form-control>
+            </nz-form-item>
+        </div>
+
+        <!-- Campo asistente -->
+        <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="12" [nzXl]="12" [nzXXl]="12">
+            <nz-form-item nz-row>
+                <nz-form-label class="form-label" [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24">
+                    <span> Nombre Asistente &nbsp; (Opcional)</span>
+                </nz-form-label>
+
+                <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24">  
+                    <input nz-input placeholder="Nombre Asistente" formControlName="nameAssistante">
                 </nz-form-control>
             </nz-form-item>
         </div>

@@ -25,7 +25,6 @@
 .download-documents {
     width: 75%;
     margin: 3rem auto !important;
-    // padding: 1rem;
     height: 70px;
     -webkit-box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.45);
     -moz-box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.45);
@@ -45,9 +44,6 @@
 
 .fixed-icons {
     position: relative !important;
-    // top: 50px; /* Ajusta según tu diseño */
-    // left: 5px; /* Ajusta según tu diseño */
-    // left: 1%;
     z-index: 1000;
     display: flex;
     flex-direction: row !important;
@@ -79,7 +75,7 @@
     justify-content: center;
     flex-direction: column;
     margin-bottom: 20px;
-    opacity: 0.5;
+    opacity: 1;
 }
 
 .container-img3 {
@@ -89,7 +85,7 @@
     justify-content: center;
     flex-direction: column;
     margin-bottom: 20px;
-    opacity: 0.5;
+    opacity: 1;
 }
 
 .container-img4 {
@@ -99,7 +95,7 @@
     justify-content: center;
     flex-direction: column;
     margin-bottom: 20px;
-    // opacity: 0.5;
+    // opacity: 1;
 }
 
 .container-img5 {
@@ -109,7 +105,7 @@
     justify-content: center;
     flex-direction: column;
     margin-bottom: 20px;
-    opacity: 0.5;
+    opacity: 1;
 }
 
 .icon-job{

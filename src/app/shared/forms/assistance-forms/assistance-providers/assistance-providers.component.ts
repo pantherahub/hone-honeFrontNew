@@ -47,6 +47,9 @@ export class AssistanceProvidersComponent implements OnInit {
       attended_previus: ['', [Validators.required]],
       speciality: ['', [Validators.required]],
       city: ['', [Validators.required]],
+      nameAssistante: [''],
+      idProvider : [''],
+      idOfficeProvider : [''],
       idClientHoneSolutions: [''],     
       dateAssistance: [''],     
     });
@@ -72,5 +75,17 @@ export class AssistanceProvidersComponent implements OnInit {
     this.cdr.detectChanges();
     this.updating = false;
   }
-  
+
+  /**
+   * @message deshabilitacion de campos del fomulario 
+   * @data Cuando la url tiene datos
+   * @param controlsToDisable 
+   */
+  disableFormControls(controlsToDisable: string[]) {
+    controlsToDisable.forEach(controlName => {
+      if (this.assistanceProviderForm.controls[controlName]) {
+        this.assistanceProviderForm.controls[controlName].disable();
+      }
+    });
+  }
 }
