@@ -33,6 +33,8 @@ export class ProviderAssistanceComponent implements AfterViewInit {
   ngAfterViewInit(){    
     console.log("parametros del formulario",this.assistanceProvidersComponent.assistanceProviderForm.value );
     console.log(this.clientSelected.idClientHoneSolutions);
+    console.log(this.clientSelected);
+    console.log(this.user);
   }
 
   submitForm() {
