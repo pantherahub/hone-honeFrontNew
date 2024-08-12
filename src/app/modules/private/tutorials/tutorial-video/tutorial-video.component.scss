@@ -3,12 +3,13 @@
     position: relative;
     display: flex;
     padding: 15px 40px;
-    padding-bottom: 56.25%;
-    /* 16:9 aspect ratio */
+    padding-bottom: 50.25%;
     height: 0;
     overflow: hidden;
     max-width: 100%;
-    background: #000;
+    max-height: 50%;
+    left: 13%;
+    // background: #000;
 }
 
 .video-container iframe {
@@ -16,13 +17,21 @@
     display: flex;
     padding: 15px 40px;
     top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    right: 10%;
+    width: 80%;
+    height: 90%;
 }
 
 .video-load {
-    width: 100%;
+    position: relative;   
+    width: 80%;
     padding: 1rem;
-    height: 70px;
+    height: 80%;
+}
+
+.bottom{
+    width: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;    
 }

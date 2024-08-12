@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { NgZorroModule } from '../../../ng-zorro.module';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
@@ -8,6 +8,8 @@ import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { RecaptchaModule } from 'ng-recaptcha';
 import { environment } from '../../../../environments/environment';
+import { NzModalService } from 'ng-zorro-antd/modal';
+import { ProviderTicketLoginComponent } from '../../../shared/modals/provider-ticket-login/provider-ticket-login.component';
 
 @Component({
    selector: 'app-login',
@@ -31,7 +33,8 @@ export class LoginComponent implements OnInit {
       private authService: AuthService,
       public router: Router,
       private formBuilder: FormBuilder,
-      private notificationService: NzNotificationService
+      private notificationService: NzNotificationService,      
+      private modalService: NzModalService,
    ) {
       this.createForm();
    }
@@ -111,5 +114,29 @@ export class LoginComponent implements OnInit {
       this.captchaValidation = false;
       this.showError = true;
       console.warn(`reCAPTCHA error encountered`);
+   }
+
+   /**
+    * Abre una ventana modal para solicitar ticket por inicio de sesión erroneous
+    */
+   openTicketModal(): void {
+      const modal = this.modalService.create<ProviderTicketLoginComponent, any>({
+         nzContent: ProviderTicketLoginComponent,
+         nzCentered: true,
+         nzClosable: true,
+         // nzFooter: null
+         nzMaskClosable: false, // Para evitar que se cierre al hacer clic fuera del modal
+      });
+      const instance = modal.getContentComponent();
+
+      // instance.message = message;
+
+      // Return a result when opened
+      modal.afterOpen.subscribe(() => { });
+      // Return a result when closed
+      modal.afterClose.subscribe((result: any) => {
+         if (result) {
+         }
+      });
    }
 }
