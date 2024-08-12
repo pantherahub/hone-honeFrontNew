@@ -7,7 +7,6 @@
     padding-block: 2rem;
     margin-top: 5px;
     position: relative;
-
     &:before {
         content: '';
         position: absolute;
@@ -196,13 +195,11 @@ nav a:hover {
 }
 
 .float-button {
+    width: 5%;
     position: relative;
-    bottom: 120px;
-    text-align: end;
-    margin-inline: 5rem;
-    display: flex;
-    flex-direction: row-reverse;
-    flex-wrap: nowrap;
+    bottom: 100px;
+    margin-inline: 5rem; 
+  
 }
 
 .image-container {
