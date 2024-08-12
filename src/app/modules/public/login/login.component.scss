@@ -43,6 +43,9 @@
 .container-img-footer {
     text-align: end;
     margin-inline: 5rem;
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: nowrap;
 }
 
 .form-section {
@@ -81,11 +84,13 @@ body {
     max-width: 100%;
     height: auto;
 }
-.nav-items{
+
+.nav-items {
     position: relative;
     display: flex;
     left: 30%;
 }
+
 nav ul {
     list-style: none;
     display: flex;
@@ -152,10 +157,35 @@ nav a:hover {
             max-width: 150px;
         }
     }
-    .nav-items{
+
+    .nav-items {
         position: relative;
         display: flex;
         left: 18%;
+    }
+
+    .float-button {
+        text-align: end;
+        margin-inline: 1rem;
+        margin-top: 2rem;
+        top: 1px;
+    }
+
+    .image-container {
+        border: 1px solid #00000066;
+        border-radius: 100%;
+        padding: 5px;
+
+        width: 80px;
+        height: 90px;
+        display: flex;
+        justify-content: center;
+        cursor: pointer;
+
+        img {
+            width: 50%;
+            object-fit: contain;
+        }
     }
 }
 
@@ -163,4 +193,31 @@ nav a:hover {
     display: none;
     font-size: 24px;
     cursor: pointer;
+}
+
+.float-button {
+    position: relative;
+    bottom: 120px;
+    text-align: end;
+    margin-inline: 5rem;
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: nowrap;
+}
+
+.image-container {
+    border: 1px solid #00000066;
+    border-radius: 100%;
+    padding: 12px;
+
+    width: 80px;
+    height: 90px;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+
+    img {
+        width: 75%;
+        object-fit: contain;
+    }
 }
