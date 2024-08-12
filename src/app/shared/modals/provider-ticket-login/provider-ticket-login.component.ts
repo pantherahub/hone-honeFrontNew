@@ -28,6 +28,10 @@ export class ProviderTicketLoginComponent implements AfterContentChecked, OnInit
 
   // user = this.eventManager.userLogged();
   // clientSelected: any = this.eventManager.clientSelected();
+  userId: number = 4130;
+  idClientHoneSolution: number = 7;
+  emailAdmin: string = 'business@hone-solutions.com';
+  role: number = 4;
 
   readonly #modal = inject(NzModalRef);
   readonly nzModalData: any = inject(NZ_MODAL_DATA);
@@ -69,10 +73,7 @@ export class ProviderTicketLoginComponent implements AfterContentChecked, OnInit
   /**
    * realiza el envio de la peticion de crear ticket
    */
-  userId: number = 4130;
-  idClientHoneSolution: number = 7;
-  emailAdmin: string = 'eddionic@gmail.com';
-  role: number = 4;
+
   submitData() {
     if (this.requestForm.invalid) {
       Object.values(this.requestForm.controls).forEach(control => {
