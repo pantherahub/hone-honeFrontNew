@@ -26,8 +26,6 @@ export class ProviderTicketLoginComponent implements AfterContentChecked, OnInit
 
   @Input() message?: string;
 
-  // user = this.eventManager.userLogged();
-  // clientSelected: any = this.eventManager.clientSelected();
   userId: number = 4130;
   idClientHoneSolution: number = 7;
   emailAdmin: string = 'business@hone-solutions.com';
