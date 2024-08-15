@@ -28,7 +28,7 @@ export class ProviderTicketLoginComponent implements AfterContentChecked, OnInit
 
   userId: number = 4130;
   idClientHoneSolution: number = 7;
-  emailAdmin: string = 'business@hone-solutions.com';
+  emailAdmin: string = '';
   role: number = 4;
 
   readonly #modal = inject(NzModalRef);
@@ -43,8 +43,9 @@ export class ProviderTicketLoginComponent implements AfterContentChecked, OnInit
   ) {
     this.createForm();
   }
-  ngOnInit(): void {
 
+  ngOnInit(): void {
+   
   }
 
   ngAfterContentChecked(): void { }
@@ -84,7 +85,7 @@ export class ProviderTicketLoginComponent implements AfterContentChecked, OnInit
     }
 
     this.loader = true;
-
+    this.emailAdmin = this.requestForm.get("email")?.value;
     const data: Object = {
       requestName: 'Ingreso erroneo prestador',
       employeeCode: this.userId,
@@ -98,7 +99,7 @@ export class ProviderTicketLoginComponent implements AfterContentChecked, OnInit
       idRole: this.role,
       userLogged: this.userId
     };
-
+    
     this.postTicket(data);
   }
 
