@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
 
 import { NzUploadFile } from 'ng-zorro-antd/upload';
 import { ProviderAssistanceComponent } from '../../../../shared/modals/provider-assistance/provider-assistance.component';
-import { NzModalService } from 'ng-zorro-antd/modal';
+
 import { FetchBackend } from '@angular/common/http';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
@@ -27,19 +27,18 @@ export class RemainingDocumentsComponent implements OnInit {
    loadingData: boolean = false;
 
    documentList: DocumentInterface[] = [];
-   // documentList: any[] = [];
-   form!: FormGroup;
+   
+   formDate!: FormGroup;
+   
    constructor(
       private eventManager: EventManagerService,
       private documentService: DocumentsCrudService,
       private notificationService: NzNotificationService,
-      private modalService: NzModalService,
-      public fb: FormBuilder,
+      
+      public formBuilder: FormBuilder,
    ) {
       this.createtiektcForm();
    }
-   idDocumentsByModal: any = 0;
-
 
    ngOnInit(): void {
       this.getDocumentsToUpload();
@@ -49,7 +48,7 @@ export class RemainingDocumentsComponent implements OnInit {
     * Obtiene el listado de documentos sin cargar
     */
    createtiektcForm() {
-      this.form = this.fb.group({
+      this.formDate = this.formBuilder.group({
          fecha: [""],
       });
    }
@@ -93,7 +92,7 @@ export class RemainingDocumentsComponent implements OnInit {
     * @param item - elemento de la lista para saber cual documento de carga ej (cedula, nit, rethus)
     */
    uploadDocuments(file: any, item: any) {
-      const fechaForm = this.form.get("fecha")?.value;
+      const fechaForm = this.formDate.get("fecha")?.value;
       
       this.loadingData = true;
       const { idProvider } = this.clientSelected;
@@ -135,33 +134,5 @@ export class RemainingDocumentsComponent implements OnInit {
     */
    createNotificacion(type: string, title: string, message: string) {
       this.notificationService.create(type, title, message);
-   }
-
-   /**
-   * Abre una ventana modal para actualizar el nombre del representante legal, 
-   * donde se puede abrir mediante funcion del mismo modal de contacts-provider
-   * y tambien se abre por defecto o automaticamente cuando elija allianz
-   */
-   openModalProviderAssistance() {
-      const modal = this.modalService.create<ProviderAssistanceComponent, any>({
-         nzContent: ProviderAssistanceComponent,
-         nzCentered: true,
-         nzClosable: true, //en false para ocultar la X del modal y que no pueda cerrarlo
-         // nzFooter: null
-         nzMaskClosable: false, // Para evitar que se cierre al hacer clic fuera del modal
-         nzOnOk: () => console.log('OK'),
-         nzOnCancel: () => console.log('Cancelar') // Maneja el evento de cancelación
-      });
-      const instance = modal.getContentComponent();
-
-      // instance.message = message;
-
-      // Return a result when opened
-      modal.afterOpen.subscribe(() => { });
-      // Return a result when closed
-      modal.afterClose.subscribe((result: any) => {
-         if (result) {
-         }
-      });
    }
 }
