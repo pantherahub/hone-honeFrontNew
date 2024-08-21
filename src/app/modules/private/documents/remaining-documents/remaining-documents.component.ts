@@ -8,11 +8,15 @@ import { Observable, Observer } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
 import { NzUploadFile } from 'ng-zorro-antd/upload';
+import { ProviderAssistanceComponent } from '../../../../shared/modals/provider-assistance/provider-assistance.component';
+
+import { FetchBackend } from '@angular/common/http';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
 @Component({
    selector: 'app-remaining-documents',
    standalone: true,
-   imports: [ NgZorroModule, CommonModule ],
+   imports: [NgZorroModule, CommonModule],
    templateUrl: './remaining-documents.component.html',
    styleUrl: './remaining-documents.component.scss'
 })
@@ -23,21 +27,33 @@ export class RemainingDocumentsComponent implements OnInit {
    loadingData: boolean = false;
 
    documentList: DocumentInterface[] = [];
-
-   constructor (
+   
+   formDate!: FormGroup;
+   
+   constructor(
       private eventManager: EventManagerService,
       private documentService: DocumentsCrudService,
-      private notificationService: NzNotificationService
-   ) {}
+      private notificationService: NzNotificationService,
+      
+      public formBuilder: FormBuilder,
+   ) {
+      this.createtiektcForm();
+   }
 
-   ngOnInit (): void {
+   ngOnInit(): void {
       this.getDocumentsToUpload();
    }
 
    /**
     * Obtiene el listado de documentos sin cargar
     */
-   getDocumentsToUpload () {
+   createtiektcForm() {
+      this.formDate = this.formBuilder.group({
+         fecha: [""],
+      });
+   }
+
+   getDocumentsToUpload() {
       this.loadingData = true;
       const { idProvider, idTypeProvider, idClientHoneSolutions } = this.clientSelected;
       this.documentService.getDocumentsToUpload(idProvider, idTypeProvider, idClientHoneSolutions).subscribe({
@@ -48,11 +64,11 @@ export class RemainingDocumentsComponent implements OnInit {
          error: (error: any) => {
             this.loadingData = false;
          },
-         complete: () => {}
+         complete: () => { }
       });
    }
 
-   private getBase64 (img: File, callback: (img: string) => void): void {
+   private getBase64(img: File, callback: (img: string) => void): void {
       const reader = new FileReader();
       reader.addEventListener('load', () => callback(reader.result!.toString()));
       reader.readAsDataURL(img);
@@ -63,7 +79,7 @@ export class RemainingDocumentsComponent implements OnInit {
     * @param event - evento del input que contiene el archivo para cargar
     * @param item - elemento de la lista para saber cual documento de carga ej (cedula, nit, rethus)
     */
-   loadFiles (event: any, item: any) {
+   loadFiles(event: any, item: any) {
       if (event.target.files.length > 0) {
          const file: FileList = event.target.files[0];
          this.uploadDocuments(file, item);
@@ -75,10 +91,13 @@ export class RemainingDocumentsComponent implements OnInit {
     * @param file - recibe el archivo para cargar
     * @param item - elemento de la lista para saber cual documento de carga ej (cedula, nit, rethus)
     */
-   uploadDocuments (file: any, item: any) {
+   uploadDocuments(file: any, item: any) {
+      const fechaForm = this.formDate.get("fecha")?.value;
+      
       this.loadingData = true;
       const { idProvider } = this.clientSelected;
-      const today = new Date();
+      // const today = new Date();
+      const today = (fechaForm === 0 || fechaForm === null || fechaForm === undefined || fechaForm === '') ? new Date() : fechaForm;
       const fileToUpload = new FormData();
       fileToUpload.append('archivo', file);
       const body = {
@@ -96,13 +115,14 @@ export class RemainingDocumentsComponent implements OnInit {
             this.loadingData = false;
             this.createNotificacion('success', 'Carga exitosa', 'El documento se subió de manera satisfactoria');
             this.getDocumentsToUpload();
+            location.reload();
             this.eventManager.getPercentApi.set(this.counterApi + 1);
          },
          error: (error: any) => {
             this.loadingData = false;
             this.createNotificacion('error', 'Error', 'Lo sentimos, hubo un error en el servidor.');
          },
-         complete: () => {}
+         complete: () => { }
       });
    }
 
@@ -112,7 +132,7 @@ export class RemainingDocumentsComponent implements OnInit {
     * @param title - string recibe el titulo de la notificacion
     * @param message - string recibe el mensaje de la notificacion
     */
-   createNotificacion (type: string, title: string, message: string) {
+   createNotificacion(type: string, title: string, message: string) {
       this.notificationService.create(type, title, message);
    }
 }
