@@ -22,11 +22,20 @@
     flex-direction: column;
     justify-content: center;
     color: #00000073;
-    
+
     img {
         width: 50px;
-        align-self: center;    
+        align-self: center;
     }
+}
+
+.form-documentList {
+    position: relative;
+    display: contents;
+}
+
+.custom-file-date {
+    position: relative;
 }
 
 @media only screen and (max-width: 524px) {

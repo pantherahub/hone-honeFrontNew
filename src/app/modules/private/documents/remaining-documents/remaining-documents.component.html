@@ -10,14 +10,28 @@
 
 
     <div class="container-grid">
-
         @for (item of documentList; track $index) {
-        <label id="upload" class="custom-file-upload btn rounded">
-            <input type="file" name="file" id="upload-file" accept=".pdf,.png, .jpeg, .jpg" class="custom-file-input"
-                (change)="loadFiles($event, item)" hidden>
-            <img src="../../../../../assets/img/warning.png" alt="" srcset="">
-            {{item.NameDocument}}
-        </label>
+            @if (item.idTypeDocuments == 8  || item.idTypeDocuments == 22){
+                <form nz-form nz-row [formGroup]="formDate" class="form-documentList" nzJustify="center" nzAlign="bottom" >
+                    <label id="upload" class="custom-file-upload btn rounded" >
+                        <input type="file" name="file" id="upload-file" accept=".pdf,.png, .jpeg, .jpg" class="custom-file-input"
+                            (change)="loadFiles($event, item)" hidden>
+                        <img src="../../../../../assets/img/warning.png" alt="" srcset="">
+                        {{item.NameDocument}}
+                        <input type="date" name="date" id="upload-file" accept=".pdf,.png, .jpeg, .jpg" class="custom-file-date" formControlName="fecha">
+                    </label>
+                
+                </form>
+            }
+            @else {
+                <label id="upload" class="custom-file-upload btn rounded">
+                    <input type="file" name="file" id="upload-file" accept=".pdf,.png, .jpeg, .jpg" class="custom-file-input"
+                        (change)="loadFiles($event, item)" hidden>
+                    <img src="../../../../../assets/img/warning.png" alt="" srcset="">
+                    {{item.NameDocument}}
+                </label>
+            }
+        
         }
     </div>
     } @else{
