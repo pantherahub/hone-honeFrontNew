@@ -24,7 +24,8 @@ export interface DocumentInterface {
    UrlDocument?: string;
    nameDocument?: string;
    idTypeProvider?: number;
-   idDocument?: number;
+   // idDocument?: number;
+   idTypeDocuments?: number;
    idClientHoneSolutions?: number;
    dateAdd?: string;
    expirationDate?: string;

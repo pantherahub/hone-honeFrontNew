@@ -12,3 +12,30 @@
     gap: 1rem;
     justify-content: end;
 }
+
+.whatsapp{
+    position: relative;
+    display: flex;
+    align-items: center;
+    right: 20%;
+    top: -15px;
+}
+
+@media only screen and (max-width: 768px) {
+    .footer {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .whatsapp{
+        position: relative;
+        display: flex;
+        align-items: center;
+        left: 30%;
+        top: 1px;
+    }
+    .icon{
+        height: 26px;
+    }
+}

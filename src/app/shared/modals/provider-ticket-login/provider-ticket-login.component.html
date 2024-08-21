@@ -1,6 +1,7 @@
 <section id="header">
     <div class="header-title">
-        <h2>Repórtanos tu dificultad y con gusto nuestro equipo Hone Solutions se pondrá en contacto contigo, a la mayor brevedad posible</h2>
+        <h2>Repórtanos tu dificultad y con gusto nuestro equipo Hone Solutions se pondrá en contacto contigo, a la mayor
+            brevedad posible</h2>
     </div>
 </section>
 
@@ -148,7 +149,8 @@
                             obligatorio!
                         </p>
                     </ng-template>
-                    <textarea rows="4" nz-input placeholder="Ingresar la observación que tenga a su disposición y no olvides agregar el nombre del cliente al que perteneces ej. (Allianz, Axa Colpatria ....)"
+                    <textarea rows="4" nz-input
+                        placeholder="Ingresar la observación que tenga a su disposición y no olvides agregar el nombre del cliente al que perteneces ej. (Allianz, Axa Colpatria ....)"
                         formControlName="observation"></textarea>
                 </nz-form-control>
             </nz-form-item>
@@ -160,6 +162,11 @@
 
 <section id="footer">
     <div class="footer">
+        <p class="whatsapp">
+            <span ><img  class="icon" src="../../../../assets/document-compliance/whatsapp-icon.png"
+                    alt="Ícono de WhatsApp"></span>
+            <a [href]="'https://wa.me/+57' + 3104748360" target="_blank">3104748360</a>
+        </p>
         <button nz-button nzType="default" (click)="destroyModal()">Cancelar</button>
         <button nz-button nzType="primary" (click)="submitData()" [nzLoading]="loader">Enviar datos</button>
     </div>
