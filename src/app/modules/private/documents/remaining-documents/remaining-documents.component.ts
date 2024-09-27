@@ -27,14 +27,14 @@ export class RemainingDocumentsComponent implements OnInit {
    loadingData: boolean = false;
 
    documentList: DocumentInterface[] = [];
-   
+
    formDate!: FormGroup;
-   
+
    constructor(
       private eventManager: EventManagerService,
       private documentService: DocumentsCrudService,
       private notificationService: NzNotificationService,
-      
+
       public formBuilder: FormBuilder,
    ) {
       this.createtiektcForm();
@@ -93,7 +93,7 @@ export class RemainingDocumentsComponent implements OnInit {
     */
    uploadDocuments(file: any, item: any) {
       const fechaForm = this.formDate.get("fecha")?.value;
-      
+
       this.loadingData = true;
       const { idProvider } = this.clientSelected;
       // const today = new Date();
@@ -135,4 +135,19 @@ export class RemainingDocumentsComponent implements OnInit {
    createNotificacion(type: string, title: string, message: string) {
       this.notificationService.create(type, title, message);
    }
+
+
+   /**
+    * 
+    * @param current Bloquea las fechas antes de la fecha actual, habilita por 30 dias y bloquea fechas posterior 
+    * @returns 
+    */
+   disableDates = (current: Date): boolean => {
+      const today = new Date();
+      const maxDate = new Date();
+      maxDate.setDate(today.getDate() + 30);
+      return current < today || current > maxDate;
+   };
+
+   
 }
