@@ -1,0 +1,18 @@
+services:
+    hone_front_new:
+        build: .
+        user: 'root'
+        container_name: 'hone_front_new'
+        ports:
+          - "7002:4200"
+        volumes:
+          - .:/app
+        networks:
+            - local_net
+        stdin_open: true
+        tty: true
+networks:
+    local_net:
+        name: local_net
+        driver: bridge
+        external: true
