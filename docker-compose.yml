@@ -6,7 +6,7 @@ services:
         ports:
           - "7002:4200"
         volumes:
-          - .:/app
+          - .:/app:rw
         working_dir: /app
         networks:
             - local_net
