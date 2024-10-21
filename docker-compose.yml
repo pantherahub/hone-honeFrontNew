@@ -1,8 +1,8 @@
 services:
-    hone_front_new:
+    hs_prestadores:
         image: node:18.19.1
         user: 'root'
-        container_name: 'hone_front_new'
+        container_name: 'hs_prestadores'
         ports:
           - "7002:4200"
         volumes:
