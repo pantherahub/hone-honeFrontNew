@@ -39,11 +39,11 @@ fi
 echo "Se valida si existe la carpeta"
 # Verificar si la carpeta existe
 if [ -d "$NGINX_FOLDER/$APP_FOLDER" ]; then
-    echo "La carpeta '$nombre_carpeta' ya existe en $directorio."
+    echo "La carpeta '$APP_FOLDER' ya existe en $directorio."
 else
-    echo "La carpeta '$nombre_carpeta' no existe en $directorio. Creando la carpeta..."
-    mkdir $NGINX_FOLDER/$APP_FOLDER
-    echo "Carpeta '$nombre_carpeta' creada en $directorio."
+    echo "La carpeta '$APP_FOLDER' no existe en $directorio. Creando la carpeta..."
+    sudo mkdir $NGINX_FOLDER/$APP_FOLDER
+    echo "Carpeta '$APP_FOLDER' creada en $directorio."
 fi
 
 echo "Copiando al directorio $NGINX_FOLDER/$APP_FOLDER..."
