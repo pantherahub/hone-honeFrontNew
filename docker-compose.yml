@@ -4,7 +4,7 @@ services:
         user: 'root'
         container_name: 'hs_prestadores'
         ports:
-          - "7002:4200"
+          - "7003:7003"
         volumes:
           - .:/app:rw
         working_dir: /app

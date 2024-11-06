@@ -33,13 +33,6 @@ export class ProviderAssistancessComponent implements AfterViewInit, OnInit {
     private notificationService: NzNotificationService,
   ) { }
 
-  /**
-   * http://localhost:4200/page-form-assistance?x_client=4&idOfficeProviderClient=2975&provider=5926&user=Fauner&email=faunerramirez@outlook.com&id=1061692138&city=Armenia
-   * Path page-form-assistance?x_client=8
-  https://honesolutionsprovider.azurewebsites.net/page-form-assistance?x_client=4?{this.idOfficeProvider}?{this.idProvider}?{this.userName}?{this.email}?{this.identificacion}
-  https://honesolutionsprovider.azurewebsites.net/page-form-assistance?x_client=4&office=12344&provider=5926&user=Fauner&email=faunerramirez@outlook.com&id=1061692138&city=Armenia
-  https://honesolutionsprovider.azurewebsites.net/page-form-assistance?x_client=4&idOfficeProviderClient=154088&provider=174151&user=Juan Tobar&email=juansetonog@gmail.com&id=1085346541&city=Cravo Norte
-   */
 
 
   ngOnInit() {
@@ -55,17 +48,17 @@ export class ProviderAssistancessComponent implements AfterViewInit, OnInit {
         this.identification = paramsObject['params'].id;
         this.city = paramsObject['params'].city;
         this.email = paramsObject['params'].email;
-        
+
       }
     });
-   
-  
+
+
   }
 
   ngAfterViewInit() {
     console.log(this.assistanceProvidersComponent.assistanceProviderForm.value);
     // Usamos setTimeout para asegurarnos de que los cambios se apliquen en el siguiente ciclo de detección de cambios.
-    //Movemos la lógica de llenado del formulario al ciclo de vida ngAfterViewInit para asegurarnos de que el componente hijo y 
+    //Movemos la lógica de llenado del formulario al ciclo de vida ngAfterViewInit para asegurarnos de que el componente hijo y
     //su formulario estén completamente inicializados.
 
     setTimeout(() => {
@@ -124,7 +117,7 @@ export class ProviderAssistancessComponent implements AfterViewInit, OnInit {
       email: this.email
 
     };
-   
+
     this.postProviderAssist(payload);
   }
 
