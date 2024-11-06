@@ -47,7 +47,7 @@ else
 fi
 
 echo "Copiando al directorio $NGINX_FOLDER/$APP_FOLDER..."
-sudo cp -r "$BUILD_DIR" $NGINX_FOLDER/$APP_FOLDER/dist
+sudo cp -r "$BUILD_DIR" $NGINX_FOLDER/$APP_FOLDER
 
 echo "Cambio del usuario para: $NGINX_FOLDER/$APP_FOLDER..."
 cd $NGINX_FOLDER
