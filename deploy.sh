@@ -4,9 +4,11 @@
 set -e
 
 # Ruta a la aplicación Angular
-APP_DIR="/home/honesolutions/hone-honeFrontNew"
+APP_DIR=$(pwd)
 BUILD_DIR="$APP_DIR/dist"
 ENVIRONMENT=${1:-"prod"}
+APP_FOLDER="hone-honeFrontNew"
+NGINX_FOLDER="/var/www/html"
 
 # Usar nvm para seleccionar la versión de Node.js
 export NVM_DIR="$HOME/.nvm"
@@ -34,12 +36,22 @@ if [ ! -d "$BUILD_DIR" ]; then
   exit 1
 fi
 
-echo "Copiando al directorio /var/www/html/hone-honeFrontNew..."
-sudo cp -r "$BUILD_DIR" /var/www/html/hone-honeFrontNew/dist
+echo "Se valida si existe la carpeta"
+# Verificar si la carpeta existe
+if [ -d "$NGINX_FOLDER/$APP_FOLDER" ]; then
+    echo "La carpeta '$nombre_carpeta' ya existe en $directorio."
+else
+    echo "La carpeta '$nombre_carpeta' no existe en $directorio. Creando la carpeta..."
+    mkdir $NGINX_FOLDER/$APP_FOLDER
+    echo "Carpeta '$nombre_carpeta' creada en $directorio."
+fi
 
-echo "Cambio del usuario para: /var/www/html/hone-honeFrontNew..."
-cd /var/www/html
-sudo chown -R honesolutions:honesolutions ./hone-honeFrontNew
+echo "Copiando al directorio $NGINX_FOLDER/$APP_FOLDER..."
+sudo cp -r "$BUILD_DIR" $NGINX_FOLDER/$APP_FOLDER/dist
+
+echo "Cambio del usuario para: $NGINX_FOLDER/$APP_FOLDER..."
+cd $NGINX_FOLDER
+sudo chown -R honesolutions:honesolutions ./$APP_FOLDER
 
 echo "Completo!"
 
