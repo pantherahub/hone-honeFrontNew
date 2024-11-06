@@ -103,6 +103,9 @@
 						"production": {
 							"buildTarget": "hone-solutions-providers:build:production"
 						},
+						"testing": {
+							"buildTarget": "hone-solutions-providers:build:testing"
+						},
 						"development": {
 							"buildTarget": "hone-solutions-providers:build:development"
 						}
