@@ -1,15 +1,15 @@
 import { Component, HostListener, OnInit } from '@angular/core';
-import { NgZorroModule } from 'app/ng-zorro.module';
+import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { CommonModule } from '@angular/common';
-import { AuthService } from 'app/services/auth.service';
+import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
 
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { RecaptchaModule } from 'ng-recaptcha';
-import { environment } from '../../../../environments/environment';
+import { environment } from 'src/environments/environment';
 import { NzModalService } from 'ng-zorro-antd/modal';
-import { ProviderTicketLoginComponent } from 'app/shared/modals/provider-ticket-login/provider-ticket-login.component';
+import { ProviderTicketLoginComponent } from 'src/app/shared/modals/provider-ticket-login/provider-ticket-login.component';
 
 @Component({
    selector: 'app-login',

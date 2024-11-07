@@ -5,5 +5,5 @@ export const environment = {
 
 	PASS_ENC: '123456',
 	PUBLIC_PASS_KEY: '6LcojGQqAAAAADPhwhfQj7iHK9RZBcvCUKEf_s88',
-	PRIVATE_PASS_KEY: '6LcojGQqAAAAAHk2GoQ7YuuKXZuRdSjKG_aKqmmm'
+	PRIVATE_PASS_KEY: ''
 };
