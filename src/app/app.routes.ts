@@ -11,72 +11,71 @@ import { ProviderAssistancessComponent } from './modules/public/provider-assista
 import { TutorialVideoComponent } from './modules/private/tutorials/tutorial-video/tutorial-video.component';
 
 export const routes: Routes = [
-   //   PRIVATE ROUTES
-   {
-      path: 'tutorial',
-      component: AdminLayoutComponent,
-      children: [ { path: '', component: TutorialVideoComponent } ],
-      canActivate: [ authGuard ]
-   },
-   {
-      path: 'home',
-      component: AdminLayoutComponent,
-      children: [ { path: '', component: HomeComponent } ],
-      canActivate: [ authGuard ]
-   },
-   {
-      path: 'cargar-documentos/:id',
-      component: AdminLayoutComponent,
-      children: [ { path: '', component: ListDocumentsComponent } ],
-      canActivate: [ authGuard ]
-   },
-   {
-      path: 'cumplimiento-documentos/:id',
-      component: AdminLayoutComponent,
-      children: [ { path: '', component: ComplianceDocumentationComponent } ],
-      canActivate: [ authGuard ]
-   },
-   //   PUBLIC ROUTES
-   {
-      path: 'login',
-      component: LoginComponent
-   },
-   {
-      path: 'page-not-found',
-      component: PageNotFoundComponent
-   },
-   {
-      path: 'page-form-assistance',
-      component: ProviderAssistancessComponent
-   },
-   //   DEFAULT ROUTES
-   {
-      path: '',
-      redirectTo: 'login',
-      pathMatch: 'full'
-   },
-   {
-      path: '**',
-      pathMatch: 'full',
-      redirectTo: 'page-not-found'
-   },
-   {
-      path: '**',
-      pathMatch: 'full',
-      redirectTo: 'page-form-assistance'
-   }
+	//   PRIVATE ROUTES
+	{
+		path: '',
+    component: AdminLayoutComponent,
+    canActivate: [authGuard],
+		children: [
+      {
+        path: 'tutorial',
+        component: TutorialVideoComponent
+      },
+      {
+        path: 'home',
+        component: HomeComponent
+      },
+      {
+        path: 'cargar-documentos/:id',
+        component: ListDocumentsComponent
+      },
+			{
+        path: 'cumplimiento-documentos/:id',
+        component: ComplianceDocumentationComponent
+			}
+		]
+	},
+	//   PUBLIC ROUTES
+	{
+		path: 'login',
+		component: LoginComponent
+	},
+	{
+		path: 'page-not-found',
+		component: PageNotFoundComponent
+	},
+	{
+		path: 'page-form-assistance',
+		component: ProviderAssistancessComponent
+	},
+	//   DEFAULT ROUTES
+	{
+		path: '',
+		redirectTo: 'login',
+		pathMatch: 'full'
+	},
+	{
+		path: '**',
+		pathMatch: 'full',
+		redirectTo: 'page-not-found'
+	},
+	{
+		path: '**',
+		pathMatch: 'full',
+		redirectTo: 'page-form-assistance'
+	}
 ];
 
 @NgModule({
-   imports: [
-      RouterModule.forRoot(routes, {
-         useHash: true,
-         /* Activa las anclas en angular */
-         anchorScrolling: 'enabled',
-         /* Restaura el scroll a la posición inicial */
-         scrollPositionRestoration: 'enabled'
-      })
-   ],
-   exports: [ RouterModule ]
+	imports: [
+		RouterModule.forRoot(routes, {
+			useHash: true,
+			/* Activa las anclas en angular */
+			anchorScrolling: 'enabled',
+			/* Restaura el scroll a la posición inicial */
+			scrollPositionRestoration: 'enabled'
+		})
+	],
+	exports: [RouterModule]
 })
 export class AppRoutingModule {}

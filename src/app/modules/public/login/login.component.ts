@@ -1,15 +1,15 @@
 import { Component, HostListener, OnInit } from '@angular/core';
-import { NgZorroModule } from '../../../ng-zorro.module';
+import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../../services/auth.service';
+import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
 
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { RecaptchaModule } from 'ng-recaptcha';
-import { environment } from '../../../../environments/environment';
+import { environment } from 'src/environments/environment';
 import { NzModalService } from 'ng-zorro-antd/modal';
-import { ProviderTicketLoginComponent } from '../../../shared/modals/provider-ticket-login/provider-ticket-login.component';
+import { ProviderTicketLoginComponent } from 'src/app/shared/modals/provider-ticket-login/provider-ticket-login.component';
 
 @Component({
    selector: 'app-login',
@@ -33,7 +33,7 @@ export class LoginComponent implements OnInit {
       private authService: AuthService,
       public router: Router,
       private formBuilder: FormBuilder,
-      private notificationService: NzNotificationService,      
+      private notificationService: NzNotificationService,
       private modalService: NzModalService,
    ) {
       this.createForm();
@@ -83,7 +83,7 @@ export class LoginComponent implements OnInit {
          },
          error: (error: any) => {
             this.isSubmitData = false;
-            
+
             if (error.status == 401) {
                this.createNotificacion('error', 'Error', error.error.message);
                return;
