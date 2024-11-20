@@ -6,6 +6,7 @@
 @import "../node_modules/ng-zorro-antd/button/style/index.min.css";  /* Import one component's styles */
 
 @import "assets/styles/global.scss";
+@import "scss/utilities";
 
 :root{
   transition-duration: 0.3s;

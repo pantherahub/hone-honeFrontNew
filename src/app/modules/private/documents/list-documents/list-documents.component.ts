@@ -30,7 +30,6 @@ export class ListDocumentsComponent implements OnInit {
    contactsOfProviders: any = [];
 
    percentData: PercentInterface = {};
-  
 
    constructor(
       private eventManager: EventManagerService,
@@ -45,7 +44,7 @@ export class ListDocumentsComponent implements OnInit {
             this.getDocumentPercent();
          }
       });
-     
+
       if (this.clientSelected.idTypeProvider ==7) {
          this.hiddenCard = true;
       }
@@ -84,7 +83,7 @@ export class ListDocumentsComponent implements OnInit {
    }
 
    /**
-   * Retorna los contactos por prestador y abre el modal para actualizar y cerrar, 
+   * Retorna los contactos por prestador y abre el modal para actualizar y cerrar,
    * y se hace el llamando de this.getContactsByIDProvider(this.clientSelected.idProvider); en el  ngOnInit() para que funcione
    */
    getContactsByIDProvider(idProvider: any) {
@@ -210,7 +209,7 @@ export class ListDocumentsComponent implements OnInit {
    }
 
    /**
-   * Abre una ventana modal para actualizar el nombre del representante legal, 
+   * Abre una ventana modal para actualizar el nombre del representante legal,
    * donde se puede abrir mediante funcion del mismo modal de contacts-provider
    * y tambien se abre por defecto o automaticamente cuando elija allianz
    */
@@ -237,7 +236,7 @@ export class ListDocumentsComponent implements OnInit {
       });
    }
    /**
-   * Abre una ventana modal para actualizar el nombre del representante legal, 
+   * Abre una ventana modal para actualizar el nombre del representante legal,
    * donde se puede abrir mediante funcion del mismo modal de contacts-provider
    * y tambien se abre por defecto o automaticamente cuando elija allianz
    */
