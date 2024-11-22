@@ -1,4 +1,4 @@
-import { Component, OnInit, NgModule } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { EventManagerService } from '../../../../services/events-manager/event-manager.service';
 import { DocumentsCrudService } from '../../../../services/documents/documents-crud.service';
 import { DocumentInterface } from '../../../../models/client.interface';
@@ -8,30 +8,24 @@ import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { PipesModule } from '../../../../pipes/pipes.module';
 
-import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { ModalEditDocumentComponent } from '../modal-edit-document/modal-edit-document.component';
+import { FileViewerComponent } from 'src/app/shared/modals/file-viewer/file-viewer.component';
 
 @Component({
    selector: 'app-uploaded-documents',
    standalone: true,
-   imports: [ CommonModule, NgZorroModule, PipesModule, PdfViewerModule ],
+   imports: [ CommonModule, NgZorroModule, PipesModule, FileViewerComponent ],
    templateUrl: './uploaded-documents.component.html',
    styleUrl: './uploaded-documents.component.scss'
 })
 export class UploadedDocumentsComponent implements OnInit {
-   loading: boolean = false;
+   loadingData: boolean = false;
    clientSelected: any = this.eventManager.clientSelected();
    counterApi: any = this.eventManager.getPercentApi();
-
-   loadingData: boolean = false;
-   previewVisible: boolean = false;
-   isImage: boolean = false;
-   previewFile: string = '';
-   currentItem: DocumentInterface = {};
-
    documentList: DocumentInterface[] = [];
 
-   typeImageExtension = [ 'jpg', 'jpeg', 'webb', 'gif', 'tiff', 'tif', 'bmp', 'raw', 'png', 'jfif' ];
+   previewVisible: boolean = false;
+   currentItem: DocumentInterface = {};
 
    constructor (
       private eventManager: EventManagerService,
@@ -107,18 +101,17 @@ export class UploadedDocumentsComponent implements OnInit {
       this.resetValues();
       if (item.UrlDocument) {
          this.currentItem = item;
-         const array = item.UrlDocument.split('.');
-         const extension = array[array.length - 1];
-
-         const resp = this.typeImageExtension.find((item: any) => item == extension.toString());
-         if (resp) {
-            this.isImage = true;
-         } else {
-            this.isImage = false;
-         }
-         this.previewVisible = true;
-         this.previewFile = item.UrlDocument;
+         this.openViewerModal();
       }
+   }
+
+   openViewerModal() {
+      this.previewVisible = true;
+   }
+
+   closeViewerModal() {
+      this.previewVisible = false;
+      this.resetValues();
    }
 
    /**
@@ -126,7 +119,6 @@ export class UploadedDocumentsComponent implements OnInit {
     */
    resetValues () {
       this.currentItem = {};
-      this.previewFile = '';
    }
 
    /**

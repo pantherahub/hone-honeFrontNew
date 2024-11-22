@@ -1,0 +1,24 @@
+<nz-modal
+  [nzVisible]="visible"
+  [nzTitle]="currentItem?.NameDocument || 'No especifica'"
+  [nzFooter]="null"
+  [nzWidth]="'800px'"
+  [nzClassName]="'custom-modal'"
+  [nzContent]="modalContent"
+  (nzOnCancel)="closeModal()"
+>
+  <ng-template #modalContent>
+    <div class="modal-content">
+      <div class="loading-pdf">
+        <nz-spin *ngIf="loadingPdf" nzSimple [nzSize]="'large'" nzTip="Cargando documento..."></nz-spin>
+      </div>
+      <img *ngIf="isImage" [src]="previewFile" [ngStyle]="{ width: '100%' }" />
+      <ngx-doc-viewer
+        *ngIf="!isImage"
+        [url]="previewFile"
+        class="doc-viewer"
+        (loaded)="onDocumentLoaded()"
+      ></ngx-doc-viewer>
+    </div>
+  </ng-template>
+</nz-modal>

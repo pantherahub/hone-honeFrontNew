@@ -1,4 +1,4 @@
-<div class="generalContainer">
+<div class="generalContainer expired-documents">
 
 
     @if (loadingData) {
@@ -39,14 +39,11 @@
         </div>
         }
 
-        <nz-modal [nzVisible]="previewVisible" [nzTitle]="currentItem ? currentItem.NameDocument : 'No especifica'"
-            [nzContent]="modalContent" [nzFooter]="null" (nzOnCancel)="previewVisible = false">
-            <ng-template #modalContent>
-                <img *ngIf="isImage" [src]="previewFile" [ngStyle]="{ width: '100%' }" />
-                <pdf-viewer *ngIf="!isImage" [src]="previewFile" [render-text]="true" [original-size]="false"
-                    style="width: 100%; height: 500px"></pdf-viewer>
-            </ng-template>
-        </nz-modal>
+        <app-file-viewer
+          [visible]="previewVisible"
+          [currentItem]="currentItem"
+          (close)="closeViewerModal()"
+        ></app-file-viewer>
     </div>
     } @else{
 
@@ -59,6 +56,5 @@
     </div>
     }
     }
-
 
 </div>

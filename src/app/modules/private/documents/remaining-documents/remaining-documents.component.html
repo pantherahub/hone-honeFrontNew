@@ -6,25 +6,29 @@
         <nz-spin nzSimple [nzSize]="'large'" nzTip="Cargando datos..."></nz-spin>
     </div>
     } @else {
-       
+
         @if (!loadingData && documentList.length > 0) {
+
+            <p class="warning-message">
+              Asegúrate de que el documento no esté protegido por contraseña antes de cargarlo.
+            </p>
 
             <div class="container-grid">
                 @for (item of documentList; track $index) {
                     @if (item.idTypeDocuments == 8 || item.idTypeDocuments == 22 || item.idTypeDocuments == 7 || item.idTypeDocuments == 77 || item.idTypeDocuments == 108) {
-                        
+
                         <form nz-form nz-row [formGroup]="formDate" class="form-documentList" nzJustify="center" nzAlign="bottom">
                             <label id="upload" class="custom-file-upload btn rounded">
                                 <input type="file" name="file" id="upload-file" accept=".pdf,.png,.jpeg,.jpg" class="custom-file-input"
                                     (change)="loadFiles($event, item)" hidden>
                                 <img src="../../../../../assets/img/warning.png" alt="">
                                 {{ item.NameDocument }}
-        
+
                                 <!-- Input tipo fecha con deshabilitación de fechas para los idTypeDocuments específicos -->
                                 @if (item.idTypeDocuments == 7 || item.idTypeDocuments == 77 || item.idTypeDocuments == 108) {
-                                    <nz-date-picker 
-                                        nzFormat="yyyy-MM-dd" 
-                                        [nzDisabledDate]="disableDates" 
+                                    <nz-date-picker
+                                        nzFormat="yyyy-MM-dd"
+                                        [nzDisabledDate]="disableDates"
                                         formControlName="fecha">
                                     </nz-date-picker>
                                     <p style="color: red; font-size: 11px; text-align: justify;" >El documento No puede ser mayor a 30 días de la fecha de expedición.</p>
@@ -32,8 +36,8 @@
                                 }
                                 <!-- Input tipo fecha normal para otros documentos -->
                                 @if (item.idTypeDocuments == 8 || item.idTypeDocuments == 22) {
-                                    <nz-date-picker 
-                                        nzFormat="yyyy-MM-dd" 
+                                    <nz-date-picker
+                                        nzFormat="yyyy-MM-dd"
                                         formControlName="fecha">
                                     </nz-date-picker>
                                 }
@@ -50,19 +54,19 @@
                     }
                 }
             </div>
-        
+
         } @else {
-        
+
             <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
                 <h2 nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24">
                     No hay Documentos
                 </h2>
             </div>
-        
-        }
-        
 
-        
+        }
+
+
+
     }
 
 

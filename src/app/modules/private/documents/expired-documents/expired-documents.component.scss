@@ -23,13 +23,11 @@
 }
 
 ::ng-deep {
-
-    .ant-card-body {
+    .expired-documents .ant-card-body {
         background: #AD2102;
         color: #fff;
     }
 }
-
 
 @media only screen and (max-width: 524px) {
     .container-grid {

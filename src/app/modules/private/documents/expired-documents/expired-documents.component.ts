@@ -5,32 +5,27 @@ import { DocumentInterface } from '../../../../models/client.interface';
 import { CommonModule } from '@angular/common';
 import { NgZorroModule } from '../../../../ng-zorro.module';
 import { PipesModule } from '../../../../pipes/pipes.module';
-import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { ModalEditDocumentComponent } from '../modal-edit-document/modal-edit-document.component';
+import { FileViewerComponent } from 'src/app/shared/modals/file-viewer/file-viewer.component';
 
 @Component({
    selector: 'app-expired-documents',
    standalone: true,
-   imports: [ CommonModule, NgZorroModule, PipesModule, PdfViewerModule ],
+   imports: [ CommonModule, NgZorroModule, PipesModule, FileViewerComponent ],
    templateUrl: './expired-documents.component.html',
    styleUrl: './expired-documents.component.scss'
 })
 export class ExpiredDocumentsComponent implements OnInit {
-   loading: boolean = false;
+   loadingData: boolean = false;
    clientSelected: any = this.eventManager.clientSelected();
    counterApi: any = this.eventManager.getPercentApi();
-
-   loadingData: boolean = false;
-   previewVisible: boolean = false;
-   isImage: boolean = false;
-   previewFile: string = '';
-   currentItem: DocumentInterface = {};
-
    documentList: DocumentInterface[] = [];
 
-   typeImageExtension = [ 'jpg', 'jpeg', 'webb', 'gif', 'tiff', 'tif', 'bmp', 'raw', 'png', 'jfif' ];
+   previewVisible: boolean = false;
+   currentItem: DocumentInterface = {};
+
 
    constructor (
       private eventManager: EventManagerService,
@@ -103,30 +98,27 @@ export class ExpiredDocumentsComponent implements OnInit {
     * @param item - elemento de la lista para saber cual documento de carga ej (cedula, nit, rethus)
     */
    viewFile (item: any) {
-      this.currentItem = {};
-      this.previewFile = '';
+      this.resetValues();
       if (item.UrlDocument) {
          this.currentItem = item;
-         const array = item.UrlDocument.split('.');
-         const extension = array[array.length - 1];
-
-         const resp = this.typeImageExtension.find((item: any) => item == extension.toString());
-         if (resp) {
-            this.isImage = true;
-         } else {
-            this.isImage = false;
-         }
-         this.previewVisible = true;
-         this.previewFile = item.UrlDocument;
+         this.openViewerModal();
       }
+   }
+
+   openViewerModal() {
+      this.previewVisible = true;
+   }
+
+   closeViewerModal() {
+      this.previewVisible = false;
+      this.resetValues();
    }
 
    /**
     * Reinicia los valores del item e imagen seleccionados para visualizar
     */
-   resetValues () {
+   resetValues() {
       this.currentItem = {};
-      this.previewFile = '';
    }
 
    /**
