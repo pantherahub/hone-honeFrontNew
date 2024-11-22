@@ -11,6 +11,25 @@ import { ProviderAssistancessComponent } from './modules/public/provider-assista
 import { TutorialVideoComponent } from './modules/private/tutorials/tutorial-video/tutorial-video.component';
 
 export const routes: Routes = [
+  //   PUBLIC ROUTES
+  {
+		path: '',
+		redirectTo: 'login',
+		pathMatch: 'full'
+  },
+	{
+		path: 'login',
+		component: LoginComponent
+	},
+	{
+		path: 'page-not-found',
+		component: PageNotFoundComponent
+	},
+	{
+		path: 'page-form-assistance',
+		component: ProviderAssistancessComponent
+  },
+
 	//   PRIVATE ROUTES
 	{
 		path: '',
@@ -34,26 +53,9 @@ export const routes: Routes = [
         component: ComplianceDocumentationComponent
 			}
 		]
-	},
-	//   PUBLIC ROUTES
-	{
-		path: 'login',
-		component: LoginComponent
-	},
-	{
-		path: 'page-not-found',
-		component: PageNotFoundComponent
-	},
-	{
-		path: 'page-form-assistance',
-		component: ProviderAssistancessComponent
-	},
+  },
+
 	//   DEFAULT ROUTES
-	{
-		path: '',
-		redirectTo: 'login',
-		pathMatch: 'full'
-	},
 	{
 		path: '**',
 		pathMatch: 'full',
