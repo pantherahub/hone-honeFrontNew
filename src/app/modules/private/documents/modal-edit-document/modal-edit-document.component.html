@@ -45,7 +45,7 @@
                         </ng-template>
                         <input nz-input type="date" placeholder="" formControlName="fechadedocumento">
                         <!-- <nz-date-picker style="width: 100%;" [nzShowToday]="false" formControlName="fechadedocumento"
-                            > 
+                            >
                         </nz-date-picker> -->
                     </nz-form-control>
                 </nz-form-item>
@@ -462,8 +462,7 @@
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24">
                 <span *ngIf="loadFile">{{loadedFile ? loadedFile.name : ''}}</span>
                 <label id="upload" class="row-doc btn rounded">
-                    <input type="file" name="file" id="upload-file" accept=".pdf,.png, .jpeg, .jpg"
-                        class="custom-file-input" (change)="loadFile($event)" hidden>
+                    <input type="file" name="file" id="upload-file" class="custom-file-input" appFileValidator (fileValidated)="loadFile($event)" hidden>
                     <img src="../../../../../assets/img/folder.png" alt="" srcset="">
                     Clic para cargar
                 </label>

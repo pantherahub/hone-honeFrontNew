@@ -7,12 +7,12 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { DocumentsCrudService } from '../../../../services/documents/documents-crud.service';
 import { EventManagerService } from '../../../../services/events-manager/event-manager.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
-
+import { FileValidatorDirective } from 'src/app/directives/file-validator.directive';
 
 @Component({
    selector: 'app-modal-edit-document',
    standalone: true,
-   imports: [ NgZorroModule, CommonModule ],
+   imports: [ NgZorroModule, CommonModule, FileValidatorDirective ],
    templateUrl: './modal-edit-document.component.html',
    styleUrl: './modal-edit-document.component.scss'
 })
@@ -114,11 +114,8 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
     * @param event - evento del input que contiene el archivo para cargar
     * @param item - elemento de la lista para saber cual documento de carga ej (cedula, nit, rethus)
     */
-   loadFile (event: any) {
-      if (event.target.files.length > 0) {
-         const file: FileList = event.target.files[0];
-         this.loadedFile = file;
-      }
+   loadFile (file: any) {
+      if (file) this.loadedFile = file;
    }
 
    /**

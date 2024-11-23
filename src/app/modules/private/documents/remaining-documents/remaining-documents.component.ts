@@ -12,11 +12,12 @@ import { ProviderAssistanceComponent } from '../../../../shared/modals/provider-
 
 import { FetchBackend } from '@angular/common/http';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { FileValidatorDirective } from 'src/app/directives/file-validator.directive';
 
 @Component({
    selector: 'app-remaining-documents',
    standalone: true,
-   imports: [NgZorroModule, CommonModule],
+   imports: [NgZorroModule, CommonModule, FileValidatorDirective],
    templateUrl: './remaining-documents.component.html',
    styleUrl: './remaining-documents.component.scss'
 })
@@ -72,19 +73,17 @@ export class RemainingDocumentsComponent implements OnInit {
       const reader = new FileReader();
       reader.addEventListener('load', () => callback(reader.result!.toString()));
       reader.readAsDataURL(img);
-   }
+  }
 
    /**
     * Carga un archivo y lo envia al api de carga de documentos
     * @param event - evento del input que contiene el archivo para cargar
     * @param item - elemento de la lista para saber cual documento de carga ej (cedula, nit, rethus)
     */
-   loadFiles(event: any, item: any) {
-      if (event.target.files.length > 0) {
-         const file: FileList = event.target.files[0];
-         this.uploadDocuments(file, item);
-      }
-   }
+  loadFiles(file: any, item: any) {
+      if (!file) return;
+      this.uploadDocuments(file, item);
+    }
 
    /**
     * Carga un archivo y lo envia al api de carga de documentos
@@ -138,9 +137,9 @@ export class RemainingDocumentsComponent implements OnInit {
 
 
    /**
-    * 
-    * @param current Bloquea las fechas antes de la fecha actual, habilita por 30 dias y bloquea fechas posterior 
-    * @returns 
+    *
+    * @param current Bloquea las fechas antes de la fecha actual, habilita por 30 dias y bloquea fechas posterior
+    * @returns
     */
    disableDates = (current: Date): boolean => {
       const today = new Date();
@@ -149,5 +148,5 @@ export class RemainingDocumentsComponent implements OnInit {
       return current < today || current > maxDate;
    };
 
-   
+
 }
