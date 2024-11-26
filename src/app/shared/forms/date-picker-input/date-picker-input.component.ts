@@ -30,7 +30,6 @@ export class DatePickerInputComponent implements ControlValueAccessor {
   // ControlValueAccessor implementation
   writeValue(value: string | null): void {
     if (value) {
-      console.log(value);
       const [year, month, day] = value.split('-').map(Number);
       this.displayValue = new Date(year, month - 1, day);
     } else {
@@ -40,8 +39,6 @@ export class DatePickerInputComponent implements ControlValueAccessor {
 
   // Managing changes from the DatePicker
   onDateChange(newValue: Date): void {
-    console.log("onDateChange");
-    console.log(newValue);
     if (newValue) {
       this.innerValue = newValue.toISOString().split('T')[0];
     } else {

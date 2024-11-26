@@ -56,39 +56,45 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
    /**
     * Crea e Inicializa el formulario
     */
-   createForm () {
+   createForm() {
       this.documentForm = this.formBuilder.nonNullable.group({
          nombredocumento: [ '' ],
-         fechadedocumento: [ '' ],
-         dateDiligence: [ '' ],
-         dateFirm: [ '' ],
-         dateVaccination: [ '' ],
-         dueDate: [ '' ],
-         legalRepresentative: [ '' ],
-         NameAlternate: [ '' ],
-         documentDeliveryDate: [ '' ],
-         dateOfBirth: [ '' ],
-         consultationDate: [ '' ],
-         endorsedSpecialtyDate: [ '' ],
-         validityStartDate: [ '' ],
-         dateofRealization: [ '' ],
-         receptionDate: [ '' ],
-         lastDosimetryDate: [ '' ],
-         epsName: [ '' ],
-         riskClassifier: [ '' ],
-         resolutionOfThePension: [ '' ]
+         fechadedocumento: [ '', [Validators.required] ],
+         dateDiligence: [ '', [Validators.required] ],
+         dateFirm: [ '', [Validators.required] ],
+         dateVaccination: [ '', [Validators.required] ],
+         dueDate: [ '', [Validators.required] ],
+         legalRepresentative: [ '', [Validators.required] ],
+         NameAlternate: [ '', [Validators.required] ],
+         documentDeliveryDate: [ '', [Validators.required] ],
+         dateOfBirth: [ '', [Validators.required] ],
+         consultationDate: [ '', [Validators.required] ],
+         endorsedSpecialtyDate: [ '', [Validators.required] ],
+         validityStartDate: [ '', [Validators.required] ],
+         dateofRealization: [ '', [Validators.required] ],
+         receptionDate: [ '', [Validators.required] ],
+         lastDosimetryDate: [ '', [Validators.required] ],
+         epsName: [ '', [Validators.required] ],
+         riskClassifier: [ '', [Validators.required] ],
+         resolutionOfThePension: [ '', [Validators.required] ]
       });
-      this.setValidators();
+
+      // Clear validations of fields that do not apply
+      Object.keys(this.documentForm.controls).forEach(controlName => {
+         if (!this.isFieldRequiredForDocumentType(controlName)) {
+            this.documentForm.controls[controlName].clearValidators();
+         }
+      });
+      // Update validity statuses
+      this.documentForm.updateValueAndValidity();
+
       this.patchForm();
    }
 
-   setValidators() {
-      // Clear all validations
-      Object.keys(this.documentForm.controls).forEach(controlName => {
-         this.documentForm.controls[controlName].clearValidators();
-      });
-
-      // Map of document types and fields that require validation
+   /**
+    * Checks if the field is required for the document type
+    */
+   isFieldRequiredForDocumentType(controlName: string): boolean {
       const documentValidationMap: any = {
          'fechadedocumento': [4, 12, 110, 111, 77, 108],
          'dateDiligence': [1, 35],
@@ -109,17 +115,8 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
          'riskClassifier': [13],
          'resolutionOfThePension': [15]
       };
-
-      // Assign validations based on document type
-      Object.keys(documentValidationMap).forEach(field => {
-         if (documentValidationMap[field].includes(this.documentType)) {
-         this.documentForm.controls[field].setValidators([Validators.required]);
-         }
-      });
-
-      // Update validity statuses
-      this.documentForm.updateValueAndValidity();
-    }
+      return documentValidationMap[controlName]?.includes(this.documentType);
+   }
 
    patchForm () {
       const item = this.currentDoc;
@@ -184,10 +181,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
     * Envia peticion al servicio de login para obtener el token de acceso
     */
    submitRequest() {
-      console.log("submitRequest");
-      console.log(this.documentForm.invalid);
       if (this.documentForm.invalid) {
-         console.log("Is invalid");
          Object.values(this.documentForm.controls).forEach(control => {
             if (control.invalid) {
                control.markAsDirty();
