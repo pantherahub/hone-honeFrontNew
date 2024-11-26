@@ -3,7 +3,7 @@
 
     <section class="form-section">
 
-        <form nz-form [formGroup]="documentForm" class="form-login">
+        <form nz-form [formGroup]="documentForm" (ngSubmit)="submitRequest()" class="form-login">
 
             <!-- Campo Nombre de Documento -->
             <!-- <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
@@ -29,7 +29,12 @@
 
             <!-- Campo Fecha de Expedición  idTypeDocument 4 y 12-->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="documentType == 4 || documentType == 12">
+                *ngIf="documentType == 4
+                  || documentType == 12
+                  || documentType == 110
+                  || documentType == 111
+                  || documentType == 77
+                  || documentType == 108">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
@@ -43,10 +48,11 @@
                                 obligatorio!
                             </p>
                         </ng-template>
-                        <input nz-input type="date" placeholder="" formControlName="fechadedocumento">
-                        <!-- <nz-date-picker style="width: 100%;" [nzShowToday]="false" formControlName="fechadedocumento"
-                            >
-                        </nz-date-picker> -->
+                        <!-- <input nz-input type="date" placeholder="" formControlName="fechadedocumento"> -->
+                        <app-date-picker-input
+                          formControlName="fechadedocumento"
+                          [disableDates]="disableDates">
+                        </app-date-picker-input>
                     </nz-form-control>
                 </nz-form-item>
             </div>
@@ -470,8 +476,8 @@
 
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
                 style="text-align: center; margin-top: 3rem;">
-                <button nz-button nzType="primary" class="btn-primary custom-btn ml-3" [disabled]="false"
-                    [nzLoading]="loader" (click)="submitRequest()" nz-popover nzPopoverTitle="" nzJustify="center"
+                <button type="submit" nz-button nzType="primary" class="btn-primary custom-btn ml-3" [disabled]="false"
+                    [nzLoading]="loader" nz-popover nzPopoverTitle="" nzJustify="center"
                     nzAlign="middle" [nzPopoverContent]="enablePopoverMessage">
                     <ng-template #enablePopoverMessage>
                         <span>Haga clic para guardar los datos</span>

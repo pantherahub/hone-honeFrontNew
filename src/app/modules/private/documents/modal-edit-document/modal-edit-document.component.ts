@@ -2,17 +2,18 @@ import { Component, inject, AfterContentChecked, Input, OnInit } from '@angular/
 import { NZ_MODAL_DATA, NzModalRef } from 'ng-zorro-antd/modal';
 import { NgZorroModule } from '../../../../ng-zorro.module';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { DocumentsCrudService } from '../../../../services/documents/documents-crud.service';
 import { EventManagerService } from '../../../../services/events-manager/event-manager.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { FileValidatorDirective } from 'src/app/directives/file-validator.directive';
+import { DatePickerInputComponent } from 'src/app/shared/forms/date-picker-input/date-picker-input.component';
 
 @Component({
    selector: 'app-modal-edit-document',
    standalone: true,
-   imports: [ NgZorroModule, CommonModule, FileValidatorDirective ],
+   imports: [ NgZorroModule, CommonModule, FileValidatorDirective, DatePickerInputComponent ],
    templateUrl: './modal-edit-document.component.html',
    styleUrl: './modal-edit-document.component.scss'
 })
@@ -37,14 +38,15 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
       private documentService: DocumentsCrudService,
       private eventManager: EventManagerService
    ) {
-      this.createForm();
+      // this.createForm();
    }
 
    ngAfterContentChecked (): void {}
 
-   ngOnInit (): void {
+   ngOnInit(): void {
+      this.createForm();
       this.validateDocumentType();
-      this.patchForm();
+      // this.patchForm();
    }
 
    destroyModal (response: boolean = false): void {
@@ -76,7 +78,48 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
          riskClassifier: [ '' ],
          resolutionOfThePension: [ '' ]
       });
+      this.setValidators();
+      this.patchForm();
    }
+
+   setValidators() {
+      // Clear all validations
+      Object.keys(this.documentForm.controls).forEach(controlName => {
+         this.documentForm.controls[controlName].clearValidators();
+      });
+
+      // Map of document types and fields that require validation
+      const documentValidationMap: any = {
+         'fechadedocumento': [4, 12, 110, 111, 77, 108],
+         'dateDiligence': [1, 35],
+         'dateFirm': [2, 19],
+         'dateVaccination': [6, 32],
+         'dueDate': [8, 22, 37, 21],
+         'legalRepresentative': [7],
+         'NameAlternate': [7],
+         'documentDeliveryDate': [10, 11],
+         'dateOfBirth': [12],
+         'consultationDate': [16],
+         'endorsedSpecialtyDate': [16],
+         'validityStartDate': [20],
+         'dateofRealization': [36, 24, 23],
+         'receptionDate': [25, 29],
+         'lastDosimetryDate': [0],
+         'epsName': [13, 14],
+         'riskClassifier': [13],
+         'resolutionOfThePension': [15]
+      };
+
+      // Assign validations based on document type
+      Object.keys(documentValidationMap).forEach(field => {
+         if (documentValidationMap[field].includes(this.documentType)) {
+         this.documentForm.controls[field].setValidators([Validators.required]);
+         }
+      });
+
+      // Update validity statuses
+      this.documentForm.updateValueAndValidity();
+    }
 
    patchForm () {
       const item = this.currentDoc;
@@ -107,7 +150,26 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
    /**
     * Valida el tipo de documento que se va a editar
     */
-   validateDocumentType () {}
+   validateDocumentType() { }
+
+    /**
+     *
+     * @param current Bloquea las fechas antes de la fecha actual, habilita por un año y bloquea fechas posterior (para fecha de expedición)
+     * @returns
+     */
+    disableDates = (current: Date): boolean => {
+      const withRestriction = [4, 77, 108, 110, 111];
+      if (!withRestriction.includes(this.documentType)) {
+        return false;
+      }
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const maxDate = new Date();
+      maxDate.setHours(0, 0, 0, 0);
+      // One year from today
+      maxDate.setFullYear(today.getFullYear() + 1);
+      return current < today || current > maxDate;
+    };
 
    /**
     * Carga un archivo y lo envia al api de carga de documentos
@@ -121,8 +183,11 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
    /**
     * Envia peticion al servicio de login para obtener el token de acceso
     */
-   submitRequest () {
+   submitRequest() {
+      console.log("submitRequest");
+      console.log(this.documentForm.invalid);
       if (this.documentForm.invalid) {
+         console.log("Is invalid");
          Object.values(this.documentForm.controls).forEach(control => {
             if (control.invalid) {
                control.markAsDirty();
@@ -142,8 +207,10 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
 
       const docForm: Object = { ...this.documentForm.value };
 
-      for (const [ key, value ] of Object.entries(docForm)) {
-         if (value != null && value.toString().trim() != '') {
+    for (const [key, value] of Object.entries(docForm)) {
+         if (value && value instanceof Date) {
+            fileToUpload.append(key, value.toString().split('T')[0]);
+         } else if (value != null && value.toString().trim() != '') {
             fileToUpload.append(key, value);
          } else {
             fileToUpload.append(key, '');

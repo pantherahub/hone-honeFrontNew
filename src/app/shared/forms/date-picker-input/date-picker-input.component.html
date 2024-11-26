@@ -1,0 +1,9 @@
+<nz-date-picker
+  style="width: 100%;"
+  [nzPlaceHolder]="'Seleccionar fecha'"
+  [nzFormat]="'dd-MM-yyyy'"
+  [ngModel]="displayValue"
+  (ngModelChange)="onDateChange($event)"
+  [nzDisabledDate]="disableDates"
+  [nzShowToday]="nzShowToday"
+></nz-date-picker>
