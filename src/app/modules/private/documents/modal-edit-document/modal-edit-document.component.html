@@ -3,7 +3,7 @@
 
     <section class="form-section">
 
-        <form nz-form [formGroup]="documentForm" class="form-login">
+        <form nz-form [formGroup]="documentForm" (ngSubmit)="submitRequest()" class="form-login">
 
             <!-- Campo Nombre de Documento -->
             <!-- <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
@@ -27,9 +27,14 @@
                 </nz-form-item>
             </div> -->
 
-            <!-- Campo Fecha de Expedición  idTypeDocument 4 y 12-->
+            <!-- Campo Fecha de Expedición  idTypeDocument 4, 12, 113, 110, 111, 108 -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="documentType == 4 || documentType == 12">
+                *ngIf="documentType == 4
+                  || documentType == 113
+                  || documentType == 12
+                  || documentType == 110
+                  || documentType == 111
+                  || documentType == 108">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
@@ -43,10 +48,10 @@
                                 obligatorio!
                             </p>
                         </ng-template>
-                        <input nz-input type="date" placeholder="" formControlName="fechadedocumento">
-                        <!-- <nz-date-picker style="width: 100%;" [nzShowToday]="false" formControlName="fechadedocumento"
-                            >
-                        </nz-date-picker> -->
+                        <app-date-picker-input
+                          formControlName="fechadedocumento"
+                          [disableDates]="disableDates">
+                        </app-date-picker-input>
                     </nz-form-control>
                 </nz-form-item>
             </div>
@@ -68,11 +73,9 @@
                                 obligatorio!
                             </p>
                         </ng-template>
-                        <input nz-input type="date" placeholder="" formControlName="dateDiligence">
-
-                        <!-- <nz-date-picker style="width: 100%;" [nzShowToday]="false" formControlName="dateDiligence"
-                            nzFormat="dd/MM/yyyy">
-                        </nz-date-picker> -->
+                        <app-date-picker-input
+                          formControlName="dateDiligence">
+                        </app-date-picker-input>
                     </nz-form-control>
                 </nz-form-item>
             </div>
@@ -93,10 +96,9 @@
                                 obligatorio!
                             </p>
                         </ng-template>
-                        <input nz-input type="date" placeholder="" formControlName="dateFirm">
-                        <!-- <nz-date-picker style="width: 100%;" [nzShowToday]="false" formControlName="dateFirm"
-                            nzFormat="yyyy-mm-dd">
-                        </nz-date-picker> -->
+                        <app-date-picker-input
+                          formControlName="dateFirm">
+                        </app-date-picker-input>
                     </nz-form-control>
                 </nz-form-item>
             </div>
@@ -118,10 +120,9 @@
                                 obligatorio!
                             </p>
                         </ng-template>
-                        <input nz-input type="date" placeholder="" formControlName="dateVaccination">
-                        <!-- <nz-date-picker style="width: 100%;" [nzShowToday]="false" formControlName="dateVaccination"
-                            nzFormat="dd/MM/yyyy">
-                        </nz-date-picker> -->
+                        <app-date-picker-input
+                          formControlName="dateVaccination">
+                        </app-date-picker-input>
                     </nz-form-control>
                 </nz-form-item>
             </div>
@@ -143,18 +144,17 @@
                                 obligatorio!
                             </p>
                         </ng-template>
-                        <input nz-input type="date" placeholder="" formControlName="dueDate">
-                        <!-- <nz-date-picker style="width: 100%;" [nzShowToday]="false" formControlName="dueDate"
-                            nzFormat="dd/MM/yyyy">
-                        </nz-date-picker> -->
+                        <app-date-picker-input
+                          formControlName="dueDate">
+                        </app-date-picker-input>
                     </nz-form-control>
                 </nz-form-item>
             </div>
 
 
-            <!-- Campo Nombre del Representante Legal  idTypeDocument 7 -->
+            <!-- Campo Nombre del Representante Legal  idTypeDocument 113 -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="documentType == 7">
+                *ngIf="documentType == 113">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
@@ -174,9 +174,9 @@
             </div>
 
 
-            <!-- Campo Nombre Suplente/s  idTypeDocument 7 -->
+            <!-- Campo Nombre Suplente/s  idTypeDocument 113 -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="documentType == 7">
+                *ngIf="documentType == 113">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
@@ -212,10 +212,9 @@
                                 obligatorio!
                             </p>
                         </ng-template>
-                        <input nz-input type="date" placeholder="" formControlName="documentDeliveryDate">
-                        <!-- <nz-date-picker style="width: 100%;" [nzShowToday]="false"
-                            formControlName="documentDeliveryDate" nzFormat="dd/MM/yyyy">
-                        </nz-date-picker> -->
+                        <app-date-picker-input
+                          formControlName="documentDeliveryDate">
+                        </app-date-picker-input>
                     </nz-form-control>
                 </nz-form-item>
             </div>
@@ -237,10 +236,9 @@
                                 obligatorio!
                             </p>
                         </ng-template>
-                        <input nz-input type="date" placeholder="" formControlName="dateOfBirth">
-                        <!-- <nz-date-picker style="width: 100%;" [nzShowToday]="false" formControlName="dateOfBirth"
-                            nzFormat="dd/MM/yyyy">
-                        </nz-date-picker> -->
+                        <app-date-picker-input
+                          formControlName="dateOfBirth">
+                        </app-date-picker-input>
                     </nz-form-control>
                 </nz-form-item>
             </div>
@@ -262,10 +260,9 @@
                                 obligatorio!
                             </p>
                         </ng-template>
-                        <input nz-input type="date" placeholder="" formControlName="consultationDate">
-                        <!-- <nz-date-picker style="width: 100%;" [nzShowToday]="false" formControlName="consultationDate"
-                            nzFormat="dd/MM/yyyy">
-                        </nz-date-picker> -->
+                        <app-date-picker-input
+                          formControlName="consultationDate">
+                        </app-date-picker-input>
                     </nz-form-control>
                 </nz-form-item>
             </div>
@@ -310,10 +307,9 @@
                                 obligatorio!
                             </p>
                         </ng-template>
-                        <input nz-input type="date" placeholder="" formControlName="validityStartDate">
-                        <!-- <nz-date-picker style="width: 100%;" [nzShowToday]="false" formControlName="validityStartDate"
-                            nzFormat="dd/MM/yyyy">
-                        </nz-date-picker> -->
+                        <app-date-picker-input
+                          formControlName="validityStartDate">
+                        </app-date-picker-input>
                     </nz-form-control>
                 </nz-form-item>
             </div>
@@ -335,10 +331,9 @@
                                 obligatorio!
                             </p>
                         </ng-template>
-                        <input nz-input type="date" placeholder="" formControlName="dateofRealization">
-                        <!-- <nz-date-picker style="width: 100%;" [nzShowToday]="false" formControlName="dateofRealization"
-                            nzFormat="dd/MM/yyyy">
-                        </nz-date-picker> -->
+                        <app-date-picker-input
+                          formControlName="dateofRealization">
+                        </app-date-picker-input>
                     </nz-form-control>
                 </nz-form-item>
             </div>
@@ -360,7 +355,9 @@
                                 obligatorio!
                             </p>
                         </ng-template>
-                        <input nz-input type="date" placeholder="" formControlName="receptionDate">
+                        <app-date-picker-input
+                          formControlName="receptionDate">
+                        </app-date-picker-input>
                     </nz-form-control>
                 </nz-form-item>
             </div>
@@ -382,10 +379,9 @@
                                 obligatorio!
                             </p>
                         </ng-template>
-                        <input nz-input type="date" placeholder="" formControlName="lastDosimetryDate">
-                        <!-- <nz-date-picker style="width: 100%;" [nzShowToday]="false" formControlName="lastDosimetryDate"
-                            nzFormat="dd/MM/yyyy">
-                        </nz-date-picker> -->
+                        <app-date-picker-input
+                          formControlName="lastDosimetryDate">
+                        </app-date-picker-input>
                     </nz-form-control>
                 </nz-form-item>
             </div>
@@ -470,8 +466,8 @@
 
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
                 style="text-align: center; margin-top: 3rem;">
-                <button nz-button nzType="primary" class="btn-primary custom-btn ml-3" [disabled]="false"
-                    [nzLoading]="loader" (click)="submitRequest()" nz-popover nzPopoverTitle="" nzJustify="center"
+                <button type="submit" nz-button nzType="primary" class="btn-primary custom-btn ml-3" [disabled]="false"
+                    [nzLoading]="loader" nz-popover nzPopoverTitle="" nzJustify="center"
                     nzAlign="middle" [nzPopoverContent]="enablePopoverMessage">
                     <ng-template #enablePopoverMessage>
                         <span>Haga clic para guardar los datos</span>
