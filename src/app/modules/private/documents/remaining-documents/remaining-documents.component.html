@@ -25,7 +25,7 @@
 
             <div class="container-grid">
                 @for (item of documentList; track $index) {
-                    @if (item.idTypeDocuments == 8 || item.idTypeDocuments == 22 || item.idTypeDocuments == 7 || item.idTypeDocuments == 77 || item.idTypeDocuments == 108) {
+                    @if (item.idTypeDocuments == 8 || item.idTypeDocuments == 22 || item.idTypeDocuments == 113 || item.idTypeDocuments == 108) {
 
                         <form nz-form nz-row [formGroup]="formDate" class="form-documentList" nzJustify="center" nzAlign="bottom">
                             <label id="upload" class="custom-file-upload btn rounded">
@@ -34,7 +34,7 @@
                                 {{ item.NameDocument }}
 
                                 <!-- Input tipo fecha con deshabilitación de fechas para los idTypeDocuments específicos -->
-                                @if (item.idTypeDocuments == 7 || item.idTypeDocuments == 77 || item.idTypeDocuments == 108) {
+                                @if (item.idTypeDocuments == 113 || item.idTypeDocuments == 108) {
                                     <nz-date-picker
                                         nzFormat="yyyy-MM-dd"
                                         [nzDisabledDate]="disableDates"

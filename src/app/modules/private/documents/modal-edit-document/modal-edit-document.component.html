@@ -27,14 +27,13 @@
                 </nz-form-item>
             </div> -->
 
-            <!-- Campo Fecha de Expedición  idTypeDocument 4 y 12-->
+            <!-- Campo Fecha de Expedición  idTypeDocument 4, 12, 113, 110, 111, 108 -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
                 *ngIf="documentType == 4
-                  || documentType == 7
+                  || documentType == 113
                   || documentType == 12
                   || documentType == 110
                   || documentType == 111
-                  || documentType == 77
                   || documentType == 108">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
@@ -153,9 +152,9 @@
             </div>
 
 
-            <!-- Campo Nombre del Representante Legal  idTypeDocument 7 -->
+            <!-- Campo Nombre del Representante Legal  idTypeDocument 113 -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="documentType == 7">
+                *ngIf="documentType == 113">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
@@ -169,17 +168,15 @@
                                 obligatorio!
                             </p>
                         </ng-template>
-                        <app-date-picker-input
-                          formControlName="legalRepresentative">
-                        </app-date-picker-input>
+                        <input nz-input placeholder="" formControlName="legalRepresentative">
                     </nz-form-control>
                 </nz-form-item>
             </div>
 
 
-            <!-- Campo Nombre Suplente/s  idTypeDocument 7 -->
+            <!-- Campo Nombre Suplente/s  idTypeDocument 113 -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="documentType == 7">
+                *ngIf="documentType == 113">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
@@ -193,9 +190,7 @@
                                 obligatorio!
                             </p>
                         </ng-template>
-                        <app-date-picker-input
-                          formControlName="NameAlternate">
-                        </app-date-picker-input>
+                        <input nz-input placeholder="" formControlName="NameAlternate">
                     </nz-form-control>
                 </nz-form-item>
             </div>
@@ -290,9 +285,7 @@
                                 obligatorio!
                             </p>
                         </ng-template>
-                        <app-date-picker-input
-                          formControlName="endorsedSpecialtyDate">
-                        </app-date-picker-input>
+                        <input nz-input placeholder="" formControlName="endorsedSpecialtyDate">
                     </nz-form-control>
                 </nz-form-item>
             </div>
@@ -410,9 +403,7 @@
                                 obligatorio!
                             </p>
                         </ng-template>
-                        <app-date-picker-input
-                          formControlName="epsName">
-                        </app-date-picker-input>
+                        <input nz-input placeholder="" formControlName="epsName">
                     </nz-form-control>
                 </nz-form-item>
             </div>
@@ -434,9 +425,7 @@
                                 obligatorio!
                             </p>
                         </ng-template>
-                        <app-date-picker-input
-                          formControlName="riskClassifier">
-                        </app-date-picker-input>
+                        <input nz-input placeholder="" formControlName="riskClassifier">
                     </nz-form-control>
                 </nz-form-item>
             </div>
@@ -459,9 +448,7 @@
                                 obligatorio!
                             </p>
                         </ng-template>
-                        <app-date-picker-input
-                          formControlName="resolutionOfThePension">
-                        </app-date-picker-input>
+                        <input nz-input placeholder="" formControlName="resolutionOfThePension">
                     </nz-form-control>
                 </nz-form-item>
             </div>
