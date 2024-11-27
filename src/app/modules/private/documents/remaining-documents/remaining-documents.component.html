@@ -9,9 +9,19 @@
 
         @if (!loadingData && documentList.length > 0) {
 
-            <p class="warning-message">
-              Asegúrate de que el documento no esté protegido por contraseña antes de cargarlo.
-            </p>
+            <div class="container-alerts">
+              <nz-alert
+                nzType="warning"
+                nzCloseable
+                nzMessage="Asegúrate de que el documento no esté protegido por contraseña antes de cargarlo."
+              ></nz-alert>
+
+              <nz-alert
+                nzType="error"
+                nzCloseable
+                nzMessage="Asegúrate de tener desactivada la traducción de la página para evitar cambios en los nombres de los documentos."
+              ></nz-alert>
+            </div>
 
             <div class="container-grid">
                 @for (item of documentList; track $index) {

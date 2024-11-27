@@ -96,7 +96,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
     */
    isFieldRequiredForDocumentType(controlName: string): boolean {
       const documentValidationMap: any = {
-         'fechadedocumento': [4, 12, 110, 111, 77, 108],
+         'fechadedocumento': [4, 7, 12, 110, 111, 77, 108],
          'dateDiligence': [1, 35],
          'dateFirm': [2, 19],
          'dateVaccination': [6, 32],
@@ -154,18 +154,22 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
      * @param current Bloquea las fechas antes de la fecha actual, habilita por un año y bloquea fechas posterior (para fecha de expedición)
      * @returns
      */
-    disableDates = (current: Date): boolean => {
-      const withRestriction = [4, 77, 108, 110, 111];
+   disableDates = (current: Date): boolean => {
+      const withRestriction = [4, 7, 77, 108, 110, 111];
       if (!withRestriction.includes(this.documentType)) {
         return false;
       }
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      const maxDate = new Date();
-      maxDate.setHours(0, 0, 0, 0);
-      // One year from today
-      maxDate.setFullYear(today.getFullYear() + 1);
-      return current < today || current > maxDate;
+
+      if (this.documentType === 7) {
+         // Restriction by current month
+         const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+         return current < startOfMonth || current > today;
+      }
+      // Restriction by current year
+      const startOfYear = new Date(today.getFullYear(), 0, 1);
+      return current < startOfYear || current > today;
     };
 
    /**

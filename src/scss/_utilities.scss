@@ -34,3 +34,36 @@
   font-family: Arial, Helvetica, sans-serif;
   display: inline-block;
 }
+
+.ant-alert {
+  border-radius: 5px;
+  padding: 10px 15px;
+  &.ant-alert-warning {
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    .ant-alert-message {
+      color: #856404;
+    }
+  }
+  &.ant-alert-error {
+    background-color: #f8d7da;
+    border: 1px solid #f5c2c7;
+    .ant-alert-message {
+      color: #842029;
+    }
+  }
+  &.ant-alert-success {
+    background-color: #e9f7ef;
+    border: 1px solid #c3e6cb;
+    .ant-alert-message {
+      color: #155724;
+    }
+  }
+  &.ant-alert-info {
+    background-color: #cff4fc;
+    border: 1px solid #b6effb;
+    .ant-alert-message {
+      color: #055160;
+    }
+  }
+}
