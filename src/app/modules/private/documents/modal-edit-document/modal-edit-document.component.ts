@@ -155,6 +155,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
      * @returns
      */
    disableDates = (current: Date): boolean => {
+      current.setHours(0, 0, 0, 0);
       const withRestriction = [4, 113, 108, 110, 111];
       if (!withRestriction.includes(this.documentType)) {
         return false;
