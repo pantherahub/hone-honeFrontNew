@@ -13,6 +13,8 @@ import { ProviderAssistanceComponent } from '../../../../shared/modals/provider-
 import { FetchBackend } from '@angular/common/http';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { FileValidatorDirective } from 'src/app/directives/file-validator.directive';
+import { NzModalService } from 'ng-zorro-antd/modal';
+import { ModalEditDocumentComponent } from '../modal-edit-document/modal-edit-document.component';
 
 @Component({
    selector: 'app-remaining-documents',
@@ -35,7 +37,7 @@ export class RemainingDocumentsComponent implements OnInit {
       private eventManager: EventManagerService,
       private documentService: DocumentsCrudService,
       private notificationService: NzNotificationService,
-
+      private modalService: NzModalService,
       public formBuilder: FormBuilder,
    ) {
       this.createtiektcForm();
@@ -83,14 +85,62 @@ export class RemainingDocumentsComponent implements OnInit {
   loadFiles(file: any, item: any) {
       if (!file) return;
       this.uploadDocuments(file, item);
-    }
+  }
+
+  /**
+    * Abre una ventana modal para la carga de documentos
+    * @param item - recibe el tipo de documento que desea cargar
+    */
+  uploadDocumentModal(item: any): void {
+     const fileToUpload = new FormData();
+     const fechaForm = this.formDate.get("fecha")?.value;
+    const { idProvider } = this.clientSelected;
+    const body: any = {
+        posicion: 0,
+        documento: item.idTypeDocuments,
+        nombredcoumentos: item.NameDocument,
+        idUser: idProvider
+    };
+    if (fechaForm && fechaForm !== 0 && fechaForm !== '') {
+      body.fechavencimiento = fechaForm;
+   }
+    fileToUpload.append('datos', JSON.stringify(body));
+
+    const modal = this.modalService.create<ModalEditDocumentComponent, any>({
+       nzContent: ModalEditDocumentComponent,
+       nzCentered: true,
+       nzClosable: true,
+       nzTitle: 'Agregar documento',
+       nzFooter: null
+    });
+    const instance = modal.getContentComponent();
+
+    instance.currentDoc = item;
+    instance.documentId = item.idDocumentsProvider;
+    instance.documentType = item.idTypeDocuments;
+    instance.isNew = true;
+    instance.body = body;
+
+    // Return a result when opened
+    modal.afterOpen.subscribe(() => {});
+    // Return a result when closed
+    modal.afterClose.subscribe((result: any) => {
+       if (result) {
+          if (result.response) {
+            this.getDocumentsToUpload();
+            // location.reload();
+            this.eventManager.getPercentApi.set(this.counterApi + 1);
+          }
+       }
+    });
+ }
 
    /**
     * Carga un archivo y lo envia al api de carga de documentos
     * @param file - recibe el archivo para cargar
     * @param item - elemento de la lista para saber cual documento de carga ej (cedula, nit, rethus)
     */
-   uploadDocuments(file: any, item: any) {
+  uploadDocuments(file: any, item: any) {
       const fechaForm = this.formDate.get("fecha")?.value;
 
       this.loadingData = true;
@@ -114,7 +164,7 @@ export class RemainingDocumentsComponent implements OnInit {
             this.loadingData = false;
             this.createNotificacion('success', 'Carga exitosa', 'El documento se subió de manera satisfactoria');
             this.getDocumentsToUpload();
-            location.reload();
+            // location.reload();
             this.eventManager.getPercentApi.set(this.counterApi + 1);
          },
          error: (error: any) => {

@@ -26,6 +26,8 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
    @Input() currentDoc?: any;
    @Input() documentId?: any;
    @Input() documentType?: any;
+   @Input() isNew: boolean = false;
+   @Input() body?: any = null;
 
    clientSelected: any = this.eventManager.clientSelected();
 
@@ -182,6 +184,35 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
       if (file) this.loadedFile = file;
    }
 
+  createFormData(): FormData {
+    const dataToUpload= new FormData();
+
+    if (this.isNew && this.body) {
+      if (this.loadedFile) {
+        this.body = { ...this.body, nombre: this.loadedFile.name };
+     }
+      dataToUpload.append('datos', JSON.stringify(this.body));
+    }
+
+    if (this.loadedFile) {
+       dataToUpload.append('archivo', this.loadedFile);
+    }
+    const { idProvider } = this.clientSelected;
+    dataToUpload.append('idUser', idProvider);
+
+    const docForm: Object = { ...this.documentForm.value };
+    for (const [key, value] of Object.entries(docForm)) {
+        if (value && value instanceof Date) {
+          dataToUpload.append(key, value.toString().split('T')[0]);
+        } else if (value != null && value.toString().trim() != '') {
+          dataToUpload.append(key, value);
+        } else {
+          dataToUpload.append(key, '');
+        }
+    }
+    return dataToUpload;
+  }
+
    /**
     * Envia peticion al servicio de login para obtener el token de acceso
     */
@@ -197,24 +228,12 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
       }
       this.loader = true;
 
-      const fileToUpload = new FormData();
-      if (this.loadedFile) {
-         fileToUpload.append('archivo', this.loadedFile);
-      }
-      const { idProvider } = this.clientSelected;
-      fileToUpload.append('idUser', idProvider);
+     const fileToUpload = this.createFormData();
 
-      const docForm: Object = { ...this.documentForm.value };
-
-    for (const [key, value] of Object.entries(docForm)) {
-         if (value && value instanceof Date) {
-            fileToUpload.append(key, value.toString().split('T')[0]);
-         } else if (value != null && value.toString().trim() != '') {
-            fileToUpload.append(key, value);
-         } else {
-            fileToUpload.append(key, '');
-         }
-      }
+     if (this.isNew) {
+       this.saveDocument(fileToUpload);
+       return;
+     }
 
       this.documentService.updateDocuments(this.documentId, fileToUpload).subscribe({
          next: (res: any) => {
@@ -227,6 +246,22 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
             this.loader = false;
          },
          complete: () => {}
+      });
+   }
+
+   saveDocument(fileToUpload: FormData) {
+      const { idProvider } = this.clientSelected;
+      this.documentService.uploadDocuments(idProvider, fileToUpload).subscribe({
+        next: (res: any) => {
+          this.loader = false;
+          this.createNotificacion('success', 'Carga exitosa', 'El documento se subió de manera satisfactoria');
+          this.destroyModal(true);
+        },
+        error: (error: any) => {
+          this.loader = false;
+          this.createNotificacion('error', 'Error', 'Lo sentimos, hubo un error en el servidor.');
+        },
+        complete: () => { }
       });
    }
 
