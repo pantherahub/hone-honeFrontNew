@@ -12,13 +12,20 @@
       <div class="loading-pdf">
         <nz-spin *ngIf="loadingPdf" nzSimple [nzSize]="'large'" nzTip="Cargando documento..."></nz-spin>
       </div>
+
       <img *ngIf="isImage" [src]="previewFile" [ngStyle]="{ width: '100%' }" />
       <ngx-doc-viewer
         *ngIf="!isImage"
         [url]="previewFile"
         class="doc-viewer"
         (loaded)="onDocumentLoaded()"
+        [googleCheckInterval]="1500"
+        [googleMaxChecks]="15"
       ></ngx-doc-viewer>
+
+      <div class="footer">
+        <button type="button" nz-button nzType="primary" (click)="openDoc()">Abrir documento</button>
+      </div>
     </div>
   </ng-template>
 </nz-modal>
