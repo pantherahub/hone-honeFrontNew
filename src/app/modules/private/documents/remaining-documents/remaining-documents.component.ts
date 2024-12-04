@@ -105,7 +105,7 @@ export class RemainingDocumentsComponent implements OnInit {
          idUser: idProvider
       };
       if (fechaForm && fechaForm !== 0 && fechaForm !== '') {
-         body.fechavencimiento = fechaForm;
+         body.fechavencimiento = fechaForm.toISOString().split('T')[0];
       }
       fileToUpload.append('datos', JSON.stringify(body));
 
