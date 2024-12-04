@@ -95,18 +95,18 @@ export class RemainingDocumentsComponent implements OnInit {
 
       this.loadingData = true;
       const { idProvider } = this.clientSelected;
-      // const today = new Date();
-      const today = (fechaForm === 0 || fechaForm === null || fechaForm === undefined || fechaForm === '') ? new Date() : fechaForm;
       const fileToUpload = new FormData();
       fileToUpload.append('archivo', file);
-      const body = {
+      const body: any = {
          posicion: 0,
          nombre: file.name,
          documento: item.idTypeDocuments,
          nombredcoumentos: item.NameDocument,
-         fechavencimiento: today,
          idUser: idProvider
       };
+      if (fechaForm && fechaForm !== 0 && fechaForm !== '') {
+         body.fechavencimiento = fechaForm;
+      }
       fileToUpload.append('datos', JSON.stringify(body));
 
       this.documentService.uploadDocuments(idProvider, fileToUpload).subscribe({
