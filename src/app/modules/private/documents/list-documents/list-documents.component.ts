@@ -131,8 +131,18 @@ export class ListDocumentsComponent implements OnInit {
    /**
     * Valida el tipo de prestador y descarga un paquete de documentos
     */
-   downloadDocumentsAxa() {
-      this.saveAs(`assets/documents-provider/documentos-axa.zip`, `Documentos para diligenciar axa.zip`);
+  downloadDocumentsAxa() {
+    if (this.clientSelected.idTypeProvider == 9) {
+      this.saveAs(
+        `assets/documents-provider/documentos-axa-gestion-preventiva.zip`,
+        `Documentos para diligenciar axa gestión preventiva.zip`
+      );
+      return;
+    }
+    this.saveAs(
+      `assets/documents-provider/documentos-axa.zip`,
+      `Documentos para diligenciar axa.zip`
+    );
    }
 
    /**

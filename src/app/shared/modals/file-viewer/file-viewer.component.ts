@@ -59,7 +59,7 @@ export class FileViewerComponent {
     this.retryAttempts++;
     this.refreshDocTimer = setTimeout(() => {
       this.refreshDocument()
-    }, 3000);
+    }, 5000);
   }
 
   refreshDocument() {
@@ -81,5 +81,9 @@ export class FileViewerComponent {
       clearTimeout(this.refreshDocTimer);
       this.refreshDocTimer = null;
     }
+  }
+
+  openDoc() {
+    window.open(this.previewFile, '_blank');
   }
 }
