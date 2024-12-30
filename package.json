@@ -18,7 +18,7 @@
     "@angular/forms": "^17.0.0",
     "@angular/platform-browser": "^17.0.0",
     "@angular/platform-browser-dynamic": "^17.0.0",
-    "@angular/router": "^17.0.0",
+    "@angular/router": "^17.3.12",
     "ng-recaptcha": "^13.2.1",
     "ng-zorro-antd": "^17.1.0",
     "ng2-pdf-viewer": "^10.0.0",
