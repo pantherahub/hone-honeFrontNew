@@ -26,6 +26,8 @@ export class ContactsProviderServicesService {
     return this.httpClient.post(`${this.url}createContactProvider`, contacts);
   }
 
-  
+  getOccupation() {
+    return this.httpClient.get(`${this.url}GetOccupation`);
+  }
 }
 

@@ -1,0 +1,199 @@
+<nz-row nzJustify="center">
+  <nz-col [nzSpan]="24" [nzMd]="18" [nzLg]="12">
+    <div class="update-data">
+      <div class="update-data__header">
+        <h2 class="update-data__title">Información prestador</h2>
+      </div>
+
+      <!-- <nz-form [formGroup]="taskForm">
+        <div class="update-data__body">
+
+          <div nz-row [nzGutter]="16">
+            <nz-form-item nz-col [nzSpan]="12">
+              <nz-form-label [nzRequired]="true" nzFor="name">Nombre</nz-form-label>
+              <nz-form-control [nzErrorTip]="nameErrorTip">
+                <ng-template #nameErrorTip>
+                  <p *ngIf="taskForm.controls['name'].hasError('required')">El nombre es requerido.</p>
+                </ng-template>
+                <input nz-input id="name" formControlName="name" placeholder="Nombre" />
+              </nz-form-control>
+            </nz-form-item>
+
+            <nz-form-item nz-col [nzSpan]="12">
+              <nz-form-label [nzRequired]="true" nzFor="name">Idioma</nz-form-label>
+              <nz-form-control [nzErrorTip]="nameErrorTip">
+                <ng-template #nameErrorTip>
+                  <p *ngIf="taskForm.controls['name'].hasError('required')">El idioma es requerido.</p>
+                </ng-template>
+                <input nz-input id="name" formControlName="name" placeholder="Nombre" />
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+
+        </div>
+        TESTSTTT
+      </nz-form> -->
+
+
+      <form nz-form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+        <div class="update-data__body">
+          <div class="container-alerts">
+            <nz-alert
+              nzType="warning"
+              nzCloseable
+              nzMessage="Asegúrate de hacer el envío de todo el formulario para ver reflejados los cambios."
+            ></nz-alert>
+          </div>
+
+          <div nz-row [nzGutter]="16">
+            <nz-col [nzSpan]="12">
+              <nz-form-item nz-row>
+                <nz-form-label [nzRequired]="true" nzFor="name">Nombre</nz-form-label>
+                <nz-form-control [nzErrorTip]="nameErrorTip">
+                  <ng-template #nameErrorTip>
+                    <p *ngIf="taskForm.controls['name'].hasError('required')">El campo es requerido.</p>
+                  </ng-template>
+                  <input nz-input id="name" formControlName="name" placeholder="Nombre" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+
+            <nz-col [nzSpan]="12">
+              <nz-form-item>
+                <nz-form-label [nzRequired]="true" nzFor="email">Correo</nz-form-label>
+                <nz-form-control [nzErrorTip]="emailErrorTip">
+                  <ng-template #emailErrorTip>
+                    <p *ngIf="taskForm.controls['email'].hasError('required')">El campo es requerido.</p>
+                  </ng-template>
+                  <input nz-input id="email" formControlName="email" placeholder="Correo" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+
+            <nz-col [nzSpan]="12">
+              <nz-form-item>
+                <nz-form-label [nzRequired]="true" nzFor="language">Idioma</nz-form-label>
+                <nz-form-control [nzErrorTip]="languageErrorTip">
+                  <ng-template #languageErrorTip>
+                    <p *ngIf="taskForm.controls['language'].hasError('required')">El campo es requerido.</p>
+                  </ng-template>
+                  <input nz-input id="language" formControlName="language" placeholder="Idioma" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+
+            <nz-col [nzSpan]="12">
+              <nz-form-item>
+                <nz-form-label [nzRequired]="true" nzFor="razonSocial">Razon social</nz-form-label>
+                <nz-form-control [nzErrorTip]="razonSocialErrorTip">
+                  <ng-template #razonSocialErrorTip>
+                    <p *ngIf="taskForm.controls['razonSocial'].hasError('required')">El campo es requerido.</p>
+                  </ng-template>
+                  <input nz-input id="razonSocial" formControlName="razonSocial" placeholder="Nombre" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+
+            <nz-col [nzSpan]="12">
+              <nz-form-item>
+                <nz-form-label [nzRequired]="true" nzFor="documentTypeId">Tipo de identificación</nz-form-label>
+                <nz-form-control [nzSpan]="12" nzErrorTip="El campo es requerido.">
+                  <nz-select
+                    id="documentTypeId"
+                    formControlName="documentTypeId"
+                    nzPlaceHolder="Seleccionar"
+                  >
+                    <nz-option *ngFor="let type of identificationTypes" [nzValue]="type.idTypeDocument" [nzLabel]="type.typeDocument"></nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+
+            <nz-col [nzSpan]="12">
+              <nz-form-item>
+                <nz-form-label [nzRequired]="true" nzFor="identification">Identificación</nz-form-label>
+                <nz-form-control [nzErrorTip]="identificationErrorTip">
+                  <ng-template #identificationErrorTip>
+                    <p *ngIf="taskForm.controls['identification'].hasError('required')">El campo es requerido.</p>
+                  </ng-template>
+                  <input nz-input id="identification" formControlName="identification" placeholder="Identificación" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+
+          </div>
+
+          <div>
+            <div class="table-head">
+              <h3>Sedes existentes</h3>
+              <button nz-button nzType="primary" (click)="openOfficeModal()">Agregar nueva</button>
+            </div>
+
+            <!-- Table -->
+            <nz-table #officeTable [nzData]="existingOffices" [nzScroll]="{ x: '1150px', y: '240px' }">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Cliente</th>
+                  <th>Ciudad</th>
+                  <th>Dirección</th>
+                  <th nzRight>Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let data of officeTable.data; let i = index">
+                  <td>{{ data.OfficeProviderName }}</td>
+                  <td>{{ data.clientHoneSolutions }}</td>
+                  <td>{{ data.city }}</td>
+                  <td>{{ data.address }}</td>
+                  <td nzRight>
+                     <button nz-button nzType="primary" (click)="openOfficeModal(i)"><span nz-icon nzType="edit"></span></button>
+                     <button nz-button nzDanger nzType="primary" (click)="deleteOffice(i)"><span nz-icon nzType="delete"></span></button>
+                  </td>
+                </tr>
+              </tbody>
+            </nz-table>
+          </div>
+
+          <div>
+            <div class="table-head">
+              <h3>Contactos existentes</h3>
+              <button nz-button nzType="primary" (click)="openOfficeModal()">Agregar nuevo</button>
+            </div>
+
+            <!-- Table -->
+            <nz-table #contactTable [nzData]="existingContacts" [nzScroll]="{ x: '1150px', y: '240px' }">
+              <thead>
+                <tr>
+                  <th>Cargo</th>
+                  <th>Nombre</th>
+                  <th>Telefono</th>
+                  <th>Correo</th>
+                  <th nzRight>Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let data of contactTable.data; let i = index">
+                  <td>{{ data.occupation.Occupation }}</td>
+                  <td>{{ data.name }}</td>
+                  <td>{{ data.phone }}</td>
+                  <td>{{ data.email }}</td>
+                  <td nzRight>
+                     <button nz-button nzType="primary" (click)="openOfficeModal(i)"><span nz-icon nzType="edit"></span></button>
+                     <button nz-button nzDanger nzType="primary" (click)="deleteOffice(i)"><span nz-icon nzType="delete"></span></button>
+                  </td>
+                </tr>
+              </tbody>
+            </nz-table>
+          </div>
+
+        </div>
+
+        <div class="update-data__footer">
+          <button nz-button nzType="primary" class="btn-primary" type="submit">Actualizar datos</button>
+        </div>
+      </form>
+
+    </div>
+  </nz-col>
+</nz-row>
