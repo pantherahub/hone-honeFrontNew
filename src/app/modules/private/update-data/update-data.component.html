@@ -35,7 +35,7 @@
       </nz-form> -->
 
 
-      <form nz-form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+      <form nz-form nzLayout="vertical" [formGroup]="taskForm" (ngSubmit)="onSubmit()">
         <div class="update-data__body">
           <div class="container-alerts">
             <nz-alert
@@ -46,7 +46,7 @@
           </div>
 
           <div nz-row [nzGutter]="16">
-            <nz-col [nzSpan]="12">
+            <nz-col [nzSpan]="24" [nzSm]="12">
               <nz-form-item nz-row>
                 <nz-form-label [nzRequired]="true" nzFor="name">Nombre</nz-form-label>
                 <nz-form-control [nzErrorTip]="nameErrorTip">
@@ -58,7 +58,7 @@
               </nz-form-item>
             </nz-col>
 
-            <nz-col [nzSpan]="12">
+            <nz-col [nzSpan]="24" [nzSm]="12">
               <nz-form-item>
                 <nz-form-label [nzRequired]="true" nzFor="email">Correo</nz-form-label>
                 <nz-form-control [nzErrorTip]="emailErrorTip">
@@ -70,19 +70,30 @@
               </nz-form-item>
             </nz-col>
 
-            <nz-col [nzSpan]="12">
+            <nz-col [nzSpan]="24" [nzSm]="12">
               <nz-form-item>
                 <nz-form-label [nzRequired]="true" nzFor="language">Idioma</nz-form-label>
                 <nz-form-control [nzErrorTip]="languageErrorTip">
                   <ng-template #languageErrorTip>
                     <p *ngIf="taskForm.controls['language'].hasError('required')">El campo es requerido.</p>
                   </ng-template>
-                  <input nz-input id="language" formControlName="language" placeholder="Idioma" />
+                  <!-- <input nz-input id="language" formControlName="language" placeholder="Idioma" /> -->
+                  <nz-select
+                    nzMode="multiple"
+                    [nzMaxTagCount]="3"
+                    nzAllowClear
+                    [nzMaxTagPlaceholder]="langTagPlaceHolder"
+                    formControlName="language"
+                    nzPlaceHolder="Seleccionar"
+                  >
+                    <nz-option *ngFor="let lang of languages" [nzLabel]="lang.name" [nzValue]="lang.code"></nz-option>
+                  </nz-select>
+                  <ng-template #langTagPlaceHolder let-selectedList>{{ selectedList.length }} más...</ng-template>
                 </nz-form-control>
               </nz-form-item>
             </nz-col>
 
-            <nz-col [nzSpan]="12">
+            <nz-col [nzSpan]="24" [nzSm]="12">
               <nz-form-item>
                 <nz-form-label [nzRequired]="true" nzFor="razonSocial">Razon social</nz-form-label>
                 <nz-form-control [nzErrorTip]="razonSocialErrorTip">
@@ -94,10 +105,10 @@
               </nz-form-item>
             </nz-col>
 
-            <nz-col [nzSpan]="12">
+            <nz-col [nzSpan]="24" [nzSm]="12">
               <nz-form-item>
                 <nz-form-label [nzRequired]="true" nzFor="documentTypeId">Tipo de identificación</nz-form-label>
-                <nz-form-control [nzSpan]="12" nzErrorTip="El campo es requerido.">
+                <nz-form-control nzErrorTip="El campo es requerido.">
                   <nz-select
                     id="documentTypeId"
                     formControlName="documentTypeId"
@@ -109,7 +120,7 @@
               </nz-form-item>
             </nz-col>
 
-            <nz-col [nzSpan]="12">
+            <nz-col [nzSpan]="24" [nzSm]="12">
               <nz-form-item>
                 <nz-form-label [nzRequired]="true" nzFor="identification">Identificación</nz-form-label>
                 <nz-form-control [nzErrorTip]="identificationErrorTip">
@@ -126,7 +137,7 @@
           <div>
             <div class="table-head">
               <h3>Sedes existentes</h3>
-              <button nz-button nzType="primary" (click)="openOfficeModal()">Agregar nueva</button>
+              <button nz-button nzType="primary" type="button" (click)="openOfficeModal()">Agregar nueva</button>
             </div>
 
             <!-- Table -->
@@ -147,8 +158,8 @@
                   <td>{{ data.city }}</td>
                   <td>{{ data.address }}</td>
                   <td nzRight>
-                     <button nz-button nzType="primary" (click)="openOfficeModal(i)"><span nz-icon nzType="edit"></span></button>
-                     <button nz-button nzDanger nzType="primary" (click)="deleteOffice(i)"><span nz-icon nzType="delete"></span></button>
+                     <button nz-button nzType="primary" type="button" (click)="openOfficeModal(i)"><span nz-icon nzType="edit"></span></button>
+                     <button nz-button nzDanger nzType="primary" type="button" (click)="deleteOffice(i)"><span nz-icon nzType="delete"></span></button>
                   </td>
                 </tr>
               </tbody>
@@ -158,7 +169,7 @@
           <div>
             <div class="table-head">
               <h3>Contactos existentes</h3>
-              <button nz-button nzType="primary" (click)="openOfficeModal()">Agregar nuevo</button>
+              <button nz-button nzType="primary" type="button" (click)="openContactModal()">Agregar nuevo</button>
             </div>
 
             <!-- Table -->
@@ -179,8 +190,8 @@
                   <td>{{ data.phone }}</td>
                   <td>{{ data.email }}</td>
                   <td nzRight>
-                     <button nz-button nzType="primary" (click)="openOfficeModal(i)"><span nz-icon nzType="edit"></span></button>
-                     <button nz-button nzDanger nzType="primary" (click)="deleteOffice(i)"><span nz-icon nzType="delete"></span></button>
+                     <button nz-button nzType="primary" type="button" (click)="openContactModal(i)"><span nz-icon nzType="edit"></span></button>
+                     <button nz-button nzDanger nzType="primary" type="button" (click)="deleteContact(i)"><span nz-icon nzType="delete"></span></button>
                   </td>
                 </tr>
               </tbody>

@@ -1,5 +1,13 @@
-.footer {
-  display: flex;
-  gap: 1rem;
-  justify-content: end;
+.office-form {
+  .table-head {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .footer {
+    display: flex;
+    gap: 1rem;
+    justify-content: end;
+  }
 }
