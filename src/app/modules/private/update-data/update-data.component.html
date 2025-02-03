@@ -5,7 +5,7 @@
         <h2 class="update-data__header__title">Información prestador</h2>
       </div>
 
-      <form nz-form nzLayout="vertical" [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+      <form nz-form nzLayout="vertical" [formGroup]="providerForm" (ngSubmit)="onSubmit()">
         <div class="update-data__body">
 
           <div class="container-alerts">
@@ -22,7 +22,7 @@
                 <nz-form-label [nzRequired]="true" nzFor="name">Nombre</nz-form-label>
                 <nz-form-control [nzErrorTip]="nameErrorTip">
                   <ng-template #nameErrorTip>
-                    <p *ngIf="taskForm.controls['name'].hasError('required')">El campo es requerido.</p>
+                    <p *ngIf="providerForm.controls['name'].hasError('required')">El campo es requerido.</p>
                   </ng-template>
                   <input nz-input id="name" formControlName="name" placeholder="Nombre" />
                 </nz-form-control>
@@ -34,7 +34,8 @@
                 <nz-form-label [nzRequired]="true" nzFor="email">Correo</nz-form-label>
                 <nz-form-control [nzErrorTip]="emailErrorTip">
                   <ng-template #emailErrorTip>
-                    <p *ngIf="taskForm.controls['email'].hasError('required')">El campo es requerido.</p>
+                    <p *ngIf="providerForm.controls['email'].hasError('required')">El campo es requerido.</p>
+                    <p *ngIf="providerForm.controls['email'].hasError('email')">Correo inválido.</p>
                   </ng-template>
                   <input nz-input id="email" formControlName="email" placeholder="Correo" />
                 </nz-form-control>
@@ -46,9 +47,8 @@
                 <nz-form-label [nzRequired]="true" nzFor="languages">Idioma</nz-form-label>
                 <nz-form-control [nzErrorTip]="languagesErrorTip">
                   <ng-template #languagesErrorTip>
-                    <p *ngIf="taskForm.controls['languages'].hasError('required')">El campo es requerido.</p>
+                    <p *ngIf="providerForm.controls['languages'].hasError('required')">El campo es requerido.</p>
                   </ng-template>
-                  <!-- <input nz-input id="languages" formControlName="languages" placeholder="Idioma" /> -->
                   <nz-select
                     nzMode="multiple"
                     [nzMaxTagCount]="3"
@@ -69,7 +69,7 @@
                 <nz-form-label [nzRequired]="true" nzFor="razonSocial">Razon social</nz-form-label>
                 <nz-form-control [nzErrorTip]="razonSocialErrorTip">
                   <ng-template #razonSocialErrorTip>
-                    <p *ngIf="taskForm.controls['razonSocial'].hasError('required')">El campo es requerido.</p>
+                    <p *ngIf="providerForm.controls['razonSocial'].hasError('required')">El campo es requerido.</p>
                   </ng-template>
                   <input nz-input id="razonSocial" formControlName="razonSocial" placeholder="Nombre" />
                 </nz-form-control>
@@ -96,7 +96,7 @@
                 <nz-form-label [nzRequired]="true" nzFor="identification">Identificación</nz-form-label>
                 <nz-form-control [nzErrorTip]="identificationErrorTip">
                   <ng-template #identificationErrorTip>
-                    <p *ngIf="taskForm.controls['identification'].hasError('required')">El campo es requerido.</p>
+                    <p *ngIf="providerForm.controls['identification'].hasError('required')">El campo es requerido.</p>
                   </ng-template>
                   <input nz-input id="identification" formControlName="identification" placeholder="Identificación" />
                 </nz-form-control>

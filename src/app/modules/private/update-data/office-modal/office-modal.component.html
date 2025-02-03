@@ -2,41 +2,6 @@
   <div>
 
     <div nz-row [nzGutter]="16">
-      <nz-col [nzSpan]="24">
-        <nz-form-label [nzRequired]="true">Correo(s)</nz-form-label>
-        <div nz-row [nzGutter]="16" formArrayName="emails">
-          @for (control of emailsArray.controls; track control; let i = $index) {
-            <nz-col [nzSpan]="24" [nzSm]="12">
-              <nz-form-item>
-                <nz-form-control nzErrorTip="Ingresa un correo válido.">
-                  <input
-                    nz-input
-                    type="email"
-                    placeholder="Correo"
-                    [formControlName]="i"
-                  />
-                  <span
-                    nz-icon
-                    nzType="minus-circle-o"
-                    class="dynamic-delete-button"
-                    *ngIf="emailsArray.length > 1"
-                    (click)="removeEmail(i)"
-                  ></span>
-                </nz-form-control>
-              </nz-form-item>
-            </nz-col>
-          }
-          <nz-col [nzSpan]="24" [nzSm]="12">
-            <nz-form-item>
-              <nz-form-control>
-                <button nz-button nzType="dashed" type="button" (click)="addEmail()" [disabled]="emailsArray.length >= 5">
-                  <span nz-icon nzType="plus"></span> Agregar correo
-                </button>
-              </nz-form-control>
-            </nz-form-item>
-          </nz-col>
-        </div>
-      </nz-col>
 
       <nz-col [nzSpan]="24" [nzSm]="12">
         <nz-form-item>

@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { CitiesServiceService } from 'src/app/services/cities/cities-service.service';
-import { maxArrayLength, minArrayLength } from 'src/app/utils/form-validators';
 import { ContactFormComponent } from '../contact-form/contact-form.component';
+import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
+import { ContactsProviderServicesService } from 'src/app/services/contacts-provider/contacts-provider.services.service';
 
 @Component({
   selector: 'app-office-modal',
@@ -24,8 +25,10 @@ export class OfficeModalComponent implements OnInit {
   constructor(
     private modal: NzModalRef,
     private fb: FormBuilder,
+    private formUtils: FormUtilsService,
     private modalService: NzModalService,
-    private citiesService: CitiesServiceService
+    private citiesService: CitiesServiceService,
+    private contactsProviderService: ContactsProviderServicesService
   ) { }
 
   ngOnInit(): void {
@@ -44,25 +47,38 @@ export class OfficeModalComponent implements OnInit {
     });
   }
 
+  loadContacts(officeId: number) {
+    // Update endpoint and filter by office
+    this.contactsProviderService.getContactById(officeId).subscribe({
+      next: (res: any) => {
+        this.existingContacts = res.contacts;
+      },
+      error: (err: any) => {
+        console.error(err);
+      }
+    });
+  }
+
   initializeForm() {
     this.officeForm = this.fb.group({
-      idTemporalOfficeProvider: [null],
-      emails: this.fb.array([
-        this.fb.control('', [Validators.required, Validators.email])
-      ], [minArrayLength(1), maxArrayLength(5)]),
-      address: ['', [Validators.required]],
-      enableCode: ['', [Validators.required]],
-      name: ['', [Validators.required]],
-      idCity: ['', [Validators.required]],
-      schedulingLink: [''],
+      idTemporalOfficeProvider: [this.office?.idTemporalOfficeProvider || null],
+      address: [this.office?.address || '', [Validators.required]],
+      enableCode: [this.office?.enableCode || '', [Validators.required]],
+      name: [this.office?.name || '', [Validators.required]],
+      idCity: [this.office?.idCity || '', [Validators.required]],
+      schedulingLink: [this.office?.schedulingLink || ''],
 
-      attentionDays: ['', [Validators.required]],
-      officeHours: ['', [Validators.required]],
+      attentionDays: [this.office?.attentionDays || '', [Validators.required]],
+      officeHours: [this.office?.officeHours || '', [Validators.required]],
 
       updatedContacts: this.fb.array([]),
       createdContacts: this.fb.array([]),
       deletedContacts: this.fb.array([])
     });
+    if (this.office) {
+      this.loadContacts(this.office.idTemporalOfficeProvider);
+      // this.existingContacts = this.office.contacts || [];
+    }
   }
 
   get updatedContacts() {
@@ -73,20 +89,6 @@ export class OfficeModalComponent implements OnInit {
   }
   get deletedContacts() {
     return this.officeForm.get('deletedContacts') as FormArray;
-  }
-
-  get emailsArray(): FormArray {
-    return this.officeForm.get('emails') as FormArray;
-  }
-  addEmail(): void {
-    if (this.emailsArray.length < 5) {
-      this.emailsArray.push(this.fb.control('', [Validators.required, Validators.email]));
-    }
-  }
-  removeEmail(index: number): void {
-    if (this.emailsArray.length > 1) {
-      this.emailsArray.removeAt(index);
-    }
   }
 
   openContactModal(contactIndex: number | null = null) {
@@ -109,14 +111,19 @@ export class OfficeModalComponent implements OnInit {
     }
 
     modalRef.afterClose.subscribe((result: any) => {
-      if (result && result.office) {
-        const newOffice = result.office;
+      if (result && result.contact) {
+        const newContact = result.contact;
+
         if (result.isNew) {
-          this.createdContacts.push(this.fb.group(newOffice));
-          this.existingContacts.push(newOffice);
+          this.createdContacts.push(this.fb.group(newContact));
+          this.existingContacts.push(newContact);
         } else if (!result.isNew && contactIndex != null) {
-          this.updatedContacts.push(this.fb.group(newOffice));
-          this.existingContacts[contactIndex] = newOffice;
+          const updatedContact = {
+            ...newContact,
+            cityName: newContact.occupationName || this.existingContacts[contactIndex].occupationName
+          };
+          this.updatedContacts.push(this.fb.group(updatedContact));
+          this.existingContacts[contactIndex] = updatedContact;
         }
       }
     });
@@ -125,21 +132,21 @@ export class OfficeModalComponent implements OnInit {
   deleteContact(index: number): void {
     const deletedContact = this.existingContacts[index];
 
-    // Remuevo de existingContacts
+    // Remove from existingContacts
     this.existingContacts.splice(index, 1);
 
     if (deletedContact.idTemporalContact !== null) {
-      // Buscar en updatedContacts y eliminar si existe
+      // Search in updatedContacts and delete if it exists
       const updatedIndex = this.updatedContacts.controls.findIndex(office =>
         office.value.idTemporalContact == deletedContact.idTemporalContact
       );
       if (updatedIndex !== -1) {
         this.updatedContacts.removeAt(updatedIndex);
       }
-      // Hago push al array de eliminados si es una sede existente
+      // Push to deleted array if it already existed
       this.deletedContacts.push(this.fb.control(deletedContact.idTemporalContact));
     } else {
-      // Buscar en createdContacts y eliminar si existe
+      // Search in createdContacts and delete if it exists
       const createdIndex = this.createdContacts.controls.findIndex(office =>
         JSON.stringify(office.value) === JSON.stringify(deletedContact)
       );
@@ -151,35 +158,19 @@ export class OfficeModalComponent implements OnInit {
 
   onSubmit() {
     if (this.officeForm.invalid) {
-      // this.officeForm.markAllAsTouched();
-      Object.values(this.officeForm.controls).forEach(control => {
-        if (control.invalid) {
-          control.markAsDirty();
-          control.updateValueAndValidity({ onlySelf: true });
-        }
-        if (control instanceof FormArray) {
-          control.controls.forEach((group: AbstractControl) => {
-            if (group instanceof FormGroup) {
-              // Si es un FormGroup, recorro los controles
-              Object.values(group.controls).forEach(field => {
-                field.markAsTouched();
-                field.updateValueAndValidity();
-              });
-            } else if (group instanceof FormControl) {
-              // Si es un FormControl, valido directamente
-              group.markAsTouched();
-              group.updateValueAndValidity();
-            }
-          });
-        } else {
-          control.markAsTouched();
-          control.updateValueAndValidity();
-        }
-      });
+      this.formUtils.markFormTouched(this.officeForm);
       return;
     }
+
+    // Get selected city with name
+    const selectedCity = this.cities.find(city => city.idCity === this.officeForm.value.idCity);
+    const officeData = {
+      ...this.officeForm.value,
+      cityName: selectedCity ? selectedCity.city : null
+    };
+
     this.modal.close({
-      office: this.officeForm.value,
+      office: officeData,
       isNew: this.office === null
     });
   }

@@ -21,4 +21,8 @@ export class ClientProviderService {
   getIdentificationTypes(): Observable<any> {
     return this.httpClient.get(this.url + "getTypeDocument");
   }
+
+  getProviderData(idProvider: any): Observable<any> {
+    return this.httpClient.get(`${this.url}getHoneProvider/${idProvider}`);
+  }
 }

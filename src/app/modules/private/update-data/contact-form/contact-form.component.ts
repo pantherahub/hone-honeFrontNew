@@ -6,7 +6,7 @@ import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { CitiesServiceService } from 'src/app/services/cities/cities-service.service';
 import { ClientProviderService } from 'src/app/services/clients/client-provider.service';
 import { ContactsProviderServicesService } from 'src/app/services/contacts-provider/contacts-provider.services.service';
-import { maxArrayLength, minArrayLength } from 'src/app/utils/form-validators';
+import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 
 @Component({
   selector: 'app-contact-form',
@@ -31,6 +31,7 @@ export class ContactFormComponent implements OnInit {
   constructor(
     private modal: NzModalRef,
     private fb: FormBuilder,
+    private formUtils: FormUtilsService,
     private contactsProviderService: ContactsProviderServicesService,
     private clientProviderService: ClientProviderService,
     private citiesService: CitiesServiceService
@@ -41,11 +42,15 @@ export class ContactFormComponent implements OnInit {
     this.getContactOccupations();
     this.getIdentificationTypes();
     this.getCities();
+
+    if (this.contact) {
+      this.loadContactData();
+    }
   }
 
   getContactOccupations() {
     this.contactOccupations = [];
-    // Enviar el id del prestador/sede para que no lleguen cargos unicos ya guardados
+    // Update endpoint and filter by provider/office to avoid one-time charges already saved
     const contactType = this.selectedContactType;
     const contactModelType = this.contactModelType;
     this.contactsProviderService.getOccupation().subscribe({
@@ -83,15 +88,15 @@ export class ContactFormComponent implements OnInit {
   initializeForm() {
     this.contactForm = this.fb.group({
       idTemporalContact: [null],
-      idOccupation: ['', [Validators.required]],
       type: ['person', [Validators.required]], // person or area
+      idOccupation: [null, [Validators.required]],
       name: ['', [Validators.required]],
       emails: this.fb.array([
         this.fb.control('', [Validators.required, Validators.email])
-      ], [minArrayLength(1), maxArrayLength(5)]),
+      ], [this.formUtils.minArrayLength(1), this.formUtils.maxArrayLength(5)]),
       telephones: this.fb.array([
         this.createTelephoneGroup()
-      ], [minArrayLength(1), maxArrayLength(5)]),
+      ], [this.formUtils.minArrayLength(1), this.formUtils.maxArrayLength(5)]),
 
       idTypeDocument: [null],
       identification: [null],
@@ -106,7 +111,8 @@ export class ContactFormComponent implements OnInit {
       }
       this.getContactOccupations();
       this.contactForm.patchValue({
-        name: ''
+        name: '',
+        idOccupation: null
       });
       this.resetContactDocument();
     });
@@ -117,6 +123,40 @@ export class ContactFormComponent implements OnInit {
       this.resetContactDocument();
       this.updateIdentificationValidators();
     });
+  }
+
+  loadContactData(): void {
+    if (!this.contact) return;
+
+    this.contactForm.patchValue({
+      idTemporalContact: this.contact.idTemporalContact,
+      type: this.contact.type,
+      idOccupation: this.contact.idOccupation,
+      name: this.contact.name,
+      idTypeDocument: this.contact.idTypeDocument,
+      identification: this.contact.identification,
+      expeditionDate: this.contact.expeditionDate,
+      idCityExpedition: this.contact.idCityExpedition,
+    });
+
+    // Load emails
+    if (this.contact.emails && this.contact.emails.length) {
+      const emailsArray = this.emailsArray;
+      this.contact.emails.forEach((email: string) => {
+        emailsArray.push(this.fb.control(email, [Validators.required, Validators.email]));
+      });
+    }
+
+    // Load telephone numbers
+    if (this.contact.telephones && this.contact.telephones.length) {
+      const telephonesArray = this.telephonesArray;
+      this.contact.telephones.forEach((telephone: any) => {
+        telephonesArray.push(this.fb.group({
+          type: [telephone.type, [Validators.required]],
+          number: [telephone.number, [Validators.required]]
+        }));
+      });
+    }
   }
 
   resetContactDocument() {
@@ -188,35 +228,19 @@ export class ContactFormComponent implements OnInit {
 
   onSubmit() {
     if (this.contactForm.invalid) {
-      // this.contactForm.markAllAsTouched();
-      Object.values(this.contactForm.controls).forEach(control => {
-        if (control.invalid) {
-          control.markAsDirty();
-          control.updateValueAndValidity({ onlySelf: true });
-        }
-        if (control instanceof FormArray) {
-          control.controls.forEach((group: AbstractControl) => {
-            if (group instanceof FormGroup) {
-              // Si es un FormGroup, recorro los controles
-              Object.values(group.controls).forEach(field => {
-                field.markAsTouched();
-                field.updateValueAndValidity();
-              });
-            } else if (group instanceof FormControl) {
-              // Si es un FormControl, valido directamente
-              group.markAsTouched();
-              group.updateValueAndValidity();
-            }
-          });
-        } else {
-          control.markAsTouched();
-          control.updateValueAndValidity();
-        }
-      });
+      this.formUtils.markFormTouched(this.contactForm);
       return;
     }
+
+    // Get selected occupation with name
+    const selectedOccupation = this.contactOccupations.find(occupation => occupation.idOccupation === this.contactForm.value.idOccupation);
+    const contactData = {
+      ...this.contactForm.value,
+      occupationName: selectedOccupation ? selectedOccupation.Occupation : null
+    };
+
     this.modal.close({
-      office: this.contactForm.value,
+      contact: contactData,
       isNew: this.contact === null
     });
   }

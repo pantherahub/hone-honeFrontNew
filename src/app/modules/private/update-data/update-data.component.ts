@@ -10,6 +10,7 @@ import { ContactsProviderServicesService } from 'src/app/services/contacts-provi
 import { ClientProviderService } from 'src/app/services/clients/client-provider.service';
 import { LANGUAGES } from 'src/app/utils/languages';
 import { ContactFormComponent } from './contact-form/contact-form.component';
+import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 
 @Component({
   selector: 'app-update-data',
@@ -21,9 +22,7 @@ import { ContactFormComponent } from './contact-form/contact-form.component';
 export class UpdateDataComponent implements OnInit {
 
   user = this.eventManager.userLogged();
-  startTime!: Date;
-  // startTime2!: number;
-  taskForm!: FormGroup;
+  providerForm!: FormGroup;
 
   languages: any[] = LANGUAGES;
   identificationTypes: any[] = [];
@@ -35,6 +34,7 @@ export class UpdateDataComponent implements OnInit {
     // private clientService: ClientProviderService,
     private eventManager: EventManagerService,
     private fb: FormBuilder,
+    private formUtils: FormUtilsService,
     private modalService: NzModalService,
     private officeProviderService: OfficeProviderService,
     private contactsProviderService: ContactsProviderServicesService,
@@ -43,17 +43,14 @@ export class UpdateDataComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.taskForm = this.fb.group({});
+    this.providerForm = this.fb.group({});
     this.getIdentificationTypes();
-    this.getOffices();
-    this.getContacts();
 
     this.initializeForm();
+    // this.loadProviderData();
 
-
-    this.startTime = new Date();
-    console.log('Inicio del formulario Date:', this.startTime);
-    // this.startTime2 = Date.now();
+    // Remove (testing):
+    this.loadContacts(this.user.id || 0);
   }
 
   getIdentificationTypes() {
@@ -67,8 +64,8 @@ export class UpdateDataComponent implements OnInit {
     });
   }
 
-  getOffices() {
-    this.officeProviderService.getOfficeProviders(this.user.id, this.user.roles?.idRoles).subscribe({
+  loadOffices(providerId: number) {
+    this.officeProviderService.getOfficeProviders(providerId, this.user.roles?.idRoles).subscribe({
       next: (res: any) => {
         this.existingOffices = res.data[0];
       },
@@ -78,8 +75,9 @@ export class UpdateDataComponent implements OnInit {
     });
   }
 
-  getContacts() {
-    this.contactsProviderService.getContactById(this.user.id).subscribe({
+  loadContacts(providerId: number) {
+    // Update endpoint and filter by provider
+    this.contactsProviderService.getContactById(providerId).subscribe({
       next: (res: any) => {
         this.existingContacts = res.contacts;
       },
@@ -90,16 +88,16 @@ export class UpdateDataComponent implements OnInit {
   }
 
   initializeForm() {
-    this.taskForm = this.fb.group({
+    this.providerForm = this.fb.group({
+      idProvider: [this.user.id],
       startTime: [new Date()],
       endTime: [''],
-      email: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
       name: ['', [Validators.required]],
       languages: [[], [Validators.required]],
       razonSocial: ['', [Validators.required]],
       idTypeDocument: ['', [Validators.required]],
       identification: ['', [Validators.required]],
-
       website: [''],
 
       updatedOffices: this.fb.array([]),
@@ -109,54 +107,50 @@ export class UpdateDataComponent implements OnInit {
       updatedContacts: this.fb.array([]),
       createdContacts: this.fb.array([]),
       deletedContacts: this.fb.array([])
-    }, {
-      validators: [this.emailOrIdentificationGroupValidator]
     });
   }
 
-  /**
-   * Validator of the 'email' field validating email or identification
-   */
-  emailOrIdentificationGroupValidator(group: AbstractControl): ValidationErrors | null {
-    const emailControl = group.get('email');
-    const identificationControl = group.get('identification');
-    if (!emailControl || !identificationControl) return null;
+  loadProviderData(): void {
+    this.clientProviderService.getProviderData(this.user.id).subscribe({
+      next: (res: any) => {
+        const data = res.data;
+        this.providerForm.patchValue({
+          email: data.email,
+          name: data.name,
+          languages: data.languages,
+          razonSocial: data.razonSocial,
+          idTypeDocument: data.idTypeDocument,
+          identification: data.identification,
+          website: data.website
+        });
 
-    const emailOrIdentification = emailControl.value;
-    const identification = identificationControl.value;
-
-    // Not required
-    if (!emailOrIdentification) return null;
-
-    // Validate if it is an email
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+(\.[a-zA-Z]{2,})+$/;
-    if (emailPattern.test(emailOrIdentification)) return null;
-
-    // Check if it matches the ID
-    if (!identification || emailOrIdentification !== identification) {
-      return { invalidEmailOrIdentification: true };
-    }
-    return null;
+        this.loadOffices(data.idProvider);
+        this.loadContacts(data.idProvider);
+      },
+      error: (err: any) => {
+        console.error(err);
+      }
+    });
   }
 
   get updatedOffices() {
-    return this.taskForm.get('updatedOffices') as FormArray;
+    return this.providerForm.get('updatedOffices') as FormArray;
   }
   get createdOffices() {
-    return this.taskForm.get('createdOffices') as FormArray;
+    return this.providerForm.get('createdOffices') as FormArray;
   }
   get deletedOffices() {
-    return this.taskForm.get('deletedOffices') as FormArray;
+    return this.providerForm.get('deletedOffices') as FormArray;
   }
 
   get updatedContacts() {
-    return this.taskForm.get('updatedContacts') as FormArray;
+    return this.providerForm.get('updatedContacts') as FormArray;
   }
   get createdContacts() {
-    return this.taskForm.get('createdContacts') as FormArray;
+    return this.providerForm.get('createdContacts') as FormArray;
   }
   get deletedContacts() {
-    return this.taskForm.get('deletedContacts') as FormArray;
+    return this.providerForm.get('deletedContacts') as FormArray;
   }
 
   openOfficeModal(officeIndex: number | null = null) {
@@ -181,12 +175,17 @@ export class UpdateDataComponent implements OnInit {
     modalRef.afterClose.subscribe((result: any) => {
       if (result && result.office) {
         const newOffice = result.office;
+
         if (result.isNew) {
           this.createdOffices.push(this.fb.group(newOffice));
           this.existingOffices.push(newOffice);
         } else if (!result.isNew && officeIndex != null) {
-          this.updatedOffices.push(this.fb.group(newOffice));
-          this.existingOffices[officeIndex] = newOffice;
+          const updatedOffice = {
+            ...newOffice,
+            cityName: newOffice.cityName || this.existingOffices[officeIndex].cityName
+          };
+          this.updatedOffices.push(this.fb.group(updatedOffice));
+          this.existingOffices[officeIndex] = updatedOffice;
         }
       }
     });
@@ -212,14 +211,19 @@ export class UpdateDataComponent implements OnInit {
     }
 
     modalRef.afterClose.subscribe((result: any) => {
-      if (result && result.office) {
-        const newOffice = result.office;
+      if (result && result.contact) {
+        const newContact = result.contact;
+
         if (result.isNew) {
-          this.createdContacts.push(this.fb.group(newOffice));
-          this.existingContacts.push(newOffice);
+          this.createdContacts.push(this.fb.group(newContact));
+          this.existingContacts.push(newContact);
         } else if (!result.isNew && contactIndex != null) {
-          this.updatedContacts.push(this.fb.group(newOffice));
-          this.existingContacts[contactIndex] = newOffice;
+          const updatedContact = {
+            ...newContact,
+            cityName: newContact.occupationName || this.existingContacts[contactIndex].occupationName
+          };
+          this.updatedContacts.push(this.fb.group(updatedContact));
+          this.existingContacts[contactIndex] = updatedContact;
         }
       }
     });
@@ -228,21 +232,21 @@ export class UpdateDataComponent implements OnInit {
   deleteOffice(index: number): void {
     const deletedOffice = this.existingOffices[index];
 
-    // Remuevo de existingOffices
+    // Remove from existingOffices
     this.existingOffices.splice(index, 1);
 
     if (deletedOffice.idTemporalOfficeProvider !== null) {
-      // Buscar en updatedOffices y eliminar si existe
+      // Search in updatedOffices and delete if it exists
       const updatedIndex = this.updatedOffices.controls.findIndex(office =>
         office.value.idTemporalOfficeProvider == deletedOffice.idTemporalOfficeProvider
       );
       if (updatedIndex !== -1) {
         this.updatedOffices.removeAt(updatedIndex);
       }
-      // Hago push al array de eliminados si es una sede existente
+      // Push to deleted array if it already existed
       this.deletedOffices.push(this.fb.control(deletedOffice.idTemporalOfficeProvider));
     } else {
-      // Buscar en createdOffices y eliminar si existe
+      // Search in createdOffices and delete if it exists
       const createdIndex = this.createdOffices.controls.findIndex(office =>
         JSON.stringify(office.value) === JSON.stringify(deletedOffice)
       );
@@ -256,21 +260,21 @@ export class UpdateDataComponent implements OnInit {
   deleteContact(index: number): void {
     const deletedContact = this.existingContacts[index];
 
-    // Remuevo de existingContacts
+    // Remove from existingContacts
     this.existingContacts.splice(index, 1);
 
     if (deletedContact.idTemporalContact !== null) {
-      // Buscar en updatedContacts y eliminar si existe
+      // Search in updatedContacts and delete if it exists
       const updatedIndex = this.updatedContacts.controls.findIndex(office =>
         office.value.idTemporalContact == deletedContact.idTemporalContact
       );
       if (updatedIndex !== -1) {
         this.updatedContacts.removeAt(updatedIndex);
       }
-      // Hago push al array de eliminados si es una sede existente
+      // Push to deleted array if it already existed
       this.deletedContacts.push(this.fb.control(deletedContact.idTemporalContact));
     } else {
-      // Buscar en createdContacts y eliminar si existe
+      // Search in createdContacts and delete if it exists
       const createdIndex = this.createdContacts.controls.findIndex(office =>
         JSON.stringify(office.value) === JSON.stringify(deletedContact)
       );
@@ -282,35 +286,11 @@ export class UpdateDataComponent implements OnInit {
 
   onSubmit(): void {
     console.log("onSubmit");
-    if (this.taskForm.invalid) {
-      // this.taskForm.markAllAsTouched();
-      Object.values(this.taskForm.controls).forEach(control => {
-        if (control.invalid) {
-          control.markAsDirty();
-          control.updateValueAndValidity({ onlySelf: true });
-        }
-        if (control instanceof FormArray) {
-          control.controls.forEach((group: AbstractControl) => {
-            if (group instanceof FormGroup) {
-              // Si es un FormGroup, recorro los controles
-              Object.values(group.controls).forEach(field => {
-                field.markAsTouched();
-                field.updateValueAndValidity();
-              });
-            } else if (group instanceof FormControl) {
-              // Si es un FormControl, valido directamente
-              group.markAsTouched();
-              group.updateValueAndValidity();
-            }
-          });
-        } else {
-          control.markAsTouched();
-          control.updateValueAndValidity();
-        }
-      });
+    if (this.providerForm.invalid) {
+      this.formUtils.markFormTouched(this.providerForm);
       return;
     };
-    this.taskForm.patchValue({ endTime: new Date() });
+    this.providerForm.patchValue({ endTime: new Date() });
   }
 
 }
