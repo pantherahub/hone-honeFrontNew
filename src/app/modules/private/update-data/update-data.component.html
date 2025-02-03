@@ -1,42 +1,13 @@
 <nz-row nzJustify="center">
-  <nz-col [nzSpan]="24" [nzMd]="18" [nzLg]="12">
+  <nz-col [nzSpan]="24" [nzMd]="18" [nzXl]="12">
     <div class="update-data">
       <div class="update-data__header">
-        <h2 class="update-data__title">Información prestador</h2>
+        <h2 class="update-data__header__title">Información prestador</h2>
       </div>
-
-      <!-- <nz-form [formGroup]="taskForm">
-        <div class="update-data__body">
-
-          <div nz-row [nzGutter]="16">
-            <nz-form-item nz-col [nzSpan]="12">
-              <nz-form-label [nzRequired]="true" nzFor="name">Nombre</nz-form-label>
-              <nz-form-control [nzErrorTip]="nameErrorTip">
-                <ng-template #nameErrorTip>
-                  <p *ngIf="taskForm.controls['name'].hasError('required')">El nombre es requerido.</p>
-                </ng-template>
-                <input nz-input id="name" formControlName="name" placeholder="Nombre" />
-              </nz-form-control>
-            </nz-form-item>
-
-            <nz-form-item nz-col [nzSpan]="12">
-              <nz-form-label [nzRequired]="true" nzFor="name">Idioma</nz-form-label>
-              <nz-form-control [nzErrorTip]="nameErrorTip">
-                <ng-template #nameErrorTip>
-                  <p *ngIf="taskForm.controls['name'].hasError('required')">El idioma es requerido.</p>
-                </ng-template>
-                <input nz-input id="name" formControlName="name" placeholder="Nombre" />
-              </nz-form-control>
-            </nz-form-item>
-          </div>
-
-        </div>
-        TESTSTTT
-      </nz-form> -->
-
 
       <form nz-form nzLayout="vertical" [formGroup]="taskForm" (ngSubmit)="onSubmit()">
         <div class="update-data__body">
+
           <div class="container-alerts">
             <nz-alert
               nzType="warning"
@@ -72,18 +43,18 @@
 
             <nz-col [nzSpan]="24" [nzSm]="12">
               <nz-form-item>
-                <nz-form-label [nzRequired]="true" nzFor="language">Idioma</nz-form-label>
-                <nz-form-control [nzErrorTip]="languageErrorTip">
-                  <ng-template #languageErrorTip>
-                    <p *ngIf="taskForm.controls['language'].hasError('required')">El campo es requerido.</p>
+                <nz-form-label [nzRequired]="true" nzFor="languages">Idioma</nz-form-label>
+                <nz-form-control [nzErrorTip]="languagesErrorTip">
+                  <ng-template #languagesErrorTip>
+                    <p *ngIf="taskForm.controls['languages'].hasError('required')">El campo es requerido.</p>
                   </ng-template>
-                  <!-- <input nz-input id="language" formControlName="language" placeholder="Idioma" /> -->
+                  <!-- <input nz-input id="languages" formControlName="languages" placeholder="Idioma" /> -->
                   <nz-select
                     nzMode="multiple"
                     [nzMaxTagCount]="3"
                     nzAllowClear
                     [nzMaxTagPlaceholder]="langTagPlaceHolder"
-                    formControlName="language"
+                    formControlName="languages"
                     nzPlaceHolder="Seleccionar"
                   >
                     <nz-option *ngFor="let lang of languages" [nzLabel]="lang.name" [nzValue]="lang.code"></nz-option>
@@ -107,11 +78,11 @@
 
             <nz-col [nzSpan]="24" [nzSm]="12">
               <nz-form-item>
-                <nz-form-label [nzRequired]="true" nzFor="documentTypeId">Tipo de identificación</nz-form-label>
+                <nz-form-label [nzRequired]="true" nzFor="idTypeDocument">Tipo de identificación</nz-form-label>
                 <nz-form-control nzErrorTip="El campo es requerido.">
                   <nz-select
-                    id="documentTypeId"
-                    formControlName="documentTypeId"
+                    id="idTypeDocument"
+                    formControlName="idTypeDocument"
                     nzPlaceHolder="Seleccionar"
                   >
                     <nz-option *ngFor="let type of identificationTypes" [nzValue]="type.idTypeDocument" [nzLabel]="type.typeDocument"></nz-option>
@@ -132,16 +103,25 @@
               </nz-form-item>
             </nz-col>
 
+            <nz-col [nzSpan]="24" [nzSm]="12">
+              <nz-form-item>
+                <nz-form-label [nzRequired]="true" nzFor="website">Sitio web</nz-form-label>
+                <nz-form-control>
+                  <input nz-input id="website" formControlName="website" placeholder="Web" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+
           </div>
 
           <div>
             <div class="table-head">
-              <h3>Sedes existentes</h3>
+              <h3 class="table-head__title">Sedes existentes</h3>
               <button nz-button nzType="primary" type="button" (click)="openOfficeModal()">Agregar nueva</button>
             </div>
 
             <!-- Table -->
-            <nz-table #officeTable [nzData]="existingOffices" [nzScroll]="{ x: '1150px', y: '240px' }">
+            <nz-table #officeTable [nzData]="existingOffices" [nzScroll]="{ x: '1150px', y: '240px' }" class="table">
               <thead>
                 <tr>
                   <th>Nombre</th>
@@ -157,9 +137,9 @@
                   <td>{{ data.clientHoneSolutions }}</td>
                   <td>{{ data.city }}</td>
                   <td>{{ data.address }}</td>
-                  <td nzRight>
-                     <button nz-button nzType="primary" type="button" (click)="openOfficeModal(i)"><span nz-icon nzType="edit"></span></button>
-                     <button nz-button nzDanger nzType="primary" type="button" (click)="deleteOffice(i)"><span nz-icon nzType="delete"></span></button>
+                  <td nzRight class="table__action">
+                     <button nz-button nzType="primary" type="button" (click)="openOfficeModal(i)" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
+                     <button nz-button nzDanger nzType="primary" type="button" (click)="deleteOffice(i)" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button>
                   </td>
                 </tr>
               </tbody>
@@ -168,12 +148,12 @@
 
           <div>
             <div class="table-head">
-              <h3>Contactos existentes</h3>
+              <h3 class="table-head__title">Contactos existentes</h3>
               <button nz-button nzType="primary" type="button" (click)="openContactModal()">Agregar nuevo</button>
             </div>
 
             <!-- Table -->
-            <nz-table #contactTable [nzData]="existingContacts" [nzScroll]="{ x: '1150px', y: '240px' }">
+            <nz-table #contactTable [nzData]="existingContacts" [nzScroll]="{ x: '1150px', y: '240px' }" class="table">
               <thead>
                 <tr>
                   <th>Cargo</th>
@@ -189,9 +169,9 @@
                   <td>{{ data.name }}</td>
                   <td>{{ data.phone }}</td>
                   <td>{{ data.email }}</td>
-                  <td nzRight>
-                     <button nz-button nzType="primary" type="button" (click)="openContactModal(i)"><span nz-icon nzType="edit"></span></button>
-                     <button nz-button nzDanger nzType="primary" type="button" (click)="deleteContact(i)"><span nz-icon nzType="delete"></span></button>
+                  <td nzRight nzWidth="100px" class="table__action">
+                     <button nz-button nzType="primary" type="button" (click)="openContactModal(i)" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
+                     <button nz-button nzDanger nzType="primary" type="button" (click)="deleteContact(i)" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button>
                   </td>
                 </tr>
               </tbody>

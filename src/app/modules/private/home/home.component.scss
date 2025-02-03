@@ -40,6 +40,17 @@
         width: 100%;
         padding: 1rem;
     }
+
+    &__update-data {
+      flex-direction: row;
+      gap: 0.5rem;
+      > span {
+        font-size: 1rem;
+      }
+      > h2 {
+        margin: 0;
+      }
+    }
 }
 
 .banner-home {

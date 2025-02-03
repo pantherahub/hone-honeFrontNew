@@ -46,60 +46,22 @@ export class OfficeModalComponent implements OnInit {
 
   initializeForm() {
     this.officeForm = this.fb.group({
-      idOfficeProviderTemporal: [null],
+      idTemporalOfficeProvider: [null],
       emails: this.fb.array([
         this.fb.control('', [Validators.required, Validators.email])
       ], [minArrayLength(1), maxArrayLength(5)]),
-      userAttentionAddress: ['', [Validators.required]],
+      address: ['', [Validators.required]],
       enableCode: ['', [Validators.required]],
       name: ['', [Validators.required]],
-      cityId: ['', [Validators.required]],
-      customerContactEmail: ['', [Validators.required, Validators.email]],
-      customerContactTelephone: ['', [Validators.required]],
-      tradeTelephone: ['', [Validators.required]],
-      tradeEmail: ['', [Validators.required, Validators.email]],
-      billTelephone: ['', [Validators.required]],
-      billEmail: ['', [Validators.required, Validators.email]],
+      idCity: ['', [Validators.required]],
+      schedulingLink: [''],
+
       attentionDays: ['', [Validators.required]],
       officeHours: ['', [Validators.required]],
-
-      datingTelephone: ['', [Validators.required]],
-      datingCell: ['', [Validators.required]],
-      datingWhatsappLines: this.fb.array([
-        this.fb.control('', [Validators.required])
-      ], [minArrayLength(1), maxArrayLength(5)]),
-      datingEmail: ['', [Validators.required, Validators.email]],
 
       updatedContacts: this.fb.array([]),
       createdContacts: this.fb.array([]),
       deletedContacts: this.fb.array([])
-
-      // nameLegalRepresentation: ['', [Validators.required]],
-      // identificationLegalRepresentation: ['', [Validators.required]],
-      // expeditionLocation: ['', [Validators.required]],
-      // expeditionDate: ['', [Validators.required]],
-      // telephoneLegalRepresentation: ['', [Validators.required]],
-      // emailLegalRepresentation: ['', [Validators.required, Validators.email]],
-
-      // managerName: ['', [Validators.required]],
-      // managerTelephone: ['', [Validators.required]],
-      // managerEmail: ['', [Validators.required, Validators.email]],
-
-      // administratorName: ['', [Validators.required]],
-      // administratorTelephone: ['', [Validators.required]],
-      // administratorEmail: ['', [Validators.required, Validators.email]],
-
-      // businessName: ['', [Validators.required]],
-      // businessTelephone: ['', [Validators.required]],
-      // businessEmail: ['', [Validators.required, Validators.email]],
-
-      // billingName: ['', [Validators.required]],
-      // billingTelephone: ['', [Validators.required]],
-      // billingEmail: ['', [Validators.required, Validators.email]],
-
-      // authorizationsName: ['', [Validators.required]],
-      // authorizationsTelephone: ['', [Validators.required]],
-      // authorizationsEmail: ['', [Validators.required, Validators.email]],
     });
   }
 
@@ -127,20 +89,6 @@ export class OfficeModalComponent implements OnInit {
     }
   }
 
-  get datingWhatsappLinesArray(): FormArray {
-    return this.officeForm.get('datingWhatsappLines') as FormArray;
-  }
-  addDatingWhatsappLine(): void {
-    if (this.datingWhatsappLinesArray.length < 5) {
-      this.datingWhatsappLinesArray.push(this.fb.control('', [Validators.required]));
-    }
-  }
-  removeDatingWhatsappLine(index: number): void {
-    if (this.datingWhatsappLinesArray.length > 1) {
-      this.datingWhatsappLinesArray.removeAt(index);
-    }
-  }
-
   openContactModal(contactIndex: number | null = null) {
     const contact = contactIndex
       ? this.existingContacts[contactIndex]
@@ -157,6 +105,7 @@ export class OfficeModalComponent implements OnInit {
     const instanceModal = modalRef.getContentComponent();
     if (contact) {
       instanceModal.contact = contact;
+      instanceModal.contactModelType = 'office';
     }
 
     modalRef.afterClose.subscribe((result: any) => {
@@ -179,16 +128,16 @@ export class OfficeModalComponent implements OnInit {
     // Remuevo de existingContacts
     this.existingContacts.splice(index, 1);
 
-    if (deletedContact.idContactTemporal !== null) {
+    if (deletedContact.idTemporalContact !== null) {
       // Buscar en updatedContacts y eliminar si existe
       const updatedIndex = this.updatedContacts.controls.findIndex(office =>
-        office.value.idContactTemporal == deletedContact.idContactTemporal
+        office.value.idTemporalContact == deletedContact.idTemporalContact
       );
       if (updatedIndex !== -1) {
         this.updatedContacts.removeAt(updatedIndex);
       }
       // Hago push al array de eliminados si es una sede existente
-      this.deletedContacts.push(this.fb.control(deletedContact.idContactTemporal));
+      this.deletedContacts.push(this.fb.control(deletedContact.idTemporalContact));
     } else {
       // Buscar en createdContacts y eliminar si existe
       const createdIndex = this.createdContacts.controls.findIndex(office =>

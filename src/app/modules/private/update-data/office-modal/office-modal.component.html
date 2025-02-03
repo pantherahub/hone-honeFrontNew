@@ -40,12 +40,12 @@
 
       <nz-col [nzSpan]="24" [nzSm]="12">
         <nz-form-item>
-          <nz-form-label [nzRequired]="true" nzFor="userAttentionAddress">Dirección de atención de usuarios</nz-form-label>
-          <nz-form-control [nzErrorTip]="userAttentionAddressErrorTip">
-            <ng-template #userAttentionAddressErrorTip>
-              <p *ngIf="officeForm.controls['userAttentionAddress'].hasError('required')">El campo es requerido.</p>
+          <nz-form-label [nzRequired]="true" nzFor="address">Dirección de atención de usuarios</nz-form-label>
+          <nz-form-control [nzErrorTip]="addressErrorTip">
+            <ng-template #addressErrorTip>
+              <p *ngIf="officeForm.controls['address'].hasError('required')">El campo es requerido.</p>
             </ng-template>
-            <input nz-input id="userAttentionAddress" formControlName="userAttentionAddress" placeholder="Dirección" />
+            <input nz-input id="address" formControlName="address" placeholder="Dirección" />
           </nz-form-control>
         </nz-form-item>
       </nz-col>
@@ -76,11 +76,11 @@
 
       <nz-col [nzSpan]="24" [nzSm]="12">
         <nz-form-item>
-          <nz-form-label [nzRequired]="true" nzFor="cityId">Ciudad</nz-form-label>
+          <nz-form-label [nzRequired]="true" nzFor="idCity">Ciudad</nz-form-label>
           <nz-form-control nzErrorTip="El campo es requerido.">
             <nz-select
-              id="cityId"
-              formControlName="cityId"
+              id="idCity"
+              formControlName="idCity"
               nzShowSearch
               [nzShowArrow]="true"
               nzPlaceHolder="Seleccionar"
@@ -92,73 +92,10 @@
       </nz-col>
 
       <nz-col [nzSpan]="24" [nzSm]="12">
-        <nz-form-item>
-          <nz-form-label [nzRequired]="true" nzFor="customerContactEmail">Correo para cliente</nz-form-label>
-          <nz-form-control [nzErrorTip]="customerContactEmailErrorTip">
-            <ng-template #customerContactEmailErrorTip>
-              <p *ngIf="officeForm.controls['customerContactEmail'].hasError('required')">El campo es requerido.</p>
-            </ng-template>
-            <input nz-input id="customerContactEmail" formControlName="customerContactEmail" placeholder="Correo" />
-          </nz-form-control>
-        </nz-form-item>
-      </nz-col>
-
-      <nz-col [nzSpan]="24" [nzSm]="12">
         <nz-form-item nz-row>
-          <nz-form-label [nzRequired]="true" nzFor="customerContactTelephone">Teléfono para cliente</nz-form-label>
-          <nz-form-control [nzErrorTip]="customerContactTelephoneErrorTip">
-            <ng-template #customerContactTelephoneErrorTip>
-              <p *ngIf="officeForm.controls['customerContactTelephone'].hasError('required')">El campo es requerido.</p>
-            </ng-template>
-            <input nz-input id="customerContactTelephone" formControlName="customerContactTelephone" placeholder="Teléfono" />
-          </nz-form-control>
-        </nz-form-item>
-      </nz-col>
-
-      <nz-col [nzSpan]="24" [nzSm]="12">
-        <nz-form-item>
-          <nz-form-label [nzRequired]="true" nzFor="tradeEmail">Correo comercial</nz-form-label>
-          <nz-form-control [nzErrorTip]="tradeEmailErrorTip">
-            <ng-template #tradeEmailErrorTip>
-              <p *ngIf="officeForm.controls['tradeEmail'].hasError('required')">El campo es requerido.</p>
-            </ng-template>
-            <input nz-input id="tradeEmail" formControlName="tradeEmail" placeholder="Correo" />
-          </nz-form-control>
-        </nz-form-item>
-      </nz-col>
-
-      <nz-col [nzSpan]="24" [nzSm]="12">
-        <nz-form-item nz-row>
-          <nz-form-label [nzRequired]="true" nzFor="tradeTelephone">Teléfono comercial</nz-form-label>
-          <nz-form-control [nzErrorTip]="tradeTelephoneErrorTip">
-            <ng-template #tradeTelephoneErrorTip>
-              <p *ngIf="officeForm.controls['tradeTelephone'].hasError('required')">El campo es requerido.</p>
-            </ng-template>
-            <input nz-input id="tradeTelephone" formControlName="tradeTelephone" placeholder="Teléfono" />
-          </nz-form-control>
-        </nz-form-item>
-      </nz-col>
-
-      <nz-col [nzSpan]="24" [nzSm]="12">
-        <nz-form-item>
-          <nz-form-label [nzRequired]="true" nzFor="billEmail">Correo facturación</nz-form-label>
-          <nz-form-control [nzErrorTip]="billEmailErrorTip">
-            <ng-template #billEmailErrorTip>
-              <p *ngIf="officeForm.controls['billEmail'].hasError('required')">El campo es requerido.</p>
-            </ng-template>
-            <input nz-input id="billEmail" formControlName="billEmail" placeholder="Correo" />
-          </nz-form-control>
-        </nz-form-item>
-      </nz-col>
-
-      <nz-col [nzSpan]="24" [nzSm]="12">
-        <nz-form-item nz-row>
-          <nz-form-label [nzRequired]="true" nzFor="billTelephone">Teléfono facturación</nz-form-label>
-          <nz-form-control [nzErrorTip]="billTelephoneErrorTip">
-            <ng-template #billTelephoneErrorTip>
-              <p *ngIf="officeForm.controls['billTelephone'].hasError('required')">El campo es requerido.</p>
-            </ng-template>
-            <input nz-input id="billTelephone" formControlName="billTelephone" placeholder="Teléfono" />
+          <nz-form-label nzFor="schedulingLink">Link de agendamiento</nz-form-label>
+          <nz-form-control>
+            <input nz-input id="schedulingLink" formControlName="schedulingLink" placeholder="Link" />
           </nz-form-control>
         </nz-form-item>
       </nz-col>
@@ -187,89 +124,17 @@
         </nz-form-item>
       </nz-col>
 
-      <nz-col [nzSpan]="24" [nzSm]="12">
-        <nz-form-item>
-          <nz-form-label [nzRequired]="true" nzFor="datingEmail">Correo citas</nz-form-label>
-          <nz-form-control [nzErrorTip]="datingEmailErrorTip">
-            <ng-template #datingEmailErrorTip>
-              <p *ngIf="officeForm.controls['datingEmail'].hasError('required')">El campo es requerido.</p>
-            </ng-template>
-            <input nz-input id="datingEmail" formControlName="datingEmail" placeholder="Correo" />
-          </nz-form-control>
-        </nz-form-item>
-      </nz-col>
-
-      <nz-col [nzSpan]="24" [nzSm]="12">
-        <nz-form-item nz-row>
-          <nz-form-label [nzRequired]="true" nzFor="datingTelephone">Teléfono citas</nz-form-label>
-          <nz-form-control [nzErrorTip]="datingTelephoneErrorTip">
-            <ng-template #datingTelephoneErrorTip>
-              <p *ngIf="officeForm.controls['datingTelephone'].hasError('required')">El campo es requerido.</p>
-            </ng-template>
-            <input nz-input id="datingTelephone" formControlName="datingTelephone" placeholder="Teléfono" />
-          </nz-form-control>
-        </nz-form-item>
-      </nz-col>
-
-      <nz-col [nzSpan]="24" [nzSm]="12">
-        <nz-form-item nz-row>
-          <nz-form-label [nzRequired]="true" nzFor="datingCell">Celular citas</nz-form-label>
-          <nz-form-control [nzErrorTip]="datingCellErrorTip">
-            <ng-template #datingCellErrorTip>
-              <p *ngIf="officeForm.controls['datingCell'].hasError('required')">El campo es requerido.</p>
-            </ng-template>
-            <input nz-input id="datingCell" formControlName="datingCell" placeholder="Celular" />
-          </nz-form-control>
-        </nz-form-item>
-      </nz-col>
-
-      <nz-col [nzSpan]="24" [nzSm]="12">
-        <nz-form-label [nzRequired]="true">Líneas WhatsApp</nz-form-label>
-        <div nz-row [nzGutter]="16" formArrayName="datingWhatsappLines">
-          @for (control of datingWhatsappLinesArray.controls; track control; let i = $index) {
-            <nz-col [nzSpan]="24" [nzSm]="12">
-              <nz-form-item>
-                <nz-form-control nzErrorTip="El campo es requerido.">
-                  <input
-                    nz-input
-                    type="text"
-                    placeholder="WhatsApp"
-                    [formControlName]="i"
-                  />
-                  <span
-                    nz-icon
-                    nzType="minus-circle-o"
-                    class="dynamic-delete-button"
-                    *ngIf="datingWhatsappLinesArray.length > 1"
-                    (click)="removeDatingWhatsappLine(i)"
-                  ></span>
-                </nz-form-control>
-              </nz-form-item>
-            </nz-col>
-          }
-          <nz-col [nzSpan]="24" [nzSm]="12">
-            <nz-form-item>
-              <nz-form-control>
-                <button nz-button nzType="dashed" type="button" (click)="addDatingWhatsappLine()" [disabled]="datingWhatsappLinesArray.length >= 5">
-                  <span nz-icon nzType="plus"></span> Agregar
-                </button>
-              </nz-form-control>
-            </nz-form-item>
-          </nz-col>
-        </div>
-      </nz-col>
-
     </div>
 
     <!-- Contacts -->
     <div>
       <div class="table-head">
-        <h3>Contactos existentes</h3>
+        <h3 class="table-head__title">Contactos existentes</h3>
         <button nz-button nzType="primary" type="button" (click)="openContactModal()">Agregar nuevo</button>
       </div>
 
       <!-- Table -->
-      <nz-table #contactTable [nzData]="existingContacts" [nzScroll]="{ x: '1150px', y: '240px' }">
+      <nz-table #contactTable nzSize="small" [nzData]="existingContacts" [nzScroll]="{ x: '1150px', y: '240px' }" class="table">
         <thead>
           <tr>
             <th>Cargo</th>
@@ -285,9 +150,9 @@
             <td>{{ data.name }}</td>
             <td>{{ data.phone }}</td>
             <td>{{ data.email }}</td>
-            <td nzRight>
-              <button nz-button nzType="primary" type="button" (click)="openContactModal(i)"><span nz-icon nzType="edit"></span></button>
-              <button nz-button nzDanger nzType="primary" type="button" (click)="deleteContact(i)"><span nz-icon nzType="delete"></span></button>
+            <td nzRight class="table__action">
+              <button nz-button nzType="primary" type="button" (click)="openContactModal(i)" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
+              <button nz-button nzDanger nzType="primary" type="button" (click)="deleteContact(i)" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button>
             </td>
           </tr>
         </tbody>
@@ -297,7 +162,7 @@
   </div>
   <div class="footer">
     <button nz-button nzType="primary" type="submit">
-      {{ office ? 'Actualizar' : 'Agregar' }}
+      {{ office ? 'Actualizar sede' : 'Agregar sede' }}
     </button>
   </div>
 </form>

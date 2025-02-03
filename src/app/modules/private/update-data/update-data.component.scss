@@ -1,6 +1,13 @@
 .update-data {
   padding: 20px;
 
+  &__header {
+    padding: 20px 0;
+    &__title {
+      font-size: 1.25rem;
+    }
+  }
+
   &__body {
     display: flex;
     flex-direction: column;
@@ -17,26 +24,24 @@
       display: flex;
       justify-content: space-between;
       flex-wrap: wrap;
+      margin: 0.5rem 0;
+      &__title {
+        margin: 0;
+      }
+    }
+
+    .table {
+      &__action {
+        display: flex;
+        gap: 0.5rem;
+      }
     }
   }
 
   &__footer {
     display: flex;
     justify-content: flex-end;
-    // padding: 20px;
+    padding: 40px 0 20px 0;
   }
 
 }
-
-// .ant-form-item-label,
-// .ant-form-item-control {
-//   flex: 0 0 100%;
-//   max-width: 100%;
-// }
-
-// .ant-form-item-label {
-//   padding: 0 0 0px;
-//   line-height: 1.5715;
-//   white-space: initial;
-//   text-align: left;
-// }

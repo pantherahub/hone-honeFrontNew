@@ -1,19 +1,18 @@
 <form nz-form nzLayout="vertical" [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="contact-form">
 
   <div nz-row [nzGutter]="16">
+
     <nz-col [nzSpan]="24" [nzSm]="12">
       <nz-form-item>
-        <nz-form-label [nzRequired]="true" nzFor="occupationId">Cargo</nz-form-label>
+        <nz-form-label [nzRequired]="true" nzFor="type">Tipo de contacto</nz-form-label>
         <nz-form-control nzErrorTip="El campo es requerido.">
           <nz-select
-            id="occupationId"
-            formControlName="occupationId"
-            nzShowSearch
-            [nzShowArrow]="true"
+            id="type"
+            formControlName="type"
             nzPlaceHolder="Seleccionar"
-            [disabled]="contact !== null"
           >
-            <nz-option *ngFor="let occupation of contactOccupations" [nzValue]="occupation.isOccupation" [nzLabel]="occupation.Occupation"></nz-option>
+            <nz-option nzValue="person" nzLabel="Persona"></nz-option>
+            <nz-option nzValue="area" nzLabel="Área"></nz-option>
           </nz-select>
         </nz-form-control>
       </nz-form-item>
@@ -21,12 +20,88 @@
 
     <nz-col [nzSpan]="24" [nzSm]="12">
       <nz-form-item>
+        <nz-form-label [nzRequired]="true" nzFor="idOccupation">
+          {{ selectedContactType === 'Person' ? 'Cargo' : 'Área' }}
+        </nz-form-label>
+        <nz-form-control nzErrorTip="El campo es requerido.">
+          <nz-select
+            id="idOccupation"
+            formControlName="idOccupation"
+            nzShowSearch
+            [nzShowArrow]="true"
+            nzPlaceHolder="Seleccionar"
+            [disabled]="contact !== null"
+          >
+            <nz-option *ngFor="let occupation of contactOccupations" [nzValue]="occupation.idOccupation" [nzLabel]="occupation.Occupation"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </nz-col>
+
+    <nz-col [nzSpan]="24" [nzSm]="12" *ngIf="selectedContactType === 'person'">
+      <nz-form-item>
         <nz-form-label [nzRequired]="true" nzFor="officeName">Nombre</nz-form-label>
         <nz-form-control [nzErrorTip]="nameErrorTip">
           <ng-template #nameErrorTip>
             <p *ngIf="contactForm.controls['name'].hasError('required')">El campo es requerido.</p>
           </ng-template>
           <input nz-input id="officeName" formControlName="name" placeholder="Nombre" />
+        </nz-form-control>
+      </nz-form-item>
+    </nz-col>
+
+    <nz-col [nzSpan]="24" [nzSm]="12" *ngIf="identificationEnabled">
+      <nz-form-item>
+        <nz-form-label [nzRequired]="true" nzFor="idTypeDocument">Tipo de identificación</nz-form-label>
+        <nz-form-control nzErrorTip="El campo es requerido.">
+          <nz-select
+            id="idTypeDocument"
+            formControlName="idTypeDocument"
+            nzPlaceHolder="Seleccionar"
+          >
+            <nz-option *ngFor="let type of identificationTypes" [nzValue]="type.idTypeDocument" [nzLabel]="type.typeDocument"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </nz-col>
+
+    <nz-col [nzSpan]="24" [nzSm]="12" *ngIf="identificationEnabled">
+      <nz-form-item>
+        <nz-form-label [nzRequired]="true" nzFor="identification">Identificación</nz-form-label>
+        <nz-form-control [nzErrorTip]="identificationErrorTip">
+          <ng-template #identificationErrorTip>
+            <p *ngIf="contactForm.controls['identification'].hasError('required')">El campo es requerido.</p>
+          </ng-template>
+          <input nz-input id="identification" formControlName="identification" placeholder="Identificación" />
+        </nz-form-control>
+      </nz-form-item>
+    </nz-col>
+
+    <nz-col [nzSpan]="24" [nzSm]="12" *ngIf="identificationEnabled">
+      <nz-form-item>
+        <nz-form-label [nzRequired]="true" nzFor="expeditionDate">Fecha de expedición</nz-form-label>
+        <nz-form-control [nzErrorTip]="expeditionDateErrorTip">
+          <ng-template #expeditionDateErrorTip>
+            <p *ngIf="contactForm.controls['expeditionDate'].hasError('required')">El campo es requerido.</p>
+          </ng-template>
+          <nz-date-picker formControlName="expeditionDate" nzPlaceHolder="Fecha"></nz-date-picker>
+        </nz-form-control>
+      </nz-form-item>
+    </nz-col>
+
+    <nz-col [nzSpan]="24" [nzSm]="12" *ngIf="identificationEnabled">
+      <nz-form-item>
+        <nz-form-label [nzRequired]="true" nzFor="idCityExpedition">Ciudad de expedición</nz-form-label>
+        <nz-form-control nzErrorTip="El campo es requerido.">
+          <nz-select
+            id="idCityExpedition"
+            formControlName="idCityExpedition"
+            nzShowSearch
+            [nzShowArrow]="true"
+            nzPlaceHolder="Seleccionar"
+          >
+            <nz-option *ngFor="let city of cities" [nzValue]="city.idCityExpedition" [nzLabel]="city.city"></nz-option>
+          </nz-select>
         </nz-form-control>
       </nz-form-item>
     </nz-col>
@@ -68,18 +143,15 @@
     </nz-col>
 
     <nz-col [nzSpan]="24" [nzSm]="24">
-      <nz-form-label [nzRequired]="true">Teléfonos</nz-form-label>
+      <nz-form-label [nzRequired]="true">Teléfono(s)</nz-form-label>
       <div nz-row [nzGutter]="16" formArrayName="telephones">
         @for (control of telephonesArray.controls; track control; let i = $index) {
-          <nz-col [nzSpan]="24" [nzSm]="12">
-            <nz-form-item>
+          <nz-col [nzSpan]="11" [nzSm]="6">
+            <nz-form-item [formGroupName]="i">
               <nz-form-control nzErrorTip="El campo es requerido.">
-                <input
-                  nz-input
-                  type="text"
-                  placeholder="Teléfono"
-                  [formControlName]="i"
-                />
+                <nz-select formControlName="type" nzPlaceHolder="Tipo">
+                  <nz-option *ngFor="let option of telephoneNumberTypes" [nzValue]="option" [nzLabel]="option"></nz-option>
+                </nz-select>
                 <span
                   nz-icon
                   nzType="minus-circle-o"
@@ -90,18 +162,32 @@
               </nz-form-control>
             </nz-form-item>
           </nz-col>
+
+          <nz-col [nzSpan]="13" [nzSm]="6">
+            <nz-form-item [formGroupName]="i">
+              <nz-form-control nzErrorTip="El campo es requerido.">
+                <input
+                  nz-input
+                  type="text"
+                  placeholder="Número"
+                  formControlName="number"
+                />
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
         }
         <nz-col [nzSpan]="24" [nzSm]="12">
           <nz-form-item>
             <nz-form-control>
               <button nz-button nzType="dashed" type="button" (click)="addTelephone()" [disabled]="telephonesArray.length >= 5">
-                <span nz-icon nzType="plus"></span> Agregar
+                <span nz-icon nzType="plus"></span> Agregar teléfono
               </button>
             </nz-form-control>
           </nz-form-item>
         </nz-col>
       </div>
     </nz-col>
+
   </div>
 
   <div class="footer">

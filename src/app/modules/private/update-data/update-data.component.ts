@@ -95,10 +95,12 @@ export class UpdateDataComponent implements OnInit {
       endTime: [''],
       email: ['', [Validators.required]],
       name: ['', [Validators.required]],
-      language: [[], [Validators.required]],
+      languages: [[], [Validators.required]],
       razonSocial: ['', [Validators.required]],
-      documentTypeId: ['', [Validators.required]],
+      idTypeDocument: ['', [Validators.required]],
       identification: ['', [Validators.required]],
+
+      website: [''],
 
       updatedOffices: this.fb.array([]),
       createdOffices: this.fb.array([]),
@@ -206,6 +208,7 @@ export class UpdateDataComponent implements OnInit {
     const instanceModal = modalRef.getContentComponent();
     if (contact) {
       instanceModal.contact = contact;
+      instanceModal.contactModelType = 'provider';
     }
 
     modalRef.afterClose.subscribe((result: any) => {
@@ -228,16 +231,16 @@ export class UpdateDataComponent implements OnInit {
     // Remuevo de existingOffices
     this.existingOffices.splice(index, 1);
 
-    if (deletedOffice.idOfficeProviderTemporal !== null) {
+    if (deletedOffice.idTemporalOfficeProvider !== null) {
       // Buscar en updatedOffices y eliminar si existe
       const updatedIndex = this.updatedOffices.controls.findIndex(office =>
-        office.value.idOfficeProviderTemporal == deletedOffice.idOfficeProviderTemporal
+        office.value.idTemporalOfficeProvider == deletedOffice.idTemporalOfficeProvider
       );
       if (updatedIndex !== -1) {
         this.updatedOffices.removeAt(updatedIndex);
       }
       // Hago push al array de eliminados si es una sede existente
-      this.deletedOffices.push(this.fb.control(deletedOffice.idOfficeProviderTemporal));
+      this.deletedOffices.push(this.fb.control(deletedOffice.idTemporalOfficeProvider));
     } else {
       // Buscar en createdOffices y eliminar si existe
       const createdIndex = this.createdOffices.controls.findIndex(office =>
@@ -256,16 +259,16 @@ export class UpdateDataComponent implements OnInit {
     // Remuevo de existingContacts
     this.existingContacts.splice(index, 1);
 
-    if (deletedContact.idContactTemporal !== null) {
+    if (deletedContact.idTemporalContact !== null) {
       // Buscar en updatedContacts y eliminar si existe
       const updatedIndex = this.updatedContacts.controls.findIndex(office =>
-        office.value.idContactTemporal == deletedContact.idContactTemporal
+        office.value.idTemporalContact == deletedContact.idTemporalContact
       );
       if (updatedIndex !== -1) {
         this.updatedContacts.removeAt(updatedIndex);
       }
       // Hago push al array de eliminados si es una sede existente
-      this.deletedContacts.push(this.fb.control(deletedContact.idContactTemporal));
+      this.deletedContacts.push(this.fb.control(deletedContact.idTemporalContact));
     } else {
       // Buscar en createdContacts y eliminar si existe
       const createdIndex = this.createdContacts.controls.findIndex(office =>

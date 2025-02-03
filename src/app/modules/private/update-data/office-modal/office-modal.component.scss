@@ -3,11 +3,23 @@
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
+    margin: 0.5rem 0;
+    &__title {
+      margin: 0;
+    }
+  }
+
+  .table {
+    &__action {
+      display: flex;
+      gap: 0.5rem;
+    }
   }
 
   .footer {
     display: flex;
     gap: 1rem;
     justify-content: end;
+    padding-top: 40px;
   }
 }
