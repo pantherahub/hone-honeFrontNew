@@ -24,7 +24,7 @@ export class ContactFormComponent implements OnInit {
   contactOccupations: any[] = [];
   identificationTypes: any[] = [];
   cities: any[] = [];
-  telephoneNumberTypes: string[] = ['Celular', 'Fijo', 'Whatsapp'];
+  phoneNumberTypes: string[] = ['Celular', 'Fijo', 'Whatsapp'];
 
   identificationEnabled: boolean = false;
 
@@ -94,8 +94,8 @@ export class ContactFormComponent implements OnInit {
       emails: this.fb.array([
         this.fb.control('', [Validators.required, Validators.email])
       ], [this.formUtils.minArrayLength(1), this.formUtils.maxArrayLength(5)]),
-      telephones: this.fb.array([
-        this.createTelephoneGroup()
+      phones: this.fb.array([
+        this.createPhoneGroup()
       ], [this.formUtils.minArrayLength(1), this.formUtils.maxArrayLength(5)]),
 
       idTypeDocument: [null],
@@ -147,13 +147,13 @@ export class ContactFormComponent implements OnInit {
       });
     }
 
-    // Load telephone numbers
-    if (this.contact.telephones && this.contact.telephones.length) {
-      const telephonesArray = this.telephonesArray;
-      this.contact.telephones.forEach((telephone: any) => {
-        telephonesArray.push(this.fb.group({
-          type: [telephone.type, [Validators.required]],
-          number: [telephone.number, [Validators.required]]
+    // Load phone numbers
+    if (this.contact.phones && this.contact.phones.length) {
+      const phonesArray = this.phonesArray;
+      this.contact.phones.forEach((phone: any) => {
+        phonesArray.push(this.fb.group({
+          type: [phone.type, [Validators.required]],
+          number: [phone.number, [Validators.required]]
         }));
       });
     }
@@ -206,23 +206,23 @@ export class ContactFormComponent implements OnInit {
     }
   }
 
-  get telephonesArray(): FormArray {
-    return this.contactForm.get('telephones') as FormArray;
+  get phonesArray(): FormArray {
+    return this.contactForm.get('phones') as FormArray;
   }
-  createTelephoneGroup(): FormGroup {
+  createPhoneGroup(): FormGroup {
     return this.fb.group({
       type: ['', [Validators.required]],
       number: ['', [Validators.required]]
     });
   }
-  addTelephone(): void {
-    if (this.telephonesArray.length < 5) {
-      this.telephonesArray.push(this.createTelephoneGroup());
+  addPhone(): void {
+    if (this.phonesArray.length < 5) {
+      this.phonesArray.push(this.createPhoneGroup());
     }
   }
-  removeTelephone(index: number): void {
-    if (this.telephonesArray.length > 1) {
-      this.telephonesArray.removeAt(index);
+  removePhone(index: number): void {
+    if (this.phonesArray.length > 1) {
+      this.phonesArray.removeAt(index);
     }
   }
 

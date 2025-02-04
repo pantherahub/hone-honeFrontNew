@@ -7,6 +7,9 @@ import { CitiesServiceService } from 'src/app/services/cities/cities-service.ser
 import { ContactFormComponent } from '../contact-form/contact-form.component';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { ContactsProviderServicesService } from 'src/app/services/contacts-provider/contacts-provider.services.service';
+import { ClientProviderService } from 'src/app/services/clients/client-provider.service';
+import { ClientInterface } from 'src/app/models/client.interface';
+import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 
 @Component({
   selector: 'app-office-modal',
@@ -20,19 +23,25 @@ export class OfficeModalComponent implements OnInit {
   @Input() office: any | null = null;
   officeForm!: FormGroup;
   cities: any[] = [];
+  clientList: ClientInterface[] = [];
   existingContacts: any[] = [];
 
+  user = this.eventManager.userLogged();
+
   constructor(
+    private eventManager: EventManagerService,
     private modal: NzModalRef,
     private fb: FormBuilder,
     private formUtils: FormUtilsService,
     private modalService: NzModalService,
     private citiesService: CitiesServiceService,
+    private clientService: ClientProviderService,
     private contactsProviderService: ContactsProviderServicesService
   ) { }
 
   ngOnInit(): void {
     this.getCities();
+    this.getClientList();
     this.initializeForm();
   }
 
@@ -46,6 +55,17 @@ export class OfficeModalComponent implements OnInit {
       }
     });
   }
+
+  getClientList() {
+    this.clientService.getClientListByProviderId(this.user.id).subscribe({
+      next: (res: any) => {
+        this.clientList = res;
+      },
+      error: (err: any) => {
+        console.error(err);
+      }
+    });
+ }
 
   loadContacts(officeId: number) {
     // Update endpoint and filter by office
@@ -70,6 +90,7 @@ export class OfficeModalComponent implements OnInit {
 
       attentionDays: [this.office?.attentionDays || '', [Validators.required]],
       officeHours: [this.office?.officeHours || '', [Validators.required]],
+      idsClientHoneSolutions : [this.office?.idsClientHoneSolutions  || [], [Validators.required]],
 
       updatedContacts: this.fb.array([]),
       createdContacts: this.fb.array([]),

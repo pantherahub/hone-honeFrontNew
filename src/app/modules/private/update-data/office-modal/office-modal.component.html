@@ -89,6 +89,28 @@
         </nz-form-item>
       </nz-col>
 
+      <nz-col [nzSpan]="24" [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label [nzRequired]="true" nzFor="idsClientHoneSolutions">Aseguradoras</nz-form-label>
+          <nz-form-control [nzErrorTip]="idsClientHoneSolutionsErrorTip">
+            <ng-template #idsClientHoneSolutionsErrorTip>
+              <p *ngIf="officeForm.controls['idsClientHoneSolutions'].hasError('required')">El campo es requerido.</p>
+            </ng-template>
+            <nz-select
+              nzMode="multiple"
+              [nzMaxTagCount]="3"
+              nzAllowClear
+              [nzMaxTagPlaceholder]="clientTagPlaceHolder"
+              formControlName="idsClientHoneSolutions"
+              nzPlaceHolder="Seleccionar"
+            >
+              <nz-option *ngFor="let client of clientList" [nzLabel]="client.clientHoneSolutions || ''" [nzValue]="client.idClientHoneSolutions"></nz-option>
+            </nz-select>
+            <ng-template #clientTagPlaceHolder let-selectedList>{{ selectedList.length }} más...</ng-template>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+
     </div>
 
     <!-- Contacts -->

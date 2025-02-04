@@ -144,20 +144,20 @@
 
     <nz-col [nzSpan]="24" [nzSm]="24">
       <nz-form-label [nzRequired]="true">Teléfono(s)</nz-form-label>
-      <div nz-row [nzGutter]="16" formArrayName="telephones">
-        @for (control of telephonesArray.controls; track control; let i = $index) {
+      <div nz-row [nzGutter]="16" formArrayName="phones">
+        @for (control of phonesArray.controls; track control; let i = $index) {
           <nz-col [nzSpan]="11" [nzSm]="6">
             <nz-form-item [formGroupName]="i">
               <nz-form-control nzErrorTip="El campo es requerido.">
                 <nz-select formControlName="type" nzPlaceHolder="Tipo">
-                  <nz-option *ngFor="let option of telephoneNumberTypes" [nzValue]="option" [nzLabel]="option"></nz-option>
+                  <nz-option *ngFor="let option of phoneNumberTypes" [nzValue]="option" [nzLabel]="option"></nz-option>
                 </nz-select>
                 <span
                   nz-icon
                   nzType="minus-circle-o"
                   class="dynamic-delete-button"
-                  *ngIf="telephonesArray.length > 1"
-                  (click)="removeTelephone(i)"
+                  *ngIf="phonesArray.length > 1"
+                  (click)="removePhone(i)"
                 ></span>
               </nz-form-control>
             </nz-form-item>
@@ -179,7 +179,7 @@
         <nz-col [nzSpan]="24" [nzSm]="12">
           <nz-form-item>
             <nz-form-control>
-              <button nz-button nzType="dashed" type="button" (click)="addTelephone()" [disabled]="telephonesArray.length >= 5">
+              <button nz-button nzType="dashed" type="button" (click)="addPhone()" [disabled]="phonesArray.length >= 5">
                 <span nz-icon nzType="plus"></span> Agregar teléfono
               </button>
             </nz-form-control>
