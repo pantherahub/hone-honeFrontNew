@@ -10,6 +10,7 @@ import { ContactsProviderServicesService } from 'src/app/services/contacts-provi
 import { ClientProviderService } from 'src/app/services/clients/client-provider.service';
 import { ClientInterface } from 'src/app/models/client.interface';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
+import { distinctUntilChanged } from 'rxjs';
 
 @Component({
   selector: 'app-office-modal',
@@ -71,7 +72,30 @@ export class OfficeModalComponent implements OnInit {
     // Update endpoint and filter by office
     this.contactsProviderService.getContactById(officeId).subscribe({
       next: (res: any) => {
-        this.existingContacts = res.contacts;
+        // Convertir los contactos existentes en un Map para acceso rápido por idTemporalContact
+        let existingContactsMap = new Map(
+          res.contacts.map((contact: any) => [contact.idTemporalContact, contact])
+        );
+
+        const updatedContacts = this.updatedContacts.value || [];
+        const createdContacts = this.createdContacts.value || [];
+        const deletedContacts = this.deletedContacts.value || [];
+
+        // 1. Actualizar solo los contactos existentes
+        updatedContacts.forEach((contact: any) => {
+          if (existingContactsMap.has(contact.idTemporalContact)) {
+            existingContactsMap.set(contact.idTemporalContact, contact);
+          }
+        });
+
+        // 2. Eliminar los contactos presentes en deletedContacts
+        deletedContacts.forEach((id: number) => existingContactsMap.delete(id));
+
+        // Convertir Map a array
+        this.existingContacts = Array.from(existingContactsMap.values());
+
+        // 3. Agregar los contactos nuevos (sin idTemporalContact) con push
+        this.existingContacts.push(...createdContacts);
       },
       error: (err: any) => {
         console.error(err);
@@ -86,20 +110,32 @@ export class OfficeModalComponent implements OnInit {
       enableCode: [this.office?.enableCode || '', [Validators.required]],
       name: [this.office?.name || '', [Validators.required]],
       idCity: [this.office?.idCity || '', [Validators.required]],
+      cityName: [this.office?.cityName || ''],
       schedulingLink: [this.office?.schedulingLink || ''],
 
       attentionDays: [this.office?.attentionDays || '', [Validators.required]],
       officeHours: [this.office?.officeHours || '', [Validators.required]],
-      idsClientHoneSolutions : [this.office?.idsClientHoneSolutions  || [], [Validators.required]],
+      idsClientHoneSolutions : [this.office?.idsClientHoneSolutions || [], [Validators.required]],
 
       updatedContacts: this.fb.array([]),
       createdContacts: this.fb.array([]),
       deletedContacts: this.fb.array([])
     });
+
     if (this.office) {
       this.loadContacts(this.office.idTemporalOfficeProvider);
       // this.existingContacts = this.office.contacts || [];
     }
+
+    this.officeForm.get('idCity')?.valueChanges
+      .pipe(distinctUntilChanged())
+      .subscribe((value) => {
+        // Get selected city with name
+        const selectedCity = this.cities.find(city => city.idCity === value);
+        this.officeForm.patchValue({
+          cityName: selectedCity ? selectedCity.city : ''
+        });
+      });
   }
 
   get updatedContacts() {
@@ -136,8 +172,11 @@ export class OfficeModalComponent implements OnInit {
         const newContact = result.contact;
 
         if (result.isNew) {
+          // Revisar cuando se actualiza un contacto que fue agregado anteriormente
+          console.log("PUSHH");
           this.createdContacts.push(this.fb.group(newContact));
           this.existingContacts.push(newContact);
+          this.existingContacts = [...this.existingContacts];
         } else if (!result.isNew && contactIndex != null) {
           const updatedContact = {
             ...newContact,
@@ -145,6 +184,7 @@ export class OfficeModalComponent implements OnInit {
           };
           this.updatedContacts.push(this.fb.group(updatedContact));
           this.existingContacts[contactIndex] = updatedContact;
+          this.existingContacts = [...this.existingContacts];
         }
       }
     });
@@ -183,15 +223,8 @@ export class OfficeModalComponent implements OnInit {
       return;
     }
 
-    // Get selected city with name
-    const selectedCity = this.cities.find(city => city.idCity === this.officeForm.value.idCity);
-    const officeData = {
-      ...this.officeForm.value,
-      cityName: selectedCity ? selectedCity.city : null
-    };
-
     this.modal.close({
-      office: officeData,
+      office: this.officeForm,
       isNew: this.office === null
     });
   }

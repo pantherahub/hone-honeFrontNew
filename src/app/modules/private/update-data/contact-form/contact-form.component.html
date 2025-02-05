@@ -4,15 +4,14 @@
 
     <nz-col [nzSpan]="24" [nzSm]="12">
       <nz-form-item>
-        <nz-form-label [nzRequired]="true" nzFor="type">Tipo de contacto</nz-form-label>
+        <nz-form-label [nzRequired]="true" nzFor="idOccupationType">Tipo de contacto</nz-form-label>
         <nz-form-control nzErrorTip="El campo es requerido.">
           <nz-select
-            id="type"
-            formControlName="type"
+            id="idOccupationType"
+            formControlName="idOccupationType"
             nzPlaceHolder="Seleccionar"
           >
-            <nz-option nzValue="person" nzLabel="Persona"></nz-option>
-            <nz-option nzValue="area" nzLabel="Área"></nz-option>
+            <nz-option *ngFor="let type of contactOccupationTypes" [nzValue]="type.idOccupationType" [nzLabel]="type.name"></nz-option>
           </nz-select>
         </nz-form-control>
       </nz-form-item>
@@ -21,7 +20,7 @@
     <nz-col [nzSpan]="24" [nzSm]="12">
       <nz-form-item>
         <nz-form-label [nzRequired]="true" nzFor="idOccupation">
-          {{ selectedContactType === 'person' ? 'Cargo' : 'Área' }}
+          {{ selectedOccupationType === 1 ? 'Área' : 'Cargo' }}
         </nz-form-label>
         <nz-form-control nzErrorTip="El campo es requerido.">
           <nz-select
@@ -38,7 +37,8 @@
       </nz-form-item>
     </nz-col>
 
-    <nz-col [nzSpan]="24" [nzSm]="12" *ngIf="selectedContactType === 'person'">
+    <!-- Person contact -->
+    <nz-col [nzSpan]="24" [nzSm]="12" *ngIf="selectedOccupationType === 2">
       <nz-form-item>
         <nz-form-label [nzRequired]="true" nzFor="officeName">Nombre</nz-form-label>
         <nz-form-control [nzErrorTip]="nameErrorTip">
@@ -111,13 +111,15 @@
       <div nz-row [nzGutter]="16" formArrayName="emails">
         @for (control of emailsArray.controls; track control; let i = $index) {
           <nz-col [nzSpan]="24" [nzSm]="12">
-            <nz-form-item>
+            <nz-form-item [formGroupName]="i">
               <nz-form-control nzErrorTip="Ingresa un correo válido.">
                 <input
                   nz-input
                   type="email"
                   placeholder="Correo"
-                  [formControlName]="i"
+                  formControlName="email"
+                  class="passenger-input"
+                  [id]="'email-' + i"
                 />
                 <span
                   nz-icon

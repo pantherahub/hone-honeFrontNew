@@ -125,17 +125,16 @@
               <thead>
                 <tr>
                   <th>Nombre</th>
-                  <th>Cliente</th>
+                  <!-- <th>Cliente</th> -->
                   <th>Ciudad</th>
                   <th>Dirección</th>
-                  <th nzRight>Acción</th>
+                  <th nzRight nzWidth="100px">Acción</th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let data of officeTable.data; let i = index">
-                  <td>{{ data.OfficeProviderName }}</td>
-                  <td>{{ data.clientHoneSolutions }}</td>
-                  <td>{{ data.city }}</td>
+                  <td>{{ data.name }}</td>
+                  <td>{{ data.cityName }}</td>
                   <td>{{ data.address }}</td>
                   <td nzRight class="table__action">
                      <button nz-button nzType="primary" type="button" (click)="openOfficeModal(i)" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
@@ -160,7 +159,7 @@
                   <th>Nombre</th>
                   <th>Telefono</th>
                   <th>Correo</th>
-                  <th nzRight>Acción</th>
+                  <th nzRight nzWidth="100px">Acción</th>
                 </tr>
               </thead>
               <tbody>

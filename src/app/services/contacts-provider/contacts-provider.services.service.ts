@@ -29,5 +29,9 @@ export class ContactsProviderServicesService {
   getOccupation() {
     return this.httpClient.get(`${this.url}GetOccupation`);
   }
+
+  getOccupationTypes() {
+    return this.httpClient.get(`${this.url}OccupationTypes`);
+  }
 }
 

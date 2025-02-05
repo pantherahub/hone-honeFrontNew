@@ -90,7 +90,7 @@ export class UpdateDataComponent implements OnInit {
   initializeForm() {
     this.providerForm = this.fb.group({
       idProvider: [this.user.id],
-      startTime: [new Date()],
+      startTime: [new Date().toString()],
       endTime: [''],
       email: ['', [Validators.required, Validators.email]],
       name: ['', [Validators.required]],
@@ -177,15 +177,22 @@ export class UpdateDataComponent implements OnInit {
         const newOffice = result.office;
 
         if (result.isNew) {
-          this.createdOffices.push(this.fb.group(newOffice));
-          this.existingOffices.push(newOffice);
+          console.log("result.office");
+          console.log(result.office);
+          console.log(newOffice);
+          this.createdOffices.push(newOffice);
+          this.existingOffices.push(newOffice.value);
+          this.existingOffices = [...this.existingOffices];
+          console.log("form");
+          console.log(this.providerForm.value);
         } else if (!result.isNew && officeIndex != null) {
-          const updatedOffice = {
-            ...newOffice,
-            cityName: newOffice.cityName || this.existingOffices[officeIndex].cityName
-          };
-          this.updatedOffices.push(this.fb.group(updatedOffice));
-          this.existingOffices[officeIndex] = updatedOffice;
+          // const updatedOffice = {
+          //   ...newOffice,
+          //   cityName: newOffice.cityName || this.existingOffices[officeIndex].cityName
+          // };
+          this.updatedOffices.push(newOffice);
+          this.existingOffices[officeIndex] = newOffice.value;
+          this.existingOffices = [...this.existingOffices];
         }
       }
     });
@@ -217,6 +224,7 @@ export class UpdateDataComponent implements OnInit {
         if (result.isNew) {
           this.createdContacts.push(this.fb.group(newContact));
           this.existingContacts.push(newContact);
+          this.existingContacts = [...this.existingContacts];
         } else if (!result.isNew && contactIndex != null) {
           const updatedContact = {
             ...newContact,
@@ -224,6 +232,7 @@ export class UpdateDataComponent implements OnInit {
           };
           this.updatedContacts.push(this.fb.group(updatedContact));
           this.existingContacts[contactIndex] = updatedContact;
+          this.existingContacts = [...this.existingContacts];
         }
       }
     });
@@ -290,7 +299,8 @@ export class UpdateDataComponent implements OnInit {
       this.formUtils.markFormTouched(this.providerForm);
       return;
     };
-    this.providerForm.patchValue({ endTime: new Date() });
+    this.providerForm.patchValue({ endTime: new Date().toString() });
+    console.log(this.providerForm.value);
   }
 
 }
