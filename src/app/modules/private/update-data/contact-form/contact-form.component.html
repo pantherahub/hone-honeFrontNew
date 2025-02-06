@@ -11,7 +11,7 @@
             formControlName="idOccupationType"
             nzPlaceHolder="Seleccionar"
           >
-            <nz-option *ngFor="let type of contactOccupationTypes" [nzValue]="type.idOccupationType" [nzLabel]="type.name"></nz-option>
+            <nz-option *ngFor="let type of contactOccupationTypes" [nzValue]="type.idOccupationType" [nzLabel]="type.type"></nz-option>
           </nz-select>
         </nz-form-control>
       </nz-form-item>
@@ -31,7 +31,7 @@
             nzPlaceHolder="Seleccionar"
             [disabled]="contact !== null"
           >
-            <nz-option *ngFor="let occupation of contactOccupations" [nzValue]="occupation.idOccupation" [nzLabel]="occupation.Occupation"></nz-option>
+            <nz-option *ngFor="let occupation of contactOccupations" [nzValue]="occupation.idOccupation" [nzLabel]="occupation.occupation"></nz-option>
           </nz-select>
         </nz-form-control>
       </nz-form-item>
@@ -100,7 +100,7 @@
             [nzShowArrow]="true"
             nzPlaceHolder="Seleccionar"
           >
-            <nz-option *ngFor="let city of cities" [nzValue]="city.idCityExpedition" [nzLabel]="city.city"></nz-option>
+            <nz-option *ngFor="let city of cities" [nzValue]="city.idCity" [nzLabel]="city.city"></nz-option>
           </nz-select>
         </nz-form-control>
       </nz-form-item>
@@ -108,7 +108,7 @@
 
     <nz-col [nzSpan]="24">
       <nz-form-label [nzRequired]="true">Correo(s)</nz-form-label>
-      <div nz-row [nzGutter]="16" formArrayName="emails">
+      <div nz-row [nzGutter]="16" formArrayName="Emails">
         @for (control of emailsArray.controls; track control; let i = $index) {
           <nz-col [nzSpan]="24" [nzSm]="12">
             <nz-form-item [formGroupName]="i">
@@ -146,7 +146,7 @@
 
     <nz-col [nzSpan]="24" [nzSm]="24">
       <nz-form-label [nzRequired]="true">Teléfono(s)</nz-form-label>
-      <div nz-row [nzGutter]="16" formArrayName="phones">
+      <div nz-row [nzGutter]="16" formArrayName="Phones">
         @for (control of phonesArray.controls; track control; let i = $index) {
           <nz-col [nzSpan]="11" [nzSm]="6">
             <nz-form-item [formGroupName]="i">

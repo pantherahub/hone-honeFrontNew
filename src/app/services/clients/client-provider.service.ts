@@ -25,4 +25,16 @@ export class ClientProviderService {
   getProviderData(idProvider: any): Observable<any> {
     return this.httpClient.get(`${this.url}getHoneProvider/${idProvider}`);
   }
+
+  getCompanies(): Observable<any> {
+    return this.httpClient.get(this.url + "Companies/GetAll");
+  }
+
+  getTemporalProviderData(idProvider: any): Observable<any> {
+    return this.httpClient.get(`${this.url}TemporalProvider/GetOne/Provider/${idProvider}`);
+  }
+
+  sendTemporalProviderForm(data: any) {
+    return this.httpClient.post(`${this.url}TemporalProvider/Store`, data);
+  }
 }

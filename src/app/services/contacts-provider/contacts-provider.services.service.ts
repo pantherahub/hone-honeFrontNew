@@ -26,12 +26,21 @@ export class ContactsProviderServicesService {
     return this.httpClient.post(`${this.url}createContactProvider`, contacts);
   }
 
-  getOccupation() {
-    return this.httpClient.get(`${this.url}GetOccupation`);
+  getTemporalContactsById(modelType: string, id: number) {
+    let url = `${this.url}TemporalContacts/GetAll`;
+    let params = `/Type/${modelType}/Id/${id}`;
+    return this.httpClient.get(url + params);
   }
 
-  getOccupationTypes() {
-    return this.httpClient.get(`${this.url}OccupationTypes`);
+  getOccupationTypes(): Observable<any> {
+    return this.httpClient.get(`${this.url}Occupations/Type/GetAll`);
   }
+
+  getOccupation(idOccupationType: number, type: string | null = null): Observable<any> {
+    let url = `${this.url}Occupations/Type/${idOccupationType}`;
+    if (type) url += `/${type}`;
+    return this.httpClient.get(url);
+  }
+
 }
 

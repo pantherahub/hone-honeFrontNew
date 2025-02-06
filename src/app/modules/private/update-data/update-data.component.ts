@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
@@ -11,6 +11,9 @@ import { ClientProviderService } from 'src/app/services/clients/client-provider.
 import { LANGUAGES } from 'src/app/utils/languages';
 import { ContactFormComponent } from './contact-form/contact-form.component';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { AlertService } from 'src/app/services/alerts/alert.service';
+import { format } from 'date-fns';
 
 @Component({
   selector: 'app-update-data',
@@ -30,14 +33,16 @@ export class UpdateDataComponent implements OnInit {
   existingOffices: any[] = [];
   existingContacts: any[] = [];
 
+  loading: boolean = false;
+
   constructor (
     // private clientService: ClientProviderService,
     private eventManager: EventManagerService,
     private fb: FormBuilder,
     private formUtils: FormUtilsService,
+    private messageService: NzMessageService,
+    private alertService: AlertService,
     private modalService: NzModalService,
-    private officeProviderService: OfficeProviderService,
-    private contactsProviderService: ContactsProviderServicesService,
     private clientProviderService: ClientProviderService
     // private router: Router
   ) { }
@@ -47,10 +52,7 @@ export class UpdateDataComponent implements OnInit {
     this.getIdentificationTypes();
 
     this.initializeForm();
-    // this.loadProviderData();
-
-    // Remove (testing):
-    this.loadContacts(this.user.id || 0);
+    this.loadProviderData();
   }
 
   getIdentificationTypes() {
@@ -64,38 +66,14 @@ export class UpdateDataComponent implements OnInit {
     });
   }
 
-  loadOffices(providerId: number) {
-    this.officeProviderService.getOfficeProviders(providerId, this.user.roles?.idRoles).subscribe({
-      next: (res: any) => {
-        this.existingOffices = res.data[0];
-      },
-      error: (err: any) => {
-        console.error(err);
-      }
-    });
-  }
-
-  loadContacts(providerId: number) {
-    // Update endpoint and filter by provider
-    this.contactsProviderService.getContactById(providerId).subscribe({
-      next: (res: any) => {
-        this.existingContacts = res.contacts;
-      },
-      error: (err: any) => {
-        console.error(err);
-      }
-    });
-  }
-
   initializeForm() {
     this.providerForm = this.fb.group({
       idProvider: [this.user.id],
-      startTime: [new Date().toString()],
+      startTime: [this.formatDate(new Date())],
       endTime: [''],
-      email: ['', [Validators.required, Validators.email]],
-      name: ['', [Validators.required]],
+      email: [this.user.email || '', [Validators.required, Validators.email]],
+      name: [this.user.name || '', [Validators.required]],
       languages: [[], [Validators.required]],
-      razonSocial: ['', [Validators.required]],
       idTypeDocument: ['', [Validators.required]],
       identification: ['', [Validators.required]],
       website: [''],
@@ -111,23 +89,27 @@ export class UpdateDataComponent implements OnInit {
   }
 
   loadProviderData(): void {
-    this.clientProviderService.getProviderData(this.user.id).subscribe({
+    this.loading = true;
+    this.clientProviderService.getTemporalProviderData(this.user.id).subscribe({
       next: (res: any) => {
         const data = res.data;
+        this.loading = false;
+        if (!data) return;
+
         this.providerForm.patchValue({
           email: data.email,
           name: data.name,
           languages: data.languages,
-          razonSocial: data.razonSocial,
           idTypeDocument: data.idTypeDocument,
           identification: data.identification,
           website: data.website
         });
 
-        this.loadOffices(data.idProvider);
-        this.loadContacts(data.idProvider);
+        this.existingOffices = data.TemporalOffices;
+        this.existingContacts = data.TemporalContacts;
       },
       error: (err: any) => {
+        this.loading = false;
         console.error(err);
       }
     });
@@ -154,7 +136,7 @@ export class UpdateDataComponent implements OnInit {
   }
 
   openOfficeModal(officeIndex: number | null = null) {
-    const office = officeIndex
+    const office = officeIndex != null
       ? this.existingOffices[officeIndex]
       : null;
 
@@ -171,35 +153,50 @@ export class UpdateDataComponent implements OnInit {
       instanceModal.office = office;
     }
 
-    // modal.afterOpen.subscribe(() => {});
     modalRef.afterClose.subscribe((result: any) => {
       if (result && result.office) {
         const newOffice = result.office;
 
-        if (result.isNew) {
+        if (result.isNew && newOffice.value.idAddedTemporal) {
           console.log("result.office");
           console.log(result.office);
           console.log(newOffice);
-          this.createdOffices.push(newOffice);
-          this.existingOffices.push(newOffice.value);
+          if (officeIndex != null) {
+            const createdOfficesIndex = this.createdOffices.controls.findIndex(
+              (control) => control.value.idAddedTemporal === newOffice.value.idAddedTemporal
+            );
+            (this.createdOffices as FormArray).setControl(createdOfficesIndex, newOffice);
+            this.existingOffices[officeIndex] = newOffice.value;
+          } else {
+            this.createdOffices.push(newOffice);
+            this.existingOffices.push(newOffice.value);
+          }
           this.existingOffices = [...this.existingOffices];
+          this.messageService.create(
+            'success',
+            `Sede ${officeIndex != null ? 'actualizada' : 'agregada'}.`
+          );
           console.log("form");
           console.log(this.providerForm.value);
         } else if (!result.isNew && officeIndex != null) {
-          // const updatedOffice = {
-          //   ...newOffice,
-          //   cityName: newOffice.cityName || this.existingOffices[officeIndex].cityName
-          // };
-          this.updatedOffices.push(newOffice);
+          const updatedOfficesIndex = this.updatedOffices.controls.findIndex(
+            (control) => control.value.idTemporalOfficeProvider === newOffice.value.idTemporalOfficeProvider
+          );
+          if (updatedOfficesIndex) {
+            (this.updatedOffices as FormArray).setControl(updatedOfficesIndex, newOffice);
+          } else {
+            this.updatedOffices.push(newOffice);
+          }
           this.existingOffices[officeIndex] = newOffice.value;
           this.existingOffices = [...this.existingOffices];
+          this.messageService.create('success', 'Sede actualizada.');
         }
       }
     });
   }
 
   openContactModal(contactIndex: number | null = null) {
-    const contact = contactIndex
+    const contact = contactIndex != null
       ? this.existingContacts[contactIndex]
       : null;
 
@@ -212,33 +209,50 @@ export class UpdateDataComponent implements OnInit {
       nzStyle: { 'max-width': '90%', 'margin': '22px 0' }
     });
     const instanceModal = modalRef.getContentComponent();
-    if (contact) {
-      instanceModal.contact = contact;
-      instanceModal.contactModelType = 'provider';
-    }
+    instanceModal.contactModelType = 'Prestador';
+    if (contact) instanceModal.contact = contact;
 
     modalRef.afterClose.subscribe((result: any) => {
       if (result && result.contact) {
         const newContact = result.contact;
 
-        if (result.isNew) {
-          this.createdContacts.push(this.fb.group(newContact));
-          this.existingContacts.push(newContact);
+        if (result.isNew && newContact.value.idAddedTemporal) {
+          if (contactIndex != null) {
+            const createdContactsIndex = this.createdContacts.controls.findIndex(
+              (control) => control.value.idAddedTemporal === newContact.value.idAddedTemporal
+            );
+            (this.createdContacts as FormArray).setControl(createdContactsIndex, newContact);
+            this.existingContacts[contactIndex] = newContact.value;
+          } else {
+            this.createdContacts.push(newContact);
+            this.existingContacts.push(newContact.value);
+          }
           this.existingContacts = [...this.existingContacts];
+          this.messageService.create(
+            'success',
+            `Contacto ${contactIndex != null ? 'actualizado' : 'agregado'}.`
+          );
         } else if (!result.isNew && contactIndex != null) {
-          const updatedContact = {
-            ...newContact,
-            cityName: newContact.occupationName || this.existingContacts[contactIndex].occupationName
-          };
-          this.updatedContacts.push(this.fb.group(updatedContact));
-          this.existingContacts[contactIndex] = updatedContact;
+          const updatedContactsIndex = this.updatedContacts.controls.findIndex(
+            (control) => control.value.idTemporalContact === newContact.value.idTemporalContact
+          );
+          if (updatedContactsIndex) {
+            (this.updatedContacts as FormArray).setControl(updatedContactsIndex, newContact);
+          } else {
+            this.updatedContacts.push(newContact);
+          }
+          this.existingContacts[contactIndex] = newContact.value;
           this.existingContacts = [...this.existingContacts];
+          this.messageService.create('success', 'Contacto actualizado.');
         }
       }
     });
   }
 
-  deleteOffice(index: number): void {
+  async deleteOffice(index: number) {
+    const confirmed = await this.alertService.confirmDelete();
+    if (!confirmed) return;
+
     const deletedOffice = this.existingOffices[index];
 
     // Remove from existingOffices
@@ -263,10 +277,14 @@ export class UpdateDataComponent implements OnInit {
         this.createdOffices.removeAt(createdIndex);
       }
     }
-
+    this.existingOffices = [...this.existingOffices];
+    this.messageService.create('success', 'Sede eliminada.');
   }
 
-  deleteContact(index: number): void {
+  async deleteContact(index: number) {
+    const confirmed = await this.alertService.confirmDelete();
+    if (!confirmed) return;
+
     const deletedContact = this.existingContacts[index];
 
     // Remove from existingContacts
@@ -291,6 +309,12 @@ export class UpdateDataComponent implements OnInit {
         this.createdContacts.removeAt(createdIndex);
       }
     }
+    this.existingContacts = [...this.existingContacts];
+    this.messageService.create('success', 'Contacto eliminado.');
+  }
+
+  formatDate(date: Date): string {
+    return format(date, 'yyyy-MM-dd HH:mm:ss');
   }
 
   onSubmit(): void {
@@ -299,8 +323,21 @@ export class UpdateDataComponent implements OnInit {
       this.formUtils.markFormTouched(this.providerForm);
       return;
     };
-    this.providerForm.patchValue({ endTime: new Date().toString() });
+    this.providerForm.patchValue({ endTime: this.formatDate(new Date()) });
     console.log(this.providerForm.value);
+
+    this.loading = true;
+    this.clientProviderService.sendTemporalProviderForm(this.providerForm.value).subscribe({
+      next: (res: any) => {
+        this.loading = false;
+        this.alertService.success('Enviado', 'Actualización enviada.');
+      },
+      error: (err: any) => {
+        this.loading = false;
+        console.error(err);
+        this.alertService.error();
+      }
+    });
   }
 
 }

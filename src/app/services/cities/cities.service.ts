@@ -6,7 +6,7 @@ import { environment } from 'src/environments/environment';
 @Injectable({
   providedIn: 'root'
 })
-export class CitiesServiceService {
+export class CitiesService {
 
   url = environment.url;
 

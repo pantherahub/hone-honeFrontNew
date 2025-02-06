@@ -91,22 +91,22 @@
 
       <nz-col [nzSpan]="24" [nzSm]="12">
         <nz-form-item>
-          <nz-form-label [nzRequired]="true" nzFor="idsClientHoneSolutions">Aseguradoras</nz-form-label>
-          <nz-form-control [nzErrorTip]="idsClientHoneSolutionsErrorTip">
-            <ng-template #idsClientHoneSolutionsErrorTip>
-              <p *ngIf="officeForm.controls['idsClientHoneSolutions'].hasError('required')">El campo es requerido.</p>
+          <nz-form-label [nzRequired]="true" nzFor="idsCompanies">Compañías con convenio</nz-form-label>
+          <nz-form-control [nzErrorTip]="idsCompaniesErrorTip">
+            <ng-template #idsCompaniesErrorTip>
+              <p *ngIf="officeForm.controls['idsCompanies'].hasError('required')">El campo es requerido.</p>
             </ng-template>
             <nz-select
               nzMode="multiple"
               [nzMaxTagCount]="3"
               nzAllowClear
-              [nzMaxTagPlaceholder]="clientTagPlaceHolder"
-              formControlName="idsClientHoneSolutions"
+              [nzMaxTagPlaceholder]="companyTagPlaceHolder"
+              formControlName="idsCompanies"
               nzPlaceHolder="Seleccionar"
             >
-              <nz-option *ngFor="let client of clientList" [nzLabel]="client.clientHoneSolutions || ''" [nzValue]="client.idClientHoneSolutions"></nz-option>
+              <nz-option *ngFor="let company of companyList" [nzLabel]="company.name || ''" [nzValue]="company.idClientHoneSolutions"></nz-option>
             </nz-select>
-            <ng-template #clientTagPlaceHolder let-selectedList>{{ selectedList.length }} más...</ng-template>
+            <ng-template #companyTagPlaceHolder let-selectedList>{{ selectedList.length }} más...</ng-template>
           </nz-form-control>
         </nz-form-item>
       </nz-col>
@@ -116,30 +116,32 @@
     <!-- Contacts -->
     <div>
       <div class="table-head">
-        <h3 class="table-head__title">Contactos existentes</h3>
+        <h3 class="table-head__title">Contactos</h3>
         <button nz-button nzType="primary" type="button" (click)="openContactModal()">Agregar nuevo</button>
       </div>
 
       <!-- Table -->
-      <nz-table #contactTable nzSize="small" [nzData]="existingContacts" [nzScroll]="{ x: '1150px', y: '240px' }" class="table">
-        <thead>
-          <tr>
-            <th>Área</th>
-            <th>Nombre</th>
-            <th nzRight nzWidth="100px">Acción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let data of contactTable.data; let i = index">
-            <td>{{ data.occupationName }}</td>
-            <td>{{ data.name }}</td>
-            <td nzRight class="table__action">
-              <button nz-button nzType="primary" type="button" (click)="openContactModal(i)" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
-              <button nz-button nzDanger nzType="primary" type="button" (click)="deleteContact(i)" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button>
-            </td>
-          </tr>
-        </tbody>
-      </nz-table>
+      <div class="responsive-table">
+        <nz-table #contactTable nzSize="small" [nzData]="existingContacts" [nzPageSize]="5" class="table">
+          <thead>
+            <tr>
+              <th>Área / Cargo</th>
+              <th>Nombre</th>
+              <th nzWidth="100px">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of contactTable.data; let i = index">
+              <td>{{ data.occupationName || data.Occupation?.occupation || '' }}</td>
+              <td>{{ data.name || 'N/A' }}</td>
+              <td class="table__action">
+                <button nz-button nzType="primary" type="button" (click)="openContactModal(i)" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
+                <button nz-button nzDanger nzType="primary" type="button" (click)="deleteContact(i)" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </div>
     </div>
 
   </div>

@@ -9,6 +9,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { IconsProviderModule } from './icons-provider.module';
+import { NzModalModule } from 'ng-zorro-antd/modal';
 
 registerLocaleData(en);
 
@@ -16,8 +17,11 @@ export const appConfig: ApplicationConfig = {
    providers: [
       provideRouter(routes),
       provideNzI18n(en_US),
-      importProvidersFrom(FormsModule),
-      importProvidersFrom(HttpClientModule),
+      importProvidersFrom(
+        FormsModule,
+        HttpClientModule,
+        NzModalModule
+      ),
       provideAnimations()
    ]
 };

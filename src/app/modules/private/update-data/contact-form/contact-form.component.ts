@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { format } from 'date-fns';
 import { NzModalRef } from 'ng-zorro-antd/modal';
 import { distinctUntilChanged } from 'rxjs';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
-import { CitiesServiceService } from 'src/app/services/cities/cities-service.service';
+import { CitiesService } from 'src/app/services/cities/cities.service';
 import { ClientProviderService } from 'src/app/services/clients/client-provider.service';
 import { ContactsProviderServicesService } from 'src/app/services/contacts-provider/contacts-provider.services.service';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
@@ -19,7 +20,7 @@ import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service
 export class ContactFormComponent implements OnInit {
 
   @Input() contact: any | null = null;
-  @Input() contactModelType: string = 'provider'; // provider or office
+  @Input() contactModelType: string = 'Prestador'; // 'Prestador' or 'Sede'
   contactForm!: FormGroup;
 
   contactOccupationTypes: any[] = [];
@@ -39,7 +40,7 @@ export class ContactFormComponent implements OnInit {
     private formUtils: FormUtilsService,
     private contactsProviderService: ContactsProviderServicesService,
     private clientProviderService: ClientProviderService,
-    private citiesService: CitiesServiceService
+    private citiesService: CitiesService
   ) { }
 
   ngOnInit(): void {
@@ -51,22 +52,9 @@ export class ContactFormComponent implements OnInit {
   }
 
   loadContactOccupationTypes() {
-    /* Mock data */
-    this.contactOccupationTypes = [
-      {
-        idOccupationType: 1,
-        name: 'area'
-      },
-      {
-        idOccupationType: 2,
-        name: 'persona'
-      }
-    ];
-    return;
-
     this.contactsProviderService.getOccupationTypes().subscribe({
-      next: (data: any) => {
-        this.contactOccupationTypes = data;
+      next: (res: any) => {
+        this.contactOccupationTypes = res.data;
       },
       error: (err: any) => {
         console.error(err);
@@ -75,91 +63,17 @@ export class ContactFormComponent implements OnInit {
   }
 
   loadFilteredContactOccupations() {
-    /* Mock data */
-    this.contactOccupations = [
-      {
-          "idOccupation": 1,
-          "Occupation": "Gerente"
+    this.contactsProviderService.getOccupation(this.selectedOccupationType, this.contactModelType).subscribe({
+      next: (res: any) => {
+        const data = res.data
+        if (data && data.length) {
+          this.contactOccupations = data[0].Occupations;
+        }
       },
-      {
-          "idOccupation": 2,
-          "Occupation": "Gerente general"
-      },
-      {
-          "idOccupation": 3,
-          "Occupation": "Secretaria gerente"
-      },
-      {
-          "idOccupation": 4,
-          "Occupation": "Convenios y contratación"
-      },
-      {
-          "idOccupation": 5,
-          "Occupation": "Facturación"
-      },
-      {
-          "idOccupation": 6,
-          "Occupation": "Atención al usuario y Trabajo Social"
-      },
-      {
-          "idOccupation": 7,
-          "Occupation": "Admisiones"
-      },
-      {
-          "idOccupation": 8,
-          "Occupation": "Referencia y contra referencia"
-      },
-      {
-          "idOccupation": 9,
-          "Occupation": "Epidemióloga"
-      },
-      {
-          "idOccupation": 10,
-          "Occupation": "Coordinadora de Enfermería"
-      },
-      {
-          "idOccupation": 11,
-          "Occupation": "Farmacia"
-      },
-      {
-          "idOccupation": 12,
-          "Occupation": "Asignacion de citas"
-      },
-      {
-          "idOccupation": 13,
-          "Occupation": "Líder de Calidad"
-      },
-      {
-          "idOccupation": 14,
-          "Occupation": "Ingeniería 5istemas"
-      },
-      {
-          "idOccupation": 15,
-          "Occupation": "Representante legal"
+      error: (err: any) => {
+        console.error(err);
       }
-    ]
-    // this.contactsProviderService.getOccupation().subscribe({
-    //   next: (data: any) => {
-    //     this.contactOccupations = data;
-    //   },
-    //   error: (err: any) => {
-    //     console.error(err);
-    //   }
-    // });
-    return;
-
-    this.contactOccupations = [];
-    if (!this.contactOccupationTypes.length) return;
-    // Update endpoint and filter by provider/office to avoid one-time charges already saved
-
-    const allowedTypes = this.contactModelType === 'provider'
-      ? ['prestador', 'compartido']
-      : ['sede', 'compartido'];
-
-    this.contactOccupations = this.contactOccupationTypes
-      .filter(occupationType => occupationType.idOccupationType === this.selectedOccupationType)
-      .flatMap(occupationType => occupationType.Occupations)
-      .filter(occupation => allowedTypes.includes(occupation.type));
+    });
   }
 
   loadIdentificationTypes() {
@@ -187,23 +101,25 @@ export class ContactFormComponent implements OnInit {
   initializeForm() {
     this.contactForm = this.fb.group({
       idTemporalContact: [null],
-      idOccupationType: [null, [Validators.required]], // person or area
-      idOccupation: [null, [Validators.required]],
+      idAddedTemporal: [Date.now().toString()], // Temporary identifier of objects in memory
+      idOccupationType: [null, [Validators.required]], // area or person
+      idOccupation: [{ value: null, disabled: true }, [Validators.required]],
+      occupationName: [''],
       name: [''],
-      emails: this.fb.array([], [this.formUtils.minArrayLength(1), this.formUtils.maxArrayLength(5)]),
-      phones: this.fb.array([], [this.formUtils.minArrayLength(1), this.formUtils.maxArrayLength(5)]),
+      Emails: this.fb.array([], [this.formUtils.minArrayLength(1), this.formUtils.maxArrayLength(5)]),
+      Phones: this.fb.array([], [this.formUtils.minArrayLength(1), this.formUtils.maxArrayLength(5)]),
 
       idTypeDocument: [null],
       identification: [null],
       expeditionDate: [null],
       idCityExpedition: [null],
 
-      // createdEmails: this.fb.array([]),
-      // updatedEmails: this.fb.array([]),
+      createdEmails: this.fb.array([]),
+      updatedEmails: this.fb.array([]),
       deletedEmails: this.fb.array([]),
 
-      // createdPhones: this.fb.array([]),
-      // updatedPhones: this.fb.array([]),
+      createdPhones: this.fb.array([]),
+      updatedPhones: this.fb.array([]),
       deletedPhones: this.fb.array([]),
     });
 
@@ -223,7 +139,6 @@ export class ContactFormComponent implements OnInit {
   }
 
   onChangeContactType(newValue: any) {
-    console.log("idOccupationType Changed", newValue);
     this.contactForm.patchValue({
       name: '',
       idOccupation: null
@@ -231,24 +146,24 @@ export class ContactFormComponent implements OnInit {
     this.resetContactDocument();
 
     const nameControl = this.contactForm.get('name');
+    const idOccupationControl = this.contactForm.get('idOccupation');
 
     if (!newValue) {
-      console.log("clear");
       nameControl?.clearValidators();
       nameControl?.updateValueAndValidity();
       this.identificationEnabled = false;
       this.contactOccupations = [];
+      idOccupationControl?.disable();
       return;
     }
+    idOccupationControl?.enable();
 
     // Equals to 'area'
     if (newValue === 1) {
-      console.log("clear");
       nameControl?.clearValidators();
       nameControl?.updateValueAndValidity();
       this.identificationEnabled = false;
     } else {
-      console.log("set");
       nameControl?.setValidators([Validators.required]);
       nameControl?.updateValueAndValidity();
     }
@@ -261,6 +176,24 @@ export class ContactFormComponent implements OnInit {
     this.identificationEnabled = newValue === 15;
     this.resetContactDocument();
     this.updateIdentificationValidators();
+
+    // Set occupationName
+    if (!this.contact || this.contact.idOccupation !== newValue) {
+      this.setOccupationName(newValue);
+      return;
+    }
+    if (this.contact.occupationName === this.contactForm.value.occupationName) {
+      return;
+    }
+    this.setOccupationName(newValue);
+  }
+
+  setOccupationName(idOccupation: any) {
+    const selectedOccupation = this.contactOccupations.find(occupation => occupation.idOccupation === idOccupation);
+
+    this.contactForm.patchValue({
+      occupationName: selectedOccupation?.occupation || ''
+    });
   }
 
   // getContactType(): any {
@@ -273,10 +206,13 @@ export class ContactFormComponent implements OnInit {
   loadContactData(): void {
     console.log("LOADCONTACTDATA");
     if (this.contact) {
+      console.log(this.contact);
       this.contactForm.patchValue({
         idTemporalContact: this.contact.idTemporalContact,
+        idAddedTemporal: this.contact.idAddedTemporal ?? null,
         idOccupationType: this.contact.idOccupationType,
         idOccupation: this.contact.idOccupation,
+        occupationName: this.contact.occupationName || this.contact?.Occupation?.occupation || '',
         name: this.contact.name,
         idTypeDocument: this.contact.idTypeDocument,
         identification: this.contact.identification,
@@ -343,11 +279,12 @@ export class ContactFormComponent implements OnInit {
   }
 
   get emailsArray(): FormArray {
-    return this.contactForm.get('emails') as FormArray;
+    return this.contactForm.get('Emails') as FormArray;
   }
   createEmailGroup(email: any | null = null): FormGroup {
     const emailGroup = this.fb.group({
       idEmail: [email?.idEmail || null],
+      // idAddedTemporal: [email?.idAddedTemporal || Date.now().toString()],
       email: [email?.email || '', [Validators.required, Validators.email]],
       status: [email ? email.status || null : 'created'] // updated, created, null for existing emails
     });
@@ -372,11 +309,12 @@ export class ContactFormComponent implements OnInit {
   }
 
   get phonesArray(): FormArray {
-    return this.contactForm.get('phones') as FormArray;
+    return this.contactForm.get('Phones') as FormArray;
   }
   createPhoneGroup(phone: any | null = null): FormGroup {
     const phoneGroup = this.fb.group({
       idPhone: [phone?.idPhone || null],
+      // idAddedTemporal: [phone?.idAddedTemporal || Date.now().toString()],
       type: [phone?.type || '', [Validators.required]],
       number: [phone?.number || '', [Validators.required]],
       status: [phone ? phone.status || null : 'created'] // updated, created, null for existing phones
@@ -396,71 +334,73 @@ export class ContactFormComponent implements OnInit {
 
   onSubmit() {
     if (this.contactForm.invalid) {
-      Object.keys(this.contactForm.controls).forEach((key) => {
-        const control = this.contactForm.get(key);
-
-        if (control?.invalid) {
-          console.log(`Campo inválido: ${key}, Errores:`, control.errors);
-        }
-      });
       this.formUtils.markFormTouched(this.contactForm);
       return;
     }
 
-    // Arrays para los emails y phones creados y actualizados
-    const createdEmails: any[] = [];
-    const updatedEmails: any[] = [];
-    const createdPhones: any[] = [];
-    const updatedPhones: any[] = [];
+    // Reset the arrays in the form before filling them again
+    this.contactForm.setControl('createdEmails', this.fb.array([]));
+    this.contactForm.setControl('updatedEmails', this.fb.array([]));
+    this.contactForm.setControl('createdPhones', this.fb.array([]));
+    this.contactForm.setControl('updatedPhones', this.fb.array([]));
 
-    // Verificar los correos electrónicos
+    const createdEmailsArray = this.contactForm.get('createdEmails') as FormArray;
+    const updatedEmailsArray = this.contactForm.get('updatedEmails') as FormArray;
+    const createdPhonesArray = this.contactForm.get('createdPhones') as FormArray;
+    const updatedPhonesArray = this.contactForm.get('updatedPhones') as FormArray;
+
+    // Check emails
     this.emailsArray.controls.forEach((emailGroup: AbstractControl) => {
-      const formGroup = emailGroup as FormGroup;
-      const email = formGroup.value;
+      const emailFormGroup = emailGroup as FormGroup;
+      const email = emailFormGroup.value;
       const savedEmail = this.savedEmails.find(saved => saved.idEmail === email.idEmail);
 
+      // console.log("SAVED_EMAIL:", savedEmail);
       if (email.status === 'created' && !email.idEmail) {
-        createdEmails.push(email);
+        createdEmailsArray.push(this.createEmailGroup(email));
       } else if (email.status !== 'created' && savedEmail) {
-        const isUpdated = savedEmail.email !== email.email;
+        const isUpdated = savedEmail.email !== email.email || savedEmail.status === 'updated';
         if (isUpdated) {
-          email.status = 'updated';
+          emailFormGroup.patchValue({
+            status: 'updated'
+          });
+          updatedEmailsArray.push(this.createEmailGroup(email));
         }
-        updatedEmails.push(email);
       }
     });
 
-    // Verificar los números de teléfono
+    // Verify phone numbers
     this.phonesArray.controls.forEach((phoneGroup: AbstractControl) => {
-      const formGroup = phoneGroup as FormGroup;
-      const phone = formGroup.value;
+      const phoneFormGroup = phoneGroup as FormGroup;
+      const phone = phoneFormGroup.value;
       const savedPhone = this.savedPhones.find(saved => saved.idPhone === phone.idPhone);
 
       if (phone.status === 'created' && !phone.idPhone) {
-        createdPhones.push(phone);
+        createdPhonesArray.push(this.createPhoneGroup(phone));
       } else if (phone.status !== 'created' && savedPhone) {
-        const isUpdated = savedPhone.type !== phone.type || savedPhone.number !== phone.number;
+        const isUpdated = savedPhone.type !== phone.type
+          || savedPhone.number !== phone.number
+          || savedPhone.status === 'updated';
         if (isUpdated) {
-          phone.status = 'updated';
+          phoneFormGroup.patchValue({
+            status: 'updated'
+          });
+          // phone.status = 'updated';
+          updatedPhonesArray.push(this.createPhoneGroup(phone));
         }
-        updatedPhones.push(phone);
       }
     });
 
-    // Get selected occupation with name
-    const selectedOccupation = this.contactOccupations.find(occupation => occupation.idOccupation === this.contactForm.value.idOccupation);
-    const contactData = {
-      ...this.contactForm.value,
-      occupationName: selectedOccupation ? selectedOccupation.Occupation : null,
-      createdEmails,
-      updatedEmails,
-      createdPhones,
-      updatedPhones
-    };
+    const expeditionDate = this.contactForm.get('expeditionDate')?.value;
+    if (expeditionDate) {
+      this.contactForm.patchValue({
+        expeditionDate: `${format(expeditionDate, 'yyyy-MM-dd')}T00:00:00`
+      });
+    }
 
     this.modal.close({
-      contact: contactData,
-      isNew: this.contact === null
+      contact: this.contactForm,
+      isNew: this.contact === null || this.contact.idTemporalContact === null
     });
   }
 
