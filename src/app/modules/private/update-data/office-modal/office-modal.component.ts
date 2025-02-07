@@ -77,7 +77,7 @@ export class OfficeModalComponent implements OnInit {
    * Update existingContacts with the modifications made.
    */
   refreshContacts(contacts: any[]) {
-    // Convertir los contactos existentes en un Map para acceso rápido por idTemporalContact
+    // Convert existing contacts into a Map for quick access by idTemporalContact
     let existingContactsMap = new Map(
       contacts.map((contact: any) => [contact.idTemporalContact, contact])
     );
@@ -86,20 +86,20 @@ export class OfficeModalComponent implements OnInit {
     const createdContacts = this.office.createdContacts || [];
     const deletedContacts = this.office.deletedContacts || [];
 
-    // 1. Actualizar solo los contactos existentes
+    // 1. Update existing contacts
     updatedContacts.forEach((contact: any) => {
       if (existingContactsMap.has(contact.idTemporalContact)) {
         existingContactsMap.set(contact.idTemporalContact, contact);
       }
     });
 
-    // 2. Eliminar los contactos presentes en deletedContacts
+    // 2. Delete contacts present in deletedContacts
     deletedContacts.forEach((id: number) => existingContactsMap.delete(id));
 
-    // Convertir Map a array
+    // Convert Map to array
     this.existingContacts = Array.from(existingContactsMap.values());
 
-    // 3. Agregar los contactos nuevos (sin idTemporalContact) con push
+    // 3. Add new contacts (without idTemporalContact)
     this.existingContacts.push(...createdContacts);
   }
 
@@ -188,10 +188,6 @@ export class OfficeModalComponent implements OnInit {
         const newContact = result.contact;
 
         if (result.isNew && newContact.value.idAddedTemporal) {
-          // Revisar cuando se actualiza un contacto que fue agregado anteriormente
-          console.log("PUSHH");
-          console.log(newContact);
-          console.log("contactIndex:", contactIndex);
           if (contactIndex != null) {
             const createdContactsIndex = this.createdContacts.controls.findIndex(
               (control) => control.value.idAddedTemporal === newContact.value.idAddedTemporal
@@ -204,23 +200,21 @@ export class OfficeModalComponent implements OnInit {
           }
           this.existingContacts = [...this.existingContacts];
           this.messageService.create(
-            'success',
-            `Contacto ${contactIndex != null ? 'actualizado' : 'agregado'}.`
+            'info',
+            `Contacto por ${contactIndex != null ? 'actualizar' : 'agregar'}.`
           );
-          console.log(this.existingContacts);
-          console.log(this.officeForm.value);
         } else if (!result.isNew && contactIndex != null) {
           const updatedContactsIndex = this.updatedContacts.controls.findIndex(
             (control) => control.value.idTemporalContact === newContact.value.idTemporalContact
           );
-          if (updatedContactsIndex) {
+          if (updatedContactsIndex !== -1) {
             (this.updatedContacts as FormArray).setControl(updatedContactsIndex, newContact);
           } else {
             this.updatedContacts.push(newContact);
           }
           this.existingContacts[contactIndex] = newContact.value;
           this.existingContacts = [...this.existingContacts];
-          this.messageService.create('success', 'Contacto actualizado.');
+          this.messageService.create('info', 'Contacto por actualizar.');
         }
       }
     });
@@ -258,7 +252,7 @@ export class OfficeModalComponent implements OnInit {
       }
     }
     this.existingContacts = [...this.existingContacts];
-    this.messageService.create('success', 'Contacto eliminado.');
+    this.messageService.create('info', 'Contacto por eliminar.');
   }
 
   onSubmit() {

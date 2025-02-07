@@ -5,8 +5,6 @@ import { NzModalService } from 'ng-zorro-antd/modal';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 import { OfficeModalComponent } from './office-modal/office-modal.component';
-import { OfficeProviderService } from 'src/app/services/office-provider/office-provider.service';
-import { ContactsProviderServicesService } from 'src/app/services/contacts-provider/contacts-provider.services.service';
 import { ClientProviderService } from 'src/app/services/clients/client-provider.service';
 import { LANGUAGES } from 'src/app/utils/languages';
 import { ContactFormComponent } from './contact-form/contact-form.component';
@@ -26,6 +24,7 @@ export class UpdateDataComponent implements OnInit {
 
   user = this.eventManager.userLogged();
   providerForm!: FormGroup;
+  isFirstForm: boolean = true;
 
   languages: any[] = LANGUAGES;
   identificationTypes: any[] = [];
@@ -36,7 +35,6 @@ export class UpdateDataComponent implements OnInit {
   loading: boolean = false;
 
   constructor (
-    // private clientService: ClientProviderService,
     private eventManager: EventManagerService,
     private fb: FormBuilder,
     private formUtils: FormUtilsService,
@@ -44,7 +42,6 @@ export class UpdateDataComponent implements OnInit {
     private alertService: AlertService,
     private modalService: NzModalService,
     private clientProviderService: ClientProviderService
-    // private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -52,7 +49,6 @@ export class UpdateDataComponent implements OnInit {
     this.getIdentificationTypes();
 
     this.initializeForm();
-    this.loadProviderData();
   }
 
   getIdentificationTypes() {
@@ -86,6 +82,7 @@ export class UpdateDataComponent implements OnInit {
       createdContacts: this.fb.array([]),
       deletedContacts: this.fb.array([])
     });
+    this.loadProviderData();
   }
 
   loadProviderData(): void {
@@ -95,6 +92,8 @@ export class UpdateDataComponent implements OnInit {
         const data = res.data;
         this.loading = false;
         if (!data) return;
+
+        this.isFirstForm = false;
 
         // Convert to an array
         let languages = [];
@@ -174,9 +173,6 @@ export class UpdateDataComponent implements OnInit {
         const newOffice = result.office;
 
         if (result.isNew && newOffice.value.idAddedTemporal) {
-          console.log("result.office");
-          console.log(result.office);
-          console.log(newOffice);
           if (officeIndex != null) {
             const createdOfficesIndex = this.createdOffices.controls.findIndex(
               (control) => control.value.idAddedTemporal === newOffice.value.idAddedTemporal
@@ -189,23 +185,21 @@ export class UpdateDataComponent implements OnInit {
           }
           this.existingOffices = [...this.existingOffices];
           this.messageService.create(
-            'success',
-            `Sede ${officeIndex != null ? 'actualizada' : 'agregada'}.`
+            'info',
+            `Sede por ${officeIndex != null ? 'actualizar' : 'agregar'}.`
           );
-          console.log("form");
-          console.log(this.providerForm.value);
         } else if (!result.isNew && officeIndex != null) {
           const updatedOfficesIndex = this.updatedOffices.controls.findIndex(
             (control) => control.value.idTemporalOfficeProvider === newOffice.value.idTemporalOfficeProvider
           );
-          if (updatedOfficesIndex) {
+          if (updatedOfficesIndex !== -1) {
             (this.updatedOffices as FormArray).setControl(updatedOfficesIndex, newOffice);
           } else {
             this.updatedOffices.push(newOffice);
           }
           this.existingOffices[officeIndex] = newOffice.value;
           this.existingOffices = [...this.existingOffices];
-          this.messageService.create('success', 'Sede actualizada.');
+          this.messageService.create('info', 'Sede por actualizar.');
         }
       }
     });
@@ -245,21 +239,21 @@ export class UpdateDataComponent implements OnInit {
           }
           this.existingContacts = [...this.existingContacts];
           this.messageService.create(
-            'success',
-            `Contacto ${contactIndex != null ? 'actualizado' : 'agregado'}.`
+            'info',
+            `Contacto por ${contactIndex != null ? 'actualizar' : 'agregar'}.`
           );
         } else if (!result.isNew && contactIndex != null) {
           const updatedContactsIndex = this.updatedContacts.controls.findIndex(
             (control) => control.value.idTemporalContact === newContact.value.idTemporalContact
           );
-          if (updatedContactsIndex) {
+          if (updatedContactsIndex !== -1) {
             (this.updatedContacts as FormArray).setControl(updatedContactsIndex, newContact);
           } else {
             this.updatedContacts.push(newContact);
           }
           this.existingContacts[contactIndex] = newContact.value;
           this.existingContacts = [...this.existingContacts];
-          this.messageService.create('success', 'Contacto actualizado.');
+          this.messageService.create('info', 'Contacto por actualizar.');
         }
       }
     });
@@ -297,7 +291,7 @@ export class UpdateDataComponent implements OnInit {
       }
     }
     this.existingOffices = [...this.existingOffices];
-    this.messageService.create('success', 'Sede eliminada.');
+    this.messageService.create('info', 'Sede por eliminar.');
   }
 
   async deleteContact(index: number) {
@@ -332,7 +326,7 @@ export class UpdateDataComponent implements OnInit {
       }
     }
     this.existingContacts = [...this.existingContacts];
-    this.messageService.create('success', 'Contacto eliminado.');
+    this.messageService.create('info', 'Contacto por eliminar.');
   }
 
   formatDate(date: Date): string {
@@ -340,19 +334,27 @@ export class UpdateDataComponent implements OnInit {
   }
 
   onSubmit(): void {
-    console.log("onSubmit");
     if (this.providerForm.invalid) {
       this.formUtils.markFormTouched(this.providerForm);
       return;
     };
+    // Clear messages
+    this.messageService.remove();
+
     this.providerForm.patchValue({ endTime: this.formatDate(new Date()) });
-    console.log(this.providerForm.value);
+    // console.log(this.providerForm.value);
+
+    const serviceMethod = (args: any) =>
+      this.isFirstForm
+        ? this.clientProviderService.sendTemporalProviderForm(args)
+        : this.clientProviderService.updateTemporalProviderForm(args);
 
     this.loading = true;
-    this.clientProviderService.sendTemporalProviderForm(this.providerForm.value).subscribe({
+    serviceMethod(this.providerForm.value).subscribe({
       next: (res: any) => {
         this.loading = false;
         this.alertService.success('Enviado', 'Actualización enviada.');
+        this.initializeForm(); // Reset form
       },
       error: (err: any) => {
         this.loading = false;

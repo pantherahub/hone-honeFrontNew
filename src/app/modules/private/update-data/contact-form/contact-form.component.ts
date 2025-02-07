@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { format } from 'date-fns';
 import { NzModalRef } from 'ng-zorro-antd/modal';
 import { distinctUntilChanged } from 'rxjs';
@@ -173,7 +173,6 @@ export class ContactFormComponent implements OnInit {
   }
 
   onChangeOccupation(newValue: any) {
-    console.log("idOccupation Changed", newValue);
     // Legal representation
     const idEnabled = newValue === 15;
     if (idEnabled != this.identificationEnabled) {
@@ -202,9 +201,7 @@ export class ContactFormComponent implements OnInit {
   }
 
   loadContactData(): void {
-    console.log("LOADCONTACTDATA");
     if (this.contact) {
-      console.log(this.contact);
       this.contactForm.patchValue({
         idTemporalContact: this.contact.idTemporalContact,
         idAddedTemporal: this.contact.idAddedTemporal ?? null,
@@ -369,7 +366,6 @@ export class ContactFormComponent implements OnInit {
       const email = emailFormGroup.value;
       const savedEmail = this.savedEmails.find(saved => saved.idEmail === email.idEmail);
 
-      // console.log("SAVED_EMAIL:", savedEmail);
       if (email.status === 'created' && !email.idEmail) {
         createdEmailsArray.push(this.createEmailGroup(email));
       } else if (email.status !== 'created' && savedEmail) {
@@ -399,7 +395,6 @@ export class ContactFormComponent implements OnInit {
           phoneFormGroup.patchValue({
             status: 'updated'
           });
-          // phone.status = 'updated';
           updatedPhonesArray.push(this.createPhoneGroup(phone));
         }
       }

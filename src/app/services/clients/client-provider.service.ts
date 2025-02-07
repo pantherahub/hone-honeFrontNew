@@ -37,4 +37,8 @@ export class ClientProviderService {
   sendTemporalProviderForm(data: any) {
     return this.httpClient.post(`${this.url}TemporalProvider/Store`, data);
   }
+
+  updateTemporalProviderForm(data: any) {
+    return this.httpClient.put(`${this.url}TemporalProvider/Update`, data);
+  }
 }

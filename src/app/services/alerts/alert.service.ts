@@ -10,7 +10,7 @@ export class AlertService {
 
   private createModal(type: 'info' | 'success' | 'error' | 'warning', options: Partial<ModalOptions<any>>): NzModalRef {
     return this.modalService[type]({
-      nzOnOk: () => console.log(`${type.toUpperCase()} OK`),
+      // nzOnOk:  () => {},
       ...options
     });
   }
