@@ -96,10 +96,26 @@ export class UpdateDataComponent implements OnInit {
         this.loading = false;
         if (!data) return;
 
+        // Convert to an array
+        let languages = [];
+        if (typeof data.languages === 'string') {
+          try {
+            languages = JSON.parse(data.languages);
+            if (!Array.isArray(languages)) {
+              languages = [];
+            }
+          } catch (error) {
+            console.error("Error parsing languages:", error);
+            languages = [];
+          }
+        } else if (Array.isArray(data.languages)) {
+          languages = data.languages;
+        }
+
         this.providerForm.patchValue({
           email: data.email,
           name: data.name,
-          languages: data.languages,
+          languages: languages,
           idTypeDocument: data.idTypeDocument,
           identification: data.identification,
           website: data.website
@@ -331,7 +347,6 @@ export class UpdateDataComponent implements OnInit {
     };
     this.providerForm.patchValue({ endTime: this.formatDate(new Date()) });
     console.log(this.providerForm.value);
-    return;
 
     this.loading = true;
     this.clientProviderService.sendTemporalProviderForm(this.providerForm.value).subscribe({

@@ -112,7 +112,7 @@ export class OfficeModalComponent implements OnInit {
 
     this.contactsProviderService.getTemporalContactsById(this.modelType, officeId).subscribe({
       next: (res: any) => {
-        this.refreshContacts(res.contacts);
+        this.refreshContacts(res.data);
       },
       error: (err: any) => {
         console.error(err);

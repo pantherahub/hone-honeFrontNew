@@ -332,13 +332,9 @@ export class ContactFormComponent implements OnInit {
     }
   }
   phoneNumberValidator(control: AbstractControl) {
-    console.log("phoneNumberValidator");
     if (!control || !control.value || !control.parent) return null;
-    console.log("pasó");
     const type = control.parent.get('type')?.value;
     const number = control.value;
-    console.log(number);
-    console.log(typeof number);
 
     if ((type === 'Celular' || type === 'Whatsapp') && number.length !== 10) {
       return { invalidLength: 'Debe ser de 10 dígitos.' };
