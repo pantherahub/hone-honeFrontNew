@@ -71,12 +71,12 @@ export class UpdateDataComponent implements OnInit {
       idProvider: [this.user.id],
       startTime: [this.formatDate(new Date())],
       endTime: [''],
-      email: [this.user.email || '', [Validators.required, Validators.email]],
+      email: [this.user.email || '', [Validators.required, this.formUtils.emailValidator]],
       name: [this.user.name || '', [Validators.required]],
       languages: [[], [Validators.required]],
       idTypeDocument: ['', [Validators.required]],
-      identification: ['', [Validators.required]],
-      website: [''],
+      identification: ['', [Validators.required, this.formUtils.numeric]],
+      website: ['', this.formUtils.url],
 
       updatedOffices: this.fb.array([]),
       createdOffices: this.fb.array([]),
@@ -250,7 +250,10 @@ export class UpdateDataComponent implements OnInit {
   }
 
   async deleteOffice(index: number) {
-    const confirmed = await this.alertService.confirmDelete();
+    const confirmed = await this.alertService.confirmDelete(
+      '¿Eliminar sede?',
+      'Eliminar sede del listado'
+    );
     if (!confirmed) return;
 
     const deletedOffice = this.existingOffices[index];
@@ -282,7 +285,10 @@ export class UpdateDataComponent implements OnInit {
   }
 
   async deleteContact(index: number) {
-    const confirmed = await this.alertService.confirmDelete();
+    const confirmed = await this.alertService.confirmDelete(
+      '¿Eliminar contacto?',
+      'Eliminar contacto del listado'
+    );
     if (!confirmed) return;
 
     const deletedContact = this.existingContacts[index];
@@ -325,6 +331,7 @@ export class UpdateDataComponent implements OnInit {
     };
     this.providerForm.patchValue({ endTime: this.formatDate(new Date()) });
     console.log(this.providerForm.value);
+    return;
 
     this.loading = true;
     this.clientProviderService.sendTemporalProviderForm(this.providerForm.value).subscribe({

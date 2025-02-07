@@ -27,6 +27,12 @@
     </div>
     }
 
+    <div>
+      <button nz-button nzType="primary" [nzSize]="'large'" type="button" routerLink="/update-data">
+        <span nz-icon nzType="setting" nzTheme="outline"></span>Actualizar información
+      </button>
+    </div>
+
     @if (!loadingData) {
     <div class="container-grid">
         @for (item of clientList; track $index) {
@@ -35,10 +41,6 @@
             <span>{{ item.url ? '' : item.clientHoneSolutions}}</span>
         </div>
         }
-        <div class="card-custom card-custom__update-data" routerLink="/update-data">
-          <span nz-icon nzType="setting" nzTheme="outline"></span>
-          <h2>Actualizar datos</h2>
-        </div>
     </div>
     <!-- <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[24,32]">
         @for (item of clientList; track $index) {

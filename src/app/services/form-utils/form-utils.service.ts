@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AbstractControl, FormArray, FormGroup, ValidatorFn } from '@angular/forms';
+import { AbstractControl, FormArray, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
 
 @Injectable({
   providedIn: 'root'
@@ -30,6 +30,32 @@ export class FormUtilsService {
       }
       return null;
     };
+  }
+
+  /**
+   * Numeric validator.
+   */
+  numeric(control: AbstractControl): ValidationErrors | null {
+    if (!control || !control.value) return null;
+    return /^[0-9]+$/.test(control.value) ? null : { invalidNumber: true };
+  }
+
+  /**
+   * Url validator. REVISAR
+   */
+  url(control: AbstractControl): ValidationErrors | null {
+    if (!control || !control.value) return null;
+    const urlPattern = /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,})(\/\S*)?$/i;
+    return urlPattern.test(control.value) ? null : { invalidUrl: true };
+  }
+
+  /**
+   * Email validator.
+   */
+  emailValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control || !control.value) return null;
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailPattern.test(control.value) ? null : { invalidEmail: true };
   }
 
   /**

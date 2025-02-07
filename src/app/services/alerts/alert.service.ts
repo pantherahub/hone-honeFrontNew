@@ -8,15 +8,6 @@ export class AlertService {
 
   constructor(private modalService: NzModalService) { }
 
-  // private modalService: NzModalService;
-  // constructor(private injector: Injector) {
-  //   this.modalService = this.injector.get(NzModalService);
-  // }
-
-  // private modalService = inject(NzModalService);
-
-  // constructor(@Inject(MY_SERVICE) private modalService: MyService) { }
-
   private createModal(type: 'info' | 'success' | 'error' | 'warning', options: Partial<ModalOptions<any>>): NzModalRef {
     return this.modalService[type]({
       nzOnOk: () => console.log(`${type.toUpperCase()} OK`),

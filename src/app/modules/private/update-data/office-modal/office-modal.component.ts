@@ -129,7 +129,7 @@ export class OfficeModalComponent implements OnInit {
       name: [this.office?.name || '', [Validators.required]],
       idCity: [this.office?.idCity || '', [Validators.required]],
       cityName: [this.office?.cityName || this.office?.City?.city || ''],
-      schedulingLink: [this.office?.schedulingLink || ''],
+      schedulingLink: [this.office?.schedulingLink || '', [this.formUtils.url]],
 
       attentionDays: [this.office?.attentionDays || '', [Validators.required]],
       officeHours: [this.office?.officeHours || '', [Validators.required]],
@@ -227,7 +227,10 @@ export class OfficeModalComponent implements OnInit {
   }
 
   async deleteContact(index: number) {
-    const confirmed = await this.alertService.confirmDelete();
+    const confirmed = await this.alertService.confirmDelete(
+      '¿Eliminar contacto?',
+      'Eliminar contacto del listado'
+    );
     if (!confirmed) return;
 
     const deletedContact = this.existingContacts[index];

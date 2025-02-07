@@ -40,8 +40,11 @@
                 <nz-form-label [nzRequired]="true" nzFor="email">Correo electrónico</nz-form-label>
                 <nz-form-control [nzErrorTip]="emailErrorTip">
                   <ng-template #emailErrorTip>
-                    <p *ngIf="providerForm.controls['email'].hasError('required')">El campo es requerido.</p>
-                    <p *ngIf="providerForm.controls['email'].hasError('email')">Correo inválido.</p>
+                    @if (providerForm.controls['email'].hasError('required')) {
+                      <p>El campo es requerido.</p>
+                    } @else if (providerForm.controls['email'].hasError('invalidEmail')) {
+                      <p>Ingresa un correo válido.</p>
+                    }
                   </ng-template>
                   <input nz-input id="email" formControlName="email" placeholder="Correo" />
                 </nz-form-control>
@@ -90,9 +93,13 @@
                 <nz-form-label [nzRequired]="true" nzFor="identification">Identificación</nz-form-label>
                 <nz-form-control [nzErrorTip]="identificationErrorTip">
                   <ng-template #identificationErrorTip>
-                    <p *ngIf="providerForm.controls['identification'].hasError('required')">El campo es requerido.</p>
+                    @if (providerForm.controls['identification'].hasError('required')) {
+                      <p>El campo es requerido.</p>
+                    } @else if (providerForm.controls['identification'].hasError('invalidNumber')) {
+                      <p>Ingresa un valor válido.</p>
+                    }
                   </ng-template>
-                  <input nz-input id="identification" formControlName="identification" placeholder="Identificación" />
+                  <input nz-input id="identification" formControlName="identification" placeholder="Identificación" type="number" onkeydown="return event.keyCode !== 69" />
                 </nz-form-control>
               </nz-form-item>
             </nz-col>
@@ -100,7 +107,10 @@
             <nz-col [nzSpan]="24" [nzSm]="12">
               <nz-form-item>
                 <nz-form-label [nzRequired]="true" nzFor="website">Sitio o página web</nz-form-label>
-                <nz-form-control>
+                <nz-form-control [nzErrorTip]="websiteErrorTip">
+                  <ng-template #websiteErrorTip>
+                    <p *ngIf="providerForm.controls['website'].hasError('invalidUrl')">Ingresa una url válida.</p>
+                  </ng-template>
                   <input nz-input id="website" formControlName="website" placeholder="Web" />
                 </nz-form-control>
               </nz-form-item>

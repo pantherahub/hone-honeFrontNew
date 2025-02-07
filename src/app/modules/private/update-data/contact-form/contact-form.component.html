@@ -70,7 +70,11 @@
         <nz-form-label [nzRequired]="true" nzFor="identification">Identificación</nz-form-label>
         <nz-form-control [nzErrorTip]="identificationErrorTip">
           <ng-template #identificationErrorTip>
-            <p *ngIf="contactForm.controls['identification'].hasError('required')">El campo es requerido.</p>
+            @if (contactForm.controls['identification'].hasError('required')) {
+              <p>El campo es requerido.</p>
+            } @else if (contactForm.controls['identification'].hasError('invalidNumber')) {
+              <p>Ingresa un valor válido.</p>
+            }
           </ng-template>
           <input nz-input id="identification" formControlName="identification" placeholder="Identificación" />
         </nz-form-control>
@@ -111,8 +115,15 @@
       <div nz-row [nzGutter]="16" formArrayName="Emails">
         @for (control of emailsArray.controls; track control; let i = $index) {
           <nz-col [nzSpan]="24" [nzSm]="12">
-            <nz-form-item [formGroupName]="i">
-              <nz-form-control nzErrorTip="Ingresa un correo válido.">
+            <nz-form-item [formGroupName]="i" class="email-form-item">
+              <nz-form-control [nzErrorTip]="emailErrorTip">
+                <ng-template #emailErrorTip>
+                  @if (control.get('email')?.hasError('required')) {
+                    El campo es requerido.
+                  } @else if (control.get('email')?.hasError('invalidEmail')) {
+                    Ingresa un correo válido.
+                  }
+                </ng-template>
                 <input
                   nz-input
                   type="email"
@@ -121,14 +132,14 @@
                   class="passenger-input"
                   [id]="'email-' + i"
                 />
-                <span
-                  nz-icon
-                  nzType="minus-circle-o"
-                  class="dynamic-delete-button"
-                  *ngIf="emailsArray.length > 1"
-                  (click)="removeEmail(i)"
-                ></span>
               </nz-form-control>
+              <span
+                nz-icon
+                nzType="minus-circle-o"
+                class="dynamic-delete-button"
+                *ngIf="emailsArray.length > 1"
+                (click)="removeEmail(i)"
+              ></span>
             </nz-form-item>
           </nz-col>
         }
@@ -167,12 +178,22 @@
 
           <nz-col [nzSpan]="13" [nzSm]="6">
             <nz-form-item [formGroupName]="i">
-              <nz-form-control nzErrorTip="El campo es requerido.">
+              <nz-form-control [nzErrorTip]="phoneErrorTip">
+                <ng-template #phoneErrorTip>
+                  @if (control.get('number')?.hasError('required')) {
+                    El campo es requerido.
+                  } @else if (control.get('number')?.hasError('invalidNumber')) {
+                    Ingresa un número válido.
+                  } @else if (control.get('number')?.hasError('invalidLength')) {
+                    {{ control.get('number')?.errors?.['invalidLength'] }}
+                  }
+                </ng-template>
                 <input
                   nz-input
-                  type="text"
+                  type="number"
                   placeholder="Número"
                   formControlName="number"
+                  onkeydown="return event.keyCode !== 69"
                 />
               </nz-form-control>
             </nz-form-item>

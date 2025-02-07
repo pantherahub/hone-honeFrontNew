@@ -22,3 +22,13 @@
 .dynamic-delete-button:hover {
   color: #777;
 }
+
+nz-form-item.email-form-item {
+  margin-bottom: 0.5rem;
+}
+
+@media screen and (max-width: 575px) {
+  nz-form-item.email-form-item {
+    margin-bottom: 15px;
+  }
+}

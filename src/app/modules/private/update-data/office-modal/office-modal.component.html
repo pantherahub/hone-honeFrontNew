@@ -59,7 +59,10 @@
       <nz-col [nzSpan]="24" [nzSm]="12">
         <nz-form-item nz-row>
           <nz-form-label nzFor="schedulingLink">Link de agendamiento</nz-form-label>
-          <nz-form-control>
+          <nz-form-control [nzErrorTip]="schedulingLinkErrorTip">
+            <ng-template #schedulingLinkErrorTip>
+              <p *ngIf="officeForm.controls['schedulingLink'].hasError('invalidUrl')">Ingresa una url válida.</p>
+            </ng-template>
             <input nz-input id="schedulingLink" formControlName="schedulingLink" placeholder="Link" />
           </nz-form-control>
         </nz-form-item>
