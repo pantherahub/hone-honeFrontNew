@@ -5,13 +5,17 @@
             <img class="logo-hone" src="../../../assets/img/logo-hone.png" alt="">
         </div>
         <div class="container-header-name-avatar" nz-col [nzXs]="12" [nzSm]="12" [nzMd]="12" [nzLg]="12">
-            <div  nz-row nzJustify="center" class="user-section" [nzGutter]="[24,24]">
-                <div nz-popover [(nzPopoverVisible)]="visible"
+            <div nz-row nzJustify="center" class="user-section" [nzGutter]="[24,24]">
+                <!-- <div nz-popover [(nzPopoverVisible)]="visible"
                 (nzPopoverVisibleChange)="change($event)" nzPopoverTrigger="click"
                 [nzPopoverContent]="contentTemplate" nzPopoverPlacement="bottomLeft">
                   <img src="../../../assets/img/user.png" alt="avatar">
                   <span class="user-section__name">{{user.name ? user.name : 'No reporta nombre'}}</span>
-                </div>
+                </div> -->
+                <nz-avatar nzIcon="setting" class="user-section__option"></nz-avatar>
+                <nz-avatar nzIcon="user" nz-popover [(nzPopoverVisible)]="visible"
+                (nzPopoverVisibleChange)="change($event)" nzPopoverTrigger="click"
+                [nzPopoverContent]="contentTemplate" nzPopoverPlacement="bottomRight" nzPopoverOverlayClassName="custom-popover-br" class="user-section__option"></nz-avatar>
             </div>
         </div>
     </div>

@@ -12,10 +12,11 @@
     justify-content: end;
     width: 100%;
 
-    > div {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
+    &__option {
+      // display: flex;
+      // flex-wrap: wrap;
+      // gap: 1rem;
+      // margin-right: 10px;
       cursor: pointer;
     }
 
@@ -51,6 +52,11 @@
     display: flex;
     top: -20px;
 }
+
+::ng-deep .custom-popover-br {
+  transform: translateX(10px) !important;
+}
+
 
 @media screen and (max-width: 768px) {
   .user-section {
