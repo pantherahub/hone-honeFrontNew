@@ -353,6 +353,9 @@ export class ContactFormComponent implements OnInit {
     return null;
   }
 
+  disableFutureDates = (current: Date): boolean => {
+    return current > new Date();
+  };
 
   onSubmit() {
     this.formUtils.trimFormStrControls(this.contactForm);
