@@ -12,11 +12,12 @@ import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { AlertService } from 'src/app/services/alerts/alert.service';
 import { format } from 'date-fns';
+import { BackendErrorsComponent } from 'src/app/shared/forms/backend-errors/backend-errors.component';
 
 @Component({
   selector: 'app-update-data',
   standalone: true,
-  imports: [NgZorroModule, CommonModule],
+  imports: [NgZorroModule, CommonModule, BackendErrorsComponent],
   templateUrl: './update-data.component.html',
   styleUrl: './update-data.component.scss'
 })
@@ -33,6 +34,7 @@ export class UpdateDataComponent implements OnInit {
   existingContacts: any[] = [];
 
   loading: boolean = false;
+  backendError: any = null;
 
   constructor (
     private eventManager: EventManagerService,
@@ -340,6 +342,7 @@ export class UpdateDataComponent implements OnInit {
     };
     // Clear messages
     this.messageService.remove();
+    this.backendError = null;
 
     this.providerForm.patchValue({ endTime: this.formatDate(new Date()) });
     // console.log(this.providerForm.value);
@@ -358,6 +361,7 @@ export class UpdateDataComponent implements OnInit {
       },
       error: (err: any) => {
         this.loading = false;
+        if (err.status == 422) this.backendError = err.error;
         console.error(err);
         this.alertService.error();
       }
