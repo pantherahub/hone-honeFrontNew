@@ -270,10 +270,16 @@ export class OfficeModalComponent implements OnInit {
   }
 
   onSubmit() {
+    this.formUtils.trimFormStrControls(this.officeForm);
     if (this.officeForm.invalid) {
       this.formUtils.markFormTouched(this.officeForm);
       return;
     }
+
+    const schedulingLink = this.officeForm.get('schedulingLink')?.value;
+    this.officeForm.patchValue({
+      schedulingLink: schedulingLink || null
+    });
 
     this.modal.close({
       office: this.officeForm,

@@ -59,6 +59,18 @@ export class FormUtilsService {
   }
 
   /**
+   * Remove spaces from FormGroup controls.
+   */
+  trimFormStrControls(form: FormGroup) {
+    Object.keys(form.controls).forEach((key) => {
+      const control = form.get(key);
+      if (control && typeof control.value === 'string') {
+        control.setValue(control.value.trim(), { emitEvent: false });
+      }
+    });
+  }
+
+  /**
    * Validate and mark an entire form recursively.
    */
   markFormTouched(control: AbstractControl) {
@@ -69,6 +81,15 @@ export class FormUtilsService {
       control.markAsTouched();
       control.markAsDirty();
       control.updateValueAndValidity({ onlySelf: true });
+    }
+  }
+
+  /**
+   * Clear/Empty a FormArray.
+   */
+  clearFormArray(formArray: FormArray) {
+    while (formArray.length !== 0) {
+      formArray.removeAt(0);
     }
   }
 

@@ -336,7 +336,31 @@ export class UpdateDataComponent implements OnInit {
     return format(date, 'yyyy-MM-dd HH:mm:ss');
   }
 
+  resetForm() {
+    this.providerForm.reset({
+      idProvider: this.user.id,
+      startTime: this.formatDate(new Date()),
+      endTime: '',
+      email: this.user.email || '',
+      name: this.user.name || '',
+      languages: [],
+      idTypeDocument: '',
+      identification: '',
+      website: ''
+    });
+    this.formUtils.clearFormArray(this.updatedOffices);
+    this.formUtils.clearFormArray(this.createdOffices);
+    this.formUtils.clearFormArray(this.deletedOffices);
+    this.formUtils.clearFormArray(this.updatedContacts);
+    this.formUtils.clearFormArray(this.createdContacts);
+    this.formUtils.clearFormArray(this.deletedContacts);
+    this.existingOffices = [];
+    this.existingContacts = [];
+    this.loadProviderData();
+  }
+
   onSubmit(): void {
+    this.formUtils.trimFormStrControls(this.providerForm);
     if (this.providerForm.invalid) {
       this.formUtils.markFormTouched(this.providerForm);
       return;
@@ -345,8 +369,11 @@ export class UpdateDataComponent implements OnInit {
     this.messageService.remove();
     this.backendError = null;
 
-    this.providerForm.patchValue({ endTime: this.formatDate(new Date()) });
-    // console.log(this.providerForm.value);
+    const website = this.providerForm.get('website')?.value;
+    this.providerForm.patchValue({
+      website: website || null,
+      endTime: this.formatDate(new Date())
+    });
 
     const serviceMethod = (args: any) =>
       this.isFirstForm
@@ -358,7 +385,7 @@ export class UpdateDataComponent implements OnInit {
       next: (res: any) => {
         this.loading = false;
         this.alertService.success('Enviado', 'Actualización enviada.');
-        this.initializeForm(); // Reset form
+        this.resetForm();
       },
       error: (err: any) => {
         this.loading = false;
