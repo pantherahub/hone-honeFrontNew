@@ -125,7 +125,7 @@
 
       <!-- Table -->
       <div class="responsive-table">
-        <nz-table #contactTable nzSize="small" [nzData]="existingContacts" [nzPageSize]="5" [nzLoading]="loadingContacts" class="table">
+        <nz-table #contactTable nzSize="small" [nzData]="existingContacts" [nzPageSize]="contactPageSize" [nzPageIndex]="contactPage" (nzPageIndexChange)="contactPage = $event" [nzLoading]="loadingContacts" class="table">
           <thead>
             <tr>
               <th>Área / Cargo</th>
@@ -138,8 +138,8 @@
               <td>{{ data.occupationName || data.OccupationForOffice?.occupation || '' }}</td>
               <td>{{ data.name || 'N/A' }}</td>
               <td class="table__action">
-                <button nz-button nzType="primary" type="button" (click)="openContactModal(i)" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
-                <button nz-button nzDanger nzType="primary" type="button" (click)="deleteContact(i)" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button>
+                <button nz-button nzType="primary" type="button" (click)="openContactModal(getGlobalIndex(i))" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
+                <button nz-button nzDanger nzType="primary" type="button" (click)="deleteContact(getGlobalIndex(i))" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button>
               </td>
             </tr>
           </tbody>

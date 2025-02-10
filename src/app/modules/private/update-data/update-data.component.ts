@@ -33,6 +33,12 @@ export class UpdateDataComponent implements OnInit {
   existingOffices: any[] = [];
   existingContacts: any[] = [];
 
+  officePage: number = 1;
+  officePageSize: number = 5;
+
+  contactPage: number = 1;
+  contactPageSize: number = 5;
+
   loading: boolean = false;
   backendError: any = null;
 
@@ -151,6 +157,10 @@ export class UpdateDataComponent implements OnInit {
   }
   get deletedContacts() {
     return this.providerForm.get('deletedContacts') as FormArray;
+  }
+
+  getGlobalIndex(localIndex: number, currentPage: number, pageSize: number): number {
+    return (currentPage - 1) * pageSize + localIndex;
   }
 
   openOfficeModal(officeIndex: number | null = null) {
