@@ -123,11 +123,12 @@ export class UpdateDataComponent implements OnInit {
         });
 
         this.existingOffices = data.TemporalOffices;
-        this.existingContacts = data.TemporalContacts;
+        this.existingContacts = data.TemporalContactsForProvider;
       },
       error: (err: any) => {
         this.loading = false;
         console.error(err);
+        this.messageService.create('error', 'Algo salió mal.');
       }
     });
   }

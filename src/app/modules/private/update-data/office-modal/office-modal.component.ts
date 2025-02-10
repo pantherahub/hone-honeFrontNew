@@ -31,6 +31,7 @@ export class OfficeModalComponent implements OnInit {
 
   user = this.eventManager.userLogged();
   modelType: string = 'Sede';
+  loadingContacts: boolean = false;
 
   constructor(
     private eventManager: EventManagerService,
@@ -110,14 +111,27 @@ export class OfficeModalComponent implements OnInit {
       return;
     }
 
+    this.loadingContacts = true;
     this.contactsProviderService.getTemporalContactsById(this.modelType, officeId).subscribe({
       next: (res: any) => {
         this.refreshContacts(res.data);
+        this.loadingContacts = false;
       },
       error: (err: any) => {
         console.error(err);
+        this.loadingContacts = false;
       }
     });
+  }
+
+  getIdsCompanies(): number[] {
+    if (this.office?.idsCompanies) {
+      return this.office.idsCompanies;
+    }
+    if (this.office?.Companies) {
+      return this.office.Companies.map((company: any) => company.idCompany);
+    }
+    return [];
   }
 
   initializeForm() {
@@ -133,7 +147,7 @@ export class OfficeModalComponent implements OnInit {
 
       attentionDays: [this.office?.attentionDays || '', [Validators.required]],
       officeHours: [this.office?.officeHours || '', [Validators.required]],
-      idsCompanies : [this.office?.idsCompanies || [], [Validators.required]],
+      idsCompanies : [this.getIdsCompanies(), [Validators.required]],
 
       updatedContacts: this.fb.array([]),
       createdContacts: this.fb.array([]),

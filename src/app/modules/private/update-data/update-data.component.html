@@ -168,7 +168,7 @@
                  </thead>
                  <tbody>
                    <tr *ngFor="let data of contactTable.data; let i = index">
-                     <td>{{ data.occupationName || data.Occupation?.occupation || '' }}</td>
+                     <td>{{ data.occupationName || data.OccupationForProvider?.occupation || '' }}</td>
                      <td>{{ data.name || 'N/A' }}</td>
                      <td class="table__action">
                         <button nz-button nzType="primary" type="button" (click)="openContactModal(i)" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>

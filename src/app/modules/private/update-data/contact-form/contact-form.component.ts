@@ -202,12 +202,16 @@ export class ContactFormComponent implements OnInit {
 
   loadContactData(): void {
     if (this.contact) {
+      const existingOccupation = this.contactModelType == 'Prestador'
+        ? this.contact.OccupationForProvider
+        : this.contact.OccupationForOffice;
+
       this.contactForm.patchValue({
         idTemporalContact: this.contact.idTemporalContact,
         idAddedTemporal: this.contact.idAddedTemporal ?? null,
         idOccupationType: this.contact.idOccupationType,
         idOccupation: this.contact.idOccupation,
-        occupationName: this.contact.occupationName || this.contact?.Occupation?.occupation || '',
+        occupationName: this.contact.occupationName || existingOccupation?.occupation || '',
         name: this.contact.name,
         idTypeDocument: this.contact.idTypeDocument,
         identification: this.contact.identification,
