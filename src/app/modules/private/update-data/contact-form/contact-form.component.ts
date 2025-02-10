@@ -108,7 +108,7 @@ export class ContactFormComponent implements OnInit {
       idOccupationType: [null, [Validators.required]], // area or person
       idOccupation: [{ value: null, disabled: true }, [Validators.required]],
       occupationName: [''],
-      name: [''],
+      name: [null],
       Emails: this.fb.array([], [this.formUtils.minArrayLength(1), this.formUtils.maxArrayLength(5)]),
       Phones: this.fb.array([], [this.formUtils.minArrayLength(1), this.formUtils.maxArrayLength(5)]),
 
@@ -143,7 +143,7 @@ export class ContactFormComponent implements OnInit {
 
   onChangeContactType(newValue: any) {
     this.contactForm.patchValue({
-      name: '',
+      name: null,
       idOccupation: null
     });
 
