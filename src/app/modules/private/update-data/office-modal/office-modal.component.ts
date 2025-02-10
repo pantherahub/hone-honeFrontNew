@@ -29,6 +29,9 @@ export class OfficeModalComponent implements OnInit {
   companyList: CompanyInterface[] = [];
   existingContacts: any[] = [];
 
+  contactPage: number = 1;
+  contactPageSize: number = 5;
+
   user = this.eventManager.userLogged();
   modelType: string = 'Sede';
   loadingContacts: boolean = false;
@@ -180,6 +183,10 @@ export class OfficeModalComponent implements OnInit {
     return this.officeForm.get('deletedContacts') as FormArray;
   }
 
+  getGlobalIndex(localIndex: number): number {
+    return (this.contactPage - 1) * this.contactPageSize + localIndex;
+  }
+
   openContactModal(contactIndex: number | null = null) {
     const contact = contactIndex != null
       ? this.existingContacts[contactIndex]
@@ -270,10 +277,16 @@ export class OfficeModalComponent implements OnInit {
   }
 
   onSubmit() {
+    this.formUtils.trimFormStrControls(this.officeForm);
     if (this.officeForm.invalid) {
       this.formUtils.markFormTouched(this.officeForm);
       return;
     }
+
+    const schedulingLink = this.officeForm.get('schedulingLink')?.value;
+    this.officeForm.patchValue({
+      schedulingLink: schedulingLink || null
+    });
 
     this.modal.close({
       office: this.officeForm,

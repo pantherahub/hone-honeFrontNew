@@ -108,7 +108,7 @@ export class ContactFormComponent implements OnInit {
       idOccupationType: [null, [Validators.required]], // area or person
       idOccupation: [{ value: null, disabled: true }, [Validators.required]],
       occupationName: [''],
-      name: [''],
+      name: [null],
       Emails: this.fb.array([], [this.formUtils.minArrayLength(1), this.formUtils.maxArrayLength(5)]),
       Phones: this.fb.array([], [this.formUtils.minArrayLength(1), this.formUtils.maxArrayLength(5)]),
 
@@ -143,7 +143,7 @@ export class ContactFormComponent implements OnInit {
 
   onChangeContactType(newValue: any) {
     this.contactForm.patchValue({
-      name: '',
+      name: null,
       idOccupation: null
     });
 
@@ -292,7 +292,7 @@ export class ContactFormComponent implements OnInit {
   removeEmail(index: number): void {
     if (this.emailsArray.length > 1) {
       const emailGroup = this.emailsArray.at(index);
-      const idEmail = emailGroup.get('idEmail');
+      const idEmail = emailGroup.get('idEmail')?.value;
       // Push to deleted array if it already existed
       if (idEmail != null) {
         const deletedEmails = this.contactForm.get('deletedEmails') as FormArray;
@@ -329,6 +329,13 @@ export class ContactFormComponent implements OnInit {
   }
   removePhone(index: number): void {
     if (this.phonesArray.length > 1) {
+      const phoneGroup = this.phonesArray.at(index);
+      const idPhone = phoneGroup.get('idPhone')?.value;
+      // Push to deleted array if it already existed
+      if (idPhone != null) {
+        const deletedPhones = this.contactForm.get('deletedPhones') as FormArray;
+        deletedPhones.push(this.fb.control(idPhone));
+      }
       this.phonesArray.removeAt(index);
     }
   }
@@ -346,8 +353,12 @@ export class ContactFormComponent implements OnInit {
     return null;
   }
 
+  disableFutureDates = (current: Date): boolean => {
+    return current > new Date();
+  };
 
   onSubmit() {
+    this.formUtils.trimFormStrControls(this.contactForm);
     if (this.contactForm.invalid) {
       this.formUtils.markFormTouched(this.contactForm);
       return;
