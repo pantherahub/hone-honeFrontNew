@@ -34,6 +34,9 @@ export class ContactFormComponent implements OnInit {
   savedEmails: any[] = [];
   savedPhones: any[] = [];
 
+  loading: boolean = false;
+  loadingSetupContactData: boolean = false;
+
   constructor(
     private modal: NzModalRef,
     private fb: FormBuilder,
@@ -62,9 +65,9 @@ export class ContactFormComponent implements OnInit {
     });
   }
 
-  loadFilteredContactOccupations() {
+  loadFilteredContactOccupations(occupationType: any, validateForm: boolean = false) {
     this.contactsProviderService.getOccupation(
-      this.selectedOccupationType,
+      occupationType,
       this.contactModelType
     ).subscribe({
       next: (res: any) => {
@@ -72,9 +75,11 @@ export class ContactFormComponent implements OnInit {
         if (data && data.length) {
           this.contactOccupations = data[0].Occupations;
         }
+        if (validateForm) this.formValidationsLoadData();
       },
       error: (err: any) => {
         console.error(err);
+        if (validateForm) this.formValidationsLoadData();
       }
     });
   }
@@ -129,12 +134,14 @@ export class ContactFormComponent implements OnInit {
     this.contactForm.get('idOccupationType')?.valueChanges
       .pipe(distinctUntilChanged())
       .subscribe((value) => {
+        if (this.loadingSetupContactData) return;
         this.onChangeContactType(value);
       });
 
     this.contactForm.get('idOccupation')?.valueChanges
       .pipe(distinctUntilChanged())
       .subscribe((value) => {
+        if (this.loadingSetupContactData) return;
         this.onChangeOccupation(value);
       });
 
@@ -146,6 +153,7 @@ export class ContactFormComponent implements OnInit {
       name: null,
       idOccupation: null
     });
+    this.contactOccupations = [];
 
     const nameControl = this.contactForm.get('name');
     const idOccupationControl = this.contactForm.get('idOccupation');
@@ -154,7 +162,6 @@ export class ContactFormComponent implements OnInit {
       nameControl?.clearValidators();
       nameControl?.updateValueAndValidity();
       this.identificationEnabled = false;
-      this.contactOccupations = [];
       idOccupationControl?.disable();
       return;
     }
@@ -169,14 +176,14 @@ export class ContactFormComponent implements OnInit {
       nameControl?.setValidators([Validators.required]);
       nameControl?.updateValueAndValidity();
     }
-    this.loadFilteredContactOccupations();
+    this.loadFilteredContactOccupations(newValue);
   }
 
   onChangeOccupation(newValue: any) {
-    // Legal representation
-    const idEnabled = newValue === 15;
-    if (idEnabled != this.identificationEnabled) {
-      this.identificationEnabled = idEnabled;
+    // Person and unique occupation
+    const enabled = newValue != null && this.getOccupation(newValue)?.unique && this.selectedOccupationType === 2;
+    if (enabled != this.identificationEnabled) {
+      this.identificationEnabled = enabled;
       this.updateIdentificationValidators();
     }
 
@@ -191,17 +198,62 @@ export class ContactFormComponent implements OnInit {
     this.setOccupationName(newValue);
   }
 
-  setOccupationName(idOccupation: any) {
-    const selectedOccupation = this.contactOccupations.find(
+  getOccupation(idOccupation: any) {
+    return this.contactOccupations.find(
       occupation => occupation.idOccupation === idOccupation
     );
+  }
+
+  setOccupationName(idOccupation: any) {
+    const selectedOccupation = this.getOccupation(idOccupation);
     this.contactForm.patchValue({
       occupationName: selectedOccupation?.occupation || ''
     });
   }
 
+  /**
+   * If the contact already comes, process name and identification fields.
+   */
+  formValidationsLoadData() {
+    const nameControl = this.contactForm.get('name');
+    const idOccupationControl = this.contactForm.get('idOccupation');
+    const selectedIdOccupation = idOccupationControl?.value;
+    let enabled = false;
+
+    // If it is a person
+    if (this.selectedOccupationType === 2) {
+      // Convert the name to required
+      nameControl?.setValidators([Validators.required]);
+      nameControl?.updateValueAndValidity();
+
+      if (selectedIdOccupation != null) {
+        let occupation = this.getOccupation(selectedIdOccupation);
+
+        const existingOccupation = this.contactModelType == 'Prestador'
+          ? this.contact.OccupationForProvider
+          : this.contact.OccupationForOffice;
+        if (!occupation && existingOccupation && selectedIdOccupation === existingOccupation.idOccupation) {
+          occupation = existingOccupation;
+        }
+
+        if (occupation) enabled = occupation.unique;
+      }
+    }
+    // Enable identification fields
+    if (enabled != this.identificationEnabled) {
+      this.identificationEnabled = enabled;
+      this.updateIdentificationValidators(false);
+    }
+    idOccupationControl?.enable();
+    this.loading = false;
+    this.loadingSetupContactData = false;
+  }
+
   loadContactData(): void {
     if (this.contact) {
+      this.loading = true;
+      this.loadingSetupContactData = true;
+
       const existingOccupation = this.contactModelType == 'Prestador'
         ? this.contact.OccupationForProvider
         : this.contact.OccupationForOffice;
@@ -218,6 +270,14 @@ export class ContactFormComponent implements OnInit {
         expeditionDate: this.contact.expeditionDate,
         idCityExpedition: this.contact.idCityExpedition,
       });
+    }
+
+    // Validate form and initialize change events
+    if (this.contact?.idOccupationType) {
+      this.loadFilteredContactOccupations(this.contact.idOccupationType, true);
+    } else {
+      this.loading = false;
+      this.loadingSetupContactData = false;
     }
 
     // Load emails
@@ -241,16 +301,18 @@ export class ContactFormComponent implements OnInit {
     }
   }
 
-  updateIdentificationValidators() {
+  updateIdentificationValidators(reset: boolean = true) {
     const idTypeDocumentControl = this.contactForm.get('idTypeDocument');
     const identificationControl = this.contactForm.get('identification');
     const expeditionDateControl = this.contactForm.get('expeditionDate');
     const idCityExpeditionControl = this.contactForm.get('idCityExpedition');
 
-    idTypeDocumentControl?.reset();
-    identificationControl?.reset();
-    expeditionDateControl?.reset();
-    idCityExpeditionControl?.reset();
+    if (reset) {
+      idTypeDocumentControl?.reset();
+      identificationControl?.reset();
+      expeditionDateControl?.reset();
+      idCityExpeditionControl?.reset();
+    }
 
     if (this.identificationEnabled) {
       idTypeDocumentControl?.setValidators([Validators.required]);
