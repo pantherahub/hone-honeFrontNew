@@ -107,7 +107,7 @@
               formControlName="idsCompanies"
               nzPlaceHolder="Seleccionar"
             >
-              <nz-option *ngFor="let company of companyList" [nzLabel]="company.name || ''" [nzValue]="company.idClientHoneSolutions"></nz-option>
+              <nz-option *ngFor="let company of companyList" [nzLabel]="company.name || ''" [nzValue]="company.idCompany"></nz-option>
             </nz-select>
             <ng-template #companyTagPlaceHolder let-selectedList>{{ selectedList.length }} más...</ng-template>
           </nz-form-control>
