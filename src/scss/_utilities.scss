@@ -42,7 +42,7 @@
 }
 
 .loading-overlay {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
@@ -52,6 +52,9 @@
   align-items: center;
   background: rgba(255, 255, 255, 0.8);
   z-index: 1050;
+  &.fixed {
+    position: fixed;
+  }
   nz-spin {
     width: 100%;
   }

@@ -1,5 +1,11 @@
 <form nz-form nzLayout="vertical" [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="contact-form">
 
+  @if (loading) {
+    <div class="loading-overlay">
+      <nz-spin [nzSize]="'large'" nzTip="Cargando..."></nz-spin>
+    </div>
+  }
+
   <div nz-row [nzGutter]="16">
 
     <nz-col [nzSpan]="24" [nzSm]="12">
