@@ -9,6 +9,7 @@ import { AdminLayoutComponent } from './views/admin-layout/admin-layout.componen
 import { ComplianceDocumentationComponent } from './modules/private/documents/compliance-documentation/compliance-documentation.component';
 import { ProviderAssistancessComponent } from './modules/public/provider-assistancess/provider-assistancess.component';
 import { TutorialVideoComponent } from './modules/private/tutorials/tutorial-video/tutorial-video.component';
+import { UpdateDataComponent } from './modules/private/update-data/update-data.component';
 
 export const routes: Routes = [
   //   PUBLIC ROUTES
@@ -43,6 +44,10 @@ export const routes: Routes = [
       {
         path: 'home',
         component: HomeComponent
+      },
+      {
+        path: 'update-data',
+        component: UpdateDataComponent
       },
       {
         path: 'cargar-documentos/:id',

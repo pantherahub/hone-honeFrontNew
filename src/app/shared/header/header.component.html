@@ -6,19 +6,12 @@
         </div>
         <div class="container-header-name-avatar" nz-col [nzXs]="12" [nzSm]="12" [nzMd]="12" [nzLg]="12">
             <div  nz-row nzJustify="center" class="user-section" [nzGutter]="[24,24]">
-
-                <!-- <button nz-button nz-popover nzPopoverTitle="Title" [(nzPopoverVisible)]="visible"
-                    (nzPopoverVisibleChange)="change($event)" nzPopoverTrigger="click"
-                    [nzPopoverContent]="contentTemplate" nzPopoverPlacement="bottom">
-
-                    <img src="../../../assets/img/user.png" alt="avatar">
-                </button> -->
-
-                <img src="../../../assets/img/user.png" alt="avatar" nz-popover [(nzPopoverVisible)]="visible"
-                    (nzPopoverVisibleChange)="change($event)" nzPopoverTrigger="click"
-                    [nzPopoverContent]="contentTemplate" nzPopoverPlacement="bottom"
-                    >
-                <span>{{user.name ? user.name : 'No reporta nombre'}}</span>
+                <div nz-popover [(nzPopoverVisible)]="visible"
+                (nzPopoverVisibleChange)="change($event)" nzPopoverTrigger="click"
+                [nzPopoverContent]="contentTemplate" nzPopoverPlacement="bottomLeft">
+                  <img src="../../../assets/img/user.png" alt="avatar">
+                  <span class="user-section__name">{{user.name ? user.name : 'No reporta nombre'}}</span>
+                </div>
             </div>
         </div>
     </div>
