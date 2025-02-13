@@ -9,6 +9,11 @@
 @import "scss/utilities";
 @import "scss/reset";
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
 :root{
   transition-duration: 0.3s;
   animation-duration: 0.3s;

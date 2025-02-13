@@ -1,61 +1,20 @@
-.container {
-    // background: rgba(0, 21, 41, 1);
-    // background-color: #5DBFBC66;
-    background-color: #ffffff;
-    color: #000;
-    height: 80px;
+.header-container {
+  box-shadow: 0px 0px 25.58px 0px #0000001A;
 }
 
 .user-section {
-    display: flex;
-    gap: 1rem;
-    justify-content: end;
-    width: 100%;
-
-    &__option {
-      // display: flex;
-      // flex-wrap: wrap;
-      // gap: 1rem;
-      // margin-right: 10px;
-      cursor: pointer;
-    }
-
     &__name {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      // max-width: 150px;
       max-width: 310px;
       display: inline-block;
     }
 }
 
-.row {
-    margin: 0 !important;
-    height: 100%;
-    border-bottom: 7px solid #4747c5;
-}
-
-.container-logo-hone {
-    position: relative;
-    display: flex;
-    top: -25px;
-
-}
-
-.logo-hone {
-    height: 95px;
-}
-
-.container-header-name-avatar{
-    position: relative !important;
-    display: flex;
-    top: -20px;
-}
-
-::ng-deep .custom-popover-br {
-  transform: translateX(10px) !important;
-}
+// ::ng-deep .custom-popover-br {
+//   transform: translateX(10px) !important;
+// }
 
 
 @media screen and (max-width: 768px) {
@@ -68,6 +27,7 @@
 
 @media screen and (max-width: 450px) {
   .user-section {
+    padding: 10px;
     &__name {
       display: none;
     }
