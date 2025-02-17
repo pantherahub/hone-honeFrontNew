@@ -10,7 +10,7 @@ ENVIRONMENT=${1:-"prod"}
 APP_FOLDER="prestadores"
 
 USER_DIR=$(echo "$HOME" | sed 's/\\/\\\\/g') # Escapar caracteres en Windows
-COMPILED_FOLDER="$USER_DIR/www/hone/fronts-compiled"
+COMPILED_FOLDER="$USER_DIR/www/hone-solutions-repos/fronts-compiled"
 
 # Usar nvm para seleccionar la versión de Node.js
 export PATH=$PATH:$USER_DIR/AppData/Roaming/nvm/v18.20.4/
