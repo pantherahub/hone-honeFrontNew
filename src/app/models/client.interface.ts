@@ -30,3 +30,11 @@ export interface DocumentInterface {
    dateAdd?: string;
    expirationDate?: string;
 }
+
+export interface CompanyInterface {
+  idCompany: number;
+  idClientHoneSolutions?: number | null;
+  name: string;
+  createdAt?: string;
+  updatedAt?: string;
+}

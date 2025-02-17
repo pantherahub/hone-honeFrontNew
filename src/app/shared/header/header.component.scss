@@ -12,8 +12,20 @@
     justify-content: end;
     width: 100%;
 
-    img {
-        cursor: pointer;
+    > div {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      cursor: pointer;
+    }
+
+    &__name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      // max-width: 150px;
+      max-width: 310px;
+      display: inline-block;
     }
 }
 
@@ -40,6 +52,18 @@
     top: -20px;
 }
 
-// .container-header{
-//     position: absolute;
-// }
+@media screen and (max-width: 768px) {
+  .user-section {
+    &__name {
+      max-width: 150px;
+    }
+  }
+}
+
+@media screen and (max-width: 450px) {
+  .user-section {
+    &__name {
+      display: none;
+    }
+  }
+}

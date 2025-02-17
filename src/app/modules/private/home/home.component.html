@@ -6,7 +6,9 @@
                 <h1 nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24">
                     Estimado Prestador, Bienvenido(a) a tu portal transaccional de actualización de documentos <br>
                 </h1>
-                <span nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24">{{user.name ? user.name : 'No report nombre'}}</span>
+                <span nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24">
+                  <b>{{user.name ? user.name : 'No reporta nombre'}}</b>
+                </span>
                 <p nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24">
                     Identificamos que tienes convenio con las siguientes compañías aliadas, por favor te invitamos a dar clic sobre el logo de la compañía en la que requieres actualizar documentos.
 
@@ -26,6 +28,12 @@
         <nz-spin nzSimple [nzSize]="'large'" nzTip="Cargando datos..."></nz-spin>
     </div>
     }
+
+    <div>
+      <button nz-button nzType="primary" [nzSize]="'large'" type="button" routerLink="/update-data">
+        <span nz-icon nzType="setting" nzTheme="outline"></span>Actualizar información
+      </button>
+    </div>
 
     @if (!loadingData) {
     <div class="container-grid">
@@ -47,7 +55,5 @@
         }
     </div> -->
     }
-
-
 
 </div>
