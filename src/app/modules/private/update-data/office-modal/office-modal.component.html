@@ -1,0 +1,156 @@
+<form nz-form nzLayout="vertical" [formGroup]="officeForm" (ngSubmit)="onSubmit()" class="office-form">
+  <div>
+
+    <div nz-row [nzGutter]="16">
+
+      <nz-col [nzSpan]="24" [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label [nzRequired]="true" nzFor="address">Dirección de atención de usuarios</nz-form-label>
+          <nz-form-control [nzErrorTip]="addressErrorTip">
+            <ng-template #addressErrorTip>
+              <p *ngIf="officeForm.controls['address'].hasError('required')">El campo es requerido.</p>
+            </ng-template>
+            <input nz-input id="address" formControlName="address" placeholder="Dirección" />
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+
+      <nz-col [nzSpan]="24" [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label [nzRequired]="true" nzFor="enableCode">Código habilitación</nz-form-label>
+          <nz-form-control [nzErrorTip]="enableCodeErrorTip">
+            <ng-template #enableCodeErrorTip>
+              <p *ngIf="officeForm.controls['enableCode'].hasError('required')">El campo es requerido.</p>
+            </ng-template>
+            <input nz-input id="enableCode" formControlName="enableCode" placeholder="Código" />
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+
+      <nz-col [nzSpan]="24" [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label [nzRequired]="true" nzFor="officeName">Nombre</nz-form-label>
+          <nz-form-control [nzErrorTip]="nameErrorTip">
+            <ng-template #nameErrorTip>
+              <p *ngIf="officeForm.controls['name'].hasError('required')">El campo es requerido.</p>
+            </ng-template>
+            <input nz-input id="officeName" formControlName="name" placeholder="Nombre" />
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+
+      <nz-col [nzSpan]="24" [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label [nzRequired]="true" nzFor="idCity">Ciudad</nz-form-label>
+          <nz-form-control nzErrorTip="El campo es requerido.">
+            <nz-select
+              id="idCity"
+              formControlName="idCity"
+              nzShowSearch
+              [nzShowArrow]="true"
+              nzPlaceHolder="Seleccionar"
+            >
+              <nz-option *ngFor="let city of cities" [nzValue]="city.idCity" [nzLabel]="city.city"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+
+      <nz-col [nzSpan]="24" [nzSm]="12">
+        <nz-form-item nz-row>
+          <nz-form-label nzFor="schedulingLink">Link de agendamiento</nz-form-label>
+          <nz-form-control [nzErrorTip]="schedulingLinkErrorTip">
+            <ng-template #schedulingLinkErrorTip>
+              <p *ngIf="officeForm.controls['schedulingLink'].hasError('invalidUrl')">Ingresa una url válida.</p>
+            </ng-template>
+            <input nz-input id="schedulingLink" formControlName="schedulingLink" placeholder="Link" />
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+
+      <nz-col [nzSpan]="24" [nzSm]="12">
+        <nz-form-item nz-row>
+          <nz-form-label [nzRequired]="true" nzFor="attentionDays">Días de atención</nz-form-label>
+          <nz-form-control [nzErrorTip]="attentionDaysErrorTip">
+            <ng-template #attentionDaysErrorTip>
+              <p *ngIf="officeForm.controls['attentionDays'].hasError('required')">El campo es requerido.</p>
+            </ng-template>
+            <input nz-input id="attentionDays" formControlName="attentionDays" placeholder="Días" />
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+
+      <nz-col [nzSpan]="24" [nzSm]="12">
+        <nz-form-item nz-row>
+          <nz-form-label [nzRequired]="true" nzFor="officeHours">Horario de atención</nz-form-label>
+          <nz-form-control [nzErrorTip]="officeHoursErrorTip">
+            <ng-template #officeHoursErrorTip>
+              <p *ngIf="officeForm.controls['officeHours'].hasError('required')">El campo es requerido.</p>
+            </ng-template>
+            <input nz-input id="officeHours" formControlName="officeHours" placeholder="Horario" />
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+
+      <nz-col [nzSpan]="24" [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label [nzRequired]="true" nzFor="idsCompanies">Compañías con convenio</nz-form-label>
+          <nz-form-control [nzErrorTip]="idsCompaniesErrorTip">
+            <ng-template #idsCompaniesErrorTip>
+              <p *ngIf="officeForm.controls['idsCompanies'].hasError('required')">El campo es requerido.</p>
+            </ng-template>
+            <nz-select
+              nzMode="multiple"
+              [nzMaxTagCount]="3"
+              nzAllowClear
+              [nzMaxTagPlaceholder]="companyTagPlaceHolder"
+              formControlName="idsCompanies"
+              nzPlaceHolder="Seleccionar"
+            >
+              <nz-option *ngFor="let company of companyList" [nzLabel]="company.name || ''" [nzValue]="company.idCompany"></nz-option>
+            </nz-select>
+            <ng-template #companyTagPlaceHolder let-selectedList>{{ selectedList.length }} más...</ng-template>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+
+    </div>
+
+    <!-- Contacts -->
+    <div>
+      <div class="table-head">
+        <h3 class="table-head__title">Contactos</h3>
+        <button nz-button nzType="primary" type="button" (click)="openContactModal()">Agregar nuevo</button>
+      </div>
+
+      <!-- Table -->
+      <div class="responsive-table">
+        <nz-table #contactTable nzSize="small" [nzData]="existingContacts" [nzPageSize]="contactPageSize" [nzPageIndex]="contactPage" (nzPageIndexChange)="contactPage = $event" [nzLoading]="loadingContacts" class="table">
+          <thead>
+            <tr>
+              <th>Área / Cargo</th>
+              <th>Nombre</th>
+              <th nzWidth="100px">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of contactTable.data; let i = index">
+              <td>{{ data.occupationName || data.OccupationForOffice?.occupation || '' }}</td>
+              <td>{{ data.name || 'N/A' }}</td>
+              <td class="table__action">
+                <button nz-button nzType="primary" type="button" (click)="openContactModal(getGlobalIndex(i))" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
+                <button nz-button nzDanger nzType="primary" type="button" (click)="deleteContact(getGlobalIndex(i))" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </div>
+    </div>
+
+  </div>
+  <div class="footer">
+    <button nz-button nzType="primary" type="submit">
+      {{ office ? 'Actualizar sede' : 'Agregar sede' }}
+    </button>
+  </div>
+</form>
