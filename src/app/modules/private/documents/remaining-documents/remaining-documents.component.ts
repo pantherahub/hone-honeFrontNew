@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { DocumentsCrudService } from '../../../../services/documents/documents-crud.service';
 import { DocumentInterface } from '../../../../models/client.interface';
 import { EventManagerService } from '../../../../services/events-manager/event-manager.service';
@@ -11,7 +11,7 @@ import { NzUploadFile } from 'ng-zorro-antd/upload';
 import { ProviderAssistanceComponent } from '../../../../shared/modals/provider-assistance/provider-assistance.component';
 
 import { FetchBackend } from '@angular/common/http';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FileValidatorDirective } from 'src/app/directives/file-validator.directive';
 
 @Component({
@@ -28,8 +28,11 @@ export class RemainingDocumentsComponent implements OnInit {
    loadingData: boolean = false;
 
    documentList: DocumentInterface[] = [];
+   formDocList: FormGroup[] = [];
 
    formDate!: FormGroup;
+
+   @ViewChildren('fileInput') fileInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
    constructor(
       private eventManager: EventManagerService,
@@ -60,6 +63,20 @@ export class RemainingDocumentsComponent implements OnInit {
       this.documentService.getDocumentsToUpload(idProvider, idTypeProvider, idClientHoneSolutions).subscribe({
          next: (res: any) => {
             this.documentList = res;
+            this.formDocList = res.map((item: DocumentInterface) =>
+              this.formBuilder.group({
+                file: [null, Validators.required],
+                fecha: [
+                  "",
+                  item.idTypeDocuments === 8 ||
+                  item.idTypeDocuments === 22 ||
+                  item.idTypeDocuments === 113 ||
+                  item.idTypeDocuments === 108
+                    ? [Validators.required]
+                    : [],
+                ],
+              })
+            );
             this.loadingData = false;
          },
          error: (error: any) => {
@@ -73,16 +90,29 @@ export class RemainingDocumentsComponent implements OnInit {
       const reader = new FileReader();
       reader.addEventListener('load', () => callback(reader.result!.toString()));
       reader.readAsDataURL(img);
-  }
+   }
+
+   triggerFileInput(index: number): void {
+      const fileInput = this.fileInputs.toArray()[index].nativeElement;
+      if (fileInput) {
+        fileInput.click();
+      }
+    }
+
 
    /**
     * Carga un archivo y lo envia al api de carga de documentos
     * @param event - evento del input que contiene el archivo para cargar
     * @param item - elemento de la lista para saber cual documento de carga ej (cedula, nit, rethus)
     */
-  loadFiles(file: any, item: any) {
+  loadFiles(file: any, item: any, index: number, autoUpload: boolean = false) {
       if (!file) return;
-      this.uploadDocuments(file, item);
+      this.formDocList[index].patchValue({
+        file: file
+      });
+      if (autoUpload) {
+        this.uploadDocuments(item, index);
+      }
     }
 
    /**
@@ -90,16 +120,18 @@ export class RemainingDocumentsComponent implements OnInit {
     * @param file - recibe el archivo para cargar
     * @param item - elemento de la lista para saber cual documento de carga ej (cedula, nit, rethus)
     */
-   uploadDocuments(file: any, item: any) {
-      const fechaForm = this.formDate.get("fecha")?.value;
+  uploadDocuments(item: any, index: number) {
+      const docForm = this.formDocList[index];
+      const fileForm = docForm.get("file")?.value;
+      const fechaForm = docForm.get("fecha")?.value;
 
       this.loadingData = true;
       const { idProvider } = this.clientSelected;
       const fileToUpload = new FormData();
-      fileToUpload.append('archivo', file);
+      fileToUpload.append('archivo', fileForm);
       const body: any = {
          posicion: 0,
-         nombre: file.name,
+         nombre: fileForm.name,
          documento: item.idTypeDocuments,
          nombredcoumentos: item.NameDocument,
          idUser: idProvider
@@ -123,7 +155,26 @@ export class RemainingDocumentsComponent implements OnInit {
          },
          complete: () => { }
       });
-   }
+  }
+
+  submitForm(index: number, item: DocumentInterface) {
+    const docForm = this.formDocList[index];
+    const file = docForm.get("file")?.value;
+    if (!file) {
+        this.createNotificacion("error", "Error", "Debe seleccionar un documento.");
+        return;
+    }
+    if (item.idTypeDocuments == 8 || item.idTypeDocuments == 22 || item.idTypeDocuments == 113 || item.idTypeDocuments == 108) {
+      const fechaControl = docForm.get("fecha");
+      fechaControl?.markAsTouched();
+      fechaControl?.updateValueAndValidity();
+
+      if (fechaControl?.invalid) {
+          return;
+      }
+  }
+    this.uploadDocuments(item, index);
+  }
 
    /**
     * Crea una notificacion de alerta
