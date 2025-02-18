@@ -229,7 +229,7 @@ export class UpdateDataComponent implements OnInit {
       nzCentered: true,
       nzClosable: true,
       nzWidth: '600px',
-      nzStyle: { 'max-width': '90%' }
+      nzStyle: { 'max-width': '90%', 'margin': '22px 0' }
     });
     const instanceModal = modalRef.getContentComponent();
     instanceModal.contactModelType = 'Prestador';
