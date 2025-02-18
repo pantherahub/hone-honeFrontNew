@@ -59,7 +59,7 @@
                                   </nz-form-control>
                                 </nz-form-item>
 
-                                <button style="margin-top: 0.5rem;" nz-button nzType="primary" type="button" [disabled]="formDocList[i].get('file')?.invalid" (click)="submitForm(i, item)">Subir</button>
+                                <button style="margin-top: 0.5rem;" nz-button nzType="primary" type="button" [disabled]="formDocList[i].get('file')?.invalid" (click)="submitForm(i, item); $event.stopPropagation()">Subir</button>
                             </div>
                         </form>
                     }
