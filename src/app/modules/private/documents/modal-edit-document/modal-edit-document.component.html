@@ -39,6 +39,9 @@
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
                         Fecha de Expedición
+                        <div *ngIf="documentType == 4 || documentType == 108 || documentType == 113" nz-tooltip [nzTooltipTitle]="getTooltipContent()" nzPlacement="top">
+                          <i nz-icon nzType="info-circle" nzTheme="fill" class="info-icon"></i>
+                        </div>
                     </nz-form-label>
 
                     <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
