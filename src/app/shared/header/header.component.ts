@@ -1,9 +1,11 @@
-import { Component, inject, OnInit, effect } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { NgZorroModule } from '../../ng-zorro.module';
 import { EventManagerService } from '../../services/events-manager/event-manager.service';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { TutorialService } from 'src/app/services/tutorial/tutorial.service';
+import { Subscription } from 'rxjs';
 
 @Component({
    selector: 'app-header',
@@ -12,31 +14,50 @@ import { RouterModule } from '@angular/router';
    templateUrl: './header.component.html',
    styleUrl: './header.component.scss'
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
   public eventManager = inject(EventManagerService);
   public authService = inject(AuthService);
   public user = this.eventManager.userLogged();
-  visible: boolean = false;
 
-  constructor () {
-    // effect(() => {
-    //    this.user = this.eventManager.userLogged();
-    // });
+  configTutorialVisible = false;
+
+  private tutorialSubscription!: Subscription;
+
+  constructor (
+    private tutorialService: TutorialService,
+    private router: Router
+  ) { }
+
+  ngOnInit(): void {
+    this.tutorialSubscription = this.tutorialService.stepIndex$.subscribe(step => {
+      if (!this.tutorialService.isTutorialFinished() && step === 2) {
+        this.showConfigTutorial();
+      } else {
+        this.configTutorialVisible = false;
+      }
+    });
   }
 
-  ngOnInit (): void {}
-
-  /**
-  * Hace visible el menú
-  */
-  clickMe (): void {
-    this.visible = false;
+  ngOnDestroy(): void {
+    this.tutorialSubscription.unsubscribe();
   }
 
-  change (value: boolean): void {}
+  showConfigTutorial() {
+    this.configTutorialVisible = true;
+  }
+
+  nextTutorialStep() {
+    this.configTutorialVisible = false;
+    this.tutorialService.nextStep();
+  }
+
+  navigateToUpdateData() {
+    this.nextTutorialStep();
+    this.router.navigate(['/update-data']);
+  }
 
   /**
-  * Llama el servicio de auth para cerrar sesión
+  * Calls the auth service to log out
   */
   logout () {
     this.authService.logout();

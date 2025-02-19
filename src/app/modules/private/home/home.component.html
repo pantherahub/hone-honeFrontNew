@@ -6,7 +6,7 @@
 
     <div class="flex flex-col gap-4 text-gray-950">
       <div class="flex flex-col gap-0.5 text-xl/6 font-extrabold">
-        <span>Estimada Institución Prestadora de Servicios de Salud</span>
+        <span>Estimado Prestador {{ user.name }}</span>
         <span>¡Bienvenido(a) a tu Portal Transaccional de Actualización de Documentos!</span>
       </div>
       <div class="text-lg/5">
@@ -80,35 +80,66 @@
       </div>
     } @else if (viewMode === 'grid') {
       <div class="grid gap-4 grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-        <div *ngFor="let item of filteredClients" (click)="changeOptionClient(item)" class="h-[410px] xs:h-[218.3px] flex flex-col gap-3 p-4 rounded-lg cursor-pointer bg-gray-50 text-black border-2 border-transparent hover:bg-gray-100 hover:border-gray-0 hover:shadow-[0px_16px_44px_0px_#0D0F1C1A] transition-shadow">
-          <div class="p-3.5 h-[346px] xs:h-[185.264px] overflow-hidden bg-gray-0">
-            <img class="w-full h-full object-contain" [src]="item.url ? item.url : defaultImageUrl" alt="">
+        @for (item of filteredClients; track item.idClientHoneSolutions; let i = $index) {
+          <div [ngClass]="{ 'tutorial-option-container': i === 0, 'active-tutorial': i === 0 && clientTutorialVisible }">
+            <div (click)="changeOptionClient(item)" class="h-[410px] xs:h-[218.3px] flex flex-col gap-3 p-4 rounded-lg cursor-pointer bg-gray-50 text-black border-2 border-transparent hover:bg-gray-100 hover:border-gray-0 hover:shadow-[0px_16px_44px_0px_#0D0F1C1A] transition-shadow"
+              [ngClass]="{ 'tutorial-option': i === 0 }"
+              nz-popover
+              [nzPopoverContent]="i === 0 ? popoverContent : undefined"
+              [nzPopoverVisible]="i === 0 ? clientTutorialVisible : false"
+              [nzPopoverTrigger]="null"
+              nzPopoverPlacement="bottomLeft"
+              nzPopoverOverlayClassName="tutorial-popover tutorial-popover__home-client">
+              <div class="p-3.5 h-[346px] xs:h-[185.264px] overflow-hidden bg-gray-0">
+                <img class="w-full h-full object-contain" [src]="item.url ? item.url : defaultImageUrl" alt="">
+              </div>
+              <div class="text-base/5 font-semibold text-center">
+                {{ item.clientHoneSolutions }}
+              </div>
+            </div>
           </div>
-          <div class="text-base/5 font-semibold text-center">
-            {{ item.clientHoneSolutions }}
-          </div>
-        </div>
+        }
       </div>
     } @else if (viewMode === 'list') {
       <div class="flex flex-col gap-4">
-        <div *ngFor="let item of filteredClients" (click)="changeOptionClient(item)" class="h-[98.95px] flex items-center gap-4 p-4 rounded-lg cursor-pointer bg-gray-50 text-black border-2 border-transparent hover:bg-gray-100 hover:border-gray-0 hover:shadow-[0px_16px_44px_0px_#0D0F1C1A] transition-shadow">
-          <div class="p-2 w-[67.3px] overflow-hidden bg-gray-0">
-            <img class="w-full h-full object-cover" [src]="item.url ? item.url : defaultImageUrl" alt="">
+        @for (item of filteredClients; track item.idClientHoneSolutions; let i = $index) {
+          <div class="tutorial-option-container" [ngClass]="{ 'active-tutorial': i === 0 && clientTutorialVisible }">
+            <div (click)="changeOptionClient(item)" class="h-[98.95px] flex items-center gap-4 p-4 rounded-lg cursor-pointer bg-gray-50 text-black border-2 border-transparent hover:bg-gray-100 hover:border-gray-0 hover:shadow-[0px_16px_44px_0px_#0D0F1C1A] transition-shadow"
+              [ngClass]="{ 'tutorial-option': i === 0 }"
+              nz-popover
+              [nzPopoverContent]="i === 0 ? popoverContent : undefined"
+              [nzPopoverVisible]="i === 0 ? clientTutorialVisible : false"
+              [nzPopoverTrigger]="null"
+              nzPopoverPlacement="bottomLeft"
+              nzPopoverOverlayClassName="tutorial-popover tutorial-popover__home-client">
+              <div class="p-2 w-[67.3px] overflow-hidden bg-gray-0">
+                <img class="w-full h-full object-cover" [src]="item.url ? item.url : defaultImageUrl" alt="">
+              </div>
+              <div class="text-base/5 font-semibold">
+                {{ item.clientHoneSolutions }}
+              </div>
+            </div>
           </div>
-          <div class="text-base/5 font-semibold">
-            {{ item.clientHoneSolutions }}
-          </div>
-        </div>
+        }
       </div>
     }
   </div>
 
 </div>
 
-<ng-template #videoModalTemplate let-modal>
-  <!-- <p>Este es un modal con contenido personalizado.</p>
-  <button nz-button nzType="primary" (click)="modal.close()">Cerrar</button> -->
+<button class="fixed bottom-4 right-4 sm:bottom-10 sm:right-10 bg-gray-0 hover:bg-gray-100 py-2 px-3 rounded-full sm:rounded-[2.5rem] flex gap-2" (click)="resetTutorial()">
+  <span class="hidden sm:block text-sm/4 font-bold text-gray-900">Visita guiada</span>
+  <div class="text-gray-700">
+    <svg class="w-[16px] h-[16px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+      <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm9.008-3.018a1.502 1.502 0 0 1 2.522 1.159v.024a1.44 1.44 0 0 1-1.493 1.418 1 1 0 0 0-1.037.999V14a1 1 0 1 0 2 0v-.539a3.44 3.44 0 0 0 2.529-3.256 3.502 3.502 0 0 0-7-.255 1 1 0 0 0 2 .076c.014-.398.187-.774.48-1.044Zm.982 7.026a1 1 0 1 0 0 2H12a1 1 0 1 0 0-2h-.01Z" clip-rule="evenodd"/>
+    </svg>
+  </div>
 
+</button>
+
+
+<!-- Tutorial video modal -->
+<ng-template #videoModalTemplate let-modal>
   <div class="video-load">
     <div class="video-container">
         <iframe src="https://www.youtube.com/embed/HNnISS31dPs" frameborder="0"
@@ -117,3 +148,29 @@
     </div>
   </div>
 </ng-template>
+
+
+<!-- Tutorial popover content -->
+<ng-template #popoverContent>
+  <div class="tutorial-popover__content flex flex-col gap-6">
+    <div class="flex flex-col gap-2.5 text-base/5 text-black">
+      <div class="flex justify-between items-center">
+        <h5 class="font-bold">Actualiza tus datos</h5>
+
+        <button type="button" class="p-2 rounded-[2.5rem]" (click)="nextTutorialStep()">
+          <svg class="w-[16px] h-[16px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/>
+          </svg>
+        </button>
+      </div>
+      <div class="font-regular">Cada aseguradora exige los datos actualizados para completar el proceso, para ello se debe hacer clic en el logo.</div>
+    </div>
+    <div class="flex justify-between items-center">
+      <span class="text-base/5 font-regular text-black">2 de 2</span>
+      <button type="button" class="py-2.5 px-5 rounded-[2.5rem] bg-main-blue1h text-gray-0 text-base/5 font-bold" (click)="nextTutorialStep()">Entendido</button>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Popover overlay -->
+<div *ngIf="clientTutorialVisible && filteredClients.length" class="tutorial-popover-overlay" (click)="nextTutorialStep()"></div>

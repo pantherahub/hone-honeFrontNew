@@ -12,10 +12,9 @@
     }
 }
 
-// ::ng-deep .custom-popover-br {
-//   transform: translateX(10px) !important;
-// }
-
+.tutorial-option-container.active-tutorial::before {
+  border-radius: 3rem;
+}
 
 @media screen and (max-width: 768px) {
   .user-section {

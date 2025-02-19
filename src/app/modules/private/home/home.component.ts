@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, TemplateRef, ViewChild, effect } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, TemplateRef, ViewChild, effect } from '@angular/core';
 import { ClientInterface } from '../../../models/client.interface';
 import { ClientProviderService } from '../../../services/clients/client-provider.service';
 
@@ -7,6 +7,8 @@ import { EventManagerService } from '../../../services/events-manager/event-mana
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { NzModalService } from 'ng-zorro-antd/modal';
+import { TutorialService } from 'src/app/services/tutorial/tutorial.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -15,7 +17,7 @@ import { NzModalService } from 'ng-zorro-antd/modal';
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
-export class HomeComponent implements OnInit, AfterViewInit {
+export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   user = this.eventManager.userLogged();
 
   viewMode: 'grid' | 'list' = 'grid';
@@ -27,10 +29,14 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   defaultImageUrl: string = '../../../../assets/img/no-foto.png';
 
+  clientTutorialVisible: boolean = false;
+
   @ViewChild('videoModalTemplate', { static: false }) videoModalTemplate!: TemplateRef<any>;
+  private tutorialSubscription!: Subscription;
 
   constructor (
     private clientService: ClientProviderService,
+    private tutorialService: TutorialService,
     private eventManager: EventManagerService,
     private router: Router,
     private modal: NzModalService
@@ -44,15 +50,17 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.modal.create({
-      nzTitle: 'Video presentación',
-      nzContent: this.videoModalTemplate,
-      nzFooter: null,
-      nzCentered: true,
-      nzWidth: '727px',
-      nzStyle: { 'max-width': '90%' },
-      nzClassName: 'video-modal'
+    this.tutorialSubscription = this.tutorialService.stepIndex$.subscribe(step => {
+      if (!this.tutorialService.isTutorialFinished()) {
+        this.startTutorial(step);
+      }
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.tutorialSubscription) {
+      this.tutorialSubscription.unsubscribe();
+    }
   }
 
   /**
@@ -102,5 +110,39 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.eventManager.getDataClient();
     // this.router.navigateByUrl(`/cargar-documentos/${item.idClientHoneSolutions}`);
     this.router.navigateByUrl(`/cumplimiento-documentos/${item.idClientHoneSolutions}`);
+  }
+
+
+  /* Tutorial */
+
+  startTutorial(step: number) {
+    if (step === 1) {
+      this.clientTutorialVisible = false;
+      const modalRef = this.modal.create({
+        nzTitle: 'Video presentación',
+        nzContent: this.videoModalTemplate,
+        nzFooter: null,
+        nzCentered: true,
+        nzWidth: '727px',
+        nzStyle: { 'max-width': '90%' },
+        nzClassName: 'video-modal'
+      });
+      modalRef.afterClose.subscribe((result: any) => {
+        this.tutorialService.nextStep();
+      });
+    } else if (step === 3) {
+      this.clientTutorialVisible = true;
+    } else {
+      this.clientTutorialVisible = false;
+    }
+  }
+
+  nextTutorialStep() {
+    this.clientTutorialVisible = false;
+    this.tutorialService.nextStep();
+  }
+
+  resetTutorial() {
+    this.tutorialService.resetTutorial();
   }
 }

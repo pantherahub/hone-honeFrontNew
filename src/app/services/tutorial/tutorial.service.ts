@@ -1,16 +1,18 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TutorialService {
+  private readonly INITIAL_STEP = 1;
   private readonly LAST_STEP = 3;
   private stepIndex = new BehaviorSubject<number>(this.getStoredStep());
   stepIndex$ = this.stepIndex.asObservable();
+  // stepIndex$ = this.stepIndex.asObservable().pipe(distinctUntilChanged());
 
   private getStoredStep(): number {
-    return Number(localStorage.getItem('tutorialStep')) || 1;
+    return Number(localStorage.getItem('tutorialStep')) || this.INITIAL_STEP;
   }
 
   private saveStep(step: number) {
@@ -22,7 +24,7 @@ export class TutorialService {
       this.finishTutorial();
       return;
     }
-    if (this.isTutorialFinished()) this.resetTutorial();
+    if (this.isTutorialFinished()) this.clearTutorial();
     this.stepIndex.next(step);
     this.saveStep(step);
   }
@@ -32,9 +34,14 @@ export class TutorialService {
     this.setStep(newStep);
   }
 
-  resetTutorial() {
+  private clearTutorial() {
     localStorage.removeItem('tutorialStep');
     localStorage.removeItem('tutorialFinished');
+  }
+
+  resetTutorial() {
+    this.clearTutorial();
+    this.setStep(this.INITIAL_STEP);
   }
 
   finishTutorial() {
