@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
@@ -21,7 +21,7 @@ import { BackendErrorsComponent } from 'src/app/shared/forms/backend-errors/back
   templateUrl: './update-data.component.html',
   styleUrl: './update-data.component.scss'
 })
-export class UpdateDataComponent implements OnInit {
+export class UpdateDataComponent implements OnInit, OnDestroy {
 
   user = this.eventManager.userLogged();
   providerForm!: FormGroup;
@@ -42,6 +42,8 @@ export class UpdateDataComponent implements OnInit {
   loading: boolean = false;
   backendError: any = null;
 
+  autoSaveInterval: any;
+
   constructor (
     private eventManager: EventManagerService,
     private fb: FormBuilder,
@@ -52,11 +54,86 @@ export class UpdateDataComponent implements OnInit {
     private clientProviderService: ClientProviderService
   ) { }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.providerForm = this.fb.group({});
     this.getIdentificationTypes();
 
     this.initializeForm();
+    const hasSavedState = await this.hasSavedState();
+
+    if (hasSavedState) {
+      this.restoreFormFromLocalStorage();
+    } else {
+      console.log("Not restored");
+      this.loadProviderData();
+      // this.initializeForm();
+    }
+
+    // this.restoreFormFromLocalStorage();
+    this.startAutoSave();
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.autoSaveInterval);
+  }
+
+  startAutoSave(): void {
+    this.autoSaveInterval = setInterval(() => {
+      this.saveFormToLocalStorage();
+    }, 20 * 1000); // 1 minuto
+  }
+  saveFormToLocalStorage(): void {
+    console.log("saveFormToLocalStorage");
+    if (this.providerForm.dirty) {
+      console.log("GUARDO");
+      const newState = {
+        formValue: this.providerForm.value,
+        existingOffices: this.existingOffices,
+        existingContacts: this.existingContacts
+      };
+      localStorage.setItem('formState', JSON.stringify(newState));
+      // localStorage.setItem('formState', JSON.stringify(this.providerForm.value));
+      // this.messageService.create('info', 'Formulario guardado.');
+    }
+  }
+  removeFormState() {
+    localStorage.removeItem('formState');
+  }
+  async hasSavedState(): Promise<boolean> {
+    console.log("hasSavedState");
+    const savedState = localStorage.getItem('formState');
+    if (savedState) {
+      console.log("hasSavedState.savedForm");
+      const confirmed = await this.alertService.confirm(
+        'Aviso', 'Se encontraron datos sin guardar de una sesión anterior. ¿Deseas continuar con estos datos?', {
+          nzOkText: 'Continuar',
+          nzCancelText: 'No',
+      });
+      if (!confirmed) {
+        this.removeFormState();
+        return false;
+      };
+      return true;
+    }
+    return false;
+  }
+  restoreFormFromLocalStorage() {
+    const storageState = localStorage.getItem('formState');
+    if (!storageState) return;
+    const state = JSON.parse(storageState);
+
+    const providerForm = state.formValue;
+    this.providerForm.patchValue({
+      email: providerForm.email,
+      name: providerForm.name,
+      languages: providerForm.languages,
+      idTypeDocument: providerForm.idTypeDocument,
+      identification: providerForm.identification,
+      website: providerForm.website
+    });
+    // this.providerForm.setValue(JSON.parse(savedForm));
+    // this.providerForm.patchValue(JSON.parse(savedForm));
+    // this.messageService.create('success', 'Se ha restaurado el formulario guardado.');
   }
 
   getIdentificationTypes() {
@@ -90,7 +167,7 @@ export class UpdateDataComponent implements OnInit {
       createdContacts: this.fb.array([]),
       deletedContacts: this.fb.array([])
     });
-    this.loadProviderData();
+    // this.loadProviderData();
   }
 
   loadProviderData(): void {
@@ -394,6 +471,7 @@ export class UpdateDataComponent implements OnInit {
     serviceMethod(this.providerForm.value).subscribe({
       next: (res: any) => {
         this.loading = false;
+        this.removeFormState();
         this.alertService.success('Enviado', 'Actualización enviada.');
         this.resetForm();
       },

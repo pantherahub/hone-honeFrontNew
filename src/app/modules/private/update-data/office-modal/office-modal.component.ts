@@ -105,6 +105,8 @@ export class OfficeModalComponent implements OnInit {
 
     // 3. Add new contacts (without idTemporalContact)
     this.existingContacts.push(...createdContacts);
+
+    console.log(this.officeForm.value);
   }
 
   loadContacts() {
@@ -152,9 +154,9 @@ export class OfficeModalComponent implements OnInit {
       officeHours: [this.office?.officeHours || '', [Validators.required]],
       idsCompanies : [this.getIdsCompanies(), [Validators.required]],
 
-      updatedContacts: this.fb.array([]),
-      createdContacts: this.fb.array([]),
-      deletedContacts: this.fb.array([])
+      updatedContacts: this.fb.array(this.office?.updatedContacts ?? []),
+      createdContacts: this.fb.array(this.office?.createdContacts ?? []),
+      deletedContacts: this.fb.array( this.office?.deletedContacts ?? [])
     });
 
     if (this.office) {
