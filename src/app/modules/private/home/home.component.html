@@ -1,8 +1,8 @@
-<div class="container py-4 sm:py-16 flex flex-col gap-8">
+<div class="container py-4 md:py-16 flex flex-col gap-8">
 
-  <div class="py-8 pl-6 sm:pl-60 pr-8 rounded-xl bg-blue2h-100 relative">
+  <div class="py-8 pl-6 md:pl-60 pr-8 rounded-xl bg-blue2h-100 relative">
     <img src="assets/img/home-welcome.png" alt="Imagen decorativa"
-    class="hidden sm:block absolute bottom-0 left-[27px]">
+    class="hidden md:block absolute bottom-0 left-[27px]">
 
     <div class="flex flex-col gap-4 text-gray-950">
       <div class="flex flex-col gap-0.5 text-xl/6 font-extrabold">
@@ -14,8 +14,8 @@
       </div>
       <div class="flex rounded-xl gap-2 py-2.5 px-4 bg-blue2h-50">
         <div class="py-2">
-          <svg class="w-[20px] h-[20px] text-gray-950" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-            <path fill-rule="evenodd" d="M8 10V7a4 4 0 1 1 8 0v3h1a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h1Zm2-3a2 2 0 1 1 4 0v3h-4V7Zm2 6a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0v-3a1 1 0 0 1 1-1Z" clip-rule="evenodd"/>
+          <svg width="20" height="20" class="text-gray-950">
+            <use xlink:href="/assets/icons/layout.svg#lock" />
           </svg>
         </div>
         <div class="flex flex-wrap gap-1.5 py-2 text-base/5">
@@ -31,8 +31,8 @@
 
       <div class="flex items-center gap-2 pt-3 pb-2.5 px-3 w-[364px] bg-gray-0 border border-gray-300 focus-within:border-blue-500 rounded-lg">
         <div class="text-gray-500">
-          <svg class="w-[18px] h-[18px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-            <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/>
+          <svg width="18" height="18">
+            <use xlink:href="/assets/icons/layout.svg#search" width="18" height="18" />
           </svg>
         </div>
         <input
@@ -43,8 +43,8 @@
           placeholder="Buscar"
         />
         <button *ngIf="searchQuery" (click)="clearSearch()" class="text-gray-500 hover:text-gray-700">
-          <svg class="w-[18px] h-[18px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/>
+          <svg width="18" height="18">
+            <use xlink:href="/assets/icons/alert.svg#close" width="18" height="18" />
           </svg>
         </button>
       </div>
@@ -57,8 +57,8 @@
             'bg-blue1h-700 text-gray-0': viewMode === 'grid',
             'text-gray-700 hover:bg-gray-100': viewMode !== 'grid'
           }">
-          <svg class="w-[20px] h-[20px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-            <path fill-rule="evenodd" d="M4.857 3A1.857 1.857 0 0 0 3 4.857v4.286C3 10.169 3.831 11 4.857 11h4.286A1.857 1.857 0 0 0 11 9.143V4.857A1.857 1.857 0 0 0 9.143 3H4.857Zm10 0A1.857 1.857 0 0 0 13 4.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 21 9.143V4.857A1.857 1.857 0 0 0 19.143 3h-4.286Zm-10 10A1.857 1.857 0 0 0 3 14.857v4.286C3 20.169 3.831 21 4.857 21h4.286A1.857 1.857 0 0 0 11 19.143v-4.286A1.857 1.857 0 0 0 9.143 13H4.857Zm10 0A1.857 1.857 0 0 0 13 14.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 21 19.143v-4.286A1.857 1.857 0 0 0 19.143 13h-4.286Z" clip-rule="evenodd"/>
+          <svg width="20" height="20">
+            <use xlink:href="/assets/icons/layout.svg#grid" />
           </svg>
         </button>
         <button type="button" (click)="setView('list')"
@@ -67,8 +67,8 @@
             'bg-blue1h-700 text-gray-0': viewMode === 'list',
             'text-gray-700 hover:bg-gray-100': viewMode !== 'list'
           }">
-          <svg class="w-[20px] h-[20px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-            <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M9 8h10M9 12h10M9 16h10M4.99 8H5m-.02 4h.01m0 4H5"/>
+          <svg width="20" height="20">
+            <use xlink:href="/assets/icons/layout.svg#list" />
           </svg>
         </button>
       </div>
@@ -82,13 +82,14 @@
       <div class="grid gap-4 grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
         @for (item of filteredClients; track item.idClientHoneSolutions; let i = $index) {
           <div [ngClass]="{ 'tutorial-option-container': i === 0, 'active-tutorial': i === 0 && clientTutorialVisible }">
-            <div (click)="changeOptionClient(item)" class="h-[410px] xs:h-[218.3px] flex flex-col gap-3 p-4 rounded-lg cursor-pointer bg-gray-50 text-black border-2 border-transparent hover:bg-gray-100 hover:border-gray-0 hover:shadow-[0px_16px_44px_0px_#0D0F1C1A] transition-shadow"
+            <div (click)="changeOptionClient(item, i === 0 ? clientTutorialVisible : false)" class="h-[410px] xs:h-[218.3px] flex flex-col gap-3 p-4 rounded-lg cursor-pointer bg-gray-50 text-black border-2 border-transparent hover:bg-gray-100 hover:border-gray-0 hover:shadow-[0px_16px_44px_0px_#0D0F1C1A] transition-shadow"
               [ngClass]="{ 'tutorial-option': i === 0 }"
               nz-popover
               [nzPopoverContent]="i === 0 ? popoverContent : undefined"
               [nzPopoverVisible]="i === 0 ? clientTutorialVisible : false"
               [nzPopoverTrigger]="null"
-              nzPopoverPlacement="bottomLeft"
+
+              [nzPopoverPlacement]="['bottomLeft', 'topLeft']"
               nzPopoverOverlayClassName="tutorial-popover tutorial-popover__home-client">
               <div class="p-3.5 h-[346px] xs:h-[185.264px] overflow-hidden bg-gray-0">
                 <img class="w-full h-full object-contain" [src]="item.url ? item.url : defaultImageUrl" alt="">
@@ -104,13 +105,14 @@
       <div class="flex flex-col gap-4">
         @for (item of filteredClients; track item.idClientHoneSolutions; let i = $index) {
           <div class="tutorial-option-container" [ngClass]="{ 'active-tutorial': i === 0 && clientTutorialVisible }">
-            <div (click)="changeOptionClient(item)" class="h-[98.95px] flex items-center gap-4 p-4 rounded-lg cursor-pointer bg-gray-50 text-black border-2 border-transparent hover:bg-gray-100 hover:border-gray-0 hover:shadow-[0px_16px_44px_0px_#0D0F1C1A] transition-shadow"
+            <div (click)="changeOptionClient(item, i === 0 ? clientTutorialVisible : false)" class="h-[98.95px] flex items-center gap-4 p-4 rounded-lg cursor-pointer bg-gray-50 text-black border-2 border-transparent hover:bg-gray-100 hover:border-gray-0 hover:shadow-[0px_16px_44px_0px_#0D0F1C1A] transition-shadow"
               [ngClass]="{ 'tutorial-option': i === 0 }"
               nz-popover
               [nzPopoverContent]="i === 0 ? popoverContent : undefined"
               [nzPopoverVisible]="i === 0 ? clientTutorialVisible : false"
               [nzPopoverTrigger]="null"
               nzPopoverPlacement="bottomLeft"
+              [nzPopoverPlacement]="['bottomLeft', 'topLeft']"
               nzPopoverOverlayClassName="tutorial-popover tutorial-popover__home-client">
               <div class="p-2 w-[67.3px] overflow-hidden bg-gray-0">
                 <img class="w-full h-full object-cover" [src]="item.url ? item.url : defaultImageUrl" alt="">
@@ -127,11 +129,11 @@
 
 </div>
 
-<button class="fixed bottom-4 right-4 sm:bottom-10 sm:right-10 bg-gray-0 hover:bg-gray-100 py-2 px-3 rounded-full sm:rounded-[2.5rem] flex gap-2" (click)="resetTutorial()">
-  <span class="hidden sm:block text-sm/4 font-bold text-gray-900">Visita guiada</span>
+<button class="fixed bottom-4 right-4 md:bottom-10 md:right-10 bg-gray-0 hover:bg-gray-100 py-2 px-3 rounded-full md:rounded-[2.5rem] flex gap-2" (click)="resetTutorial()">
+  <span class="hidden md:block text-sm/4 font-bold text-gray-900">Visita guiada</span>
   <div class="text-gray-700">
-    <svg class="w-[16px] h-[16px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-      <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm9.008-3.018a1.502 1.502 0 0 1 2.522 1.159v.024a1.44 1.44 0 0 1-1.493 1.418 1 1 0 0 0-1.037.999V14a1 1 0 1 0 2 0v-.539a3.44 3.44 0 0 0 2.529-3.256 3.502 3.502 0 0 0-7-.255 1 1 0 0 0 2 .076c.014-.398.187-.774.48-1.044Zm.982 7.026a1 1 0 1 0 0 2H12a1 1 0 1 0 0-2h-.01Z" clip-rule="evenodd"/>
+    <svg width="16" height="16">
+      <use xlink:href="/assets/icons/layout.svg#question-circle" width="16" height="16" />
     </svg>
   </div>
 
@@ -155,11 +157,11 @@
   <div class="tutorial-popover__content flex flex-col gap-6">
     <div class="flex flex-col gap-2.5 text-base/5 text-black">
       <div class="flex justify-between items-center">
-        <h5 class="font-bold">Actualiza tus datos</h5>
+        <h5 class="font-bold">Completa los datos</h5>
 
         <button type="button" class="p-2 rounded-[2.5rem]" (click)="nextTutorialStep()">
-          <svg class="w-[16px] h-[16px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/>
+          <svg width="16" height="16">
+            <use xlink:href="/assets/icons/alert.svg#close" width="16" height="16" />
           </svg>
         </button>
       </div>

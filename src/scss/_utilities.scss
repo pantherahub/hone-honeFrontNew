@@ -103,3 +103,13 @@
   }
 }
 
+@media (max-width: 576px) {
+  .tutorial-popover {
+    .ant-popover-inner {
+      &-content {
+        width: 330px !important;
+        max-width: 90vw;
+      }
+    }
+  }
+}

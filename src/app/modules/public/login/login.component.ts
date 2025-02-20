@@ -10,6 +10,7 @@ import { RecaptchaModule } from 'ng-recaptcha';
 import { environment } from 'src/environments/environment';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { ProviderTicketLoginComponent } from 'src/app/shared/modals/provider-ticket-login/provider-ticket-login.component';
+import { TutorialService } from 'src/app/services/tutorial/tutorial.service';
 
 @Component({
    selector: 'app-login',
@@ -35,6 +36,7 @@ export class LoginComponent implements OnInit {
     private formBuilder: FormBuilder,
     private notificationService: NzNotificationService,
     private modalService: NzModalService,
+    private tutorialService: TutorialService
   ) {
     this.createForm();
   }
@@ -83,6 +85,7 @@ export class LoginComponent implements OnInit {
     this.authService.login(payload).subscribe({
       next: (res: any) => {
         this.isSubmitData = false;
+        this.tutorialService.resetTutorial();
         this.router.navigateByUrl('home');
       },
       error: (error: any) => {

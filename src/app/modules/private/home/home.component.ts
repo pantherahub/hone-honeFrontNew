@@ -105,7 +105,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   /**
   * Redirecciona a la lista de documentos por cargar del cliente seleccionado
   */
-  changeOptionClient (item: any) {
+  changeOptionClient(item: any, activeTutorialStep: boolean = false) {
+    if (activeTutorialStep) this.nextTutorialStep();
     localStorage.setItem('clientSelected', JSON.stringify(item));
     this.eventManager.getDataClient();
     // this.router.navigateByUrl(`/cargar-documentos/${item.idClientHoneSolutions}`);
@@ -123,7 +124,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         nzContent: this.videoModalTemplate,
         nzFooter: null,
         nzCentered: true,
-        nzWidth: '727px',
+        nzWidth: '900px',
         nzStyle: { 'max-width': '90%' },
         nzClassName: 'video-modal'
       });

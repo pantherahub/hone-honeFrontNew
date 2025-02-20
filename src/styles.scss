@@ -1,17 +1,17 @@
 /* You can add global styles to this file, and also import other style files */
-
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
 /* Import ng-zorro styles */
 @import "../node_modules/ng-zorro-antd/style/index.min.css"; /* Import base styles */
 @import "../node_modules/ng-zorro-antd/button/style/index.min.css";  /* Import one component's styles */
-
 @import "assets/styles/global.scss";
-@import "scss/utilities";
-@import "scss/reset";
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@import "scss/utilities";
+@import "scss/reset";
 
 
 :root{

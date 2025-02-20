@@ -55,15 +55,8 @@
   width: 368px;
 }
 
-
-@media (max-width: 768px) {
-  .video-load {
-    width: 80%;
-  }
-}
-
-@media (max-width: 576px) {
-  .video-load {
-    width: 100%;
+@media (max-width: 380px) {
+  ::ng-deep .tutorial-popover__home-client .ant-popover-arrow {
+    left: 50%;
   }
 }

@@ -8,13 +8,13 @@
       overflow: hidden;
       text-overflow: ellipsis;
       max-width: 310px;
-      display: inline-block;
     }
 }
 
 .tutorial-option-container.active-tutorial::before {
   border-radius: 3rem;
 }
+
 
 @media screen and (max-width: 768px) {
   .user-section {
@@ -24,11 +24,22 @@
   }
 }
 
-@media screen and (max-width: 450px) {
-  .user-section {
-    padding: 10px;
-    &__name {
-      display: none;
+@media screen and (max-width: 576px) {
+  ::ng-deep .tutorial-popover__header-config {
+    .ant-popover-content  {
+      transform: translateX(5vw) !important;
+    }
+    padding-top: 2rem;
+    .ant-popover-arrow {
+      right: 38px;
+    }
+  }
+}
+
+@media screen and (max-width: 380px) {
+  ::ng-deep .tutorial-popover__header-config {
+    .ant-popover-arrow {
+      right: 50px;
     }
   }
 }
