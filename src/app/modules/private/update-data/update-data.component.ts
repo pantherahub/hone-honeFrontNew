@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzModalService } from 'ng-zorro-antd/modal';
@@ -49,7 +49,8 @@ export class UpdateDataComponent implements OnInit {
     private messageService: NzMessageService,
     private alertService: AlertService,
     private modalService: NzModalService,
-    private clientProviderService: ClientProviderService
+    private clientProviderService: ClientProviderService,
+    private location: Location
   ) { }
 
   ngOnInit(): void {
@@ -57,6 +58,10 @@ export class UpdateDataComponent implements OnInit {
     this.getIdentificationTypes();
 
     this.initializeForm();
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 
   getIdentificationTypes() {

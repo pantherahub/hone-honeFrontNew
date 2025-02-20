@@ -1,6 +1,6 @@
 <div class="header-container h-[97px] bg-gray-0 flex items-center justify-between py-4 px-5">
 
-    <img class="h-[65px]" src="assets/img/logo-hone.png" alt="Logo">
+    <img class="h-[65px] cursor-pointer" src="assets/img/logo-hone.png" alt="Logo" routerLink="/home">
 
     <div class="flex gap-1.5">
         <div class="tutorial-option-container" [ngClass]="{ 'active-tutorial': configTutorialVisible }">
@@ -33,7 +33,7 @@
   <div class="tutorial-popover__content flex flex-col gap-6">
     <div class="flex flex-col gap-2.5 text-base/5 text-black">
       <div class="flex justify-between items-center">
-        <h5 class="font-bold">Actualiza tus datos</h5>
+        <h5 class="font-bold">Actualizar información</h5>
 
         <button type="button" class="p-2 rounded-[2.5rem]" (click)="nextTutorialStep()">
           <svg width="16" height="16">
