@@ -1,56 +1,20 @@
-.container {
-    // background: rgba(0, 21, 41, 1);
-    // background-color: #5DBFBC66;
-    background-color: #ffffff;
-    color: #000;
-    height: 80px;
+.header-container {
+  box-shadow: 0px 0px 25.58px 0px #0000001A;
 }
 
 .user-section {
-    display: flex;
-    gap: 1rem;
-    justify-content: end;
-    width: 100%;
-
-    > div {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      cursor: pointer;
-    }
-
     &__name {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      // max-width: 150px;
       max-width: 310px;
-      display: inline-block;
     }
 }
 
-.row {
-    margin: 0 !important;
-    height: 100%;
-    border-bottom: 7px solid #4747c5;
+.tutorial-option-container.active-tutorial::before {
+  border-radius: 3rem;
 }
 
-.container-logo-hone {
-    position: relative;
-    display: flex;
-    top: -25px;
-
-}
-
-.logo-hone {
-    height: 95px;
-}
-
-.container-header-name-avatar{
-    position: relative !important;
-    display: flex;
-    top: -20px;
-}
 
 @media screen and (max-width: 768px) {
   .user-section {
@@ -60,10 +24,22 @@
   }
 }
 
-@media screen and (max-width: 450px) {
-  .user-section {
-    &__name {
-      display: none;
+@media screen and (max-width: 576px) {
+  ::ng-deep .tutorial-popover__header-config {
+    .ant-popover-content  {
+      transform: translateX(5vw) !important;
+    }
+    padding-top: 2rem;
+    .ant-popover-arrow {
+      right: 38px;
+    }
+  }
+}
+
+@media screen and (max-width: 380px) {
+  ::ng-deep .tutorial-popover__header-config {
+    .ant-popover-arrow {
+      right: 50px;
     }
   }
 }

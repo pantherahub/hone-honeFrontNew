@@ -1,59 +1,178 @@
-<div class="generalContainer">
-    <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[24,32]">
+<div class="container py-4 md:py-16 flex flex-col gap-8">
 
-        <div nz-col class="gutter-row">
-            <div nz-row nzJustify="center" class="banner-home">
-                <h1 nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24">
-                    Estimado Prestador, Bienvenido(a) a tu portal transaccional de actualización de documentos <br>
-                </h1>
-                <span nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24">
-                  <b>{{user.name ? user.name : 'No reporta nombre'}}</b>
-                </span>
-                <p nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24">
-                    Identificamos que tienes convenio con las siguientes compañías aliadas, por favor te invitamos a dar clic sobre el logo de la compañía en la que requieres actualizar documentos.
+  <div class="py-8 pl-6 md:pl-60 pr-8 rounded-xl bg-blue2h-100 relative">
+    <img src="assets/img/home-welcome.png" alt="Imagen decorativa"
+    class="hidden md:block absolute bottom-0 left-[27px]">
 
-                </p>
-                <br>
-                <p nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24">
-                    Recuerda que Hone Solutions es operador de varias compañías a nivel nacional y tu información se encuentra debidamente protegida según normativa vigente. Sí deseas actualizar información de los demás convenios puedes realizarlo solo dando clic en los logos disponibles a continuación.
-                </p>
-
-            </div>
+    <div class="flex flex-col gap-4 text-gray-950">
+      <div class="flex flex-col gap-0.5 text-xl/6 font-extrabold">
+        <span>Estimado Prestador {{ user.name }}</span>
+        <span>¡Bienvenido(a) a tu Portal Transaccional de Actualización de Documentos!</span>
+      </div>
+      <div class="text-lg/5">
+        Hemos identificado que cuentas con convenios activos con las siguientes compañías aliadas. Para actualizar tu documentación, solo haz clic en el logo de la empresa correspondiente.
+      </div>
+      <div class="flex rounded-xl gap-2 py-2.5 px-4 bg-blue2h-50">
+        <div class="py-2">
+          <svg width="20" height="20" class="text-gray-950">
+            <use xlink:href="/assets/icons/layout.svg#lock" />
+          </svg>
         </div>
+        <div class="flex flex-wrap gap-1.5 py-2 text-base/5">
+          <span class="font-extrabold">Tu información está segura:</span>
+          Hone Solutions opera a nivel nacional, garantizando la protección de tus datos conforme a la normativa vigente.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-4">
+    <div class="flex justify-between gap-5">
+
+      <div class="flex items-center gap-2 pt-3 pb-2.5 px-3 w-[364px] bg-gray-0 border border-gray-300 focus-within:border-blue-500 rounded-lg">
+        <div class="text-gray-500">
+          <svg width="18" height="18">
+            <use xlink:href="/assets/icons/layout.svg#search" width="18" height="18" />
+          </svg>
+        </div>
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          (input)="applyFilter()"
+          class="bg-transparent outline-none w-full text-sm leading-4 font-semibold text-gray-500"
+          placeholder="Buscar"
+        />
+        <button *ngIf="searchQuery" (click)="clearSearch()" class="text-gray-500 hover:text-gray-700">
+          <svg width="18" height="18">
+            <use xlink:href="/assets/icons/alert.svg#close" width="18" height="18" />
+          </svg>
+        </button>
+      </div>
+
+
+      <div class="flex gap-2">
+        <button type="button" (click)="setView('grid')"
+          class="p-2.5 rounded-full transition duration-200"
+          [ngClass]="{
+            'bg-blue1h-700 text-gray-0': viewMode === 'grid',
+            'text-gray-700 hover:bg-gray-100': viewMode !== 'grid'
+          }">
+          <svg width="20" height="20">
+            <use xlink:href="/assets/icons/layout.svg#grid" />
+          </svg>
+        </button>
+        <button type="button" (click)="setView('list')"
+          class="p-2.5 rounded-full transition duration-200 "
+          [ngClass]="{
+            'bg-blue1h-700 text-gray-0': viewMode === 'list',
+            'text-gray-700 hover:bg-gray-100': viewMode !== 'list'
+          }">
+          <svg width="20" height="20">
+            <use xlink:href="/assets/icons/layout.svg#list" />
+          </svg>
+        </button>
+      </div>
     </div>
 
     @if (loadingData) {
-
-    <div class="centerContent">
+      <div class="centerContent">
         <nz-spin nzSimple [nzSize]="'large'" nzTip="Cargando datos..."></nz-spin>
-    </div>
-    }
+      </div>
+    } @else if (viewMode === 'grid') {
+      <div class="grid gap-4 grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+        @for (item of filteredClients; track item.idClientHoneSolutions; let i = $index) {
+          <div [ngClass]="{ 'tutorial-option-container': i === 0, 'active-tutorial': i === 0 && clientTutorialVisible }">
+            <div (click)="changeOptionClient(item, i === 0 ? clientTutorialVisible : false)" class="h-[410px] xs:h-[218.3px] flex flex-col gap-3 p-4 rounded-lg cursor-pointer bg-gray-50 text-black border-2 border-transparent hover:bg-gray-100 hover:border-gray-0 hover:shadow-[0px_16px_44px_0px_#0D0F1C1A] transition-shadow"
+              [ngClass]="{ 'tutorial-option': i === 0 }"
+              nz-popover
+              [nzPopoverContent]="i === 0 ? popoverContent : undefined"
+              [nzPopoverVisible]="i === 0 ? clientTutorialVisible : false"
+              [nzPopoverTrigger]="null"
 
-    <div>
-      <button nz-button nzType="primary" [nzSize]="'large'" type="button" routerLink="/update-data">
-        <span nz-icon nzType="setting" nzTheme="outline"></span>Actualizar información
-      </button>
-    </div>
-
-    @if (!loadingData) {
-    <div class="container-grid">
-        @for (item of clientList; track $index) {
-        <div class="card-custom" (click)="changeOptionClient(item)">
-            <img [src]="item.url ? item.url : defaultImageUrl" alt="">
-            <span>{{ item.url ? '' : item.clientHoneSolutions}}</span>
-        </div>
-        }
-    </div>
-    <!-- <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[24,32]">
-        @for (item of clientList; track $index) {
-        <div nz-col [nzXs]="24" [nzSm]="12" [nzMd]="12" [nzLg]="12" class="gutter-row">
-            <div nz-row nzJustify="center" class="card-custom" (click)="changeOptionClient(item)">
-                <img nz-col [src]="item.url ? item.url : defaultImageUrl" alt="">
-                <span nz-col>{{ item.url ? '' : item.clientHoneSolutions}}</span>
+              [nzPopoverPlacement]="['bottomLeft', 'topLeft']"
+              nzPopoverOverlayClassName="tutorial-popover tutorial-popover__home-client">
+              <div class="p-3.5 h-[346px] xs:h-[185.264px] overflow-hidden bg-gray-0">
+                <img class="w-full h-full object-contain" [src]="item.url ? item.url : defaultImageUrl" alt="">
+              </div>
+              <div class="text-base/5 font-semibold text-center">
+                {{ item.clientHoneSolutions }}
+              </div>
             </div>
-        </div>
+          </div>
         }
-    </div> -->
+      </div>
+    } @else if (viewMode === 'list') {
+      <div class="flex flex-col gap-4">
+        @for (item of filteredClients; track item.idClientHoneSolutions; let i = $index) {
+          <div class="tutorial-option-container" [ngClass]="{ 'active-tutorial': i === 0 && clientTutorialVisible }">
+            <div (click)="changeOptionClient(item, i === 0 ? clientTutorialVisible : false)" class="h-[98.95px] flex items-center gap-4 p-4 rounded-lg cursor-pointer bg-gray-50 text-black border-2 border-transparent hover:bg-gray-100 hover:border-gray-0 hover:shadow-[0px_16px_44px_0px_#0D0F1C1A] transition-shadow"
+              [ngClass]="{ 'tutorial-option': i === 0 }"
+              nz-popover
+              [nzPopoverContent]="i === 0 ? popoverContent : undefined"
+              [nzPopoverVisible]="i === 0 ? clientTutorialVisible : false"
+              [nzPopoverTrigger]="null"
+              nzPopoverPlacement="bottomLeft"
+              [nzPopoverPlacement]="['bottomLeft', 'topLeft']"
+              nzPopoverOverlayClassName="tutorial-popover tutorial-popover__home-client">
+              <div class="p-2 w-[67.3px] overflow-hidden bg-gray-0">
+                <img class="w-full h-full object-cover" [src]="item.url ? item.url : defaultImageUrl" alt="">
+              </div>
+              <div class="text-base/5 font-semibold">
+                {{ item.clientHoneSolutions }}
+              </div>
+            </div>
+          </div>
+        }
+      </div>
     }
+  </div>
 
 </div>
+
+<button class="fixed bottom-4 right-4 md:bottom-10 md:right-10 bg-gray-0 hover:bg-gray-100 py-2 px-3 rounded-full md:rounded-[2.5rem] flex gap-2" (click)="resetTutorial()">
+  <span class="hidden md:block text-sm/4 font-bold text-gray-900">Visita guiada</span>
+  <div class="text-gray-700">
+    <svg width="16" height="16">
+      <use xlink:href="/assets/icons/layout.svg#question-circle" width="16" height="16" />
+    </svg>
+  </div>
+
+</button>
+
+
+<!-- Tutorial video modal -->
+<ng-template #videoModalTemplate let-modal>
+  <div class="video-load">
+    <div class="video-container">
+        <iframe src="https://www.youtube.com/embed/HNnISS31dPs" frameborder="0"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+    </div>
+  </div>
+</ng-template>
+
+
+<!-- Tutorial popover content -->
+<ng-template #popoverContent>
+  <div class="tutorial-popover__content flex flex-col gap-6">
+    <div class="flex flex-col gap-2.5 text-base/5 text-black">
+      <div class="flex justify-between items-center">
+        <h5 class="font-bold">Completa los datos</h5>
+
+        <button type="button" class="p-2 rounded-[2.5rem]" (click)="nextTutorialStep()">
+          <svg width="16" height="16">
+            <use xlink:href="/assets/icons/alert.svg#close" width="16" height="16" />
+          </svg>
+        </button>
+      </div>
+      <div class="font-regular">Cada aseguradora exige los datos actualizados para completar el proceso, para ello se debe hacer clic en el logo.</div>
+    </div>
+    <div class="flex justify-between items-center">
+      <span class="text-base/5 font-regular text-black">2 de 2</span>
+      <button type="button" class="py-2.5 px-5 rounded-[2.5rem] bg-main-blue1h text-gray-0 text-base/5 font-bold" (click)="nextTutorialStep()">Entendido</button>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Popover overlay -->
+<div *ngIf="clientTutorialVisible && filteredClients.length" class="tutorial-popover-overlay" (click)="nextTutorialStep()"></div>
