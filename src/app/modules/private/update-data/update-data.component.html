@@ -7,8 +7,14 @@
 <nz-row nzJustify="center">
   <nz-col [nzSpan]="24" [nzMd]="18" [nzXl]="12">
     <div class="update-data">
-      <div class="update-data__header">
-        <h2 class="update-data__header__title">Información prestador</h2>
+      <div class="update-data__header flex flex-col gap-2">
+        <button class="flex gap-1 items-center w-fit" nz-button nzType="primary" type="button" (click)="goBack()">
+          <svg width="20" height="20">
+            <use xlink:href="/assets/icons/layout.svg#arrow-left" />
+          </svg>
+          <span>Volver</span>
+        </button>
+        <h2 class="update-data__header__title text-center my-4">Información prestador</h2>
       </div>
 
       <form nz-form nzLayout="vertical" [formGroup]="providerForm" (ngSubmit)="onSubmit()">
@@ -126,7 +132,7 @@
 
             <!-- Table -->
             <div class="responsive-table">
-              <nz-table #officeTable [nzData]="existingOffices" [nzPageSize]="officePageSize" [nzPageIndex]="officePage" (nzPageIndexChange)="officePage = $event" class="table">
+              <nz-table #officeTable [nzData]="existingOffices" [nzPageSize]="officePageSize" [nzPageIndex]="officePage" (nzPageIndexChange)="officePage = $event" class="provider-table">
                 <thead>
                   <tr>
                     <th>Nombre</th>
@@ -140,7 +146,7 @@
                     <td>{{ data.name }}</td>
                     <td>{{ data.cityName || data.City?.city || '' }}</td>
                     <td>{{ data.address }}</td>
-                    <td class="table__action">
+                    <td class="provider-table__action">
                       <button nz-button nzType="primary" type="button" (click)="openOfficeModal(getGlobalIndex(i, officePage, officePageSize))" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
                       <button nz-button nzDanger nzType="primary" type="button" (click)="deleteOffice(getGlobalIndex(i, officePage, officePageSize))" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button>
                     </td>
@@ -158,7 +164,7 @@
 
             <!-- Table -->
              <div class="responsive-table">
-               <nz-table #contactTable [nzData]="existingContacts" [nzPageSize]="contactPageSize" [nzPageIndex]="contactPage" (nzPageIndexChange)="contactPage = $event" class="table">
+               <nz-table #contactTable [nzData]="existingContacts" [nzPageSize]="contactPageSize" [nzPageIndex]="contactPage" (nzPageIndexChange)="contactPage = $event" class="provider-table">
                  <thead>
                    <tr>
                      <th>Área / Cargo</th>
@@ -170,7 +176,7 @@
                    <tr *ngFor="let data of contactTable.data; let i = index">
                      <td>{{ data.occupationName || data.OccupationForProvider?.occupation || '' }}</td>
                      <td>{{ data.name || 'N/A' }}</td>
-                     <td class="table__action">
+                     <td class="provider-table__action">
                         <button nz-button nzType="primary" type="button" (click)="openContactModal(getGlobalIndex(i, contactPage, contactPageSize))" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
                         <button nz-button nzDanger nzType="primary" type="button" (click)="deleteContact(getGlobalIndex(i, contactPage, contactPageSize))" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button>
                      </td>

@@ -1,6 +1,6 @@
 <div class="layout">
     <header>
-        <div class="container">
+        <div class="compliance-container">
             <div class="user-data">
                 <span>
                     Cumplimiento documentación
@@ -23,7 +23,7 @@
                 @if(this.percentData.uploaded === 100){
                     <div class="container-img1" nz-row nzJustify="center" nzAlign="middle">
                     <img [src]=" '../../../../../assets/document-compliance/documentos.png' " alt="container-imgs">
-                    <span class="text-span">                        
+                    <span class="text-span">
                         <img [src]=" '../../../../../assets/document-compliance/agregar.png' " alt="container-imgs">
                         Documentos
                         <span class="percent" [style.color]=" '#08f610' ">
@@ -35,10 +35,10 @@
                     <div class="container-img1" nz-row nzJustify="center" nzAlign="middle">
                         <img [src]=" '../../../../../assets/document-compliance/documentos.png' " alt="container-imgs">
                         <span class="text-span">
-                            <img [src]=" '../../../../../assets/document-compliance/borrar.png' " alt="container-imgs">
+                            <img [src]=" '../../../../../assets/document-compliance/borrar.png' " alt="container-imgs" class="inline-block">
                             Documentos
                             <span class="percent" [style.color]=" '#f00816' ">
-                                {{this.percentData.uploaded}}%                                
+                                {{this.percentData.uploaded}}%
                             </span>
                         </span>
                     </div>
@@ -61,7 +61,7 @@
                         <img [src]=" '../../../../../assets/document-compliance/capacitacion.png' " alt="container-imgs"
                             nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
                         <span class="text-span">Capacitación
-                            <img [src]=" '../../../../../assets/document-compliance/borrar.png' " alt="container-imgs">
+                            <img [src]=" '../../../../../assets/document-compliance/borrar.png' " alt="container-imgs" class="inline-block">
                         </span>
                     </div>
                 }@else {
@@ -69,7 +69,7 @@
                         <img [src]=" '../../../../../assets/document-compliance/capacitacion.png' " alt="container-imgs"
                             nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
                         <span class="text-span">Capacitación
-                            <img [src]=" '../../../../../assets/document-compliance/agregar.png' " alt="container-imgs">
+                            <img [src]=" '../../../../../assets/document-compliance/agregar.png' " alt="container-imgs" class="inline-block">
                         </span>
                     </div>
                 }
@@ -112,7 +112,7 @@
     @if (!loadingData && this.percentData.uploaded === 100) {
     <section id="download-documents">
         <div class="download-documents" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-            <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
+            <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18" class="text-lg">
                 Tu proceso de documentación esta completo, queremos agradecer tu compromiso
             </h2>
 
@@ -130,7 +130,7 @@
     <section id="download-documents">
         <div class="download-documents" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
 
-            <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
+            <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18" class="text-lg">
                 Tu proceso aún no ha culminado. Agradecemos tu gran apoyo para poder culminar satisfactoriamente tu
                 vinculación - Actualización contractual
             </h2>
