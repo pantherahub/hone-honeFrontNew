@@ -75,6 +75,23 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
 
   subscribeOnChange() {
     this.formSubscription = this.providerForm.valueChanges.pipe(debounceTime(500)).subscribe(() => {
+      if (!this.providerForm.get('updatedBasicData')?.value) {
+        const keysToCheck = [
+          'name',
+          'email',
+          'languages',
+          'idTypeDocument',
+          'identification',
+          'website'
+        ];
+        // Check if any of these specific controls have changed
+        const updatedBasicData = keysToCheck.some(key => {
+          const control = this.providerForm.get(key);
+          return control?.dirty;
+        });
+        this.providerForm.patchValue({ updatedBasicData }, { emitEvent: false });
+      }
+
       this.saveFormToLocalStorage();
     });
   }
@@ -83,6 +100,45 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     if (this.formSubscription) {
       this.formSubscription.unsubscribe();
     }
+  }
+
+  initializeForm() {
+    this.providerForm = this.fb.group({
+      idProvider: [this.user.id],
+      startTime: [this.formatDate(new Date())],
+      endTime: [''],
+      email: [this.user.email || '', [Validators.required, this.formUtils.emailValidator]],
+      name: [this.user.name || '', [Validators.required]],
+      languages: [[], [Validators.required]],
+      idTypeDocument: ['', [Validators.required]],
+      identification: ['', [Validators.required, this.formUtils.numeric]],
+      website: ['', this.formUtils.url],
+
+      updatedBasicData: [false],
+
+      updatedOffices: this.fb.array([]),
+      createdOffices: this.fb.array([]),
+      deletedOffices: this.fb.array([]),
+
+      updatedContacts: this.fb.array([]),
+      createdContacts: this.fb.array([]),
+      deletedContacts: this.fb.array([])
+    });
+  }
+
+  goBack(): void {
+    this.location.back();
+  }
+
+  getIdentificationTypes() {
+    this.clientProviderService.getIdentificationTypes().subscribe({
+      next: (res: any) => {
+        this.identificationTypes = res;
+      },
+      error: (err: any) => {
+        console.error(err);
+      }
+    });
   }
 
   async loadFormData() {
@@ -104,16 +160,6 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       this.removeFormState();
     }
     this.loadProviderData();
-  }
-
-  isModifiedForm(): boolean {
-    const form = this.providerForm.value;
-    return form.updatedOffices.length
-      || form.createdOffices.length
-      || form.deletedOffices.length
-      || form.updatedContacts.length
-      || form.createdContacts.length
-      || form.deletedContacts.length;
   }
 
   saveFormToLocalStorage(): void {
@@ -150,6 +196,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       idTypeDocument: formState.idTypeDocument,
       identification: formState.identification,
       website: formState.website,
+      updatedBasicData: formState.updatedBasicData,
     });
     this.existingOffices = state.existingOffices;
     this.existingContacts = state.existingContacts;
@@ -180,43 +227,6 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
   private restoreFormArray(field: string, items: any[]) {
     const formArray = this.fb.array(items.map(item => this.fb.nonNullable.control(item)));
     this.providerForm.setControl(field, formArray);
-  }
-
-  goBack(): void {
-    this.location.back();
-  }
-
-  getIdentificationTypes() {
-    this.clientProviderService.getIdentificationTypes().subscribe({
-      next: (res: any) => {
-        this.identificationTypes = res;
-      },
-      error: (err: any) => {
-        console.error(err);
-      }
-    });
-  }
-
-  initializeForm() {
-    this.providerForm = this.fb.group({
-      idProvider: [this.user.id],
-      startTime: [this.formatDate(new Date())],
-      endTime: [''],
-      email: [this.user.email || '', [Validators.required, this.formUtils.emailValidator]],
-      name: [this.user.name || '', [Validators.required]],
-      languages: [[], [Validators.required]],
-      idTypeDocument: ['', [Validators.required]],
-      identification: ['', [Validators.required, this.formUtils.numeric]],
-      website: ['', this.formUtils.url],
-
-      updatedOffices: this.fb.array([]),
-      createdOffices: this.fb.array([]),
-      deletedOffices: this.fb.array([]),
-
-      updatedContacts: this.fb.array([]),
-      createdContacts: this.fb.array([]),
-      deletedContacts: this.fb.array([])
-    });
   }
 
   loadProviderData(): void {
