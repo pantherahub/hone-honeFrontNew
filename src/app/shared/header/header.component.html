@@ -45,7 +45,9 @@
     </div>
     <div class="flex justify-between items-center">
       <span class="text-base/5 font-regular text-black">1 de 2</span>
-      <button type="button" class="py-2.5 px-5 rounded-[2.5rem] bg-blue1h-100 hover:bg-blue1h-200 text-main-blue1h text-base/5 font-bold" (click)="nextTutorialStep()">Siguiente</button>
+      <button type="button" class="py-2.5 px-5 rounded-[2.5rem] bg-blue1h-100 hover:bg-blue1h-200 text-main-blue1h text-base/5 font-bold" (click)="nextTutorialStep()">
+        {{ this.user.withData ? 'Siguiente' : 'Ir' }}
+      </button>
     </div>
   </div>
 </ng-template>

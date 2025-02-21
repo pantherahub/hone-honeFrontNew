@@ -49,6 +49,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   nextTutorialStep() {
     this.configTutorialVisible = false;
     this.tutorialService.nextStep();
+    if (!this.user.withData) {
+      this.router.navigate(['/update-data']);
+    }
   }
 
   navigateToUpdateData() {

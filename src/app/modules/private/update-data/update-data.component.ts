@@ -13,7 +13,8 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { AlertService } from 'src/app/services/alerts/alert.service';
 import { format } from 'date-fns';
 import { BackendErrorsComponent } from 'src/app/shared/forms/backend-errors/backend-errors.component';
-import { debounceTime } from 'rxjs';
+import { debounceTime, firstValueFrom } from 'rxjs';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-update-data',
@@ -54,13 +55,14 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     private alertService: AlertService,
     private modalService: NzModalService,
     private clientProviderService: ClientProviderService,
-    private location: Location
+    private location: Location,
+    private authService: AuthService
   ) { }
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(): void {
     this.providerForm = this.fb.group({});
-    this.getIdentificationTypes();
 
+    this.getIdentificationTypes();
     this.initializeForm();
 
     this.loadFormData();
@@ -73,19 +75,21 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
 
   subscribeOnChange() {
     this.formSubscription = this.providerForm.valueChanges.pipe(debounceTime(500)).subscribe(() => {
-      // console.log("Cambio");
       this.saveFormToLocalStorage();
     });
   }
 
   unsubscribeForm() {
     if (this.formSubscription) {
-      // console.log("unsubscribeForm.OK");
       this.formSubscription.unsubscribe();
     }
   }
 
   async loadFormData() {
+    if (!this.user.withData) {
+      await firstValueFrom(this.alertService.info('Formulario requerido', 'Por favor, complete el formulario antes de continuar.').afterClose);
+    }
+
     const hasSavedState = this.hasSavedState();
     if (hasSavedState) {
       const confirmed = await this.alertService.confirm(
@@ -509,6 +513,10 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     this.messageService.remove();
     this.backendError = null;
 
+    if (!this.existingOffices?.length) {
+      this.alertService.warning('Aviso', 'Debe agregar al menos una sede.');
+      return;
+    }
     if (!this.existingContacts?.length) {
       this.alertService.warning('Aviso', 'Debe agregar al menos un contacto.');
       return;
@@ -528,6 +536,12 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     this.loading = true;
     serviceMethod(this.providerForm.value).subscribe({
       next: (res: any) => {
+        if (this.isFirstForm || !this.user.withData) {
+          const user = this.user;
+          user.withData = true;
+          this.authService.saveUserLogged(user);
+        }
+
         this.loading = false;
         this.alertService.success('Enviado', 'Actualización enviada.');
         this.resetForm();
