@@ -35,7 +35,7 @@
       <div class="flex justify-between items-center">
         <h5 class="font-bold">Actualizar información</h5>
 
-        <button type="button" class="p-2 rounded-[2.5rem]" (click)="nextTutorialStep()">
+        <button type="button" class="p-2 rounded-[2.5rem] bg-gray-0 hover:bg-gray-100" (click)="nextTutorialStep()">
           <svg width="16" height="16">
             <use xlink:href="/assets/icons/alert.svg#close" width="16" height="16" />
           </svg>
@@ -45,7 +45,9 @@
     </div>
     <div class="flex justify-between items-center">
       <span class="text-base/5 font-regular text-black">1 de 2</span>
-      <button type="button" class="py-2.5 px-5 rounded-[2.5rem] bg-blue1h-100 text-main-blue1h text-base/5 font-bold" (click)="nextTutorialStep()">Siguiente</button>
+      <button type="button" class="py-2.5 px-5 rounded-[2.5rem] bg-blue1h-100 hover:bg-blue1h-200 text-main-blue1h text-base/5 font-bold" (click)="nextTutorialStep()">
+        {{ this.user.withData ? 'Siguiente' : 'Ir' }}
+      </button>
     </div>
   </div>
 </ng-template>
