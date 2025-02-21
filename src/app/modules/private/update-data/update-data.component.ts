@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzModalService } from 'ng-zorro-antd/modal';
@@ -53,7 +53,8 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     private messageService: NzMessageService,
     private alertService: AlertService,
     private modalService: NzModalService,
-    private clientProviderService: ClientProviderService
+    private clientProviderService: ClientProviderService,
+    private location: Location
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -175,6 +176,10 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
   private restoreFormArray(field: string, items: any[]) {
     const formArray = this.fb.array(items.map(item => this.fb.nonNullable.control(item)));
     this.providerForm.setControl(field, formArray);
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 
   getIdentificationTypes() {

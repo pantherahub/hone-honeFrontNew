@@ -7,8 +7,14 @@
 <nz-row nzJustify="center">
   <nz-col [nzSpan]="24" [nzMd]="18" [nzXl]="12">
     <div class="update-data">
-      <div class="update-data__header">
-        <h2 class="update-data__header__title">Información prestador</h2>
+      <div class="update-data__header flex flex-col gap-2">
+        <button class="flex gap-1 items-center w-fit" nz-button nzType="primary" type="button" (click)="goBack()">
+          <svg width="20" height="20">
+            <use xlink:href="/assets/icons/layout.svg#arrow-left" />
+          </svg>
+          <span>Volver</span>
+        </button>
+        <h2 class="update-data__header__title text-center my-4">Información prestador</h2>
       </div>
 
       <form nz-form nzLayout="vertical" [formGroup]="providerForm" (ngSubmit)="onSubmit()">
