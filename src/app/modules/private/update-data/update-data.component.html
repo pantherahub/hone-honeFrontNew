@@ -17,7 +17,7 @@
         <h2 class="update-data__header__title text-center my-4">Información prestador</h2>
       </div>
 
-      <form nz-form nzLayout="vertical" [formGroup]="providerForm">
+      <form nz-form nzLayout="vertical" [formGroup]="providerForm" (ngSubmit)="onSubmit()">
         <div class="update-data__body">
 
           <div class="container-alerts">
@@ -191,7 +191,7 @@
         <app-backend-errors [error]="backendError"></app-backend-errors>
 
         <div class="update-data__footer">
-          <button nz-button nzType="primary" class="btn-primary" type="button" (click)="onSubmit()">Actualizar datos</button>
+          <button nz-button nzType="primary" class="btn-primary" type="submit" [disabled]="loading">Actualizar datos</button>
         </div>
       </form>
 
