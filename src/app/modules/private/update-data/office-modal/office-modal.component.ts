@@ -105,8 +105,6 @@ export class OfficeModalComponent implements OnInit {
 
     // 3. Add new contacts (without idTemporalContact)
     this.existingContacts.push(...createdContacts);
-
-    console.log(this.officeForm.value);
   }
 
   loadContacts() {
@@ -282,6 +280,11 @@ export class OfficeModalComponent implements OnInit {
     this.formUtils.trimFormStrControls(this.officeForm);
     if (this.officeForm.invalid) {
       this.formUtils.markFormTouched(this.officeForm);
+      return;
+    }
+
+    if (!this.existingContacts?.length) {
+      this.alertService.warning('Aviso', 'Debe agregar al menos un contacto.');
       return;
     }
 

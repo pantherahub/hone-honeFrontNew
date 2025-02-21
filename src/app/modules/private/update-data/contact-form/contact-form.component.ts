@@ -251,7 +251,6 @@ export class ContactFormComponent implements OnInit {
 
   loadContactData(): void {
     if (this.contact) {
-      console.log("contact:", this.contact);
       this.loading = true;
       this.loadingSetupContactData = true;
 
@@ -274,13 +273,13 @@ export class ContactFormComponent implements OnInit {
     }
 
     // Load deletedArrays
-    if (this.contact.deletedEmails) {
+    if (this.contact?.deletedEmails) {
       const deletedEmailsArray = this.contactForm.get('deletedEmails') as FormArray;
       this.contact.deletedEmails.forEach((emailId: string) => {
         deletedEmailsArray.push(this.fb.control(emailId));
       });
     }
-    if (this.contact.deletedPhones) {
+    if (this.contact?.deletedPhones) {
       const deletedPhonesArray = this.contactForm.get('deletedPhones') as FormArray;
       this.contact.deletedPhones.forEach((phoneId: string) => {
         deletedPhonesArray.push(this.fb.control(phoneId));
@@ -314,9 +313,6 @@ export class ContactFormComponent implements OnInit {
     } else {
       this.addPhone();
     }
-
-    console.log("RESET");
-    console.log(this.contactForm.value);
   }
 
   updateIdentificationValidators(reset: boolean = true) {
@@ -501,9 +497,6 @@ export class ContactFormComponent implements OnInit {
         expeditionDate: `${format(expeditionDate, 'yyyy-MM-dd')}T00:00:00`
       });
     }
-
-    console.log("SUBMITT");
-    console.log(this.contactForm.value);
 
     this.modal.close({
       contact: this.contactForm,

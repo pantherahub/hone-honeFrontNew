@@ -13,6 +13,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { AlertService } from 'src/app/services/alerts/alert.service';
 import { format } from 'date-fns';
 import { BackendErrorsComponent } from 'src/app/shared/forms/backend-errors/backend-errors.component';
+import { debounceTime } from 'rxjs';
 
 @Component({
   selector: 'app-update-data',
@@ -43,6 +44,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
   backendError: any = null;
 
   autoSaveInterval: any;
+  private formSubscription: any;
 
   constructor (
     private eventManager: EventManagerService,
@@ -59,60 +61,71 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     this.getIdentificationTypes();
 
     this.initializeForm();
-    const hasSavedState = await this.hasSavedState();
 
-    if (hasSavedState) {
-      this.restoreFormFromLocalStorage();
-    } else {
-      console.log("Not restored");
-      this.loadProviderData();
-      // this.initializeForm();
-    }
+    this.loadFormData();
 
-    // this.restoreFormFromLocalStorage();
-    this.startAutoSave();
   }
 
   ngOnDestroy(): void {
-    clearInterval(this.autoSaveInterval);
+    this.unsubscribeForm();
   }
 
-  startAutoSave(): void {
-    this.autoSaveInterval = setInterval(() => {
+  subscribeOnChange() {
+    this.formSubscription = this.providerForm.valueChanges.pipe(debounceTime(500)).subscribe(() => {
+      // console.log("Cambio");
       this.saveFormToLocalStorage();
-    }, 20 * 1000); // 1 minuto
+    });
   }
-  saveFormToLocalStorage(): void {
-    console.log("saveFormToLocalStorage");
-    if (this.providerForm.dirty) {
-      console.log("GUARDO");
-      const newState = {
-        formValue: this.providerForm.value,
-        existingOffices: this.existingOffices,
-        existingContacts: this.existingContacts
-      };
-      localStorage.setItem('formState', JSON.stringify(newState));
-      // localStorage.setItem('formState', JSON.stringify(this.providerForm.value));
-      // this.messageService.create('info', 'Formulario guardado.');
+
+  unsubscribeForm() {
+    if (this.formSubscription) {
+      // console.log("unsubscribeForm.OK");
+      this.formSubscription.unsubscribe();
     }
   }
-  removeFormState() {
-    localStorage.removeItem('formState');
-  }
-  async hasSavedState(): Promise<boolean> {
-    console.log("hasSavedState");
-    const savedState = localStorage.getItem('formState');
-    if (savedState) {
-      console.log("hasSavedState.savedForm");
+
+  async loadFormData() {
+    const hasSavedState = this.hasSavedState();
+    if (hasSavedState) {
       const confirmed = await this.alertService.confirm(
         'Aviso', 'Se encontraron datos sin guardar de una sesión anterior. ¿Deseas continuar con estos datos?', {
           nzOkText: 'Continuar',
           nzCancelText: 'No',
       });
-      if (!confirmed) {
-        this.removeFormState();
-        return false;
-      };
+      if (confirmed) {
+        this.restoreFormFromLocalStorage();
+        return;
+      }
+      this.removeFormState();
+    }
+    this.loadProviderData();
+  }
+
+  isModifiedForm(): boolean {
+    const form = this.providerForm.value;
+    return form.updatedOffices.length
+      || form.createdOffices.length
+      || form.deletedOffices.length
+      || form.updatedContacts.length
+      || form.createdContacts.length
+      || form.deletedContacts.length;
+  }
+
+  saveFormToLocalStorage(): void {
+    const newState = {
+      formValue: this.providerForm.value,
+      existingOffices: this.existingOffices,
+      existingContacts: this.existingContacts,
+      isFirstForm: this.isFirstForm
+    };
+    localStorage.setItem('formState', JSON.stringify(newState));
+  }
+  removeFormState() {
+    localStorage.removeItem('formState');
+  }
+  hasSavedState(): boolean {
+    const savedState = localStorage.getItem('formState');
+    if (savedState) {
       return true;
     }
     return false;
@@ -121,19 +134,47 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     const storageState = localStorage.getItem('formState');
     if (!storageState) return;
     const state = JSON.parse(storageState);
+    const formState = state.formValue;
 
-    const providerForm = state.formValue;
+    this.isFirstForm = state.isFirstForm;
     this.providerForm.patchValue({
-      email: providerForm.email,
-      name: providerForm.name,
-      languages: providerForm.languages,
-      idTypeDocument: providerForm.idTypeDocument,
-      identification: providerForm.identification,
-      website: providerForm.website
+      startTime: formState.startTime,
+      email: formState.email,
+      name: formState.name,
+      languages: formState.languages,
+      idTypeDocument: formState.idTypeDocument,
+      identification: formState.identification,
+      website: formState.website,
     });
-    // this.providerForm.setValue(JSON.parse(savedForm));
-    // this.providerForm.patchValue(JSON.parse(savedForm));
-    // this.messageService.create('success', 'Se ha restaurado el formulario guardado.');
+    this.existingOffices = state.existingOffices;
+    this.existingContacts = state.existingContacts;
+
+    ['createdOffices', 'updatedOffices', 'createdContacts', 'updatedContacts'].forEach(field => {
+      if (formState[field] && formState[field]?.length) {
+        this.restoreFormArray(field, formState[field]);
+      }
+    });
+
+    // Load deletedArrays
+    if (formState.deletedOffices) {
+      const deletedOfficesArray = this.providerForm.get('deletedOffices') as FormArray;
+      formState.deletedOffices.forEach((officeId: string) => {
+        deletedOfficesArray.push(this.fb.control(officeId));
+      });
+    }
+    if (formState.deletedContacts) {
+      const deletedContactsArray = this.providerForm.get('deletedContacts') as FormArray;
+      formState.deletedContacts.forEach((contactId: string) => {
+        deletedContactsArray.push(this.fb.control(contactId));
+      });
+    }
+
+    this.subscribeOnChange();
+  }
+
+  private restoreFormArray(field: string, items: any[]) {
+    const formArray = this.fb.array(items.map(item => this.fb.nonNullable.control(item)));
+    this.providerForm.setControl(field, formArray);
   }
 
   getIdentificationTypes() {
@@ -167,7 +208,6 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       createdContacts: this.fb.array([]),
       deletedContacts: this.fb.array([])
     });
-    // this.loadProviderData();
   }
 
   loadProviderData(): void {
@@ -176,7 +216,10 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       next: (res: any) => {
         const data = res.data;
         this.loading = false;
-        if (!data) return;
+        if (!data) {
+          this.subscribeOnChange();
+          return;
+        };
 
         this.isFirstForm = false;
 
@@ -207,6 +250,8 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
 
         this.existingOffices = data.TemporalOffices;
         this.existingContacts = data.TemporalContactsForProvider;
+
+        this.subscribeOnChange();
       },
       error: (err: any) => {
         this.loading = false;
@@ -424,6 +469,9 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
   }
 
   resetForm() {
+    this.unsubscribeForm();
+    this.removeFormState();
+
     this.providerForm.reset({
       idProvider: this.user.id,
       startTime: this.formatDate(new Date()),
@@ -456,6 +504,11 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     this.messageService.remove();
     this.backendError = null;
 
+    if (!this.existingContacts?.length) {
+      this.alertService.warning('Aviso', 'Debe agregar al menos un contacto.');
+      return;
+    }
+
     const website = this.providerForm.get('website')?.value;
     this.providerForm.patchValue({
       website: website || null,
@@ -471,7 +524,6 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     serviceMethod(this.providerForm.value).subscribe({
       next: (res: any) => {
         this.loading = false;
-        this.removeFormState();
         this.alertService.success('Enviado', 'Actualización enviada.');
         this.resetForm();
       },
