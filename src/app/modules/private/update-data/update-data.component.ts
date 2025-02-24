@@ -544,25 +544,28 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
         : this.clientProviderService.updateTemporalProviderForm(args);
 
     this.loading = true;
-    serviceMethod(this.providerForm.value).subscribe({
-      next: (res: any) => {
-        if (this.isFirstForm || !this.user.withData) {
-          const user = this.user;
-          user.withData = true;
-          this.authService.saveUserLogged(user);
-        }
 
-        this.loading = false;
-        this.alertService.success('Enviado', 'Actualización enviada.');
-        this.resetForm();
-      },
-      error: (err: any) => {
-        this.loading = false;
-        if (err.status == 422) this.backendError = err.error;
-        console.error(err);
-        this.alertService.error();
-      }
-    });
+    setTimeout(() => {
+      serviceMethod(this.providerForm.value).subscribe({
+        next: (res: any) => {
+          if (this.isFirstForm || !this.user.withData) {
+            const user = this.user;
+            user.withData = true;
+            this.authService.saveUserLogged(user);
+          }
+
+          this.loading = false;
+          this.alertService.success('Enviado', 'Actualización enviada.');
+          this.resetForm();
+        },
+        error: (err: any) => {
+          this.loading = false;
+          if (err.status == 422) this.backendError = err.error;
+          console.error(err);
+          this.alertService.error();
+        }
+      });
+    }, 550);
   }
 
 }

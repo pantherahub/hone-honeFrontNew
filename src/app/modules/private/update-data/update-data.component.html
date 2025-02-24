@@ -191,7 +191,7 @@
         <app-backend-errors [error]="backendError"></app-backend-errors>
 
         <div class="update-data__footer">
-          <button nz-button nzType="primary" class="btn-primary" type="submit">Actualizar datos</button>
+          <button nz-button nzType="primary" class="btn-primary" type="submit" [disabled]="loading">Actualizar datos</button>
         </div>
       </form>
 
