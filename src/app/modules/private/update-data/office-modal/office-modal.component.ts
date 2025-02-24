@@ -152,9 +152,9 @@ export class OfficeModalComponent implements OnInit {
       officeHours: [this.office?.officeHours || '', [Validators.required]],
       idsCompanies : [this.getIdsCompanies(), [Validators.required]],
 
-      updatedContacts: this.fb.array([]),
-      createdContacts: this.fb.array([]),
-      deletedContacts: this.fb.array([])
+      updatedContacts: this.fb.array(this.office?.updatedContacts ?? []),
+      createdContacts: this.fb.array(this.office?.createdContacts ?? []),
+      deletedContacts: this.fb.array( this.office?.deletedContacts ?? [])
     });
 
     if (this.office) {
@@ -280,6 +280,11 @@ export class OfficeModalComponent implements OnInit {
     this.formUtils.trimFormStrControls(this.officeForm);
     if (this.officeForm.invalid) {
       this.formUtils.markFormTouched(this.officeForm);
+      return;
+    }
+
+    if (!this.existingContacts?.length) {
+      this.alertService.warning('Aviso', 'Debe agregar al menos un contacto.');
       return;
     }
 

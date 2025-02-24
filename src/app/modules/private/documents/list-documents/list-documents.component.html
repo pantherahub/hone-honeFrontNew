@@ -1,7 +1,7 @@
 <div class="layout">
 
     <header>
-        <div class="container">
+        <div class="list-document-container">
             <div class="user-data">
                 <span>{{clientSelected.razonSocial ? clientSelected.razonSocial : ''}}</span>
                 <span>{{clientSelected.typeProvider ? clientSelected.typeProvider : ''}}</span>
@@ -9,7 +9,7 @@
                 <span>{{clientSelected.identificacion ? clientSelected.identificacion : ''}}</span>
             </div>
             <div class="logo">
-                <img [src]="clientSelected ? clientSelected.urlHeader : '../../../../../assets/img/logo-hone.png' "
+                <img [src]="clientSelected ? clientSelected.urlHeader : 'assets/img/logo-hone.png' "
                     alt="Logo">
             </div>
         </div>
@@ -22,7 +22,7 @@
             <div class="item-container-documents" nz-col [nzXs]="24" [nzSm]="24" [nzMd]="8" [nzLg]="8" [nzXl]="8"
                 [nzXXl]="8">
                 <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
+                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18" class="text-lg">
                         Documentos obligatorios a diligenciar (descargar)
                     </h2>
 
@@ -36,7 +36,7 @@
             <div class="item-container-documents" nz-col [nzXs]="24" [nzSm]="24" [nzMd]="6" [nzLg]="6" [nzXl]="6"
                 [nzXXl]="6">
                 <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18"  >
+                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18" class="text-lg">
                         Capacitación modelo de atención
                     </h2>
 
@@ -50,7 +50,7 @@
             <div class="item-container-documents" nz-col [nzXs]="24" [nzSm]="24" [nzMd]="6" [nzLg]="6" [nzXl]="6"
                 [nzXXl]="6" (click)="openContactsProvider()">
                 <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
+                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18" class="text-lg">
                         Representante legal
                     </h2>
 
@@ -73,7 +73,7 @@
             <div class="item-container-documents" nz-col [nzXs]="24" [nzSm]="24" [nzMd]="12" [nzLg]="12" [nzXl]="12"
                 [nzXXl]="12">
                 <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
+                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18" class="text-lg">
                         Documentos obligatorios a diligenciar (descargar)
                     </h2>
 
@@ -88,7 +88,7 @@
                 [nzXXl]="8">
                 <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
 
-                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18" >
+                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18" class="text-lg">
                         Capacitación modelo de atención
                     </h2>
 
@@ -111,7 +111,7 @@
             <div class="item-container-documents" nz-col [nzXs]="24" [nzSm]="24" [nzMd]="8" [nzLg]="8" [nzXl]="8"
                 [nzXXl]="8">
                 <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="14" [nzXXl]="14">
+                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="14" [nzXXl]="14" class="text-lg">
                         Documentos obligatorios a diligenciar (descargar)
                     </h2>
 
@@ -125,7 +125,7 @@
             <div class="item-container-documents" nz-col [nzXs]="24" [nzSm]="24" [nzMd]="6" [nzLg]="6" [nzXl]="6"
                 [nzXXl]="6" >
                 <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
+                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18" class="text-lg">
                         Documentos informativos
                     </h2>
 
@@ -140,7 +140,7 @@
             <div class="item-container-documents" nz-col [nzXs]="24" [nzSm]="24" [nzMd]="6" [nzLg]="6" [nzXl]="6"
                 [nzXXl]="6">
                 <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18"   >
+                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18" class="text-lg">
                         Capacitación modelo de atención
                     </h2>
 
@@ -164,7 +164,7 @@
             <div class="item-container-documents" nz-col [nzXs]="24" [nzSm]="24" [nzMd]="5" [nzLg]="5" [nzXl]="5"
                 [nzXXl]="12">
                 <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="16" [nzXXl]="16">
+                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="16" [nzXXl]="16" class="text-lg">
                         Tarifa 2024
                     </h2>
 
@@ -179,7 +179,7 @@
             <div class="item-container-documents" nz-col [nzXs]="24" [nzSm]="24" [nzMd]="8" [nzLg]="8" [nzXl]="8"
                 [nzXXl]="12">
                 <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
+                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18" class="text-lg">
                         Documentos obligatorios a diligenciar (descargar)
                     </h2>
 
@@ -193,7 +193,7 @@
             <div class="item-container-documents" nz-col [nzXs]="24" [nzSm]="24" [nzMd]="8" [nzLg]="8" [nzXl]="8"
                 [nzXXl]="8">
                 <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18"  >
+                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18" class="text-lg">
                         Capacitación modelo de atención
                     </h2>
 
@@ -225,7 +225,7 @@
                         <nz-progress nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
                             [nzPercent]="percentData.remaining" nzType="circle"
                             [nzStrokeColor]="'#FFA940'"></nz-progress>
-                        <button nz-col nz-button nzType="primary" class="btn-warning ml-3" [disabled]="false"
+                        <button nz-col nz-button nzType="primary" class="btn-warning" [disabled]="false"
                             nzJustify="center" nzAlign="middle">
                             Documentos Por Cargar
                         </button>
@@ -244,7 +244,7 @@
                             [nzPercent]="percentData.uploaded" nzType="circle"
                             [nzStrokeColor]="'#5B8C00'"></nz-progress>
 
-                        <button nz-col nz-button nzType="primary" class="btn-success ml-3" [disabled]="false"
+                        <button nz-col nz-button nzType="primary" class="btn-success" [disabled]="false"
                             nzJustify="center" nzAlign="middle">
                             Documentos Cargados
                         </button>
@@ -262,7 +262,7 @@
                         <nz-progress nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
                             [nzPercent]="percentData.expired" nzType="circle" [nzStrokeColor]="'#D4380D'"></nz-progress>
 
-                        <button nz-col nz-button nzType="primary" class="btn-danger ml-3" [disabled]="false"
+                        <button nz-col nz-button nzType="primary" class="btn-danger" [disabled]="false"
                             nzJustify="center" nzAlign="middle">
                             Documentos Vencidos
                         </button>
@@ -279,12 +279,12 @@
     <section id="download-documents">
         <div class="download-documents" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
 
-            <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18">
+            <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18" class="text-lg">
                 Deseas agregar documentos a otra empresa afiliada
             </h2>
 
             <div nz-col>
-                <button nz-button nzType="primary" class="btn-primary custom-btn ml-3" [disabled]="false"
+                <button nz-button nzType="primary" class="btn-primary custom-btn" [disabled]="false"
                     nzJustify="center" nzAlign="middle" (click)="navigateHome()">
                     Agregar
                 </button>

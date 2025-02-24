@@ -39,15 +39,9 @@ export class AuthService {
    }
 
    // Guarda en storage los datos del usuario logueado
-   private saveUserLogged (user: any) {
+   saveUserLogged (user: any) {
       localStorage.removeItem('userLogged');
-      const userLogged: any = {
-         id: user.id,
-         name: user.name,
-         email: user.email
-      };
       localStorage.setItem('userLogged', JSON.stringify(user));
-
       this.eventManager.userLogged.set(user);
    }
 

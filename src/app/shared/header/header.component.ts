@@ -1,43 +1,68 @@
-import { Component, inject, OnInit, effect } from '@angular/core';
-
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { NgZorroModule } from '../../ng-zorro.module';
 import { EventManagerService } from '../../services/events-manager/event-manager.service';
 import { AuthService } from '../../services/auth.service';
+import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
+import { TutorialService } from 'src/app/services/tutorial/tutorial.service';
+import { Subscription } from 'rxjs';
 
 @Component({
    selector: 'app-header',
    standalone: true,
-   imports: [ NgZorroModule ],
+   imports: [ NgZorroModule, CommonModule, RouterModule ],
    templateUrl: './header.component.html',
    styleUrl: './header.component.scss'
 })
-export class HeaderComponent implements OnInit {
-   public eventManager = inject(EventManagerService);
-   public authService = inject(AuthService);
-   public user = this.eventManager.userLogged();
-   visible: boolean = false;
+export class HeaderComponent implements OnInit, OnDestroy {
+  public eventManager = inject(EventManagerService);
+  public authService = inject(AuthService);
+  public user = this.eventManager.userLogged();
 
-   constructor () {
-      // effect(() => {
-      //    this.user = this.eventManager.userLogged();
-      // });
-   }
+  configTutorialVisible = false;
 
-   ngOnInit (): void {}
+  private tutorialSubscription!: Subscription;
 
-   /**
-    * Hace visible el menú
-    */
-   clickMe (): void {
-      this.visible = false;
-   }
+  constructor (
+    private tutorialService: TutorialService,
+    private router: Router
+  ) { }
 
-   change (value: boolean): void {}
+  ngOnInit(): void {
+    this.tutorialSubscription = this.tutorialService.stepIndex$.subscribe(step => {
+      if (!this.tutorialService.isTutorialFinished() && step === 2) {
+        this.showConfigTutorial();
+      } else {
+        this.configTutorialVisible = false;
+      }
+    });
+  }
 
-   /**
-    * Llama el servicio de auth para cerrar sesión
-    */
-   logout () {
-      this.authService.logout();
-   }
+  ngOnDestroy(): void {
+    this.tutorialSubscription.unsubscribe();
+  }
+
+  showConfigTutorial() {
+    this.configTutorialVisible = true;
+  }
+
+  nextTutorialStep() {
+    this.configTutorialVisible = false;
+    this.tutorialService.nextStep();
+    if (!this.user.withData) {
+      this.router.navigate(['/update-data']);
+    }
+  }
+
+  navigateToUpdateData() {
+    this.nextTutorialStep();
+    this.router.navigate(['/update-data']);
+  }
+
+  /**
+  * Calls the auth service to log out
+  */
+  logout() {
+    this.authService.logout();
+  }
 }
