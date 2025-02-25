@@ -188,7 +188,7 @@ export class RemainingDocumentsComponent implements OnInit {
 
   /**
     *
-    * @param current Bloquea las fechas antes de la fecha actual, habilita por 30 dias y bloquea fechas posterior
+    * @param current Bloquea las fechas antes de la fecha actual
     * @returns
     */
   disableDates = (current: Date): boolean => {
