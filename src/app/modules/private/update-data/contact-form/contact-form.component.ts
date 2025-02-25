@@ -272,6 +272,20 @@ export class ContactFormComponent implements OnInit {
       });
     }
 
+    // Load deletedArrays
+    if (this.contact?.deletedEmails) {
+      const deletedEmailsArray = this.contactForm.get('deletedEmails') as FormArray;
+      this.contact.deletedEmails.forEach((emailId: string) => {
+        deletedEmailsArray.push(this.fb.control(emailId));
+      });
+    }
+    if (this.contact?.deletedPhones) {
+      const deletedPhonesArray = this.contactForm.get('deletedPhones') as FormArray;
+      this.contact.deletedPhones.forEach((phoneId: string) => {
+        deletedPhonesArray.push(this.fb.control(phoneId));
+      });
+    }
+
     // Validate form and initialize change events
     if (this.contact?.idOccupationType) {
       this.loadFilteredContactOccupations(this.contact.idOccupationType, true);

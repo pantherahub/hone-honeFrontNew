@@ -8,7 +8,6 @@ import { NgModule } from '@angular/core';
 import { AdminLayoutComponent } from './views/admin-layout/admin-layout.component';
 import { ComplianceDocumentationComponent } from './modules/private/documents/compliance-documentation/compliance-documentation.component';
 import { ProviderAssistancessComponent } from './modules/public/provider-assistancess/provider-assistancess.component';
-import { TutorialVideoComponent } from './modules/private/tutorials/tutorial-video/tutorial-video.component';
 import { UpdateDataComponent } from './modules/private/update-data/update-data.component';
 
 export const routes: Routes = [
@@ -37,10 +36,6 @@ export const routes: Routes = [
     component: AdminLayoutComponent,
     canActivate: [authGuard],
 		children: [
-      {
-        path: 'tutorial',
-        component: TutorialVideoComponent
-      },
       {
         path: 'home',
         component: HomeComponent
