@@ -41,7 +41,9 @@
                                     @if (item.idTypeDocuments == 8 || item.idTypeDocuments == 22) {
                                         <nz-date-picker
                                             nzFormat="yyyy-MM-dd"
-                                            formControlName="fecha">
+                                            formControlName="fecha"
+                                            nzPlaceHolder="Vencimiento"
+                                            [nzDisabledDate]="disableDates">
                                         </nz-date-picker>
                                     }
                                   </nz-form-control>
