@@ -186,18 +186,14 @@ export class RemainingDocumentsComponent implements OnInit {
       this.notificationService.create(type, title, message);
    }
 
-
-   /**
+  /**
     *
-    * @param current Bloquea las fechas antes de la fecha actual, habilita por 30 dias y bloquea fechas posterior
+    * @param current Bloquea las fechas antes de la fecha actual
     * @returns
     */
-   disableDates = (current: Date): boolean => {
-      const today = new Date();
-      const maxDate = new Date();
-      maxDate.setDate(today.getDate() + 30);
-      return current < today || current > maxDate;
-   };
-
+  disableDates = (current: Date): boolean => {
+    const today = new Date();
+    return current < today;
+  };
 
 }

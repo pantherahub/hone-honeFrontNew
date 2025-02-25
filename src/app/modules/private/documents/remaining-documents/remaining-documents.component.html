@@ -25,7 +25,7 @@
 
             <div class="container-grid">
                 @for (item of documentList; track item; let i = $index) {
-                    @if (item.idTypeDocuments == 8 || item.idTypeDocuments == 22 || item.idTypeDocuments == 113 || item.idTypeDocuments == 108) {
+                    @if (item.idTypeDocuments == 8 || item.idTypeDocuments == 22) {
 
                         <form nz-form nz-row [formGroup]="formDocList[i]" class="form-documentList" nzJustify="center" nzAlign="bottom">
                             <div class="custom-file-upload" (click)="triggerFileInput(i)">
@@ -35,25 +35,15 @@
                                 {{ item.NameDocument }}
                               </label>
 
-
-                                <!-- Input tipo fecha para Certificación bancaria y Certificado de existencia y representación legal (Cámara de comercio) -->
                                 <nz-form-item style="margin: 0;">
                                   <nz-form-control [nzErrorTip]="'El campo es requerido.'" [nzValidateStatus]="formDocList[i].get('fecha') || 'success'">
-                                    @if (item.idTypeDocuments == 113 || item.idTypeDocuments == 108) {
-                                        <nz-date-picker
-                                            nzFormat="yyyy-MM-dd"
-                                            nzPlaceHolder="Vencimiento"
-                                            [nzDisabledDate]="disableDates"
-                                            formControlName="fecha">
-                                        </nz-date-picker>
-                                        <!-- <p style="color: red; font-size: 11px; text-align: justify;" >El documento No puede ser mayor a 30 días de la fecha de expedición.</p> -->
-
-                                    }
                                     <!-- Input tipo fecha normal para Habilitación (REPS)	y Poliza de Responsabilidad civil -->
                                     @if (item.idTypeDocuments == 8 || item.idTypeDocuments == 22) {
                                         <nz-date-picker
                                             nzFormat="yyyy-MM-dd"
-                                            formControlName="fecha">
+                                            formControlName="fecha"
+                                            nzPlaceHolder="Vencimiento"
+                                            [nzDisabledDate]="disableDates">
                                         </nz-date-picker>
                                     }
                                   </nz-form-control>
