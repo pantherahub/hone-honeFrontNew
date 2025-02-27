@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { CitiesService } from 'src/app/services/cities/cities.service';
@@ -142,7 +142,7 @@ export class OfficeModalComponent implements OnInit {
       idTemporalOfficeProvider: [this.office?.idTemporalOfficeProvider || null],
       idAddedTemporal: [this.office?.idTemporalOfficeProvider ? null : this.office?.idAddedTemporal ?? Date.now().toString()],
       address: [this.office?.address || '', [Validators.required]],
-      enableCode: [this.office?.enableCode || '', [Validators.required]],
+      enableCode: [this.office?.enableCode || '', [Validators.required, this.formUtils.numeric, this.enableCodeValidator]],
       name: [this.office?.name || '', [Validators.required]],
       idCity: [this.office?.idCity || '', [Validators.required]],
       cityName: [this.office?.cityName || this.office?.City?.city || ''],
@@ -171,6 +171,14 @@ export class OfficeModalComponent implements OnInit {
           cityName: selectedCity ? selectedCity.city : ''
         });
       });
+  }
+
+  enableCodeValidator(control: AbstractControl) {
+    if (!control || !control.value) return null;
+    if (control.value.length !== 10) {
+      return { invalidLength: 'Debe ser de 10 dígitos.' };
+    }
+    return null;
   }
 
   get updatedContacts() {
@@ -288,9 +296,9 @@ export class OfficeModalComponent implements OnInit {
       return;
     }
 
-    const schedulingLink = this.officeForm.get('schedulingLink')?.value;
+    const schedulingLink = this.officeForm.get('schedulingLink')?.value?.toLowerCase() || null;
     this.officeForm.patchValue({
-      schedulingLink: schedulingLink || null
+      schedulingLink: schedulingLink
     });
 
     this.modal.close({
