@@ -146,16 +146,17 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       await firstValueFrom(this.alertService.info('Formulario requerido', 'Por favor, complete el formulario antes de continuar.').afterClose);
     }
 
-    const hasSavedState = this.hasSavedState();
-    if (hasSavedState) {
-      const confirmed = await this.alertService.confirm(
-        'Aviso', 'Se encontraron datos sin guardar de una sesión anterior. ¿Deseas continuar con estos datos?', {
-          nzOkText: 'Continuar',
-          nzCancelText: 'No',
-      });
-      if (confirmed) {
-        this.restoreFormFromLocalStorage();
-        return;
+    if (this.hasSavedState()) {
+      if (!this.user.rejected) {
+        const confirmed = await this.alertService.confirm(
+          'Aviso', 'Se encontraron datos sin guardar de una sesión anterior. ¿Deseas continuar con estos datos?', {
+            nzOkText: 'Continuar',
+            nzCancelText: 'No',
+        });
+        if (confirmed) {
+          this.restoreFormFromLocalStorage();
+          return;
+        }
       }
       this.removeFormState();
     }
@@ -271,6 +272,14 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
         this.existingContacts = data.TemporalContactsForProvider;
 
         this.subscribeOnChange();
+
+        const user = this.user;
+        user.rejected = false;
+        if (data.status === "Rechazado") {
+          user.rejected = true;
+          this.alertService.warning('Actualización requerida', `Motivo: ${data.reason}`);
+        }
+        this.authService.saveUserLogged(user);
       },
       error: (err: any) => {
         this.loading = false;
