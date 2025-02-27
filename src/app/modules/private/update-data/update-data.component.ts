@@ -541,9 +541,9 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const website = this.providerForm.get('website')?.value;
+    const website = this.providerForm.get('website')?.value?.toLowerCase() || null;
     this.providerForm.patchValue({
-      website: website || null,
+      website: website,
       endTime: this.formatDate(new Date())
     });
 
