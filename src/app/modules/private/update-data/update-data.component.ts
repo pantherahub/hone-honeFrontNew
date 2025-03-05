@@ -273,13 +273,9 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
 
         this.subscribeOnChange();
 
-        const user = this.user;
-        user.rejected = false;
-        if (data.status === "Rechazado" && data.Reasons.length) {
-          user.rejected = true;
+        if (this.user.rejected && data.status === "Rechazado" && data.Reasons.length) {
           this.alertService.warning('Actualización requerida', `Motivo: ${data.Reasons[0].reason}`);
         }
-        this.authService.saveUserLogged(user);
       },
       error: (err: any) => {
         this.loading = false;
@@ -557,12 +553,12 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       serviceMethod(this.providerForm.value).subscribe({
         next: (res: any) => {
+          const user = this.user;
+          user.rejected = false;
           if (this.isFirstForm || !this.user.withData) {
-            const user = this.user;
             user.withData = true;
-            user.rejected = false;
-            this.authService.saveUserLogged(user);
           }
+          this.authService.saveUserLogged(user);
 
           this.loading = false;
           this.alertService.success('Enviado', 'Actualización enviada.');
