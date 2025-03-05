@@ -1,6 +1,6 @@
 import { CommonModule, Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
@@ -82,6 +82,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
           'languages',
           'idTypeDocument',
           'identification',
+          'dv',
           'website'
         ];
         // Check if any of these specific controls have changed
@@ -112,6 +113,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       languages: [[], [Validators.required]],
       idTypeDocument: ['', [Validators.required]],
       identification: ['', [Validators.required, this.formUtils.numeric]],
+      dv: [null, [this.dvValidator]],
       website: ['', this.formUtils.url],
 
       updatedBasicData: [false],
@@ -124,6 +126,18 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       createdContacts: this.fb.array([]),
       deletedContacts: this.fb.array([])
     });
+
+    this.providerForm.get('idTypeDocument')?.valueChanges.subscribe(value => {
+      if (value === 6) this.providerForm.patchValue({ dv: null });
+    });
+  }
+
+  dvValidator(control: AbstractControl) {
+    if (!control.value) return null;
+    if (control.value < 0 || control.value > 9) {
+      return { invalidDigit: 'Debe ser un número entre 0 y 9.' };
+    }
+    return null;
   }
 
   goBack(): void {
@@ -196,6 +210,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       languages: formState.languages,
       idTypeDocument: formState.idTypeDocument,
       identification: formState.identification,
+      dv: formState.dv,
       website: formState.website,
       updatedBasicData: formState.updatedBasicData,
     });
@@ -265,6 +280,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
           languages: languages,
           idTypeDocument: data.idTypeDocument,
           identification: data.identification,
+          dv: data.dv,
           website: data.website
         });
 
@@ -505,6 +521,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       languages: [],
       idTypeDocument: '',
       identification: '',
+      dv: null,
       website: ''
     });
     this.formUtils.clearFormArray(this.updatedOffices);

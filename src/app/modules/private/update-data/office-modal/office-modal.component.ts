@@ -175,8 +175,9 @@ export class OfficeModalComponent implements OnInit {
 
   enableCodeValidator(control: AbstractControl) {
     if (!control || !control.value) return null;
-    if (control.value.length !== 10) {
-      return { invalidLength: 'Debe ser de 10 dígitos.' };
+    const length = control.value.length;
+    if (length < 9 || length > 12) {
+      return { invalidLength: 'Debe tener entre 9 y 12 dígitos.' };
     }
     return null;
   }
