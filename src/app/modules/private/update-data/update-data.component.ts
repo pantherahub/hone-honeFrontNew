@@ -275,9 +275,9 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
 
         const user = this.user;
         user.rejected = false;
-        if (data.status === "Rechazado") {
+        if (data.status === "Rechazado" && data.Reasons.length) {
           user.rejected = true;
-          this.alertService.warning('Actualización requerida', `Motivo: ${data.reason}`);
+          this.alertService.warning('Actualización requerida', `Motivo: ${data.Reasons[0].reason}`);
         }
         this.authService.saveUserLogged(user);
       },
@@ -560,6 +560,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
           if (this.isFirstForm || !this.user.withData) {
             const user = this.user;
             user.withData = true;
+            user.rejected = false;
             this.authService.saveUserLogged(user);
           }
 
