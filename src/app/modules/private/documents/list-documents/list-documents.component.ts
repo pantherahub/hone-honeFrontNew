@@ -25,7 +25,7 @@ export class ListDocumentsComponent implements OnInit {
    clientSelected: any = this.eventManager.clientSelected();
    callApi: any = this.eventManager.getPercentApi();
    loadingData: boolean = false;
-   loadBtnDownload: boolean = false;
+   loadManualDownload: boolean = false;
    hiddenCard: boolean = false;
    contactsOfProviders: any = [];
 
@@ -143,6 +143,18 @@ export class ListDocumentsComponent implements OnInit {
       `assets/documents-provider/documentos-axa.zip`,
       `Documentos para diligenciar axa.zip`
     );
+  }
+
+   /**
+    * Descargar para Axa el manual de prestadores de Servicios de Salud
+    */
+  downloadAxaProviderManual() {
+    if (this.loadManualDownload) return;
+    this.saveAs(
+      'https://honesolutions.blob.core.windows.net/documents/PresentacionInduccionSostenibilidad2025.pdf',
+      'Presentación inducción y sostenibilidad 2025.pdf',
+      (loading) => this.loadManualDownload = loading
+    );
    }
 
    /**
@@ -175,11 +187,36 @@ export class ListDocumentsComponent implements OnInit {
 
    /**
     * Recibe la url de donde se toman los documentos locales y los descarga
-    * @param url - ruta de los assets a descargar
+    * @param url - ruta de los assets/container a descargar
     * @param name - nombre del archivo que se muestra en la descarga
+    * @param setLoading - metodo opcional para retornar el loading
     */
-   saveAs(url: any, name: any) {
-      this.loadBtnDownload = true;
+    saveAs(url: any, name: any, setLoading?: (loading: boolean) => void) {
+      if (setLoading) setLoading(true);
+
+      if (url.startsWith('http')) {
+        fetch(url)
+          .then(response => {
+            if (!response.ok) throw new Error('Error al descargar el archivo');
+            return response.blob();
+          })
+          .then(blob => {
+            const blobUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = name;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(blobUrl);
+          })
+          .catch(error => console.error('Error descargando el archivo:', error))
+          .finally(() => {
+            if (setLoading) setLoading(false);
+          });
+        return;
+      }
+
       const link = document.createElement('a');
       link.setAttribute('type', 'hidden');
       link.href = url;
@@ -187,8 +224,8 @@ export class ListDocumentsComponent implements OnInit {
       document.body.appendChild(link);
       link.click();
       link.remove();
-      this.loadBtnDownload = false;
-   }
+      if (setLoading) setLoading(false);
+    }
 
    navigateHome() {
       this.router.navigateByUrl('/home');
