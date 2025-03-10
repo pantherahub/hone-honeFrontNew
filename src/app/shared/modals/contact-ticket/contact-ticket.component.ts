@@ -10,6 +10,7 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { mailRegexpValidation } from '../../../utils/constant';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { ResponseCreateTicketComponent } from '../response-create-ticket/response-create-ticket.component';
+import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 
 @Component({
    selector: 'app-contact-ticket',
@@ -34,6 +35,7 @@ export class ContactTicketComponent implements AfterContentChecked, OnInit {
 
    constructor(
       private formBuilder: FormBuilder,
+      private formUtils: FormUtilsService,
       private notificationService: NzNotificationService,
       private eventManager: EventManagerService,
       private ticketService: TicketsService,
@@ -58,7 +60,7 @@ export class ContactTicketComponent implements AfterContentChecked, OnInit {
       this.requestForm = this.formBuilder.nonNullable.group({
          name: ['', [Validators.required]],
          lastname: ['', [Validators.required]],
-         identification: ['', [Validators.required]],
+         identification: ['', [Validators.required, this.formUtils.numeric]],
          email: ['', [Validators.required, Validators.pattern(mailRegexpValidation)]],
          phone: ['', [Validators.required]],
          address: ['', [Validators.required]],
@@ -108,12 +110,12 @@ export class ContactTicketComponent implements AfterContentChecked, OnInit {
       const idRole = this.user ? this.user.roles!.idRoles : 0;
       this.ticketService.postTicket(idRole, payload).subscribe({
          next: (res: any) => {
-            this.loader = false;        
+            this.loader = false;
             this.openSuccessModal();
             this.#modal.destroy();
          },
          error: (error: any) => {
-            this.loader = false;          
+            this.loader = false;
             this.openErrorModal();
          },
          complete: () => { }
@@ -123,15 +125,18 @@ export class ContactTicketComponent implements AfterContentChecked, OnInit {
    /**
     * Mapea y retorna el formulario en una sola cadena de string
     */
-   getObservations(): string {
+  getObservations(): string {
+      const removeQuotes = (value: any): string => {
+        return typeof value === 'string' ? value.replace(/["']/g, '').trim() : value;
+      };
       const { name, lastname, identification, email, phone, address, observation } = this.requestForm.value;
 
       const observaciones = `
       Información del usuario que genera caso:  Nombre: ${this.clientSelected.razonSocial} ,   identificacion: ${this.clientSelected.identificacion} ,   cliente: ${this.clientSelected.clientHoneSolutions}
       <br>
       Datos reportados del usuario:
-      <br> Nombre: ${name},  <br> Apellido: ${lastname},  <br> Identificación: ${identification},  <br> Teléfono: ${phone},  
-      <br> Email: ${email}, <br> Dirección: ${address},  <br> Observaciones: ${observation}, <br>
+      <br> Nombre: ${removeQuotes(name)},  <br> Apellido: ${removeQuotes(lastname)},  <br> Identificación: ${removeQuotes(identification)},  <br> Teléfono: ${removeQuotes(phone)},
+      <br> Email: ${removeQuotes(email)}, <br> Dirección: ${removeQuotes(address)},  <br> Observaciones: ${removeQuotes(observation)}, <br>
       `;
       return observaciones;
    }
@@ -158,7 +163,7 @@ export class ContactTicketComponent implements AfterContentChecked, OnInit {
    /**
    * abre el modal con la notificación de que el ticket fue creado con exito
    */
-   openSuccessModal() {      
+   openSuccessModal() {
       const modal = this.modalService.create<ResponseCreateTicketComponent, any>({
          nzContent: ResponseCreateTicketComponent,
          nzCentered: true,

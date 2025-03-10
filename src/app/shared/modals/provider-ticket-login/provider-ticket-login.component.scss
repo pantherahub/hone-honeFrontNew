@@ -18,7 +18,10 @@
     display: flex;
     align-items: center;
     right: 20%;
-    top: -15px;
+}
+
+.icon{
+  width: 26px;
 }
 
 @media only screen and (max-width: 768px) {
@@ -33,9 +36,5 @@
         display: flex;
         align-items: center;
         left: 30%;
-        top: 1px;
-    }
-    .icon{
-        height: 26px;
     }
 }
