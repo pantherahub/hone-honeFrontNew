@@ -289,6 +289,10 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
 
         this.subscribeOnChange();
 
+        const user = this.user;
+        user.rejected = res.rejected;
+        this.authService.saveUserLogged(user);
+
         if (this.user.rejected && data.status === "Rechazado" && data.Reasons.length) {
           this.alertService.warning('Actualización requerida', `Motivo: ${data.Reasons[0].reason}`);
         }
