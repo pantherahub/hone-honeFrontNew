@@ -110,6 +110,20 @@
               </nz-form-item>
             </nz-col>
 
+            <nz-col *ngIf="providerForm.get('idTypeDocument')?.value !== 6" [nzSpan]="24" [nzSm]="12">
+              <nz-form-item>
+                <nz-form-label nzFor="dv">Dígito de verificación</nz-form-label>
+                <nz-form-control [nzErrorTip]="dvErrorTip">
+                  <ng-template #dvErrorTip>
+                    @if (providerForm.controls['dv'].hasError('invalidDigit')) {
+                      <p>{{ providerForm.controls['dv'].errors?.['invalidDigit'] }}</p>
+                    }
+                  </ng-template>
+                  <input nz-input id="dv" formControlName="dv" placeholder="Dígito" type="number" min="0" max="9" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+
             <nz-col [nzSpan]="24" [nzSm]="12">
               <nz-form-item>
                 <nz-form-label nzFor="website">Sitio o página web</nz-form-label>
