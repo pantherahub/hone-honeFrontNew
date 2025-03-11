@@ -192,9 +192,6 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
       if (file) this.loadedFile = file;
    }
 
-   /**
-    * Envia peticion al servicio de login para obtener el token de acceso
-    */
    submitRequest() {
       if (this.documentForm.invalid) {
          Object.values(this.documentForm.controls).forEach(control => {

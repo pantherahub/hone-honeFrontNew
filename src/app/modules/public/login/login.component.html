@@ -101,8 +101,17 @@
             <!-- Campo re-captcha -->
             <re-captcha (resolved)="resolved($event)" [siteKey]="siteKey"
                 (errored)="errored()" errorMode="handled"></re-captcha>
-
             <p style="color: red;" *ngIf="showError">¡Debes validar que no eres un robot!</p>
+
+            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24">
+              <nz-form-item nz-row>
+                  <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24">
+                      <label nz-checkbox formControlName="remember">
+                          Recuérdame
+                      </label>
+                  </nz-form-control>
+              </nz-form-item>
+            </div>
 
 
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"

@@ -48,8 +48,9 @@ export class LoginComponent implements OnInit {
   //  Crea e Inicializa el formulario
   createForm () {
     this.loginForm = this.formBuilder.nonNullable.group({
-      email: [ '', [ Validators.required ] ],
-      password: [ '', [ Validators.required ] ]
+      email: ['', [Validators.required]],
+      password: ['', [Validators.required]],
+      remember: [false]
     });
   }
 
@@ -57,7 +58,7 @@ export class LoginComponent implements OnInit {
     this.menuOpen = !this.menuOpen;
   }
 
-  //  Envia peticion al servicio de login para obtener el token de acceso
+  //  Envia peticion al servicio de login
   submitRequest () {
     if (this.loginForm.invalid) {
       Object.values(this.loginForm.controls).forEach(control => {
@@ -76,17 +77,29 @@ export class LoginComponent implements OnInit {
     this.showError = false;
     this.isSubmitData = true;
 
-    const { email, password } = this.loginForm.value;
+    const { email, password, remember } = this.loginForm.value;
     const payload: any = {
-      email,
-      contrasena: password
+      credential: email,
+      password,
+      remember
     };
 
     this.authService.login(payload).subscribe({
       next: (res: any) => {
         this.isSubmitData = false;
         this.tutorialService.resetTutorial();
-        this.router.navigateByUrl('home');
+        // this.router.navigateByUrl('home');
+
+        this.authService.loadUser().subscribe({
+          next: (res: any) => {
+            this.router.navigateByUrl('home');
+          },
+          error: (err: any) => {
+            console.error('Error al cargar el usuario:', err);
+            this.createNotificacion('error', 'Error', 'No se pudo cargar la información del usuario.');
+            this.authService.logout();
+          },
+        });
       },
       error: (error: any) => {
         this.isSubmitData = false;
