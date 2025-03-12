@@ -39,7 +39,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     private tutorialService: TutorialService,
     private eventManager: EventManagerService,
     private router: Router,
-    private modal: NzModalService
+    private modal: NzModalService,
   ) {
     localStorage.removeItem('clientSelected');
     this.eventManager.clientSelected.set({});

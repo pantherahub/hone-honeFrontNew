@@ -41,12 +41,13 @@ export class LoginComponent implements OnInit {
     this.createForm();
   }
 
-  ngOnInit (): void {
-    console.log('environment prod: ', environment.production);
+  ngOnInit(): void {
+    // console.log('environment prod:', environment.production);
+    this.modalService.closeAll();
   }
 
   //  Crea e Inicializa el formulario
-  createForm () {
+  createForm() {
     this.loginForm = this.formBuilder.nonNullable.group({
       email: ['', [Validators.required]],
       password: ['', [Validators.required]],

@@ -2,15 +2,16 @@ import { HttpHandlerFn, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { HttpErrorResponse, HttpRequest, HttpEvent } from '@angular/common/http';
-import { Observable, BehaviorSubject, throwError } from 'rxjs';
+import { Observable, BehaviorSubject, throwError, EMPTY } from 'rxjs';
 import { catchError, filter, switchMap, take } from 'rxjs/operators';
+import { RefreshTokenResponse } from '../models/auth.interface';
 
 const excludedUrls = ['/Auth/Login', '/Auth/UpdateTokens'];
+let isRefreshing = false;
+let refreshTokenSubject: BehaviorSubject<RefreshTokenResponse | null> = new BehaviorSubject<RefreshTokenResponse | null>(null);
 
 export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<any>> => {
   const authService = inject(AuthService);
-  let isRefreshing = false;
-  let refreshTokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
 
   // Ignore routes
   if (excludedUrls.some(url => req.url.includes(url))) {
@@ -34,17 +35,24 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
     if (!isRefreshing) {
       isRefreshing = true;
       return authService.refreshAccessToken().pipe(
-        switchMap((newToken: string) => {
+        switchMap((res: RefreshTokenResponse) => {
+          if (!res.ok) {
+            isRefreshing = false;
+            refreshTokenSubject.next(res);
+            authService.logout();
+            return EMPTY;
+          }
           isRefreshing = false;
-          refreshTokenSubject.next(newToken);
+          refreshTokenSubject.next(res);
           return next(addAuthToken(request));
         }),
         catchError((error) => {
           isRefreshing = false;
           refreshTokenSubject.error(error);
           if (error.status === 401) {
-            refreshTokenSubject = new BehaviorSubject<string | null>(null);
+            refreshTokenSubject = new BehaviorSubject<RefreshTokenResponse | null>(null);
             authService.logout();
+            return EMPTY;
           }
           return throwError(() => error);
         })
@@ -53,8 +61,14 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
       return refreshTokenSubject.pipe(
         filter(token => token !== null),
         take(1),
-        switchMap(token => next(addAuthToken(request))),
-        catchError(error => throwError(() => error))
+        switchMap((token: RefreshTokenResponse | null) => {
+          if (token && !token.ok) return EMPTY;
+          return next(addAuthToken(request));
+        }),
+        catchError((error) => {
+          if (error.status === 401) return EMPTY;
+          return throwError(() => error)
+        })
       );
     }
   };

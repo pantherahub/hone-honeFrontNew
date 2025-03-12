@@ -4,8 +4,9 @@ import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 
 import { Observable, of } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { delay, map, tap } from 'rxjs/operators';
 import { EventManagerService } from './events-manager/event-manager.service';
+import { RefreshTokenResponse } from '../models/auth.interface';
 
 @Injectable({
    providedIn: 'root'
@@ -64,8 +65,8 @@ export class AuthService {
       },
       withData: true,
     };
-    this.saveUserLogged(mockUsuario);
-    return of(mockUsuario);
+    // this.saveUserLogged(mockUsuario);
+    // return of(mockUsuario);
 
     return this.httpClient.post(
       `${environment.url}Auth/GetUser`,
@@ -104,25 +105,21 @@ export class AuthService {
     return !!token;
   }
 
-  refreshAccessToken(): Observable<any> {
-    return this.httpClient.post(
+  refreshAccessToken(): Observable<RefreshTokenResponse> {
+    const refreshToken = this.getRefreshToken();
+    if (!refreshToken) {
+      return of({ ok: false }).pipe(delay(0));
+    }
+    return this.httpClient.post<RefreshTokenResponse>(
       `${environment.url}Auth/UpdateTokens`,
       { REFRESH_TOKEN: this.getRefreshToken() }
     ).pipe(
-      tap((res: any) => {
-        if (res.ok) {
+      tap((res: RefreshTokenResponse) => {
+        if (res.ok && res.data) {
           const newAccessToken = res.data.accessToken;
-          const newRefreshToken = res.data.refreshToken;
-          this.saveTokens(newAccessToken, newRefreshToken);
+          this.saveTokens(newAccessToken);
         }
       }),
-      map((res: any) => res.data.accessToken || 'no hay nada'),
-      // catchError((error) => {
-      //   // Simulo token para no devolver el error
-      //   const simulatedAccessToken = 'simulatedAccessToken';
-      //   this.saveTokens(simulatedAccessToken, this.getRefreshToken());
-      //   return of(simulatedAccessToken);
-      // })
     );
   }
 
@@ -132,9 +129,22 @@ export class AuthService {
     localStorage.removeItem(this.REFRESH_TOKEN_KEY);
   }
 
-  public logout () {
-    this.removeSession();
-    localStorage.clear();
-    this.router.navigateByUrl('login');
+  public logout() {
+    this.httpClient.post(
+      `${environment.url}Auth/Logout`,
+      null
+    ).subscribe({
+      next: (data: any) => {
+        this.removeSession();
+        localStorage.clear();
+        this.router.navigateByUrl('login');
+      },
+      error: (err: any) => {
+        console.error(err);
+        this.removeSession();
+        localStorage.clear();
+        this.router.navigateByUrl('login');
+      }
+    });
   }
 }
