@@ -9,6 +9,7 @@ import { AdminLayoutComponent } from './views/admin-layout/admin-layout.componen
 import { ComplianceDocumentationComponent } from './modules/private/documents/compliance-documentation/compliance-documentation.component';
 import { ProviderAssistancessComponent } from './modules/public/provider-assistancess/provider-assistancess.component';
 import { UpdateDataComponent } from './modules/private/update-data/update-data.component';
+import { UserManagementComponent } from './modules/private/user-management/user-management.component';
 
 export const routes: Routes = [
   //   PUBLIC ROUTES
@@ -45,6 +46,10 @@ export const routes: Routes = [
         component: UpdateDataComponent
       },
       {
+        path: 'user-management',
+        component: UserManagementComponent
+      },
+      {
         path: 'cargar-documentos/:id',
         component: ListDocumentsComponent
       },
@@ -59,13 +64,18 @@ export const routes: Routes = [
 	{
 		path: '**',
 		pathMatch: 'full',
-		redirectTo: 'page-not-found'
+		redirectTo: 'home'
 	},
-	{
-		path: '**',
-		pathMatch: 'full',
-		redirectTo: 'page-form-assistance'
-	}
+	// {
+	// 	path: '**',
+	// 	pathMatch: 'full',
+	// 	redirectTo: 'page-not-found'
+	// },
+	// {
+	// 	path: '**',
+	// 	pathMatch: 'full',
+	// 	redirectTo: 'page-form-assistance'
+	// }
 ];
 
 @NgModule({
