@@ -46,7 +46,7 @@ export class AlertService {
     });
   }
 
-  confirmDelete(title: string = '¿Está seguro?', content: string = 'Esta acción no se puede deshacer.'): Promise<boolean> {
+  confirmDelete(title: string = '¿Está seguro?', content: string = 'Esta acción no se puede revertir.'): Promise<boolean> {
     return this.confirm(title, content, {
       nzOkType: 'primary',
       nzOkDanger: true

@@ -1,0 +1,205 @@
+@if (loading) {
+  <div class="loading-overlay fixed">
+    <nz-spin [nzSize]="'large'" nzTip="Cargando..."></nz-spin>
+  </div>
+}
+
+<div class="container py-4">
+  <div>
+    <div class="flex justify-between flex-wrap gap-4">
+      <button class="flex gap-1 items-center w-fit" nz-button nzType="primary" type="button" (click)="goBack()">
+        <svg width="20" height="20">
+          <use xlink:href="/assets/icons/layout.svg#arrow-left" />
+        </svg>
+        <span>Volver</span>
+      </button>
+    </div>
+    <h2 class="text-lg my-4 text-center">Gestión de usuarios</h2>
+  </div>
+
+  <div class="mt-8">
+    <div class="flex justify-between flex-wrap my-2">
+      <h3 class="text-base">Usuarios existentes</h3>
+      <button nz-button nzType="primary" type="button" (click)="openUserModal()">Agregar nuevo</button>
+    </div>
+
+    <!-- Table -->
+    <div class="responsive-table">
+      <nz-table #userTable [nzData]="users" [nzPageSize]="pageSize" [nzPageIndex]="page" [nzTotal]="totalData" [nzFrontPagination]="false" [nzLoading]="loadingPage" (nzQueryParams)="onQueryParamsChange($event)" class="provider-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Identificación</th>
+            <th nzWidth="100px">Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of userTable.data; let i = index">
+            <td>
+              <nz-avatar
+                *ngIf="user.avatar; else defaultAvatar"
+                [nzSrc]="user.avatar"
+                nzSize="large"
+                class="mr-1">
+              </nz-avatar>
+              <ng-template #defaultAvatar>
+                <nz-avatar nzIcon="user" nzSize="large" class="mr-1"></nz-avatar>
+              </ng-template>
+              {{ user.name }}
+            </td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.identification }}</td>
+            <td>
+              <button nz-button nzType="primary" type="button" class="mr-1" (click)="openUserModal(user)" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
+              <button nz-button nzDanger nzType="primary" type="button" (click)="deleteUser(user)" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </div>
+  </div>
+
+</div>
+
+
+<ng-template #userModalContent>
+  <form nz-form nzLayout="vertical" [formGroup]="userForm" (ngSubmit)="saveUser()">
+    <div nz-row [nzGutter]="16">
+      <nz-col [nzSpan]="24">
+        <nz-form-item>
+          <nz-form-label class="mb-1">Foto de perfil</nz-form-label>
+          <nz-form-control>
+            <nz-upload
+              nzListType="picture-card"
+              nzShowUploadList="false"
+              [nzBeforeUpload]="beforeUpload"
+              [nzCustomRequest]="customUpload"
+            >
+              <ng-container *ngIf="avatarUrl; else uploadTemplate">
+                <img [src]="avatarUrl" class="avatar" />
+              </ng-container>
+              <ng-template #uploadTemplate>
+                <div class="upload-placeholder">
+                  <i nz-icon nzType="plus" nzTheme="outline"></i>
+                  <div class="upload-text">Cargar</div>
+                </div>
+              </ng-template>
+            </nz-upload>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+
+      <nz-col [nzSpan]="24" [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label nzRequired>Nombre(s)</nz-form-label>
+          <nz-form-control [nzErrorTip]="'El campo es requerido'">
+            <input nz-input formControlName="names" placeholder="Nombre(s)" />
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSpan]="24" [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label nzRequired>Apellido(s)</nz-form-label>
+          <nz-form-control [nzErrorTip]="'El campo es requerido'">
+            <input nz-input formControlName="lastNames" placeholder="Apellido(s)" />
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSpan]="24">
+        <nz-form-item>
+          <nz-form-label nzRequired>Correo</nz-form-label>
+          <nz-form-control [nzErrorTip]="emailErrorTip">
+            <ng-template #emailErrorTip>
+              @if (userForm.get('email')?.hasError('required')) {
+                El campo es requerido.
+              } @else if (userForm.get('email')?.hasError('invalidEmail')) {
+                Ingresa un correo válido.
+              }
+            </ng-template>
+            <input nz-input formControlName="email" type="email" placeholder="Correo electrónico" />
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSpan]="24" [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label [nzRequired]="true" nzFor="idTypeDocument">Tipo de identificación</nz-form-label>
+          <nz-form-control nzErrorTip="El campo es requerido.">
+            <nz-select
+              id="idTypeDocument"
+              formControlName="idTypeDocument"
+              nzPlaceHolder="Seleccionar"
+            >
+              <nz-option *ngFor="let type of identificationTypes" [nzValue]="type.idTypeDocument" [nzLabel]="type.typeDocument"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSpan]="24" [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label nzRequired>Identificación</nz-form-label>
+          <nz-form-control [nzErrorTip]="'El campo es requerido'">
+            <input nz-input formControlName="identification" placeholder="Número de identificación" />
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSpan]="24">
+        <nz-form-item>
+          <nz-form-label>Fecha de nacimiento</nz-form-label>
+          <nz-form-control>
+            <nz-date-picker formControlName="birthDate" nzPlaceHolder="Fecha" [nzDisabledDate]="disableFutureDates"></nz-date-picker>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSpan]="24" [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label>Teléfono 1</nz-form-label>
+          <nz-form-control [nzErrorTip]="phone1ErrorTip">
+            <ng-template #phone1ErrorTip>
+              @if (userForm.get('phone1')?.hasError('invalidNumber')) {
+                Ingresa un número válido.
+              } @else if (userForm.get('phone1')?.hasError('minlength') || userForm.get('number')?.hasError('maxlength')) {
+                Debe tener entre 6 y 15 dígitos.
+              }
+            </ng-template>
+            <input
+              nz-input
+              type="text"
+              placeholder="Número"
+              formControlName="phone1"
+            />
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+      <nz-col [nzSpan]="24" [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label>Teléfono 2</nz-form-label>
+          <nz-form-control [nzErrorTip]="phone2ErrorTip">
+            <ng-template #phone2ErrorTip>
+              @if (userForm.get('phone2')?.hasError('invalidNumber')) {
+                Ingresa un número válido.
+              } @else if (userForm.get('phone2')?.hasError('minlength') || userForm.get('number')?.hasError('maxlength')) {
+                Debe tener entre 6 y 15 dígitos.
+              }
+            </ng-template>
+            <input
+              nz-input
+              type="text"
+              placeholder="Número"
+              formControlName="phone2"
+            />
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+    </div>
+
+    <div class="flex justify-end gap-3 pt-6">
+      <button nz-button nzType="default" type="button" (click)="userModalRef.destroy()">
+        Cancelar
+      </button>
+      <button nz-button nzType="primary" type="submit" [disabled]="userForm.invalid || loading">
+        {{ selectedUserToUpdate ? 'Actualizar' : 'Agregar' }}
+      </button>
+    </div>
+  </form>
+</ng-template>

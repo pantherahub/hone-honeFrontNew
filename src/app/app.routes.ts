@@ -9,7 +9,8 @@ import { AdminLayoutComponent } from './views/admin-layout/admin-layout.componen
 import { ComplianceDocumentationComponent } from './modules/private/documents/compliance-documentation/compliance-documentation.component';
 import { ProviderAssistancessComponent } from './modules/public/provider-assistancess/provider-assistancess.component';
 import { UpdateDataComponent } from './modules/private/update-data/update-data.component';
-import { UserManagementComponent } from './modules/private/user-management/user-management.component';
+import { UserManagementComponent } from './modules/private/user/user-management/user-management.component';
+import { UpdatePasswordComponent } from './modules/private/user/update-password/update-password.component';
 
 export const routes: Routes = [
   //   PUBLIC ROUTES
@@ -48,6 +49,10 @@ export const routes: Routes = [
       {
         path: 'user-management',
         component: UserManagementComponent
+      },
+      {
+        path: 'update-password',
+        component: UpdatePasswordComponent
       },
       {
         path: 'cargar-documentos/:id',
