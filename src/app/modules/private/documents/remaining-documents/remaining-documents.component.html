@@ -51,7 +51,7 @@
                         }
 
                         <div class="flex flex-col">
-                          <button nz-button nzType="default" type="button" nzType="dashed" (click)="triggerFileInput(i)">
+                          <button nz-button nzType="dashed" type="button" (click)="triggerFileInput(i)">
                             Cargar +
                           </button>
                           <input type="file" name="file" #fileInput id="upload-file-{{i}}" class="custom-file-input" appFileValidator (fileValidated)="loadFiles($event, item, i)" hidden>
