@@ -5,6 +5,7 @@ import { HttpErrorResponse, HttpRequest, HttpEvent } from '@angular/common/http'
 import { Observable, BehaviorSubject, throwError, EMPTY } from 'rxjs';
 import { catchError, filter, switchMap, take } from 'rxjs/operators';
 import { RefreshTokenResponse } from '../models/auth.interface';
+import { Router } from '@angular/router';
 
 const excludedUrls = ['/Auth/Login', '/Auth/UpdateTokens'];
 let isRefreshing = false;
@@ -12,6 +13,7 @@ let refreshTokenSubject: BehaviorSubject<RefreshTokenResponse | null> = new Beha
 
 export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<any>> => {
   const authService = inject(AuthService);
+  const router = inject(Router);
 
   // Ignore routes
   if (excludedUrls.some(url => req.url.includes(url))) {
@@ -73,10 +75,24 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
     }
   };
 
+  const handle403Error = (error: HttpErrorResponse): boolean => {
+    if (error.error?.renewPassword) {
+      router.navigate(['/reset-password']);
+      return true;
+    } else if (error.error?.withVerificationEmail === false) {
+      router.navigate(['/verify-email']);
+      return true;
+    }
+    return false;
+  };
+
   return next(addAuthToken(req)).pipe(
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401 && !req.url.includes('/Auth/UpdateTokens') && !req.url.includes('/Auth/Logout')) {
         return handle401Error(req, next);
+      } else if (error.status === 403 && !req.url.includes('/Auth/UpdateTokens') && !req.url.includes('/Auth/Logout')) {
+        const handled = handle403Error(error);
+        if (handled) return EMPTY;
       }
       return throwError(() => error);
     })
