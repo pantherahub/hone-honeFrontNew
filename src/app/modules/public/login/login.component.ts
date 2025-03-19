@@ -43,6 +43,9 @@ export class LoginComponent implements OnInit {
 
   ngOnInit (): void {
     console.log('environment prod: ', environment.production);
+
+    const hasSupportParam = this.router.url.includes('?support=true');
+    if (hasSupportParam) this.openTicketModal();
   }
 
   //  Crea e Inicializa el formulario
