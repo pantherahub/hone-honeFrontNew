@@ -30,6 +30,12 @@ export class AuthService {
         if (res.ok) {
           const data = res.data;
           this.saveTokens(data.accessToken, data.refreshToken);
+
+          if (!data.withVerificationEmail) {
+            localStorage.setItem('requiresEmailVerification', 'true');
+          } else if (data.renewPassword) {
+            localStorage.setItem('requiresPasswordReset', 'true');
+          }
         }
       })
     );
@@ -65,8 +71,9 @@ export class AuthService {
       },
       withData: true,
     };
-    // this.saveUserLogged(mockUsuario);
-    // return of(mockUsuario);
+    // testing:
+    this.saveUserLogged(mockUsuario);
+    return of(mockUsuario);
 
     return this.httpClient.post(
       `${environment.url}Auth/GetUser`,

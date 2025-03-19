@@ -11,6 +11,9 @@ import { ProviderAssistancessComponent } from './modules/public/provider-assista
 import { UpdateDataComponent } from './modules/private/update-data/update-data.component';
 import { UserManagementComponent } from './modules/private/user/user-management/user-management.component';
 import { UpdatePasswordComponent } from './modules/private/user/update-password/update-password.component';
+import { ResetPasswordComponent } from './modules/private/user/reset-password/reset-password.component';
+import { authStatusGuard } from './guards/auth-status.guard';
+import { VerifyEmailComponent } from './modules/private/user/verify-email/verify-email.component';
 
 export const routes: Routes = [
   //   PUBLIC ROUTES
@@ -31,12 +34,22 @@ export const routes: Routes = [
 		path: 'page-form-assistance',
 		component: ProviderAssistancessComponent
   },
+  {
+    path: 'verify-email',
+    canActivate: [authGuard],
+    component: VerifyEmailComponent
+  },
+  {
+    path: 'reset-password',
+    canActivate: [authGuard],
+    component: ResetPasswordComponent
+  },
 
 	//   PRIVATE ROUTES
 	{
 		path: '',
     component: AdminLayoutComponent,
-    canActivate: [authGuard],
+    canActivate: [authGuard, authStatusGuard],
 		children: [
       {
         path: 'home',

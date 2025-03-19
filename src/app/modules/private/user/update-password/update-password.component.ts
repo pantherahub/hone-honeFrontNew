@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { AlertService } from 'src/app/services/alerts/alert.service';
+import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { NewPasswordFormComponent } from 'src/app/shared/forms/new-password-form/new-password-form.component';
 
 @Component({
@@ -21,6 +22,7 @@ export class UpdatePasswordComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private alertService: AlertService,
+    private formUtils: FormUtilsService,
   ) { }
 
   ngOnInit() {
@@ -29,7 +31,12 @@ export class UpdatePasswordComponent implements OnInit {
     });
   }
 
+  markFormAsTouched() {
+    this.formUtils.markFormTouched(this.passwordForm);
+  }
+
   onPasswordSubmitted(event: { newPassword: string, confirmPassword: string }) {
+    this.markFormAsTouched();
     if (this.passwordForm.valid) {
       const currentPassword = this.passwordForm.value.currentPassword;
       const newPassword = event.newPassword;

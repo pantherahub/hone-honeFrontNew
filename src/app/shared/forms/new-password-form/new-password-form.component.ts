@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
+import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 
 @Component({
   selector: 'app-new-password-form',
@@ -16,8 +17,12 @@ export class NewPasswordFormComponent implements OnInit {
   @Input() showCancelButton: boolean = false;
   @Output() cancel = new EventEmitter<void>();
   @Output() submitPassword = new EventEmitter<{ newPassword: string, confirmPassword: string }>();
+  @Output() validationFailed = new EventEmitter<void>();
 
-  constructor(private fb: FormBuilder) { }
+  constructor(
+    private fb: FormBuilder,
+    private formUtils: FormUtilsService
+  ) { }
 
   ngOnInit() {
     this.passwordForm = this.fb.group({
@@ -27,13 +32,22 @@ export class NewPasswordFormComponent implements OnInit {
         Validators.pattern(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^\w\s]).{8,}$/)
       ]],
       confirmPassword: ['', [Validators.required]]
-    }, { validator: this.passwordsMatchValidator });
+    }, { validators: this.passwordsMatchValidator });
   }
 
-  passwordsMatchValidator(form: FormGroup) {
-    const newPassword = form.get('newPassword')?.value;
-    const confirmPassword = form.get('confirmPassword')?.value;
-    return newPassword === confirmPassword ? null : { passwordMismatch: true };
+  passwordsMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+    const form = control as FormGroup;
+    const newPasswordControl = form.get('newPassword');
+    const confirmPasswordControl = form.get('confirmPassword');
+    if (confirmPasswordControl?.errors && !confirmPasswordControl.errors['passwordMismatch']) {
+      return null;
+    }
+
+    if (newPasswordControl?.value !== confirmPasswordControl?.value) {
+      confirmPasswordControl?.setErrors({ passwordMismatch: true });
+      return { passwordMismatch: true };
+    }
+    return null;
   }
 
   cancelForm() {
@@ -41,8 +55,12 @@ export class NewPasswordFormComponent implements OnInit {
   }
 
   onSubmit() {
-    this.passwordForm.markAllAsTouched();
-    if (this.passwordForm.invalid) return;
+    this.formUtils.markFormTouched(this.passwordForm);
+    this.passwordForm.updateValueAndValidity();
+    if (this.passwordForm.invalid) {
+      this.validationFailed.emit();
+      return;
+    }
     this.submitPassword.emit(this.passwordForm.value);
   }
 }

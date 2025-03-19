@@ -90,10 +90,17 @@ export class LoginComponent implements OnInit {
         this.isSubmitData = false;
         this.tutorialService.resetTutorial();
         // this.router.navigateByUrl('home');
+        const authData = res.data;
 
         this.authService.loadUser().subscribe({
-          next: (res: any) => {
-            this.router.navigateByUrl('home');
+          next: (resp: any) => {
+            if (!authData.withVerificationEmail) {
+              this.router.navigateByUrl('verify-email');
+            } else if (authData.renewPassword) {
+              this.router.navigateByUrl('reset-password');
+            } else {
+              this.router.navigateByUrl('home');
+            }
           },
           error: (err: any) => {
             console.error('Error al cargar el usuario:', err);
