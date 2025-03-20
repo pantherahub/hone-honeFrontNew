@@ -1,6 +1,6 @@
 import { CommonModule, Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
@@ -82,6 +82,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
           'languages',
           'idTypeDocument',
           'identification',
+          'dv',
           'website'
         ];
         // Check if any of these specific controls have changed
@@ -112,6 +113,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       languages: [[], [Validators.required]],
       idTypeDocument: ['', [Validators.required]],
       identification: ['', [Validators.required, this.formUtils.numeric]],
+      dv: [null, [this.dvValidator]],
       website: ['', this.formUtils.url],
 
       updatedBasicData: [false],
@@ -124,6 +126,18 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       createdContacts: this.fb.array([]),
       deletedContacts: this.fb.array([])
     });
+
+    this.providerForm.get('idTypeDocument')?.valueChanges.subscribe(value => {
+      if (value === 6) this.providerForm.patchValue({ dv: null });
+    });
+  }
+
+  dvValidator(control: AbstractControl) {
+    if (!control.value) return null;
+    if (control.value < 0 || control.value > 9) {
+      return { invalidDigit: 'Debe ser un número entre 0 y 9.' };
+    }
+    return null;
   }
 
   goBack(): void {
@@ -146,16 +160,17 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       await firstValueFrom(this.alertService.info('Formulario requerido', 'Por favor, complete el formulario antes de continuar.').afterClose);
     }
 
-    const hasSavedState = this.hasSavedState();
-    if (hasSavedState) {
-      const confirmed = await this.alertService.confirm(
-        'Aviso', 'Se encontraron datos sin guardar de una sesión anterior. ¿Deseas continuar con estos datos?', {
-          nzOkText: 'Continuar',
-          nzCancelText: 'No',
-      });
-      if (confirmed) {
-        this.restoreFormFromLocalStorage();
-        return;
+    if (this.hasSavedState()) {
+      if (!this.user.rejected) {
+        const confirmed = await this.alertService.confirm(
+          'Aviso', 'Se encontraron datos sin guardar de una sesión anterior. ¿Deseas continuar con estos datos?', {
+            nzOkText: 'Continuar',
+            nzCancelText: 'No',
+        });
+        if (confirmed) {
+          this.restoreFormFromLocalStorage();
+          return;
+        }
       }
       this.removeFormState();
     }
@@ -195,6 +210,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       languages: formState.languages,
       idTypeDocument: formState.idTypeDocument,
       identification: formState.identification,
+      dv: formState.dv,
       website: formState.website,
       updatedBasicData: formState.updatedBasicData,
     });
@@ -264,6 +280,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
           languages: languages,
           idTypeDocument: data.idTypeDocument,
           identification: data.identification,
+          dv: data.dv,
           website: data.website
         });
 
@@ -271,6 +288,14 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
         this.existingContacts = data.TemporalContactsForProvider;
 
         this.subscribeOnChange();
+
+        const user = this.user;
+        user.rejected = res.rejected;
+        this.authService.saveUserLogged(user);
+
+        if (this.user.rejected && data.status === "Rechazado" && data.Reasons.length) {
+          this.alertService.warning('Actualización requerida', `Motivo: ${data.Reasons[0].reason}`);
+        }
       },
       error: (err: any) => {
         this.loading = false;
@@ -500,6 +525,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       languages: [],
       idTypeDocument: '',
       identification: '',
+      dv: null,
       website: ''
     });
     this.formUtils.clearFormArray(this.updatedOffices);
@@ -532,9 +558,9 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const website = this.providerForm.get('website')?.value;
+    const website = this.providerForm.get('website')?.value?.toLowerCase() || null;
     this.providerForm.patchValue({
-      website: website || null,
+      website: website,
       endTime: this.formatDate(new Date())
     });
 
@@ -548,11 +574,12 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       serviceMethod(this.providerForm.value).subscribe({
         next: (res: any) => {
+          const user = this.user;
+          user.rejected = false;
           if (this.isFirstForm || !this.user.withData) {
-            const user = this.user;
             user.withData = true;
-            this.authService.saveUserLogged(user);
           }
+          this.authService.saveUserLogged(user);
 
           this.loading = false;
           this.alertService.success('Enviado', 'Actualización enviada.');

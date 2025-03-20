@@ -105,14 +105,11 @@ export class RemainingDocumentsComponent implements OnInit {
     * @param event - evento del input que contiene el archivo para cargar
     * @param item - elemento de la lista para saber cual documento de carga ej (cedula, nit, rethus)
     */
-  loadFiles(file: any, item: any, index: number, autoUpload: boolean = false) {
+  loadFiles(file: any, item: any, index: number) {
       if (!file) return;
       this.formDocList[index].patchValue({
         file: file
       });
-      if (autoUpload) {
-        this.uploadDocuments(item, index);
-      }
     }
 
    /**

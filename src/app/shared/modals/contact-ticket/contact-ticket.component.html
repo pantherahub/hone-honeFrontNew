@@ -21,8 +21,8 @@
                 <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
                     [nzErrorTip]="nameErrorTip">
                     <ng-template #nameErrorTip>
-                        <p *ngIf="requestForm.controls['name'].hasError('required')">¡Este campo es
-                            obligatorio!
+                        <p *ngIf="requestForm.controls['name'].hasError('required')">
+                          El campo es requerido.
                         </p>
                     </ng-template>
                     <input nz-input placeholder="Nombre" formControlName="name">
@@ -41,8 +41,8 @@
                 <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
                     [nzErrorTip]="lastnameErrorTip">
                     <ng-template #lastnameErrorTip>
-                        <p *ngIf="requestForm.controls['lastname'].hasError('required')">¡Este campo es
-                            obligatorio!
+                        <p *ngIf="requestForm.controls['lastname'].hasError('required')">
+                          El campo es requerido.
                         </p>
                     </ng-template>
                     <input nz-input placeholder="Apellido" formControlName="lastname">
@@ -61,9 +61,11 @@
                 <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
                     [nzErrorTip]="identificationErrorTip">
                     <ng-template #identificationErrorTip>
-                        <p *ngIf="requestForm.controls['identification'].hasError('required')">¡Este campo es
-                            obligatorio!
-                        </p>
+                        @if (requestForm.controls['identification'].hasError('required')) {
+                          <p>El campo es requerido.</p>
+                        } @else if (requestForm.controls['identification'].hasError('invalidNumber')) {
+                          <p>Ingresa un valor válido.</p>
+                        }
                     </ng-template>
                     <input nz-input placeholder="Identificación" formControlName="identification"
                         (keypress)="keyPressCode($event)">
@@ -82,10 +84,11 @@
                 <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
                     [nzErrorTip]="emailErrorTip">
                     <ng-template #emailErrorTip>
-                        <p *ngIf="requestForm.controls['email'].hasError('required')">¡Este campo es
-                            obligatorio!
+                        <p *ngIf="requestForm.controls['email'].hasError('required')">
+                          El campo es requerido.
                         </p>
-                        <p *ngIf="requestForm.controls['email'].hasError('pattern')">¡El correo no es válido!
+                        <p *ngIf="requestForm.controls['email'].hasError('pattern')">
+                          ¡El correo no es válido!
                         </p>
                     </ng-template>
                     <input nz-input placeholder="Email" formControlName="email">
@@ -104,8 +107,8 @@
                 <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
                     [nzErrorTip]="phoneErrorTip">
                     <ng-template #phoneErrorTip>
-                        <p *ngIf="requestForm.controls['phone'].hasError('required')">¡Este campo es
-                            obligatorio!
+                        <p *ngIf="requestForm.controls['phone'].hasError('required')">
+                          El campo es requerido.
                         </p>
                     </ng-template>
                     <input nz-input placeholder="Celular" formControlName="phone" (keypress)="keyPressCode($event)">
@@ -124,8 +127,8 @@
                 <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
                     [nzErrorTip]="addressErrorTip">
                     <ng-template #addressErrorTip>
-                        <p *ngIf="requestForm.controls['address'].hasError('required')">¡Este campo es
-                            obligatorio!
+                        <p *ngIf="requestForm.controls['address'].hasError('required')">
+                          El campo es requerido.
                         </p>
                     </ng-template>
                     <input nz-input placeholder="Dirección" formControlName="address">
@@ -144,8 +147,8 @@
                 <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
                     [nzErrorTip]="observationErrorTip">
                     <ng-template #observationErrorTip>
-                        <p *ngIf="requestForm.controls['observation'].hasError('required')">¡Este campo es
-                            obligatorio!
+                        <p *ngIf="requestForm.controls['observation'].hasError('required')">
+                          El campo es requerido.
                         </p>
                     </ng-template>
                     <textarea rows="4" nz-input placeholder="Ingresar la observación que tenga a su disposición"

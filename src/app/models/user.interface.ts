@@ -3,6 +3,7 @@ export interface UserInterface {
    email?: string;
    name?: string;
    withData?: boolean;
+   rejected?: boolean;
    roles?: RoleInterface;
 }
 
