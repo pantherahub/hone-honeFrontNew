@@ -404,7 +404,6 @@ export class ContactFormComponent implements OnInit {
       idCity: [phone == null && this.officeIdCity ? this.officeIdCity : phone?.idCity || null],
       status: [phone ? phone.status || null : 'created'] // updated, created, null for existing phones
     });
-    if (this.officeIdCity) phoneGroup.get('idCity')?.setValidators([Validators.required]);
     if (this.officeIdCity && !activeCity) phoneGroup.get('idCity')?.disable();
     phoneGroup.get('type')?.valueChanges
       .pipe(distinctUntilChanged())
@@ -412,9 +411,9 @@ export class ContactFormComponent implements OnInit {
         const idCityControl = phoneGroup.get('idCity');
         let idCity = null;
         if (value === 'Fijo') {
-          idCityControl?.setValidators([Validators.required]);
-          if (this.officeIdCity) {
-            idCity = this.officeIdCity;
+          idCity = this.officeIdCity || null;
+          if (this.contactModelType === 'Prestador' && !this.officeIdCity) {
+            idCityControl?.setValidators([Validators.required]);
           }
         } else {
           idCityControl?.clearValidators();

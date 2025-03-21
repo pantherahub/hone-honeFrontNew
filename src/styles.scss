@@ -12,6 +12,7 @@
 
 @import "scss/utilities";
 @import "scss/reset";
+@import "scss/animations";
 
 
 :root{
@@ -22,74 +23,4 @@
 body{
   // font-family: 'Lato';
   font-family: 'Montserrat', sans-serif;
-}
-
-@layer utilities {
-  @property --border-angle {
-    syntax: "<angle>";
-    initial-value: 0deg;
-    inherits: false;
-  }
-
-  @keyframes border-angle-rotate {
-    from { --border-angle: 0deg; }
-    to { --border-angle: 360deg; }
-  }
-
-  .animated-border {
-    --border-angle: 0deg;
-    border-radius: 2.5rem;
-    border: 0.25rem solid transparent;
-    background: linear-gradient(white, white) padding-box,
-      conic-gradient(from var(--border-angle), var(--color-blue1h-500) 10%, white) border-box;
-    animation: border-angle-rotate 2s infinite linear;
-  }
-}
-
-
-/* Second animation */
-@property --angle {
-  syntax: "<angle>";
-  initial-value: 90deg;
-  inherits: false;
-}
-@keyframes borderRotate {
-  100% {
-    --angle: 420deg;
-  }
-}
-.conic-gradient-border {
-  // position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 9999px;
-  overflow: hidden;
-}
-.conic-gradient-border::before {
-  content: "";
-  position: absolute;
-  inset: -3px;
-  border-radius: inherit;
-  background: conic-gradient(
-    from var(--angle),
-    rgba(168, 239, 255, 0.1),
-    var(--color-blue1h-500) 0.1turn,
-    var(--color-blue1h-500) 0.15turn,
-    rgba(168, 239, 255, 0.1) 0.25turn
-  );
-  animation: borderRotate 2.5s linear infinite;
-  z-index: 0;
-}
-.conic-gradient-border::after {
-  content: "";
-  position: absolute;
-  inset: 3px;
-  border-radius: inherit;
-  background: white;
-  z-index: 1;
-}
-.conic-gradient-border > * {
-  position: relative;
-  z-index: 2;
 }

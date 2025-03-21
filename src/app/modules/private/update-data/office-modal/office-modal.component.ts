@@ -162,15 +162,30 @@ export class OfficeModalComponent implements OnInit {
       // this.existingContacts = this.office.contacts || [];
     }
 
+    let previousCityId = this.office?.idCity || null;
     this.officeForm.get('idCity')?.valueChanges
-      .pipe(distinctUntilChanged())
-      .subscribe((newIdCity) => {
+      .pipe()
+      .subscribe(async (newIdCity) => {
+        if (!previousCityId || newIdCity === previousCityId) return;
+        const hasContacts = this.existingContacts && this.existingContacts.length;
+        if (hasContacts) {
+          const confirmed = await this.alertService.confirmDelete(
+            '¿Está seguro?',
+            'Si actualiza la ciudad todos los indicativos de teléfonos fijos de los contactos serán actualizados a la ciudad seleccionada.'
+          );
+          if (!confirmed) {
+            this.officeForm.patchValue({ idCity: previousCityId }, { emitEvent: false });
+            return;
+          }
+          this.updateContactsByCity(newIdCity);
+        }
+
         // Get selected city with name and set cityName
         const selectedCity = this.cities.find(city => city.idCity === newIdCity);
         this.officeForm.patchValue({
           cityName: selectedCity ? selectedCity.city : ''
         });
-        this.updateContactsByCity(newIdCity);
+        previousCityId = newIdCity;
       });
   }
 
