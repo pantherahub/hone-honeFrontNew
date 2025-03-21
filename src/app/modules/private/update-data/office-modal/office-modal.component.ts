@@ -164,12 +164,13 @@ export class OfficeModalComponent implements OnInit {
 
     this.officeForm.get('idCity')?.valueChanges
       .pipe(distinctUntilChanged())
-      .subscribe((value) => {
+      .subscribe((newIdCity) => {
         // Get selected city with name and set cityName
-        const selectedCity = this.cities.find(city => city.idCity === value);
+        const selectedCity = this.cities.find(city => city.idCity === newIdCity);
         this.officeForm.patchValue({
           cityName: selectedCity ? selectedCity.city : ''
         });
+        this.updateContactsByCity(newIdCity);
       });
   }
 
@@ -180,6 +181,68 @@ export class OfficeModalComponent implements OnInit {
       return { invalidLength: 'Debe tener entre 9 y 12 dígitos.' };
     }
     return null;
+  }
+
+  updateContactsByCity(newCityId: number) {
+
+    const updatePhoneArrays = (phones: any[]) => {
+      return phones.map((phone: any)  => {
+        if (phone.type === 'Fijo') {
+          const updatedPhone = {
+            ...phone,
+            idCity: newCityId,
+          };
+          return updatedPhone;
+        }
+        return { ...phone };
+      });
+    }
+
+    const updateCityForPhones = (contacts: any[], isContactBaseList: boolean = false) => {
+      return contacts.map(contact => {
+
+        // Modify only "Fijo" type phones
+        const hasFijoPhone = contact.Phones?.some((phone: any) => phone.type === 'Fijo');
+        if (!hasFijoPhone) return contact;
+
+        contact.Phones = contact.Phones.map((phone: any) => {
+          if (phone.type === 'Fijo') {
+            const updatedPhone = {
+              ...phone,
+              idCity: newCityId,
+              status: phone.status == null ? 'updated' : phone.status
+            };
+            if (phone.status == null) {
+              if (!contact.updatedPhones) {
+                contact.updatedPhones = [];
+              }
+              contact.updatedPhones.push({ ...updatedPhone });
+            }
+            return updatedPhone;
+          }
+          return phone;
+        });
+        contact.createdPhones = updatePhoneArrays(contact.createdPhones || []);
+        contact.updatedPhones = updatePhoneArrays(contact.updatedPhones || []);
+
+        if (isContactBaseList && contact.idTemporalContact) {
+          const alreadyUpdated = this.updatedContacts.controls.some(
+            (control) => control.value.idTemporalContact === contact.idTemporalContact
+          );
+          if (!alreadyUpdated) {
+            // Add contact to updatedContacts FormArray
+            this.updatedContacts.push(this.fb.nonNullable.control(contact));
+          }
+        }
+
+        return { ...contact };
+      });
+    };
+
+    // Update contacts in each list
+    this.existingContacts = updateCityForPhones(this.existingContacts, true);
+    this.createdContacts.setValue(updateCityForPhones(this.createdContacts.value || []));
+    this.updatedContacts.setValue(updateCityForPhones(this.updatedContacts.value || []));
   }
 
   get updatedContacts() {
@@ -197,6 +260,13 @@ export class OfficeModalComponent implements OnInit {
   }
 
   openContactModal(contactIndex: number | null = null) {
+    this.formUtils.trimFormStrControls(this.officeForm);
+    if (this.officeForm.invalid) {
+      this.formUtils.markFormTouched(this.officeForm);
+      this.alertService.warning('Aviso', 'Para actualizar contactos primero debe diligenciar la información de la sede.');
+      return;
+    }
+
     const contact = contactIndex != null
       ? this.existingContacts[contactIndex]
       : null;
@@ -211,6 +281,7 @@ export class OfficeModalComponent implements OnInit {
     });
     const instanceModal = modalRef.getContentComponent();
     instanceModal.contactModelType = this.modelType;
+    instanceModal.officeIdCity = this.officeForm.value.idCity;
     if (contact) instanceModal.contact = contact;
 
     modalRef.afterClose.subscribe((result: any) => {

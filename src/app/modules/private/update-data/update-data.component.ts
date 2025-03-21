@@ -545,6 +545,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       this.formUtils.markFormTouched(this.providerForm);
       return;
     };
+
     // Clear messages
     this.messageService.remove();
     this.backendError = null;
@@ -559,7 +560,9 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     }
 
     const website = this.providerForm.get('website')?.value?.toLowerCase() || null;
+    const email = this.providerForm.get('email')?.value?.toLowerCase() || null;
     this.providerForm.patchValue({
+      email: email,
       website: website,
       endTime: this.formatDate(new Date())
     });

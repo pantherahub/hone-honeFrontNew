@@ -129,14 +129,22 @@
 
 </div>
 
-<button class="fixed bottom-4 right-4 md:bottom-10 md:right-10 bg-gray-0 hover:bg-gray-100 py-2 px-3 rounded-full md:rounded-[2.5rem] flex gap-2" (click)="resetTutorial()">
-  <span class="hidden md:block text-sm/4 font-bold text-gray-900">Visita guiada</span>
-  <div class="text-gray-700">
-    <svg width="16" height="16">
-      <use xlink:href="/assets/icons/layout.svg#question-circle" width="16" height="16" />
+<!--
+BUTTON ANIMATION
+shadow-lg
+
+transition-all animated-border
+transition-all conic-gradient-border
+-->
+
+<button class="animation-testing fixed bottom-4 right-4 md:bottom-10 md:right-10 bg-gray-0 hover:bg-gray-100 py-3 px-4 rounded-full md:rounded-[2.5rem] flex gap-2 shadow-lg
+transition-all animated-border" (click)="resetTutorial()">
+  <span class="hidden md:block text-base/4 font-bold text-gray-900">Ver visita guiada</span>
+  <div class="text-gray-700  animate-bounce">
+    <svg width="18" height="18">
+      <use xlink:href="/assets/icons/layout.svg#question-circle" width="18" height="18" />
     </svg>
   </div>
-
 </button>
 
 
