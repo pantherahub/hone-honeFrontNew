@@ -342,16 +342,6 @@ export class OfficeModalComponent implements OnInit {
       ? this.existingSchedules[scheduleIndex]
       : null;
 
-    if (!schedule) {
-      const rangeCount = this.existingSchedules.filter(s => s.schedule.includes('-')).length;
-      const dayCount = this.existingSchedules.filter(s => !s.schedule.includes('-')).length;
-
-      if (rangeCount >= 3 && dayCount >= 8) {
-        this.alertService.warning('Límite alcanzado', 'No puede agregar más de 3 rangos y más de 8 días individuales.');
-        return;
-      }
-    }
-
     const modalRef = this.modalService.create<ScheduleFormComponent, any>({
       nzTitle: schedule ? 'Actualizar horario' : 'Agregar horario',
       // nzTitle: 'Seleccionar Horarios de Atención',

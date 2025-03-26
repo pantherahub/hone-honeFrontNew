@@ -77,7 +77,7 @@ export class ScheduleFormComponent implements OnInit {
     this.scheduleForm = this.fb.group({
       idTemporalSchedule: [null],
       idAddedTemporal: [Date.now().toString()], // Temporary identifier of objects in memory
-      scheduleType: ['', [Validators.required, this.exceedScheduleLimitValidator(this.existingSchedules, this.schedule)]], // Range or day
+      scheduleType: ['', [Validators.required]], // Range or day
 
       startDayRange: [''],
       endDayRange: [''],
@@ -237,24 +237,6 @@ export class ScheduleFormComponent implements OnInit {
         scheduleControl?.setErrors(null);
       }
 
-      return null;
-    };
-  }
-
-  exceedScheduleLimitValidator(existingSchedules: any[], currentSchedule: any | null) {
-    return (control: AbstractControl) => {
-      const value = control.value;
-      const rangeCount = existingSchedules.filter(s => s.schedule.includes('-')).length;
-      const dayCount = existingSchedules.filter(s => !s.schedule.includes('-')).length;
-
-      if (value === 'range' && rangeCount >= 3
-        && (!currentSchedule || currentSchedule.scheduleType === 'day')) {
-        return { maxRangesExceeded: true };
-      }
-      if (value === 'day' && dayCount >= 8
-        && (!currentSchedule || currentSchedule.scheduleType === 'range')) {
-        return { maxDaysExceeded: true };
-      }
       return null;
     };
   }

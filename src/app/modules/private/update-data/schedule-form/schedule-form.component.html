@@ -16,10 +16,6 @@
               El campo es requerido.
             } @else if (scheduleForm.controls['scheduleType'].hasError('overlappingSchedule')) {
               {{ scheduleForm.controls['scheduleType'].errors?.['overlappingSchedule'] }}
-            } @else if (scheduleForm.controls['scheduleType'].hasError('maxRangesExceeded')) {
-              No puede agregar más de 3 rangos.
-            } @else if (scheduleForm.controls['scheduleType'].hasError('maxDaysExceeded')) {
-              No puede agregar más de 8 días individuales.
             }
           </ng-template>
           <nz-select formControlName="scheduleType" nzPlaceHolder="Seleccionar tipo" (ngModelChange)="onScheduleTypeChange($event)">
