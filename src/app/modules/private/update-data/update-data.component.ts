@@ -487,8 +487,8 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
 
     if (deletedContact.idTemporalContact !== null) {
       // Search in updatedContacts and delete if it exists
-      const updatedIndex = this.updatedContacts.controls.findIndex(office =>
-        office.value.idTemporalContact == deletedContact.idTemporalContact
+      const updatedIndex = this.updatedContacts.controls.findIndex(contact =>
+        contact.value.idTemporalContact == deletedContact.idTemporalContact
       );
       if (updatedIndex !== -1) {
         this.updatedContacts.removeAt(updatedIndex);
@@ -497,8 +497,8 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       this.deletedContacts.push(this.fb.control(deletedContact.idTemporalContact));
     } else {
       // Search in createdContacts and delete if it exists
-      const createdIndex = this.createdContacts.controls.findIndex(office =>
-        JSON.stringify(office.value) === JSON.stringify(deletedContact)
+      const createdIndex = this.createdContacts.controls.findIndex(contact =>
+        JSON.stringify(contact.value) === JSON.stringify(deletedContact)
       );
       if (createdIndex !== -1) {
         this.createdContacts.removeAt(createdIndex);
@@ -527,7 +527,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       identification: '',
       dv: null,
       website: ''
-    });
+    }, { emitEvent: false });
     this.formUtils.clearFormArray(this.updatedOffices);
     this.formUtils.clearFormArray(this.createdOffices);
     this.formUtils.clearFormArray(this.deletedOffices);

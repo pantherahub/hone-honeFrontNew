@@ -1,0 +1,108 @@
+<form nz-form nzLayout="vertical" [formGroup]="scheduleForm" (ngSubmit)="onSubmit()" class="schedule-form">
+  @if (loading) {
+    <div class="loading-overlay">
+      <nz-spin [nzSize]="'large'" nzTip="Cargando..."></nz-spin>
+    </div>
+  }
+
+  <div nz-row [nzGutter]="16">
+
+    <nz-col [nzSpan]="24">
+      <nz-form-item>
+        <nz-form-label nzFor="scheduleType" [nzRequired]="true">Tipo de horario</nz-form-label>
+        <nz-form-control [nzErrorTip]="scheduleTypeErrorTip">
+          <ng-template #scheduleTypeErrorTip>
+            @if (scheduleForm.controls['scheduleType'].hasError('required')) {
+              El campo es requerido.
+            } @else if (scheduleForm.controls['scheduleType'].hasError('overlappingSchedule')) {
+              {{ scheduleForm.controls['scheduleType'].errors?.['overlappingSchedule'] }}
+            } @else if (scheduleForm.controls['scheduleType'].hasError('maxRangesExceeded')) {
+              No puede agregar más de 3 rangos.
+            } @else if (scheduleForm.controls['scheduleType'].hasError('maxDaysExceeded')) {
+              No puede agregar más de 8 días individuales.
+            }
+          </ng-template>
+          <nz-select formControlName="scheduleType" nzPlaceHolder="Seleccionar tipo" (ngModelChange)="onScheduleTypeChange($event)">
+            <nz-option *ngFor="let type of scheduleTypeMap" [nzValue]="type.value" [nzLabel]="type.label"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </nz-col>
+
+    @if (scheduleForm.get('scheduleType')?.value === 'range') {
+      <nz-col [nzSpan]="12">
+        <nz-form-item>
+          <nz-form-label nzFor="startDayRange" [nzRequired]="true">Día de inicio</nz-form-label>
+          <nz-form-control nzErrorTip="El campo es requerido.">
+            <nz-select formControlName="startDayRange" nzPlaceHolder="Seleccionar">
+              <nz-option *ngFor="let day of dayOptionsStart" [nzValue]="day" [nzLabel]="day"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+
+      <nz-col [nzSpan]="12">
+        <nz-form-item>
+          <nz-form-label nzFor="endDayRange" [nzRequired]="true">Día de fin</nz-form-label>
+          <nz-form-control nzErrorTip="El campo es requerido.">
+            <nz-select formControlName="endDayRange" nzPlaceHolder="Seleccionar">
+              <nz-option *ngFor="let day of availableEndDays" [nzValue]="day" [nzLabel]="day"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+    } @else if (scheduleForm.get('scheduleType')?.value === 'day') {
+      <nz-col [nzSpan]="24">
+        <nz-form-item>
+          <nz-form-label nzFor="day" [nzRequired]="true">Seleccionar día</nz-form-label>
+          <nz-form-control nzErrorTip="El campo es requerido.">
+            <nz-select formControlName="day" nzPlaceHolder="Seleccionar día">
+              <nz-option *ngFor="let day of dayOptionsWithFestivos" [nzValue]="day" [nzLabel]="day"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+    }
+
+    <nz-col [nzSpan]="24">
+      <nz-form-item>
+        <nz-form-label nzFor="type" [nzRequired]="true">Jornada</nz-form-label>
+        <nz-form-control [nzErrorTip]="typeErrorTip">
+          <ng-template #typeErrorTip>
+            @if (scheduleForm.controls['type'].hasError('required')) {
+              El campo es requerido.
+            } @else if (scheduleForm.controls['type'].hasError('duplicateSchedule')) {
+              {{ scheduleForm.controls['type'].errors?.['duplicateSchedule'] }}
+            }
+          </ng-template>
+          <nz-select formControlName="type" nzPlaceHolder="Seleccionar jornada">
+            <nz-option *ngFor="let jornada of dayType" [nzValue]="jornada" [nzLabel]="jornada"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </nz-col>
+
+    <nz-col [nzSpan]="12">
+      <nz-form-item>
+        <nz-form-label nzFor="startTime" [nzRequired]="true">Hora de inicio</nz-form-label>
+        <nz-form-control nzErrorTip="El campo es requerido.">
+          <input type="time" nz-input formControlName="startTime" />
+        </nz-form-control>
+      </nz-form-item>
+    </nz-col>
+
+    <nz-col [nzSpan]="12">
+      <nz-form-item>
+        <nz-form-label nzFor="endTime" [nzRequired]="true">Hora de fin</nz-form-label>
+        <nz-form-control nzErrorTip="El campo es requerido.">
+          <input type="time" nz-input formControlName="endTime" />
+        </nz-form-control>
+      </nz-form-item>
+    </nz-col>
+  </div>
+
+  <div nz-row nzJustify="end">
+    <button nz-button nzType="primary" type="submit">Guardar</button>
+  </div>
+
+</form>

@@ -75,30 +75,6 @@
       </nz-col>
 
       <nz-col [nzSpan]="24" [nzSm]="12">
-        <nz-form-item nz-row>
-          <nz-form-label [nzRequired]="true" nzFor="attentionDays">Días de atención</nz-form-label>
-          <nz-form-control [nzErrorTip]="attentionDaysErrorTip">
-            <ng-template #attentionDaysErrorTip>
-              <p *ngIf="officeForm.controls['attentionDays'].hasError('required')">El campo es requerido.</p>
-            </ng-template>
-            <input nz-input id="attentionDays" formControlName="attentionDays" placeholder="Días" />
-          </nz-form-control>
-        </nz-form-item>
-      </nz-col>
-
-      <nz-col [nzSpan]="24" [nzSm]="12">
-        <nz-form-item nz-row>
-          <nz-form-label [nzRequired]="true" nzFor="officeHours">Horario de atención</nz-form-label>
-          <nz-form-control [nzErrorTip]="officeHoursErrorTip">
-            <ng-template #officeHoursErrorTip>
-              <p *ngIf="officeForm.controls['officeHours'].hasError('required')">El campo es requerido.</p>
-            </ng-template>
-            <input nz-input id="officeHours" formControlName="officeHours" placeholder="Horario" />
-          </nz-form-control>
-        </nz-form-item>
-      </nz-col>
-
-      <nz-col [nzSpan]="24" [nzSm]="12">
         <nz-form-item>
           <nz-form-label [nzRequired]="true" nzFor="idsCompanies">Compañías con convenio</nz-form-label>
           <nz-form-control [nzErrorTip]="idsCompaniesErrorTip">
@@ -120,6 +96,39 @@
         </nz-form-item>
       </nz-col>
 
+    </div>
+
+    <!-- Schedules -->
+    <div>
+      <div class="table-head">
+        <h3 class="table-head__title">Horarios de atención</h3>
+        <button nz-button nzType="primary" type="button" (click)="openScheduleModal()">Agregar nuevo</button>
+      </div>
+
+      <!-- Table -->
+      <div class="responsive-table">
+        <nz-table #scheduleTable nzSize="small" [nzData]="existingSchedules" [nzPageSize]="schedulePageSize" [nzPageIndex]="schedulePage" (nzPageIndexChange)="schedulePage = $event" [nzLoading]="loadingSchedules" class="schedule-table">
+          <thead>
+            <tr>
+              <th>Días</th>
+              <th>Jornada</th>
+              <th>Horario</th>
+              <th nzWidth="100px">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of scheduleTable.data; let i = index">
+              <td>{{ data.schedule || '' }}</td>
+              <td>{{ data.type || '' }}</td>
+              <td>{{ data.startTime + ' - ' + data.endTime || '' }}</td>
+              <td class="schedule-table__action">
+                <button nz-button nzType="primary" type="button" (click)="openScheduleModal(getGlobalIndex(schedulePage, schedulePageSize, i))" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
+                <button nz-button nzDanger nzType="primary" type="button" (click)="deleteSchedule(getGlobalIndex(schedulePage, schedulePageSize, i))" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </div>
     </div>
 
     <!-- Contacts -->
@@ -144,8 +153,8 @@
               <td>{{ data.occupationName || data.OccupationForOffice?.occupation || '' }}</td>
               <td>{{ data.name || 'N/A' }}</td>
               <td class="contact-table__action">
-                <button nz-button nzType="primary" type="button" (click)="openContactModal(getGlobalIndex(i))" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
-                <button nz-button nzDanger nzType="primary" type="button" (click)="deleteContact(getGlobalIndex(i))" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button>
+                <button nz-button nzType="primary" type="button" (click)="openContactModal(getGlobalIndex(contactPage, contactPageSize, i))" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
+                <button nz-button nzDanger nzType="primary" type="button" (click)="deleteContact(getGlobalIndex(contactPage, contactPageSize, i))" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button>
               </td>
             </tr>
           </tbody>
