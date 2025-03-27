@@ -13,7 +13,8 @@ import { EventManagerService } from 'src/app/services/events-manager/event-manag
 import { distinctUntilChanged } from 'rxjs';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { AlertService } from 'src/app/services/alerts/alert.service';
-import { ScheduleFormComponent } from '../schedule-form/schedule-form.component';
+import { ScheduleFormComponent } from './schedule-form/schedule-form.component';
+import { AddressFormComponent } from './address-form/address-form.component';
 
 @Component({
   selector: 'app-office-modal',
@@ -333,6 +334,29 @@ export class OfficeModalComponent implements OnInit {
     return this.officeForm.get('deletedContacts') as FormArray;
   }
 
+  openAddressModal() {
+    const modalRef = this.modalService.create<AddressFormComponent, any>({
+      nzTitle: 'Dirección de atención de usuarios',
+      nzContent: AddressFormComponent,
+      nzCentered: true,
+      nzClosable: true,
+      nzWidth: '600px',
+      nzStyle: { 'max-width': '90%', 'margin': '22px 0' }
+    });
+
+    const instanceModal = modalRef.getContentComponent();
+    instanceModal.address = this.officeForm.value.address;
+
+    modalRef.afterClose.subscribe((result: any) => {
+      if (result && result.address) {
+        const newAddress = result.address;
+        // console.log("close.result.address:", newAddress);
+        this.officeForm.patchValue({ address: newAddress });
+        // this.formattedAddress = direccion;
+      }
+    });
+  }
+
   getGlobalIndex(page: number, pageSize: number, localIndex: number): number {
     return (page - 1) * pageSize + localIndex;
   }
@@ -348,7 +372,8 @@ export class OfficeModalComponent implements OnInit {
       nzContent: ScheduleFormComponent,
       nzCentered: true,
       nzClosable: true,
-      nzWidth: '600px'
+      nzWidth: '600px',
+      nzStyle: { 'max-width': '90%', 'margin': '22px 0' }
     });
     const instanceModal = modalRef.getContentComponent();
     if (schedule) instanceModal.schedule = schedule;

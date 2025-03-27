@@ -10,7 +10,7 @@
             <ng-template #addressErrorTip>
               <p *ngIf="officeForm.controls['address'].hasError('required')">El campo es requerido.</p>
             </ng-template>
-            <input nz-input id="address" formControlName="address" placeholder="Dirección" />
+            <input nz-input id="address" [value]="officeForm.get('address')?.value || 'Seleccionar'" readonly placeholder="Dirección" (click)="openAddressModal()" class="cursor-pointer" />
           </nz-form-control>
         </nz-form-item>
       </nz-col>

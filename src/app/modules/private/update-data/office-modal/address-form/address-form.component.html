@@ -1,0 +1,162 @@
+<form nz-form nzLayout="vertical" [formGroup]="addressForm" (ngSubmit)="onSubmit()" class="address-form">
+  <nz-row [nzGutter]="16">
+    <!-- Tipo de Vía -->
+    <nz-col [nzSpan]="12">
+      <nz-form-item>
+        <nz-form-label nzRequired>Tipo de vía</nz-form-label>
+        <nz-form-control nzErrorTip="El campo es requerido.">
+          <nz-select nzSize="small" nzAllowClear formControlName="typeOfRoad" nzPlaceHolder="Seleccione">
+            <nz-option *ngFor="let option of viaOptions" [nzValue]="option" [nzLabel]="option"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </nz-col>
+
+    <!-- Nombre o Número de Vía -->
+    <nz-col [nzSpan]="12">
+      <nz-form-item>
+        <nz-form-label nzRequired>Nombre/número de vía</nz-form-label>
+        <nz-form-control nzErrorTip="El campo es requerido.">
+          <input nz-input nzSize="small" formControlName="roadName" placeholder="Ej: 13, Circunvalar" />
+        </nz-form-control>
+      </nz-form-item>
+    </nz-col>
+  </nz-row>
+
+  <nz-row [nzGutter]="16">
+    <!-- Complementos de Vía -->
+    <nz-col [nzSpan]="12">
+      <nz-form-item>
+        <nz-form-label>Complemento de vía</nz-form-label>
+        <nz-form-control>
+          <nz-select nzSize="small" nzAllowClear formControlName="roadMainComplement" nzPlaceHolder="Opcional">
+            <nz-option *ngFor="let option of lettersWithBis" [nzValue]="option" [nzLabel]="option"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </nz-col>
+
+    <nz-col [nzSpan]="12">
+      <nz-form-item>
+        <nz-form-label>Segundo complemento de vía</nz-form-label>
+        <nz-form-control>
+          <nz-select nzSize="small" nzAllowClear formControlName="roadSecondaryComplement" nzPlaceHolder="Opcional">
+            <nz-option *ngFor="let option of allNumberComplementOptions" [nzValue]="option" [nzLabel]="option"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </nz-col>
+  </nz-row>
+
+  <nz-row [nzGutter]="16">
+    <!-- Número Principal -->
+    <nz-col [nzSpan]="12">
+      <nz-form-item>
+        <nz-form-label nzRequired>Número</nz-form-label>
+        <nz-form-control nzErrorTip="Ingrese un número de máximo 2 dígitos">
+          <input nz-input nzSize="small" formControlName="mainNumber" placeholder="Ej: 13" />
+        </nz-form-control>
+      </nz-form-item>
+    </nz-col>
+
+    <nz-col [nzSpan]="12">
+      <nz-form-item>
+        <nz-form-label>Complemento número</nz-form-label>
+        <nz-form-control>
+          <nz-select nzSize="small" nzAllowClear formControlName="mainNumberComplement" nzPlaceHolder="Opcional">
+            <nz-option *ngFor="let option of lettersWithBis" [nzValue]="option" [nzLabel]="option"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </nz-col>
+  </nz-row>
+
+  <nz-row [nzGutter]="16">
+    <!-- Número Secundario -->
+    <nz-col [nzSpan]="12">
+      <nz-form-item>
+        <nz-form-label nzRequired>Segundo número</nz-form-label>
+        <nz-form-control nzErrorTip="Ingrese un número de máximo 2 dígitos">
+          <input nz-input nzSize="small" formControlName="secondaryNumber" placeholder="Ej: 23" />
+        </nz-form-control>
+      </nz-form-item>
+    </nz-col>
+
+    <nz-col [nzSpan]="12">
+      <nz-form-item>
+        <nz-form-label>Complemento segundo número</nz-form-label>
+        <nz-form-control>
+          <nz-select nzSize="small" nzAllowClear formControlName="secondaryNumberComplement" nzPlaceHolder="Opcional">
+            <nz-option *ngFor="let option of allNumberComplementOptions" [nzValue]="option" [nzLabel]="option"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </nz-col>
+  </nz-row>
+
+  <nz-row [nzGutter]="16">
+    <!-- Barrio -->
+    <nz-col [nzSpan]="24">
+      <nz-form-item>
+        <nz-form-label nzRequired>Barrio</nz-form-label>
+        <nz-form-control nzErrorTip="El campo es requerido.">
+          <input nz-input nzSize="small" formControlName="neighborhood" placeholder="Ej: Santa Mónica" />
+        </nz-form-control>
+      </nz-form-item>
+    </nz-col>
+
+    <!-- Complementos de Dirección -->
+    <nz-col [nzSpan]="24">
+      <nz-form-item>
+        <nz-form-label>Complemento de dirección</nz-form-label>
+        <nz-form-control>
+          <nz-row>
+            <nz-col [nzSpan]="addressForm.get('addressMainComplement')?.value ? 12 : 24">
+              <nz-select nzSize="small" nzAllowClear formControlName="addressMainComplement" nzPlaceHolder="Opcional">
+                <nz-option *ngFor="let option of addressMainComplementOptions" [nzValue]="option" [nzLabel]="option"></nz-option>
+              </nz-select>
+            </nz-col>
+            @if (addressForm.get('addressMainComplement')?.value) {
+              <nz-col [nzSpan]="12">
+                <input nz-input nzSize="small" formControlName="addressMainNameComplement" placeholder="Número o nombre" />
+              </nz-col>
+            }
+          </nz-row>
+        </nz-form-control>
+      </nz-form-item>
+    </nz-col>
+
+    <nz-col [nzSpan]="24">
+      <nz-form-item>
+        <nz-form-label>2do complemento de dirección</nz-form-label>
+        <nz-form-control>
+          <nz-row>
+            <nz-col [nzSpan]="addressForm.get('addressSecondaryComplement')?.value ? 12 : 24">
+              <nz-select nzSize="small" nzAllowClear formControlName="addressSecondaryComplement" nzPlaceHolder="Opcional">
+                <nz-option *ngFor="let option of addressSecondaryComplementOptions" [nzValue]="option" [nzLabel]="option"></nz-option>
+              </nz-select>
+            </nz-col>
+            @if (addressForm.get('addressSecondaryComplement')?.value) {
+              <nz-col [nzSpan]="12">
+                <input nz-input nzSize="small" formControlName="addressSecondaryNameComplement" placeholder="Número o nombre" />
+              </nz-col>
+            }
+          </nz-row>
+        </nz-form-control>
+      </nz-form-item>
+    </nz-col>
+
+  </nz-row>
+
+  <nz-form-item>
+    <nz-form-label>Dirección Formateada</nz-form-label>
+    <nz-form-control>
+      <input nz-input [value]="formattedAddress" disabled />
+    </nz-form-control>
+  </nz-form-item>
+
+
+  <div style="display: flex; justify-content: end; margin-top: 16px;">
+    <button nz-button nzType="primary">Guardar</button>
+  </div> <!-- [disabled]="addressForm.invalid" -->
+</form>
