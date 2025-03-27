@@ -37,7 +37,32 @@ export class AddressFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.allNumberComplementOptions = [...this.complementOptions, ...this.lettersWithBis];
+    this.initializeForm();
+  }
 
+  loadAddressData(): void {
+    if (!this.address) return;
+    this.addressForm.patchValue({
+      typeOfRoad: this.address.typeOfRoad,
+      roadName: this.address.roadName,
+      roadMainComplement: this.address.roadMainComplement || null,
+      roadSecondaryComplement: this.address.roadSecondaryComplement || null,
+      mainNumber: this.address.mainNumber,
+      mainNumberComplement: this.address.mainNumberComplement || null,
+      secondaryNumber: this.address.secondaryNumber,
+      secondaryNumberComplement: this.address.secondaryNumberComplement || null,
+      neighborhood: this.address.neighborhood,
+      addressMainComplement: this.address.addressMainComplement || null,
+      addressMainNameComplement: this.address.addressMainNameComplement || null,
+
+      addressSecondaryComplement: this.address.addressSecondaryComplement || null,
+      addressSecondaryNameComplement: this.address.addressSecondaryNameComplement || null,
+
+      formattedAddress: this.address.formattedAddress || null
+    });
+  }
+
+  initializeForm() {
     this.addressForm = this.fb.group({
       typeOfRoad: [null, Validators.required],
       roadName: [null, Validators.required],
@@ -48,40 +73,36 @@ export class AddressFormComponent implements OnInit {
       secondaryNumber: [null, [Validators.required, Validators.pattern(/^\d{1,2}$/)]],
       secondaryNumberComplement: [null],
       neighborhood: [null, Validators.required],
+
       addressMainComplement: [null],
       addressMainNameComplement: [null],
-      // addressMainNameComplement: [{ value: null, disabled: true }],
+
       addressSecondaryComplement: [null],
-      addressSecondaryNameComplement: [null]
-      // addressSecondaryNameComplement: [{ value: null, disabled: true }]
+      addressSecondaryNameComplement: [null],
+
+      formattedAddress: [null]
     });
 
     this.addressForm.get('addressMainComplement')?.valueChanges.subscribe(value => {
-      console.log("addressMainComplement1111");
+      // console.log("addressMainComplement1111");
       const mainNameComplementControl = this.addressForm.get('addressMainNameComplement');
       if (value) {
         mainNameComplementControl?.setValidators([Validators.required]);
-        // this.addressForm.get('addressMainNameComplement')?.enable();
       } else {
         mainNameComplementControl?.clearValidators();
         mainNameComplementControl?.setValue('');
-        // this.addressForm.get('addressMainNameComplement')?.disable();
-        // this.addressForm.get('addressMainNameComplement')?.reset();
       }
       mainNameComplementControl?.updateValueAndValidity();
     });
 
     this.addressForm.get('addressSecondaryComplement')?.valueChanges.subscribe(value => {
-      console.log("addressSecondaryNameComplement2222");
+      // console.log("addressSecondaryNameComplement2222");
       const secondaryNameComplementControl = this.addressForm.get('addressSecondaryNameComplement');
       if (value) {
         secondaryNameComplementControl?.setValidators([Validators.required]);
-        // this.addressForm.get('addressSecondaryNameComplement')?.enable();
       } else {
         secondaryNameComplementControl?.clearValidators();
         secondaryNameComplementControl?.setValue('');
-        // this.addressForm.get('addressSecondaryNameComplement')?.disable();
-        // this.addressForm.get('addressSecondaryNameComplement')?.reset();
       }
       secondaryNameComplementControl?.updateValueAndValidity();
     });
@@ -89,80 +110,23 @@ export class AddressFormComponent implements OnInit {
     this.addressForm.valueChanges.subscribe(() => {
       this.updateFormattedAddress();
     });
+
+    this.loadAddressData();
   }
 
   updateFormattedAddress() {
-    console.log("updateFormattedAddress000");
-
-    const {
-      typeOfRoad,
-      roadName,
-      roadMainComplement,
-      roadSecondaryComplement,
-
-      mainNumber,
-      mainNumberComplement,
-      secondaryNumber,
-      secondaryNumberComplement,
-
-      neighborhood,
-
-      addressMainComplement,
-      addressMainNameComplement,
-
-      addressSecondaryComplement,
-      addressSecondaryNameComplement
-    } = this.addressForm.value;
-
-    let address = `${typeOfRoad || ''} ${roadName || ''}`;
-
-    if (roadMainComplement) address += ` ${roadMainComplement}`;
-    if (roadSecondaryComplement) address += ` ${roadSecondaryComplement}`;
-
-    if (mainNumber || secondaryNumber) {
-      address += ` #${mainNumber || ''}`;
-      if (mainNumberComplement) address += ` ${mainNumberComplement}`;
-
-      address += ` - ${secondaryNumber || ''}`;
-      if (secondaryNumberComplement) address += ` ${secondaryNumberComplement}`;
-    }
-
-
-    if (addressMainComplement) {
-      address += ` ${addressMainComplement}`;
-      if (addressMainNameComplement) address += ` ${addressMainNameComplement}`;
-    }
-
-    if (addressSecondaryComplement) {
-      address += ` ${addressSecondaryComplement}`;
-      if (addressSecondaryNameComplement) address += ` ${addressSecondaryNameComplement}`;
-    }
-
-    if (neighborhood) address += `, ${neighborhood}`;
-
-    this.formattedAddress = address.trim();
+    this.formattedAddress = this.formUtils.formatAddress(this.addressForm.value);
   }
 
   onSubmit() {
-    console.log("onSubmit");
     this.formUtils.markFormTouched(this.addressForm);
-    if (this.addressForm.invalid) {
-      console.log("invalido");
-      return;
-    }
-    return;
+    if (this.addressForm.invalid) return;
 
+    this.addressForm.patchValue({
+      formattedAddress: this.formattedAddress
+    });
     const addressData = this.addressForm.value;
     this.modal.close({ address: addressData });
-
-    // const { tipoVia, numero, complemento, barrio } = this.addressForm.value;
-    // let direccion = `${tipoVia} ${numero}`;
-    // if (complemento) direccion += ` ${complemento}`;
-    // if (barrio) direccion += `, ${barrio}`;
-
-    // this.modal.close({
-    //   address: direccion
-    // });
   }
 
 }

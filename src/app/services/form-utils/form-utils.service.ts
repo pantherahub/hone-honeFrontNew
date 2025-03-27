@@ -93,4 +93,57 @@ export class FormUtilsService {
     }
   }
 
+  /**
+   * Format address object to string.
+   */
+  formatAddress(addressObj: any): string {
+    const {
+      typeOfRoad,
+      roadName,
+      roadMainComplement,
+      roadSecondaryComplement,
+
+      mainNumber,
+      mainNumberComplement,
+      secondaryNumber,
+      secondaryNumberComplement,
+
+      neighborhood,
+
+      addressMainComplement,
+      addressMainNameComplement,
+
+      addressSecondaryComplement,
+      addressSecondaryNameComplement
+    } = addressObj;
+
+    let address = `${typeOfRoad || ''} ${roadName || ''}`;
+
+    if (roadMainComplement) address += ` ${roadMainComplement}`;
+    if (roadSecondaryComplement) address += ` ${roadSecondaryComplement}`;
+
+    if (mainNumber || secondaryNumber) {
+      address += ` #${mainNumber || ''}`;
+      if (mainNumberComplement) address += ` ${mainNumberComplement}`;
+
+      address += ` - ${secondaryNumber || ''}`;
+      if (secondaryNumberComplement) address += ` ${secondaryNumberComplement}`;
+    }
+
+
+    if (addressMainComplement) {
+      address += ` ${addressMainComplement}`;
+      if (addressMainNameComplement) address += ` ${addressMainNameComplement}`;
+    }
+
+    if (addressSecondaryComplement) {
+      address += ` ${addressSecondaryComplement}`;
+      if (addressSecondaryNameComplement) address += ` ${addressSecondaryNameComplement}`;
+    }
+
+    if (neighborhood) address += `, ${neighborhood}`;
+
+    return address.trim();
+  }
+
 }

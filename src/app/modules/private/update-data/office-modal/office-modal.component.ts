@@ -188,10 +188,10 @@ export class OfficeModalComponent implements OnInit {
     this.officeForm = this.fb.group({
       idTemporalOfficeProvider: [this.office?.idTemporalOfficeProvider || null],
       idAddedTemporal: [this.office?.idTemporalOfficeProvider ? null : this.office?.idAddedTemporal ?? Date.now().toString()],
+      idCity: [this.office?.idCity || '', [Validators.required]],
       address: [this.office?.address || '', [Validators.required]],
       enableCode: [this.office?.enableCode || '', [Validators.required, this.formUtils.numeric, this.enableCodeValidator]],
       name: [this.office?.name || '', [Validators.required]],
-      idCity: [this.office?.idCity || '', [Validators.required]],
       cityName: [this.office?.cityName || this.office?.City?.city || ''],
       schedulingLink: [this.office?.schedulingLink || '', [this.formUtils.url]],
       idsCompanies : [this.getIdsCompanies(), [Validators.required]],

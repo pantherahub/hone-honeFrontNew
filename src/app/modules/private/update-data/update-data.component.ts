@@ -284,7 +284,18 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
           website: data.website
         });
 
-        this.existingOffices = data.TemporalOffices;
+        this.existingOffices = data.TemporalOffices.map((office: any) => {
+          if (office.address) {
+            return {
+              ...office,
+              address: {
+                ...office.address,
+                formattedAddress: this.formUtils.formatAddress(office.address)
+              }
+            };
+          }
+          return office;
+        });
         this.existingContacts = data.TemporalContactsForProvider;
 
         this.subscribeOnChange();
