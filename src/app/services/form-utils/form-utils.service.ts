@@ -132,16 +132,15 @@ export class FormUtilsService {
 
 
     if (addressMainComplement) {
-      address += ` ${addressMainComplement}`;
+      address += `, ${addressMainComplement}`;
       if (addressMainNameComplement) address += ` ${addressMainNameComplement}`;
     }
-
     if (addressSecondaryComplement) {
-      address += ` ${addressSecondaryComplement}`;
+      address += `, ${addressSecondaryComplement}`;
       if (addressSecondaryNameComplement) address += ` ${addressSecondaryNameComplement}`;
     }
 
-    if (neighborhood) address += `, ${neighborhood}`;
+    if (neighborhood) address += `, Barrio ${neighborhood}`;
 
     return address.trim();
   }

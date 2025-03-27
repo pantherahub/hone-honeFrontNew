@@ -69,9 +69,9 @@ export class AddressFormComponent implements OnInit {
       roadName: [null, Validators.required],
       roadMainComplement: [null],
       roadSecondaryComplement: [null],
-      mainNumber: [null, [Validators.required, Validators.pattern(/^\d{1,2}$/)]],
+      mainNumber: [null, [Validators.required, Validators.pattern(/^\d{1,3}$/)]],
       mainNumberComplement: [null],
-      secondaryNumber: [null, [Validators.required, Validators.pattern(/^\d{1,2}$/)]],
+      secondaryNumber: [null, [Validators.required, Validators.pattern(/^\d{1,3}$/)]],
       secondaryNumberComplement: [null],
       neighborhood: [null, Validators.required],
 
@@ -106,11 +106,11 @@ export class AddressFormComponent implements OnInit {
       secondaryNameComplementControl?.updateValueAndValidity();
     });
 
-    this.loadAddressData();
-
     this.addressForm.valueChanges.subscribe(() => {
       this.updateFormattedAddress();
     });
+
+    this.loadAddressData();
   }
 
   getFormControl(controlName: string): AbstractControl<any, any> | null {
