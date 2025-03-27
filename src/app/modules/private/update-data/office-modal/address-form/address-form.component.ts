@@ -125,6 +125,11 @@ export class AddressFormComponent implements OnInit {
     this.formUtils.markFormTouched(this.addressForm);
     if (this.addressForm.invalid) return;
 
+    const roadNameControl = this.addressForm.get('roadName');
+    roadNameControl?.setValue(
+      this.formUtils.capitalizeWords(roadNameControl?.value)
+    );
+
     this.addressForm.patchValue({
       formattedAddress: this.formattedAddress
     });
