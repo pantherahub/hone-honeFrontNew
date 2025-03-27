@@ -189,7 +189,7 @@ export class OfficeModalComponent implements OnInit {
       idTemporalOfficeProvider: [this.office?.idTemporalOfficeProvider || null],
       idAddedTemporal: [this.office?.idTemporalOfficeProvider ? null : this.office?.idAddedTemporal ?? Date.now().toString()],
       idCity: [this.office?.idCity || '', [Validators.required]],
-      address: [this.office?.address || '', [Validators.required]],
+      address: [this.office?.address || null, [Validators.required]],
       enableCode: [this.office?.enableCode || '', [Validators.required, this.formUtils.numeric, this.enableCodeValidator]],
       name: [this.office?.name || '', [Validators.required]],
       cityName: [this.office?.cityName || this.office?.City?.city || ''],
@@ -232,6 +232,15 @@ export class OfficeModalComponent implements OnInit {
             return;
           }
           this.updateContactsByCity(newIdCity);
+        }
+
+        // Adds the idCity to the address object if it is already filled in
+        const address = this.officeForm.get('address');
+        if (address?.value) {
+          address.patchValue({
+            ...address?.value,
+            idCity: newIdCity
+          });
         }
 
         // Get selected city with name and set cityName
@@ -340,7 +349,7 @@ export class OfficeModalComponent implements OnInit {
       nzContent: AddressFormComponent,
       nzCentered: true,
       nzClosable: true,
-      nzWidth: '600px',
+      nzWidth: '800px',
       nzStyle: { 'max-width': '90%', 'margin': '22px 0' }
     });
 
@@ -350,9 +359,8 @@ export class OfficeModalComponent implements OnInit {
     modalRef.afterClose.subscribe((result: any) => {
       if (result && result.address) {
         const newAddress = result.address;
-        // console.log("close.result.address:", newAddress);
-        this.officeForm.patchValue({ address: newAddress });
-        // this.formattedAddress = direccion;
+        const idCity = this.officeForm.get('idCity')?.value;
+        this.officeForm.patchValue({ address: { ...newAddress, idCity } });
       }
     });
   }

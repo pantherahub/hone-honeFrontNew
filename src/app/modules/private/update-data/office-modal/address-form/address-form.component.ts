@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzModalRef } from 'ng-zorro-antd/modal';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
@@ -60,6 +60,7 @@ export class AddressFormComponent implements OnInit {
 
       formattedAddress: this.address.formattedAddress || null
     });
+    this.formattedAddress = this.address.formattedAddress;
   }
 
   initializeForm() {
@@ -84,7 +85,6 @@ export class AddressFormComponent implements OnInit {
     });
 
     this.addressForm.get('addressMainComplement')?.valueChanges.subscribe(value => {
-      // console.log("addressMainComplement1111");
       const mainNameComplementControl = this.addressForm.get('addressMainNameComplement');
       if (value) {
         mainNameComplementControl?.setValidators([Validators.required]);
@@ -96,7 +96,6 @@ export class AddressFormComponent implements OnInit {
     });
 
     this.addressForm.get('addressSecondaryComplement')?.valueChanges.subscribe(value => {
-      // console.log("addressSecondaryNameComplement2222");
       const secondaryNameComplementControl = this.addressForm.get('addressSecondaryNameComplement');
       if (value) {
         secondaryNameComplementControl?.setValidators([Validators.required]);
@@ -107,11 +106,15 @@ export class AddressFormComponent implements OnInit {
       secondaryNameComplementControl?.updateValueAndValidity();
     });
 
+    this.loadAddressData();
+
     this.addressForm.valueChanges.subscribe(() => {
       this.updateFormattedAddress();
     });
+  }
 
-    this.loadAddressData();
+  getFormControl(controlName: string): AbstractControl<any, any> | null {
+    return this.addressForm.get(controlName);
   }
 
   updateFormattedAddress() {

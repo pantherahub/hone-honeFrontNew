@@ -285,13 +285,12 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
         });
 
         this.existingOffices = data.TemporalOffices.map((office: any) => {
-          if (office.address) {
+          if (office.TemporalAddress && office.TemporalAddress?.City) {
             return {
               ...office,
-              address: {
-                ...office.address,
-                formattedAddress: this.formUtils.formatAddress(office.address)
-              }
+              idCity: office.TemporalAddress.City.idCity,
+              cityName: office.TemporalAddress.City.city,
+              address: office.TemporalAddress,
             };
           }
           return office;

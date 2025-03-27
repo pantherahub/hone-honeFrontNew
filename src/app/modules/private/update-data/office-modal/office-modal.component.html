@@ -23,10 +23,7 @@
       <nz-col [nzSpan]="24" [nzSm]="12">
         <nz-form-item>
           <nz-form-label [nzRequired]="true" nzFor="address">Dirección de atención de usuarios</nz-form-label>
-          <nz-form-control [nzErrorTip]="addressErrorTip">
-            <ng-template #addressErrorTip>
-              <p *ngIf="officeForm.controls['address'].hasError('required')">El campo es requerido.</p>
-            </ng-template>
+          <nz-form-control [nzValidateStatus]="officeForm.controls['address']" nzErrorTip="El campo es requerido.">
             <input nz-input id="address" [value]="officeForm.get('address')?.value?.formattedAddress || 'Seleccionar'" readonly placeholder="Dirección" (click)="openAddressModal()" class="cursor-pointer" />
           </nz-form-control>
         </nz-form-item>

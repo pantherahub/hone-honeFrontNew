@@ -158,7 +158,7 @@
                 <tbody>
                   <tr *ngFor="let data of officeTable.data; let i = index">
                     <td>{{ data.name }}</td>
-                    <td>{{ data.cityName || data.City?.city || '' }}</td>
+                    <td>{{ data.cityName || data.TemporalAddress?.City?.city || '' }}</td>
                     <td class="truncate max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap">{{ data.address?.formattedAddress || '' }}</td>
                     <td class="provider-table__action">
                       <button nz-button nzType="primary" type="button" (click)="openOfficeModal(getGlobalIndex(i, officePage, officePageSize))" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
