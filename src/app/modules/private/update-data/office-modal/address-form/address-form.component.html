@@ -104,13 +104,13 @@
         <nz-form-label>Complemento de dirección</nz-form-label>
         <nz-form-control>
           <nz-row>
-            <nz-col [nzSpan]="24" [nzSm]="addressForm.get('addressMainComplement')?.value ? 12 : 24">
+            <nz-col [nzSpan]="24" [nzSm]="addressForm.get('addressMainComplement')?.value ? 9 : 24">
               <nz-select nzSize="small" nzAllowClear formControlName="addressMainComplement" nzPlaceHolder="Opcional">
                 <nz-option *ngFor="let option of addressMainComplementOptions" [nzValue]="option" [nzLabel]="option"></nz-option>
               </nz-select>
             </nz-col>
             @if (addressForm.get('addressMainComplement')?.value) {
-              <nz-col [nzSpan]="24" [nzSm]="12">
+              <nz-col [nzSpan]="24" [nzSm]="15">
                 <input nz-input nzSize="small" formControlName="addressMainNameComplement" placeholder="Número o nombre" />
               </nz-col>
             }
@@ -124,13 +124,13 @@
         <nz-form-label>2do complemento de dirección</nz-form-label>
         <nz-form-control>
           <nz-row>
-            <nz-col [nzSpan]="24" [nzSm]="addressForm.get('addressSecondaryComplement')?.value ? 12 : 24">
+            <nz-col [nzSpan]="24" [nzSm]="addressForm.get('addressSecondaryComplement')?.value ? 9 : 24">
               <nz-select nzSize="small" nzAllowClear formControlName="addressSecondaryComplement" nzPlaceHolder="Opcional">
                 <nz-option *ngFor="let option of addressSecondaryComplementOptions" [nzValue]="option" [nzLabel]="option"></nz-option>
               </nz-select>
             </nz-col>
             @if (addressForm.get('addressSecondaryComplement')?.value) {
-              <nz-col [nzSpan]="24" [nzSm]="12">
+              <nz-col [nzSpan]="24" [nzSm]="15">
                 <input nz-input nzSize="small" formControlName="addressSecondaryNameComplement" placeholder="Número o nombre" />
               </nz-col>
             }
