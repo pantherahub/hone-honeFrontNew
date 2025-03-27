@@ -152,7 +152,7 @@
         <nz-col [nzSpan]="24" [nzSm]="12">
           <nz-form-item>
             <nz-form-control>
-              <button nz-button nzType="dashed" type="button" (click)="addEmail()" [disabled]="emailsArray.length >= 5">
+              <button nz-button nzType="dashed" type="button" (click)="addEmail()" [disabled]="emailsArray.length >= 5" class="flex items-center">
                 <span nz-icon nzType="plus"></span> Agregar correo
               </button>
             </nz-form-control>
@@ -165,25 +165,31 @@
       <nz-form-label [nzRequired]="true">Teléfono(s)</nz-form-label>
       <div nz-row [nzGutter]="16" formArrayName="Phones">
         @for (control of phonesArray.controls; track control; let i = $index) {
-          <nz-col [nzSpan]="11" [nzSm]="6">
-            <nz-form-item [formGroupName]="i">
+          <nz-col [nzSpan]="isFijoPhone(control) ? 12 : 11" [nzSm]="7">
+            <nz-form-item [formGroupName]="i" class="sm:mb-0">
               <nz-form-control nzErrorTip="El campo es requerido.">
                 <nz-select formControlName="type" nzPlaceHolder="Tipo">
                   <nz-option *ngFor="let option of phoneNumberTypes" [nzValue]="option" [nzLabel]="option"></nz-option>
                 </nz-select>
-                <span
-                  nz-icon
-                  nzType="minus-circle-o"
-                  class="dynamic-delete-button"
-                  *ngIf="phonesArray.length > 1"
-                  (click)="removePhone(i)"
-                ></span>
               </nz-form-control>
             </nz-form-item>
           </nz-col>
 
-          <nz-col [nzSpan]="13" [nzSm]="6">
-            <nz-form-item [formGroupName]="i">
+          <nz-col [nzSpan]="12" [nzSm]="7" *ngIf="control.get('type')?.value === 'Fijo'">
+            <nz-form-item [formGroupName]="i" class="sm:mb-0">
+              <nz-form-control nzErrorTip="El campo es requerido.">
+                <nz-select formControlName="idCity" nzPlaceHolder="Indicativo" nzShowSearch [nzCustomTemplate]="selectedTemplate">
+                  <nz-option *ngFor="let option of cities" [nzValue]="option.idCity" [nzLabel]="option.label"></nz-option>
+                  <ng-template #selectedTemplate let-selected>
+                    <span class="custom-selected">{{ getSelectedIndicative(selected.nzValue) }}</span>
+                  </ng-template>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+
+          <nz-col [nzSpan]="isFijoPhone(control) ? 24 : 13" [nzSm]="isFijoPhone(control) ? 10 : 7">
+            <nz-form-item [formGroupName]="i" class="mb-0">
               <nz-form-control [nzErrorTip]="phoneErrorTip">
                 <ng-template #phoneErrorTip>
                   @if (control.get('number')?.hasError('required')) {
@@ -203,11 +209,20 @@
               </nz-form-control>
             </nz-form-item>
           </nz-col>
+
+          <nz-col [nzSpan]="24" class="delete-button mb-4" *ngIf="phonesArray.length > 1">
+            <span
+              nz-icon
+              nzType="minus-circle-o"
+              class="dynamic-delete-button"
+              (click)="removePhone(i)">
+            </span>
+          </nz-col>
         }
-        <nz-col [nzSpan]="24" [nzSm]="12">
-          <nz-form-item>
+        <nz-col [nzSpan]="24" [nzSm]="24">
+          <nz-form-item [ngClass]="{ 'mt-2': phonesArray.length == 1 }">
             <nz-form-control>
-              <button nz-button nzType="dashed" type="button" (click)="addPhone()" [disabled]="phonesArray.length >= 5">
+              <button nz-button nzType="dashed" type="button" (click)="addPhone()" [disabled]="phonesArray.length >= 5" class="flex items-center">
                 <span nz-icon nzType="plus"></span> Agregar teléfono
               </button>
             </nz-form-control>

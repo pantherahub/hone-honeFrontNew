@@ -284,7 +284,17 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
           website: data.website
         });
 
-        this.existingOffices = data.TemporalOffices;
+        this.existingOffices = data.TemporalOffices.map((office: any) => {
+          if (office.TemporalAddress && office.TemporalAddress?.City) {
+            return {
+              ...office,
+              idCity: office.TemporalAddress.City.idCity,
+              cityName: office.TemporalAddress.City.city,
+              address: office.TemporalAddress,
+            };
+          }
+          return office;
+        });
         this.existingContacts = data.TemporalContactsForProvider;
 
         this.subscribeOnChange();
@@ -487,8 +497,8 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
 
     if (deletedContact.idTemporalContact !== null) {
       // Search in updatedContacts and delete if it exists
-      const updatedIndex = this.updatedContacts.controls.findIndex(office =>
-        office.value.idTemporalContact == deletedContact.idTemporalContact
+      const updatedIndex = this.updatedContacts.controls.findIndex(contact =>
+        contact.value.idTemporalContact == deletedContact.idTemporalContact
       );
       if (updatedIndex !== -1) {
         this.updatedContacts.removeAt(updatedIndex);
@@ -497,8 +507,8 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       this.deletedContacts.push(this.fb.control(deletedContact.idTemporalContact));
     } else {
       // Search in createdContacts and delete if it exists
-      const createdIndex = this.createdContacts.controls.findIndex(office =>
-        JSON.stringify(office.value) === JSON.stringify(deletedContact)
+      const createdIndex = this.createdContacts.controls.findIndex(contact =>
+        JSON.stringify(contact.value) === JSON.stringify(deletedContact)
       );
       if (createdIndex !== -1) {
         this.createdContacts.removeAt(createdIndex);
@@ -527,7 +537,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       identification: '',
       dv: null,
       website: ''
-    });
+    }, { emitEvent: false });
     this.formUtils.clearFormArray(this.updatedOffices);
     this.formUtils.clearFormArray(this.createdOffices);
     this.formUtils.clearFormArray(this.deletedOffices);
@@ -545,6 +555,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       this.formUtils.markFormTouched(this.providerForm);
       return;
     };
+
     // Clear messages
     this.messageService.remove();
     this.backendError = null;
@@ -559,7 +570,9 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     }
 
     const website = this.providerForm.get('website')?.value?.toLowerCase() || null;
+    const email = this.providerForm.get('email')?.value?.toLowerCase() || null;
     this.providerForm.patchValue({
+      email: email,
       website: website,
       endTime: this.formatDate(new Date())
     });

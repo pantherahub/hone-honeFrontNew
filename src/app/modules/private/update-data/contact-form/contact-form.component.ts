@@ -21,6 +21,7 @@ export class ContactFormComponent implements OnInit {
 
   @Input() contact: any | null = null;
   @Input() contactModelType: string = 'Prestador'; // 'Prestador' or 'Sede'
+  @Input() officeIdCity: number | null = null;
   contactForm!: FormGroup;
 
   contactOccupationTypes: any[] = [];
@@ -99,11 +100,22 @@ export class ContactFormComponent implements OnInit {
     this.citiesService.getCities().subscribe({
       next: (data: any) => {
         this.cities = data;
+        this.cities = data.map((option: any) => ({
+          ...option,
+          label: `${option.city} (${option.indicative})`
+        }));
       },
       error: (err: any) => {
         console.error(err);
       }
     });
+  }
+  getSelectedCity(id: number) {
+    return this.cities.find(c => c.idCity === id);
+  }
+  getSelectedIndicative(id: number): string {
+    const option = this.getSelectedCity(id);
+    return option ? option.indicative : '';
   }
 
   initializeForm() {
@@ -381,7 +393,7 @@ export class ContactFormComponent implements OnInit {
   get phonesArray(): FormArray {
     return this.contactForm.get('Phones') as FormArray;
   }
-  createPhoneGroup(phone: any | null = null): FormGroup {
+  createPhoneGroup(phone: any | null = null, activeCity: boolean = false): FormGroup {
     const phoneGroup = this.fb.group({
       idPhone: [phone?.idPhone || null],
       type: [phone?.type || '', [Validators.required]],
@@ -389,11 +401,26 @@ export class ContactFormComponent implements OnInit {
         phone?.number || '',
         [Validators.required, this.formUtils.numeric, this.phoneNumberValidator]
       ],
+      idCity: [phone == null && this.officeIdCity ? this.officeIdCity : phone?.idCity || null],
       status: [phone ? phone.status || null : 'created'] // updated, created, null for existing phones
     });
+    if (this.officeIdCity && !activeCity) phoneGroup.get('idCity')?.disable();
     phoneGroup.get('type')?.valueChanges
       .pipe(distinctUntilChanged())
-      .subscribe(() => {
+      .subscribe((value) => {
+        const idCityControl = phoneGroup.get('idCity');
+        let idCity = null;
+        if (value === 'Fijo') {
+          idCity = this.officeIdCity || null;
+          if (this.contactModelType === 'Prestador' && !this.officeIdCity) {
+            idCityControl?.setValidators([Validators.required]);
+          }
+        } else {
+          idCityControl?.clearValidators();
+        }
+        phoneGroup.patchValue({ idCity });
+
+        // Validate number
         phoneGroup.get('number')?.updateValueAndValidity();
       });
     return phoneGroup;
@@ -428,6 +455,9 @@ export class ContactFormComponent implements OnInit {
     }
     return null;
   }
+  isFijoPhone(control: AbstractControl): boolean {
+    return control.get('type')?.value === 'Fijo';
+  }
 
   disableFutureDates = (current: Date): boolean => {
     return current > new Date();
@@ -454,6 +484,9 @@ export class ContactFormComponent implements OnInit {
     // Check emails
     this.emailsArray.controls.forEach((emailGroup: AbstractControl) => {
       const emailFormGroup = emailGroup as FormGroup;
+      emailFormGroup.patchValue({
+        email: emailFormGroup.value?.email?.toLowerCase() || ''
+      });
       const email = emailFormGroup.value;
       const savedEmail = this.savedEmails.find(saved => saved.idEmail === email.idEmail);
 
@@ -465,7 +498,7 @@ export class ContactFormComponent implements OnInit {
           emailFormGroup.patchValue({
             status: 'updated'
           });
-          updatedEmailsArray.push(this.createEmailGroup(email));
+          updatedEmailsArray.push(this.createEmailGroup(emailFormGroup.value));
         }
       }
     });
@@ -473,20 +506,24 @@ export class ContactFormComponent implements OnInit {
     // Verify phone numbers
     this.phonesArray.controls.forEach((phoneGroup: AbstractControl) => {
       const phoneFormGroup = phoneGroup as FormGroup;
+      const idCityControl = phoneFormGroup.get('idCity');
+      idCityControl?.enable();
+
       const phone = phoneFormGroup.value;
       const savedPhone = this.savedPhones.find(saved => saved.idPhone === phone.idPhone);
 
       if (phone.status === 'created' && !phone.idPhone) {
-        createdPhonesArray.push(this.createPhoneGroup(phone));
+        createdPhonesArray.push(this.createPhoneGroup(phone, true));
       } else if (phone.status !== 'created' && savedPhone) {
         const isUpdated = savedPhone.type !== phone.type
           || savedPhone.number !== phone.number
+          || savedPhone.idCity !== phone.idCity
           || savedPhone.status === 'updated';
         if (isUpdated) {
           phoneFormGroup.patchValue({
             status: 'updated'
           });
-          updatedPhonesArray.push(this.createPhoneGroup(phone));
+          updatedPhonesArray.push(this.createPhoneGroup(phoneFormGroup.value, true));
         }
       }
     });

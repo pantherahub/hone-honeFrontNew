@@ -158,8 +158,8 @@
                 <tbody>
                   <tr *ngFor="let data of officeTable.data; let i = index">
                     <td>{{ data.name }}</td>
-                    <td>{{ data.cityName || data.City?.city || '' }}</td>
-                    <td>{{ data.address }}</td>
+                    <td>{{ data.cityName || data.TemporalAddress?.City?.city || '' }}</td>
+                    <td class="truncate max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap">{{ data.address?.formattedAddress || '' }}</td>
                     <td class="provider-table__action">
                       <button nz-button nzType="primary" type="button" (click)="openOfficeModal(getGlobalIndex(i, officePage, officePageSize))" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
                       <button nz-button nzDanger nzType="primary" type="button" (click)="deleteOffice(getGlobalIndex(i, officePage, officePageSize))" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button>
@@ -205,7 +205,7 @@
         <app-backend-errors [error]="backendError"></app-backend-errors>
 
         <div class="update-data__footer">
-          <button nz-button nzType="primary" class="btn-primary" type="submit" [disabled]="loading">Actualizar datos</button>
+          <button class="btn-primary bg-green-500 hover:bg-green-500/80" type="submit" [disabled]="loading">Actualizar datos</button>
         </div>
       </form>
 
