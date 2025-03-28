@@ -149,7 +149,7 @@ module.exports = {
           red: "#E85144",
           blue: "#1A73D9",
         }
-      }
+      },
     },
   },
   plugins: [
