@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NzModalRef } from 'ng-zorro-antd/modal';
 import { distinctUntilChanged } from 'rxjs';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
@@ -295,14 +295,21 @@ export class ScheduleFormComponent implements OnInit {
     const formattedSchedule = formValues.scheduleType === 'range'
       ? `${formValues.startDayRange} - ${formValues.endDayRange}`
       : formValues.day;
-    this.scheduleForm.patchValue({
+
+    const clonedForm = new FormGroup(
+      Object.keys(this.scheduleForm.controls).reduce((acc, key) => {
+        acc[key] = new FormControl(formValues[key]);
+        return acc;
+      }, {} as { [key: string]: FormControl })
+    );
+    clonedForm.patchValue({
       schedule: formattedSchedule,
       startTime: this.convertTo12Hour(formValues.startTime),
-      endTime: this.convertTo12Hour(formValues.endTime)
+      endTime: this.convertTo12Hour(formValues.endTime),
     });
 
     this.modal.close({
-      schedule: this.scheduleForm,
+      schedule: clonedForm,
       isNew: this.schedule === null || this.schedule.idTemporalSchedule === null
     });
   }

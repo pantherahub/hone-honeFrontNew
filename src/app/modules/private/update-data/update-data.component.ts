@@ -285,7 +285,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
         });
 
         this.existingOffices = data.TemporalOffices.map((office: any) => {
-          if (office.TemporalAddress && office.TemporalAddress?.City) {
+          if (office.TemporalAddress?.City) {
             return {
               ...office,
               idCity: office.TemporalAddress.City.idCity,
@@ -293,7 +293,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
               address: office.TemporalAddress,
             };
           }
-          return office;
+          return { ...office, idCity: null };
         });
         this.existingContacts = data.TemporalContactsForProvider;
 

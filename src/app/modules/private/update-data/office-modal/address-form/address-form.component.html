@@ -14,7 +14,14 @@
     <nz-col [nzSpan]="24" [nzSm]="12" [nzMd]="9">
       <nz-form-item>
         <nz-form-label nzRequired>Nombre/número de vía</nz-form-label>
-        <nz-form-control nzErrorTip="Requerido.">
+        <nz-form-control [nzErrorTip]="roadNameErrorTip">
+          <ng-template #roadNameErrorTip>
+            @if (addressForm.controls['roadName'].hasError('required')) {
+              Requerido.
+            } @else if (addressForm.controls['roadName'].hasError('invalidRoadName')) {
+              {{ addressForm.controls['roadName'].errors?.['invalidRoadName'] }}
+            }
+          </ng-template>
           <input nz-input nzSize="small" formControlName="roadName" placeholder="Ej: 13, Circunvalar" />
         </nz-form-control>
       </nz-form-item>

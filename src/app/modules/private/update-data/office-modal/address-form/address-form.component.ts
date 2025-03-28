@@ -66,7 +66,7 @@ export class AddressFormComponent implements OnInit {
   initializeForm() {
     this.addressForm = this.fb.group({
       typeOfRoad: [null, Validators.required],
-      roadName: [null, Validators.required],
+      roadName: [null, [Validators.required, this.roadNameValidator.bind(this)]],
       roadMainComplement: [null],
       roadSecondaryComplement: [null],
       mainNumber: [null, [Validators.required, Validators.pattern(/^\d{1,3}$/)]],
@@ -113,6 +113,12 @@ export class AddressFormComponent implements OnInit {
     this.loadAddressData();
   }
 
+  roadNameValidator(control: AbstractControl): { [key: string]: any } | null {
+    if (!control.value) return null;
+    const invalid = this.viaOptions.some(road => road.toLowerCase() === control.value.toLowerCase());
+    return invalid ? { invalidRoadName: 'No debe coincidir con un tipo de vía.' } : null;
+  }
+
   getFormControl(controlName: string): AbstractControl<any, any> | null {
     return this.addressForm.get(controlName);
   }
@@ -122,6 +128,7 @@ export class AddressFormComponent implements OnInit {
   }
 
   onSubmit() {
+    this.formUtils.trimFormStrControls(this.addressForm);
     this.formUtils.markFormTouched(this.addressForm);
     if (this.addressForm.invalid) return;
 
@@ -133,7 +140,10 @@ export class AddressFormComponent implements OnInit {
     this.addressForm.patchValue({
       formattedAddress: this.formattedAddress
     });
-    const addressData = this.addressForm.value;
+
+    const addressData = Object.fromEntries(
+      Object.entries(this.addressForm.value).map(([key, value]) => [key, value === "" ? null : value])
+    );
     this.modal.close({ address: addressData });
   }
 

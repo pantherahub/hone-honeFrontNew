@@ -204,7 +204,7 @@ export class OfficeModalComponent implements OnInit {
       createdContacts: this.fb.array(this.office?.createdContacts ?? []),
       deletedContacts: this.fb.array(this.office?.deletedContacts ?? []),
 
-      TemporalSchedules: [[]], // Save schedules state
+      TemporalSchedules: [[...this.office?.TemporalSchedules]], // Save schedules state
     });
 
     if (this.office) {
@@ -217,10 +217,28 @@ export class OfficeModalComponent implements OnInit {
     this.officeForm.get('idCity')?.valueChanges
       .pipe()
       .subscribe(async (newIdCity) => {
-        if (!previousCityId || newIdCity === previousCityId) {
+        if (newIdCity === previousCityId) return;
+        else if (!previousCityId) {
+          previousCityId = newIdCity;
+
+          // Adds the idCity to the address object if it is already filled in
+          const address = this.officeForm.get('address');
+          if (address?.value) {
+            address.patchValue({
+              ...address?.value,
+              idCity: newIdCity
+            });
+          }
+
+          // Get selected city with name and set cityName
+          const selectedCity = this.cities.find(city => city.idCity === newIdCity);
+          this.officeForm.patchValue({
+            cityName: selectedCity ? selectedCity.city : ''
+          });
           previousCityId = newIdCity;
           return;
         }
+
         const hasContacts = this.existingContacts && this.existingContacts.length;
         if (hasContacts) {
           const confirmed = await this.alertService.confirmDelete(
@@ -233,22 +251,6 @@ export class OfficeModalComponent implements OnInit {
           }
           this.updateContactsByCity(newIdCity);
         }
-
-        // Adds the idCity to the address object if it is already filled in
-        const address = this.officeForm.get('address');
-        if (address?.value) {
-          address.patchValue({
-            ...address?.value,
-            idCity: newIdCity
-          });
-        }
-
-        // Get selected city with name and set cityName
-        const selectedCity = this.cities.find(city => city.idCity === newIdCity);
-        this.officeForm.patchValue({
-          cityName: selectedCity ? selectedCity.city : ''
-        });
-        previousCityId = newIdCity;
       });
   }
 
@@ -575,7 +577,6 @@ export class OfficeModalComponent implements OnInit {
     const schedulingLink = this.officeForm.get('schedulingLink')?.value?.toLowerCase() || null;
     this.officeForm.patchValue({
       schedulingLink: schedulingLink,
-      TemporalSchedules: [...this.existingSchedules]
     });
 
     this.modal.close({
