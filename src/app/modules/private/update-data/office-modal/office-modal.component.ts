@@ -204,7 +204,7 @@ export class OfficeModalComponent implements OnInit {
       createdContacts: this.fb.array(this.office?.createdContacts ?? []),
       deletedContacts: this.fb.array(this.office?.deletedContacts ?? []),
 
-      TemporalSchedules: [[...this.office?.TemporalSchedules]], // Save schedules state
+      TemporalSchedules: [this.office?.TemporalSchedules], // Save schedules state
     });
 
     if (this.office) {
