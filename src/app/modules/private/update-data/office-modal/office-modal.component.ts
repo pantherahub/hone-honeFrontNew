@@ -219,22 +219,7 @@ export class OfficeModalComponent implements OnInit {
       .subscribe(async (newIdCity) => {
         if (newIdCity === previousCityId) return;
         else if (!previousCityId) {
-          previousCityId = newIdCity;
-
-          // Adds the idCity to the address object if it is already filled in
-          const address = this.officeForm.get('address');
-          if (address?.value) {
-            address.patchValue({
-              ...address?.value,
-              idCity: newIdCity
-            });
-          }
-
-          // Get selected city with name and set cityName
-          const selectedCity = this.cities.find(city => city.idCity === newIdCity);
-          this.officeForm.patchValue({
-            cityName: selectedCity ? selectedCity.city : ''
-          });
+          this.updateCity(newIdCity);
           previousCityId = newIdCity;
           return;
         }
@@ -251,6 +236,9 @@ export class OfficeModalComponent implements OnInit {
           }
           this.updateContactsByCity(newIdCity);
         }
+
+        this.updateCity(newIdCity);
+        previousCityId = newIdCity;
       });
   }
 
@@ -261,6 +249,23 @@ export class OfficeModalComponent implements OnInit {
       return { invalidLength: 'Debe tener entre 9 y 12 dígitos.' };
     }
     return null;
+  }
+
+  updateCity(newIdCity: number) {
+    // Adds the idCity to the address object if it is already filled in
+    const address = this.officeForm.get('address');
+    if (address?.value) {
+      address.patchValue({
+        ...address?.value,
+        idCity: newIdCity
+      });
+    }
+
+    // Get selected city with name and set cityName
+    const selectedCity = this.cities.find(city => city.idCity === newIdCity);
+    this.officeForm.patchValue({
+      cityName: selectedCity ? selectedCity.city : ''
+    });
   }
 
   updateContactsByCity(newCityId: number) {

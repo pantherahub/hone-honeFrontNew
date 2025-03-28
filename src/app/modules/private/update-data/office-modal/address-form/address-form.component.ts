@@ -19,7 +19,7 @@ export class AddressFormComponent implements OnInit {
 
   viaOptions: string[] = ['Autopista', 'Avenida', 'Av. Calle', 'Av. Carrera', 'Barrio', 'Calle', 'Callejón', 'Carrera', 'Circular', 'Diagonal', 'Kilómetro', 'Pasaje', 'Paso', 'Ramal', 'SubRamal', 'Tramo', 'Transversal', 'Vereda'];
 
-  complementOptions: string[] = ['Este', 'Manzana', 'Noreste', 'Noroccidente', 'Noroeste', 'Norte', 'Occidente', 'Oeste', 'Oriente', 'Sur', 'Sureste', 'Suroccidente', 'Suroeste', 'Suroriente'];
+  complementOptions: string[] = ['Este', 'Noreste', 'Noroccidente', 'Noroeste', 'Norte', 'Occidente', 'Oeste', 'Oriente', 'Sur', 'Sureste', 'Suroccidente', 'Suroeste', 'Suroriente'];
   letterOptions: string[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
   lettersWithBis: string[] = ['Bis', ...this.letterOptions];
   allNumberComplementOptions: string[] = [];
