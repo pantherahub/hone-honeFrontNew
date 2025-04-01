@@ -9,6 +9,14 @@
     }
   }
 
+  .schedule-table {
+    &__action {
+      button:first-child {
+        margin-right: 4px;
+      }
+    }
+  }
+
   .contact-table {
     &__action {
       button:first-child {
