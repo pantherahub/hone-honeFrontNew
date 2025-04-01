@@ -154,4 +154,34 @@ export class AuthService {
       }
     });
   }
+
+  /**
+   * Forgot password - Send email and request code.
+  */
+  forgotSendEmail(reqData: any): Observable<any> {
+    return this.httpClient.post(
+      `${environment.url}Auth/Forgot/sendEmail`,
+      reqData
+    );
+  }
+
+  /**
+   * Forgot password - Verify code sent to email.
+  */
+  forgotVerifyCode(reqData: any): Observable<any> {
+    return this.httpClient.post(
+      `${environment.url}Auth/Forgot/verifyCode`,
+      reqData
+    );
+  }
+
+  /**
+   * Forgot password - Resend code to email.
+  */
+  forgotResendCode(reqData: any): Observable<any> {
+    return this.httpClient.post(
+      `${environment.url}Auth/Forgot/resendCode`,
+      reqData
+    );
+  }
 }

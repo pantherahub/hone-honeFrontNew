@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { AlertService } from 'src/app/services/alerts/alert.service';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
@@ -10,13 +10,14 @@ import { NewPasswordFormComponent } from 'src/app/shared/forms/new-password-form
 @Component({
   selector: 'app-update-password',
   standalone: true,
-  imports: [NgZorroModule, CommonModule, NewPasswordFormComponent],
+  imports: [NgZorroModule, CommonModule, RouterModule, NewPasswordFormComponent],
   templateUrl: './update-password.component.html',
   styleUrl: './update-password.component.scss'
 })
 export class UpdatePasswordComponent implements OnInit {
 
   passwordForm!: FormGroup;
+  passwordVisible: boolean = false;
 
   constructor(
     private fb: FormBuilder,

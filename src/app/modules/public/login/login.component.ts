@@ -1,9 +1,8 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { CommonModule } from '@angular/common';
 import { AuthService } from 'src/app/services/auth.service';
-import { Router } from '@angular/router';
-
+import { Router, RouterModule } from '@angular/router';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { RecaptchaModule } from 'ng-recaptcha';
@@ -15,8 +14,7 @@ import { TutorialService } from 'src/app/services/tutorial/tutorial.service';
 @Component({
    selector: 'app-login',
    standalone: true,
-   imports: [ NgZorroModule, CommonModule, RecaptchaModule ],
-
+   imports: [ NgZorroModule, CommonModule, RecaptchaModule, RouterModule ],
    templateUrl: './login.component.html',
    styleUrl: './login.component.scss'
 })
@@ -81,7 +79,7 @@ export class LoginComponent implements OnInit {
 
     const { email, password, remember } = this.loginForm.value;
     const payload: any = {
-      credential: email,
+      email,
       password,
       remember
     };

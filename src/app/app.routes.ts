@@ -14,6 +14,7 @@ import { UpdatePasswordComponent } from './modules/private/user/update-password/
 import { ResetPasswordComponent } from './modules/private/user/reset-password/reset-password.component';
 import { authStatusGuard } from './guards/auth-status.guard';
 import { VerifyEmailComponent } from './modules/private/user/verify-email/verify-email.component';
+import { ForgotPasswordComponent } from './modules/public/forgot-password/forgot-password.component';
 
 export const routes: Routes = [
   //   PUBLIC ROUTES
@@ -35,8 +36,11 @@ export const routes: Routes = [
 		component: ProviderAssistancessComponent
   },
   {
+    path: 'forgot-password',
+    component: ForgotPasswordComponent
+  },
+  {
     path: 'verify-email',
-    canActivate: [authGuard],
     component: VerifyEmailComponent
   },
   {

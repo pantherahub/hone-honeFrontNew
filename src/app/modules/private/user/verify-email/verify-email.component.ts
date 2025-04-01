@@ -17,9 +17,8 @@ export class VerifyEmailComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // Test
-    this.messageService.create('success', 'Email verificado.');
-    this.onSubmit();
+    // this.messageService.create('success', 'Email verificado.');
+    // this.onSubmit();
   }
 
   onSubmit() {

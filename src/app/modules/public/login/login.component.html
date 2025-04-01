@@ -49,22 +49,22 @@
 
         <form nz-form [formGroup]="loginForm" class="form-login">
 
-            <!-- Campo Usuario / email -->
+            <!-- Campo email -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
-                        Usuario
+                        Correo
                     </nz-form-label>
 
                     <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
                         [nzErrorTip]="emailErrorTip">
                         <ng-template #emailErrorTip>
-                            <p *ngIf="loginForm.controls['email'].hasError('required')">¡El usuario es
-                                obligatorio!
+                            <p *ngIf="loginForm.controls['email'].hasError('required')">
+                              El campo es requerido.
                             </p>
                         </ng-template>
-                        <input nz-input placeholder="" formControlName="email">
+                        <input nz-input placeholder="Correo electrónico" formControlName="email">
                     </nz-form-control>
 
                 </nz-form-item>
@@ -81,16 +81,16 @@
                     <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
                         [nzErrorTip]="passwordErrorTip">
                         <ng-template #passwordErrorTip>
-                            <p *ngIf="loginForm.controls['password'].hasError('required')">¡La contraseña es
-                                obligatoria!
+                            <p *ngIf="loginForm.controls['password'].hasError('required')">
+                              El campo es requerido.
                             </p>
                         </ng-template>
                         <nz-input-group [nzSuffix]="suffixTemplate">
-                            <input [type]="passwordVisible ? 'text' : 'password'" nz-input placeholder=""
+                            <input [type]="passwordVisible ? 'text' : 'password'" nz-input placeholder="Contraseña"
                                 formControlName="password" />
                         </nz-input-group>
                         <ng-template #suffixTemplate>
-                            <span style="cursor: pointer" nz-icon [nzType]="passwordVisible ? 'eye-invisible' : 'eye'"
+                            <span class="cursor-pointer" nz-icon [nzType]="passwordVisible ? 'eye-invisible' : 'eye'"
                                 (click)="passwordVisible = !passwordVisible"></span>
                         </ng-template>
                     </nz-form-control>
@@ -103,19 +103,20 @@
                 (errored)="errored()" errorMode="handled"></re-captcha>
             <p style="color: red;" *ngIf="showError">¡Debes validar que no eres un robot!</p>
 
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24">
-              <nz-form-item nz-row>
-                  <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24">
+            <div nz-col [nzSpan]="24">
+              <nz-form-item class="flex items-center">
+                  <nz-form-control>
                       <label nz-checkbox formControlName="remember">
                           Recuérdame
                       </label>
                   </nz-form-control>
+                  <a [routerLink]="['/forgot-password']" class="text-blue-600">¿Olvidaste la contraseña?</a>
               </nz-form-item>
             </div>
 
 
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                style="text-align: center; margin-top: 3rem;">
+                style="text-align: center; margin-top: 2rem;">
                 <button nz-button nzType="primary" class="btn-primary" [disabled]="false"
                     [nzLoading]="isSubmitData" (click)="submitRequest()" nz-popover nzPopoverTitle="" nzJustify="center"
                     nzAlign="middle" [nzPopoverContent]="enablePopoverMessage">

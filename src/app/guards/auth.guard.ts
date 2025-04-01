@@ -4,7 +4,7 @@ import { AuthService } from '../services/auth.service';
 import { catchError, map, of } from 'rxjs';
 
 export const authGuard: CanActivateFn = (route, state) => {
-   const authService = inject(AuthService);
+  const authService = inject(AuthService);
   if (authService.isAuthenticated()) {
     const currentUser = authService.getUserData();
     if (currentUser) return true;
@@ -27,5 +27,3 @@ export const authGuard: CanActivateFn = (route, state) => {
   authService.logout();
   return false;
 };
-
-
