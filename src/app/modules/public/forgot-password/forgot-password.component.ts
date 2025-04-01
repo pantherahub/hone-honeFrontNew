@@ -20,6 +20,7 @@ export class ForgotPasswordComponent implements OnInit {
   step = 0;
   emailForm!: FormGroup;
   codeForm!: FormGroup;
+  loading: boolean = false;
 
   countdown: number = 30;
   isResendDisabled: boolean = false;
@@ -89,7 +90,6 @@ export class ForgotPasswordComponent implements OnInit {
   }
 
   resendCode() {
-    // console.log("Reenviando código...");
     this.isResendDisabled = true;
     this.startCountdown();
 

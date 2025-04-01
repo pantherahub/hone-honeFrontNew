@@ -91,11 +91,15 @@ export class LoginComponent implements OnInit {
         // this.router.navigateByUrl('home');
         const authData = res.data;
 
+        if (!authData.withVerificationEmail) {
+          this.authService.saveTemporalLoginData({ apiKey: authData.apiKey, remember });
+          this.router.navigateByUrl('verify-email');
+          return;
+        }
+
         this.authService.loadUser().subscribe({
           next: (resp: any) => {
-            if (!authData.withVerificationEmail) {
-              this.router.navigateByUrl('verify-email');
-            } else if (authData.renewPassword) {
+            if (authData.renewPassword) {
               this.router.navigateByUrl('reset-password');
             } else {
               this.router.navigateByUrl('home');

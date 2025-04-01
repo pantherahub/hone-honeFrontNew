@@ -5,3 +5,15 @@ export interface RefreshTokenResponse {
     // refreshToken: string;
   } | null;
 }
+
+/**
+ * Temporary login data to verify email or two-factor authentication.
+ */
+export interface TemporalLoginData {
+  apiKey: string;
+  remember: boolean;
+}
+
+export interface VerifyEmailReq extends TemporalLoginData {
+  code: string;
+}

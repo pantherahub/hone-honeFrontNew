@@ -15,6 +15,7 @@ import { ResetPasswordComponent } from './modules/private/user/reset-password/re
 import { authStatusGuard } from './guards/auth-status.guard';
 import { VerifyEmailComponent } from './modules/private/user/verify-email/verify-email.component';
 import { ForgotPasswordComponent } from './modules/public/forgot-password/forgot-password.component';
+import { noauthGuard } from './guards/noauth.guard';
 
 export const routes: Routes = [
   //   PUBLIC ROUTES
@@ -24,7 +25,8 @@ export const routes: Routes = [
 		pathMatch: 'full'
   },
 	{
-		path: 'login',
+    path: 'login',
+    canActivate: [noauthGuard],
 		component: LoginComponent
 	},
 	{
@@ -41,6 +43,7 @@ export const routes: Routes = [
   },
   {
     path: 'verify-email',
+    canActivate: [noauthGuard],
     component: VerifyEmailComponent
   },
   {

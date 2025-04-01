@@ -2,11 +2,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
-
 import { Observable, of } from 'rxjs';
 import { delay, map, tap } from 'rxjs/operators';
 import { EventManagerService } from './events-manager/event-manager.service';
-import { RefreshTokenResponse } from '../models/auth.interface';
+import { RefreshTokenResponse, TemporalLoginData, VerifyEmailReq } from '../models/auth.interface';
 
 @Injectable({
    providedIn: 'root'
@@ -15,6 +14,7 @@ export class AuthService {
   public url = environment.url;
   private readonly ACCESS_TOKEN_KEY = 'accessToken';
   private readonly REFRESH_TOKEN_KEY = 'refreshToken';
+  private readonly TEMP_LOGIN_DATA_KEY = 'temporalLoginData';
 
   constructor(
     private httpClient: HttpClient,
@@ -27,9 +27,11 @@ export class AuthService {
       reqData
     ).pipe(
       tap((res: any) => {
-        if (res.ok) {
+        if (res.data) {
           const data = res.data;
-          this.saveTokens(data.accessToken, data.refreshToken);
+          if (data.accessToken) {
+            this.saveTokens(data.accessToken, data.refreshToken);
+          }
 
           if (!data.withVerificationEmail) {
             localStorage.setItem('requiresEmailVerification', 'true');
@@ -136,21 +138,38 @@ export class AuthService {
     localStorage.removeItem(this.REFRESH_TOKEN_KEY);
   }
 
+  saveTemporalLoginData(data: TemporalLoginData) {
+    localStorage.setItem(this.TEMP_LOGIN_DATA_KEY, JSON.stringify(data));
+  }
+  getTemporalLoginData(): TemporalLoginData | null {
+    const data = localStorage.getItem(this.TEMP_LOGIN_DATA_KEY);
+    return data ? JSON.parse(data) as TemporalLoginData : null;
+  }
+  removeTemporalLoginData() {
+    localStorage.removeItem(this.TEMP_LOGIN_DATA_KEY);
+  }
+
+  private clearAuth() {
+    this.removeSession();
+    localStorage.clear();
+    this.router.navigateByUrl('login');
+  }
+
   public logout() {
+    if (!this.isAuthenticated()) {
+      this.clearAuth();
+      return;
+    }
     this.httpClient.post(
       `${environment.url}Auth/Logout`,
       null
     ).subscribe({
       next: (data: any) => {
-        this.removeSession();
-        localStorage.clear();
-        this.router.navigateByUrl('login');
+        this.clearAuth();
       },
       error: (err: any) => {
         console.error(err);
-        this.removeSession();
-        localStorage.clear();
-        this.router.navigateByUrl('login');
+        this.clearAuth();
       }
     });
   }
@@ -181,6 +200,38 @@ export class AuthService {
   forgotResendCode(reqData: any): Observable<any> {
     return this.httpClient.post(
       `${environment.url}Auth/Forgot/resendCode`,
+      reqData
+    );
+  }
+
+  /**
+   * Verify email - Verify code sent to email.
+  */
+  verifyEmail(reqData: VerifyEmailReq): Observable<any> {
+    return this.httpClient.post(
+      `${environment.url}Auth/ValidateEmail/Validate`,
+      reqData
+    ).pipe(
+      tap((res: any) => {
+        if (res.data) {
+          const data = res.data;
+          if (data.accessToken) {
+            this.saveTokens(data.accessToken, data.refreshToken);
+            if (data.renewPassword) {
+              localStorage.setItem('requiresPasswordReset', 'true');
+            }
+          }
+        }
+      })
+    );
+  }
+
+  /**
+   * Verify email - Resend code to email.
+  */
+  verifyEmailResendCode(reqData: TemporalLoginData): Observable<any> {
+    return this.httpClient.post(
+      `${environment.url}Auth/ValidateEmail/Resend`,
       reqData
     );
   }

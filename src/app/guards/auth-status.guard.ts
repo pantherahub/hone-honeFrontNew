@@ -12,15 +12,8 @@ export const authStatusGuard: CanActivateFn = (route, state) => {
   }
 
   const requiresPasswordReset = localStorage.getItem('requiresPasswordReset');
-  const requiresEmailVerification = localStorage.getItem('requiresEmailVerification');
-
   if (requiresPasswordReset) {
     router.navigateByUrl('/reset-password');
-    return false;
-  }
-
-  if (requiresEmailVerification) {
-    router.navigateByUrl('/verify-email');
     return false;
   }
 
