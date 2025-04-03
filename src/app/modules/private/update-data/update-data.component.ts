@@ -569,6 +569,15 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const hasInvalidOffice = this.existingOffices.some(office =>
+      (!office.TemporalAddress && !office.address) ||
+      (!office.TemporalSchedules?.length && !office.createdSchedules?.length)
+    );
+    if (hasInvalidOffice) {
+      this.alertService.warning('Aviso', 'Algunas sedes tienen información incompleta.');
+      return;
+    }
+
     const website = this.providerForm.get('website')?.value?.toLowerCase() || null;
     const email = this.providerForm.get('email')?.value?.toLowerCase() || null;
     this.providerForm.patchValue({
