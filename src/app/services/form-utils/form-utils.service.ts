@@ -93,4 +93,87 @@ export class FormUtilsService {
     }
   }
 
+  /**
+   * Format address object to string.
+   */
+  formatAddress(addressObj: any): string {
+    const {
+      typeOfRoad,
+      roadName,
+      roadMainComplement,
+      roadSecondaryComplement,
+
+      mainNumber,
+      mainNumberComplement,
+      secondaryNumber,
+      secondaryNumberComplement,
+
+      neighborhood,
+      addressMainComplement,
+      addressMainNameComplement,
+      addressSecondaryComplement,
+      addressSecondaryNameComplement
+    } = addressObj;
+
+    let address = `${typeOfRoad || ''} ${roadName || ''}`;
+
+    if (roadMainComplement) address += ` ${roadMainComplement}`;
+    if (roadSecondaryComplement) address += ` ${roadSecondaryComplement}`;
+
+    if (mainNumber || secondaryNumber) {
+      address += ` #${mainNumber || ''}`;
+      if (mainNumberComplement) address += ` ${mainNumberComplement}`;
+
+      address += ` - ${secondaryNumber || ''}`;
+      if (secondaryNumberComplement) address += ` ${secondaryNumberComplement}`;
+    }
+
+    if (addressMainComplement) {
+      address += `, ${addressMainComplement}`;
+      if (addressMainNameComplement) address += ` ${addressMainNameComplement}`;
+    }
+    if (addressSecondaryComplement) {
+      address += `, ${addressSecondaryComplement}`;
+      if (addressSecondaryNameComplement) address += ` ${addressSecondaryNameComplement}`;
+    }
+
+    if (neighborhood) address += `, Barrio ${neighborhood}`;
+
+    return address.trim();
+  }
+
+  /**
+   * Capitalize connectors in string.
+   */
+  capitalizeWords(value: string): string {
+    const connectors = [
+        'de',
+        'del',
+        'la',
+        'las',
+        'los',
+        'y',
+        'a',
+        'en',
+        'el',
+        'al',
+        'por',
+        'para',
+        'con',
+        'o'
+    ];
+    if (typeof value != 'string') return value;
+
+    return value
+        .toLowerCase()
+        .split(' ')
+        .map((word, index) => {
+            if (index !== 0 && connectors.includes(word)) {
+                return word;
+            }
+            return word.charAt(0).toUpperCase() + word.slice(1);
+        })
+        .join(' ');
+  }
+
 }

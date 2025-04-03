@@ -69,9 +69,7 @@ export class RemainingDocumentsComponent implements OnInit {
                 fecha: [
                   "",
                   item.idTypeDocuments === 8 ||
-                  item.idTypeDocuments === 22 ||
-                  item.idTypeDocuments === 113 ||
-                  item.idTypeDocuments === 108
+                  item.idTypeDocuments === 22
                     ? [Validators.required]
                     : [],
                 ],
@@ -161,7 +159,7 @@ export class RemainingDocumentsComponent implements OnInit {
         this.createNotificacion("error", "Error", "Debe seleccionar un documento.");
         return;
     }
-    if (item.idTypeDocuments == 8 || item.idTypeDocuments == 22 || item.idTypeDocuments == 113 || item.idTypeDocuments == 108) {
+    if (item.idTypeDocuments == 8 || item.idTypeDocuments == 22) {
       const fechaControl = docForm.get("fecha");
       fechaControl?.markAsTouched();
       fechaControl?.updateValueAndValidity();

@@ -120,7 +120,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (step === 1) {
       this.clientTutorialVisible = false;
       const modalRef = this.modal.create({
-        nzTitle: 'Video presentación',
+        nzTitle: 'VIDEO TUTORIAL',
         nzContent: this.videoModalTemplate,
         nzFooter: null,
         nzCentered: true,
