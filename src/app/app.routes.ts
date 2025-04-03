@@ -13,7 +13,7 @@ import { UserManagementComponent } from './modules/private/user/user-management/
 import { UpdatePasswordComponent } from './modules/private/user/update-password/update-password.component';
 import { ResetPasswordComponent } from './modules/private/user/reset-password/reset-password.component';
 import { authStatusGuard } from './guards/auth-status.guard';
-import { VerifyEmailComponent } from './modules/private/user/verify-email/verify-email.component';
+import { VerifyEmailComponent } from './modules/public/verify-email/verify-email.component';
 import { ForgotPasswordComponent } from './modules/public/forgot-password/forgot-password.component';
 import { noauthGuard } from './guards/noauth.guard';
 

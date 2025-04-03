@@ -38,23 +38,23 @@ export class UpdatePasswordComponent implements OnInit {
 
   onPasswordSubmitted(event: { newPassword: string, confirmPassword: string }) {
     this.markFormAsTouched();
-    if (this.passwordForm.valid) {
-      const currentPassword = this.passwordForm.value.currentPassword;
-      const newPassword = event.newPassword;
-      const confirmPassword = event.confirmPassword;
+    if (this.passwordForm.invalid) return;
 
-      // if (newPassword !== confirmPassword) {
-      //   alert('Las contraseñas no coinciden');
-      //   return;
-      // }
+    const currentPassword = this.passwordForm.value.currentPassword;
+    const newPassword = event.newPassword;
+    const confirmPassword = event.confirmPassword;
 
-      this.alertService.success('Actualizada', 'Contraseña actualizada con éxito');
+    // if (newPassword !== confirmPassword) {
+    //   alert('Las contraseñas no coinciden');
+    //   return;
+    // }
 
-      console.log('Contraseña actual:', currentPassword);
-      console.log('Nueva contraseña:', newPassword);
+    this.alertService.success('Actualizada', 'Contraseña actualizada con éxito');
 
-      this.router.navigate(['/home']);
-    }
+    console.log('Contraseña actual:', currentPassword);
+    console.log('Nueva contraseña:', newPassword);
+
+    this.router.navigate(['/home']);
   }
 
   onCancel() {

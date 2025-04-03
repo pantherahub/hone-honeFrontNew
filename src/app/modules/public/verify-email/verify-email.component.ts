@@ -34,15 +34,15 @@ export class VerifyEmailComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.codeForm = this.fb.group({
+      code: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
+    });
+
     this.temporalLoginData = this.authService.getTemporalLoginData();
     if (!this.temporalLoginData) {
       this.onCancel();
       return;
     }
-
-    this.codeForm = this.fb.group({
-      code: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
-    });
 
     // Reset the counter if there is a timestamp in localStorage
     const lastResendTime = localStorage.getItem('resendTimestamp');
@@ -66,7 +66,7 @@ export class VerifyEmailComponent implements OnInit {
   }
 
   onCancel() {
-    localStorage.clear();
+    this.authService.clearLocalStorage();
     this.router.navigateByUrl('login');
   }
 
@@ -135,7 +135,7 @@ export class VerifyEmailComponent implements OnInit {
     this.authService.verifyEmail(verifyEmailReq).subscribe({
       next: (res: any) => {
         const authData = res.data;
-        this.messageService.create('success', 'Email verificado.');
+        this.messageService.create('success', 'Correo verificado.');
         localStorage.removeItem('requiresEmailVerification');
         localStorage.removeItem('resendTimestamp');
         localStorage.removeItem('temporalLoginData');

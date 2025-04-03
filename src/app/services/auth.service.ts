@@ -18,7 +18,8 @@ export class AuthService {
 
   constructor(
     private httpClient: HttpClient,
-    private router: Router, private eventManager: EventManagerService
+    private router: Router,
+    private eventManager: EventManagerService
   ) { }
 
   login(reqData: any): Observable<any> {
@@ -49,6 +50,30 @@ export class AuthService {
     localStorage.setItem(this.REFRESH_TOKEN_KEY, refreshToken);
   }
 
+  removeSession() {
+    localStorage.removeItem("userLogged");
+    localStorage.removeItem(this.ACCESS_TOKEN_KEY);
+    localStorage.removeItem(this.REFRESH_TOKEN_KEY);
+  }
+
+  getAccessToken(): string | null {
+    return localStorage.getItem(this.ACCESS_TOKEN_KEY);
+  }
+
+  getRefreshToken(): string | null {
+    return localStorage.getItem(this.REFRESH_TOKEN_KEY);
+  }
+
+  isAuthenticated(): boolean {
+    const token = this.getAccessToken();
+    return !!token;
+  }
+
+  getUserData(): any | null {
+    const user = localStorage.getItem("userLogged");
+    return user ? JSON.parse(user) : null;
+  }
+
   // Guarda en storage los datos del usuario logueado
   saveUserLogged(user: any) {
     localStorage.removeItem('userLogged');
@@ -73,7 +98,7 @@ export class AuthService {
       },
       withData: true,
     };
-    // testing:
+    // Testing:
     this.saveUserLogged(mockUsuario);
     return of(mockUsuario);
 
@@ -96,24 +121,6 @@ export class AuthService {
     );
   }
 
-  getAccessToken(): string | null {
-    return localStorage.getItem(this.ACCESS_TOKEN_KEY);
-  }
-
-  getRefreshToken(): string | null {
-    return localStorage.getItem(this.REFRESH_TOKEN_KEY);
-  }
-
-  getUserData(): any | null {
-    const user = localStorage.getItem("userLogged");
-    return user ? JSON.parse(user) : null;
-  }
-
-  isAuthenticated(): boolean {
-    const token = this.getAccessToken();
-    return !!token;
-  }
-
   refreshAccessToken(): Observable<RefreshTokenResponse> {
     const refreshToken = this.getRefreshToken();
     if (!refreshToken) {
@@ -121,7 +128,7 @@ export class AuthService {
     }
     return this.httpClient.post<RefreshTokenResponse>(
       `${environment.url}Auth/UpdateTokens`,
-      { REFRESH_TOKEN: this.getRefreshToken() }
+      { refreshToken: this.getRefreshToken() }
     ).pipe(
       tap((res: RefreshTokenResponse) => {
         if (res.ok && res.data) {
@@ -130,12 +137,6 @@ export class AuthService {
         }
       }),
     );
-  }
-
-  removeSession() {
-    localStorage.removeItem("userLogged");
-    localStorage.removeItem(this.ACCESS_TOKEN_KEY);
-    localStorage.removeItem(this.REFRESH_TOKEN_KEY);
   }
 
   saveTemporalLoginData(data: TemporalLoginData) {
@@ -149,9 +150,19 @@ export class AuthService {
     localStorage.removeItem(this.TEMP_LOGIN_DATA_KEY);
   }
 
-  private clearAuth() {
+  clearLocalStorage() {
     this.removeSession();
-    localStorage.clear();
+    this.removeTemporalLoginData();
+    localStorage.removeItem('requiresEmailVerification');
+    localStorage.removeItem('requiresPasswordReset');
+    localStorage.removeItem('clientSelected');
+    localStorage.removeItem('formState');
+    localStorage.removeItem('tutorialStep');
+    localStorage.removeItem('tutorialFinished');
+  }
+
+  private clearAuth() {
+    this.clearLocalStorage();
     this.router.navigateByUrl('login');
   }
 

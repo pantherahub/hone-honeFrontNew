@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { AlertService } from 'src/app/services/alerts/alert.service';
+import { AuthService } from 'src/app/services/auth.service';
 import { NewPasswordFormComponent } from 'src/app/shared/forms/new-password-form/new-password-form.component';
 
 @Component({
@@ -16,6 +17,7 @@ export class ResetPasswordComponent implements OnInit {
 
   constructor(
     private router: Router,
+    private authService: AuthService,
     private alertService: AlertService,
   ) { }
 
