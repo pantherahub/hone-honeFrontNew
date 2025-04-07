@@ -415,6 +415,7 @@ export class ContactFormComponent implements OnInit {
         const idCityControl = phoneGroup.get('idCity');
         let idCity = null;
         if (value === 'Fijo') {
+          if (idCityControl?.value) return;
           idCity = this.officeIdCity || null;
           if (this.contactModelType === 'Prestador' && !this.officeIdCity) {
             idCityControl?.setValidators([Validators.required]);
