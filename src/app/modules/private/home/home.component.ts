@@ -70,7 +70,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.loadingData = true;
     this.clientService.getClientListByProviderId(this.user.id).subscribe({
       next: (res: any) => {
-        this.clientList = res;
+        this.clientList = res.filter((client: any) => client.idClientHoneSolutions !== 10);
         this.applyFilter();
         this.loadingData = false;
       },
