@@ -39,7 +39,8 @@ export class VerifyEmailComponent implements OnInit {
     });
 
     this.temporalLoginData = this.authService.getTemporalLoginData();
-    if (!this.temporalLoginData) {
+    const requiresEmailVerification = localStorage.getItem('requiresEmailVerification');
+    if (!requiresEmailVerification || !this.temporalLoginData) {
       this.onCancel();
       return;
     }
@@ -60,7 +61,7 @@ export class VerifyEmailComponent implements OnInit {
   }
 
   onlyNumbers(event: KeyboardEvent) {
-    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace') {
+    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Enter') {
       event.preventDefault();
     }
   }

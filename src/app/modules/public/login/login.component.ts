@@ -89,12 +89,15 @@ export class LoginComponent implements OnInit {
       next: (res: any) => {
         this.isSubmitData = false;
         this.tutorialService.resetTutorial();
-        // this.router.navigateByUrl('home');
         const authData = res.data;
 
         if (!authData.withVerificationEmail) {
           this.authService.saveTemporalLoginData({ apiKey: authData.apiKey, remember });
           this.router.navigateByUrl('verify-email');
+          return;
+        } else if (authData.with2FA) {
+          this.authService.saveTemporalLoginData({ apiKey: authData.apiKey, remember });
+          this.router.navigateByUrl('two-factor');
           return;
         }
 

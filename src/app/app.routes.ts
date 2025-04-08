@@ -16,6 +16,8 @@ import { authStatusGuard } from './guards/auth-status.guard';
 import { VerifyEmailComponent } from './modules/public/verify-email/verify-email.component';
 import { ForgotPasswordComponent } from './modules/public/forgot-password/forgot-password.component';
 import { noauthGuard } from './guards/noauth.guard';
+import { TwoFactorAuthComponent } from './modules/public/two-factor-auth/two-factor-auth.component';
+import { twoFactorGuard } from './guards/two-factor.guard';
 
 export const routes: Routes = [
   //   PUBLIC ROUTES
@@ -47,6 +49,10 @@ export const routes: Routes = [
     component: VerifyEmailComponent
   },
   {
+    path: 'two-factor',
+    component: TwoFactorAuthComponent
+  },
+  {
     path: 'reset-password',
     canActivate: [authGuard],
     component: ResetPasswordComponent
@@ -72,6 +78,7 @@ export const routes: Routes = [
       },
       {
         path: 'update-password',
+        canActivate: [twoFactorGuard],
         component: UpdatePasswordComponent
       },
       {

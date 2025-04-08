@@ -15,6 +15,7 @@ export class AuthService {
   private readonly ACCESS_TOKEN_KEY = 'accessToken';
   private readonly REFRESH_TOKEN_KEY = 'refreshToken';
   private readonly TEMP_LOGIN_DATA_KEY = 'temporalLoginData';
+  private isTwoFactorAuthenticated = false;
 
   constructor(
     private httpClient: HttpClient,
@@ -36,6 +37,8 @@ export class AuthService {
 
           if (!data.withVerificationEmail) {
             localStorage.setItem('requiresEmailVerification', 'true');
+          } else if (data.with2FA) {
+            localStorage.setItem('requires2fa', 'true');
           } else if (data.renewPassword) {
             localStorage.setItem('requiresPasswordReset', 'true');
           }
@@ -59,9 +62,15 @@ export class AuthService {
   getAccessToken(): string | null {
     return localStorage.getItem(this.ACCESS_TOKEN_KEY);
   }
-
   getRefreshToken(): string | null {
     return localStorage.getItem(this.REFRESH_TOKEN_KEY);
+  }
+
+  setTwoFactorAuthenticated(status: boolean) {
+    this.isTwoFactorAuthenticated = status;
+  }
+  getTwoFactorAuthenticated(): boolean {
+    return this.isTwoFactorAuthenticated;
   }
 
   isAuthenticated(): boolean {
@@ -84,7 +93,7 @@ export class AuthService {
   loadUser(): Observable<any> {
     // Mock data
     const mockUsuario = {
-      id: 3060,
+      id: 3064,
       email: "resomagsa@rmcs.com.co",
       name: "Resonancia Magnetica Del Country S.A.",
       rejected: false,
@@ -153,6 +162,8 @@ export class AuthService {
   clearLocalStorage() {
     this.removeSession();
     this.removeTemporalLoginData();
+    this.setTwoFactorAuthenticated(false);
+    localStorage.removeItem('requires2fa');
     localStorage.removeItem('requiresEmailVerification');
     localStorage.removeItem('requiresPasswordReset');
     localStorage.removeItem('clientSelected');
@@ -244,6 +255,28 @@ export class AuthService {
     return this.httpClient.post(
       `${environment.url}Auth/ValidateEmail/Resend`,
       reqData
+    );
+  }
+
+  /**
+   * 2fa - Send two-factor authentication code.
+  */
+  twoFactorAuth(reqData: VerifyEmailReq): Observable<any> {
+    return this.httpClient.post(
+      `${environment.url}Auth/2fa/Validate`,
+      reqData
+    ).pipe(
+      tap((res: any) => {
+        if (res.data) {
+          const data = res.data;
+          if (data.accessToken) {
+            this.saveTokens(data.accessToken, data.refreshToken);
+            if (data.renewPassword) {
+              localStorage.setItem('requiresPasswordReset', 'true');
+            }
+          }
+        }
+      })
     );
   }
 }

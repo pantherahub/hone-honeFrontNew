@@ -44,7 +44,7 @@ export class ForgotPasswordComponent implements OnInit {
   }
 
   onlyNumbers(event: KeyboardEvent) {
-    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace') {
+    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Enter') {
       event.preventDefault();
     }
   }

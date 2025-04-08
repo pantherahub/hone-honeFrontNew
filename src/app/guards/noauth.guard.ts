@@ -18,7 +18,7 @@ export const noauthGuard: CanActivateFn = (route, state) => {
     return false;
   }
 
-  if (state.url === '/verify-email') {
+  if (state.url === '/verify-email' || state.url === '/two-factor') {
     const hasTemporalLoginData = authService.getTemporalLoginData();
     if (!hasTemporalLoginData) {
       router.navigateByUrl('/login');
