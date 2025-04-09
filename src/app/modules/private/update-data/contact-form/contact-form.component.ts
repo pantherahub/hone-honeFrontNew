@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { format } from 'date-fns';
 import { NzModalRef } from 'ng-zorro-antd/modal';
 import { distinctUntilChanged } from 'rxjs';
@@ -401,6 +401,10 @@ export class ContactFormComponent implements OnInit {
         phone?.number || '',
         [Validators.required, this.formUtils.numeric, this.phoneNumberValidator]
       ],
+      extension: [
+        phone?.extension || null,
+        [this.extensionValidator]
+      ],
       idCity: [phone == null && this.officeIdCity ? this.officeIdCity : phone?.idCity || null],
       status: [phone ? phone.status || null : 'created'] // updated, created, null for existing phones
     });
@@ -411,6 +415,7 @@ export class ContactFormComponent implements OnInit {
         const idCityControl = phoneGroup.get('idCity');
         let idCity = null;
         if (value === 'Fijo') {
+          if (idCityControl?.value) return;
           idCity = this.officeIdCity || null;
           if (this.contactModelType === 'Prestador' && !this.officeIdCity) {
             idCityControl?.setValidators([Validators.required]);
@@ -452,6 +457,14 @@ export class ContactFormComponent implements OnInit {
     }
     if (type === 'Fijo' && (number.length < 6 || number.length > 15)) {
       return { invalidLength: 'Debe tener entre 6 y 15 dígitos.' };
+    }
+    return null;
+  }
+  extensionValidator(control: AbstractControl): ValidationErrors | null {
+    const value: string = control.value;
+    const regex = /^[0-9#*]+$/;
+    if (value && !regex.test(value)) {
+      return { invalidExtension: 'Solo números, # y *' };
     }
     return null;
   }
@@ -512,11 +525,16 @@ export class ContactFormComponent implements OnInit {
       const phone = phoneFormGroup.value;
       const savedPhone = this.savedPhones.find(saved => saved.idPhone === phone.idPhone);
 
+      if (phone.extension !== null && phone.extension.trim() === '') {
+        phoneFormGroup.patchValue({ extension: null });
+      }
+
       if (phone.status === 'created' && !phone.idPhone) {
         createdPhonesArray.push(this.createPhoneGroup(phone, true));
       } else if (phone.status !== 'created' && savedPhone) {
         const isUpdated = savedPhone.type !== phone.type
           || savedPhone.number !== phone.number
+          || savedPhone.extension !== phone.extension
           || savedPhone.idCity !== phone.idCity
           || savedPhone.status === 'updated';
         if (isUpdated) {
