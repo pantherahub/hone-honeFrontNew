@@ -382,7 +382,7 @@ export class OfficeModalComponent implements OnInit {
       : null;
 
     const modalRef = this.modalService.create<ScheduleFormComponent, any>({
-      nzTitle: schedule ? 'Actualizar horario' : 'Agregar horario',
+      nzTitle: schedule ? 'Actualizar horario de atención' : 'Agregar horario de atención',
       // nzTitle: 'Seleccionar Horarios de Atención',
       nzContent: ScheduleFormComponent,
       nzCentered: true,
@@ -434,7 +434,7 @@ export class OfficeModalComponent implements OnInit {
   async deleteSchedule(index: number) {
     const confirmed = await this.alertService.confirmDelete(
       '¿Eliminar horario?',
-      'Eliminar horario del listado'
+      'Eliminar horario de atención del listado'
     );
     if (!confirmed) return;
 
