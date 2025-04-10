@@ -3,9 +3,10 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { Observable, of } from 'rxjs';
-import { delay, map, tap } from 'rxjs/operators';
+import { catchError, delay, tap } from 'rxjs/operators';
 import { EventManagerService } from './events-manager/event-manager.service';
 import { RefreshTokenResponse, TemporalLoginData, VerifyEmailReq } from '../models/auth.interface';
+import { AuthUserState } from '../models/user-state.interface';
 
 @Injectable({
    providedIn: 'root'
@@ -83,7 +84,7 @@ export class AuthService {
     return user ? JSON.parse(user) : null;
   }
 
-  // Guarda en storage los datos del usuario logueado
+  // Saves the logged-in user's data to storage
   saveUserLogged(user: any) {
     localStorage.removeItem('userLogged');
     localStorage.setItem('userLogged', JSON.stringify(user));
@@ -91,42 +92,82 @@ export class AuthService {
   }
 
   loadUser(): Observable<any> {
-    // Mock data
-    const mockUsuario = {
-      id: 3064,
-      email: "resomagsa@rmcs.com.co",
-      name: "Resonancia Magnetica Del Country S.A.",
-      rejected: false,
-      roles: {
-        description: "Prestador Allianz",
-        fullaccess: "no",
-        idClientHoneSolutions: 4,
-        idRoles: 5,
-        nameRol: "PRESTADOR",
-        slug: "PRESTADOR",
-      },
-      withData: true,
-    };
-    // Testing:
-    this.saveUserLogged(mockUsuario);
-    return of(mockUsuario);
-
-    return this.httpClient.post(
-      `${environment.url}Auth/GetUser`,
-      null
-      // { ACCESS_TOKEN: this.getAccessToken() }
+    return this.httpClient.get(
+      `${environment.url}Auth/GetUser`
     ).pipe(
-      map((res: any) => {
-        // this.user = res;
-        this.saveUserLogged(mockUsuario);
-        return mockUsuario;
-        // return res;
-      }), // temporal
-      // catchError((error) => {
-      //   // temporal
-      //   localStorage.setItem("userLogged", JSON.stringify(mockUsuario));
-      //   return of(mockUsuario)
-      // })
+      tap((res: any) => {
+        if (!res || res.ok === false || !res.data) {
+          throw new Error(res.message || 'Error al obtener el usuario');
+        }
+
+        const user = res.data.User;
+        const userEmail = res.data.email;
+
+        const providerData = user.UserHasProviders?.length
+          ? user.UserHasProviders[0]
+          : null;
+        const clientData = user.UserHasClients?.length
+          ? user.UserHasClients[0]
+          : null;
+
+        const source = providerData || clientData;
+        if (!source) {
+          throw new Error('El usuario no tiene asociados ni providers ni clients');
+        }
+
+        const role = source.OldRoleForProvider || source.OldRoleForClient;
+        if (!role) {
+          throw new Error('El usuario no tiene OldRoles asociados');
+        }
+
+        const provider = providerData?.Provider;
+        const client = clientData?.Client;
+
+        const userLogged: AuthUserState = {
+          id: provider?.idProvider || null,
+          email: provider?.email || null,
+          name: provider?.razonSocial || null,
+          rejected: res.rejected ?? false,
+          roles: {
+            description: role?.description,
+            fullaccess: role?.fullaccess,
+            idClientHoneSolutions: role?.idClientHoneSolutions,
+            idRoles: role?.idRoles,
+            nameRol: role?.nameRol,
+            slug: role?.slug,
+          },
+          withData: res.withData ?? false,
+
+          user: {
+            idUser: user.idUser,
+            names: user.names,
+            lastNames: user.lastNames,
+            fullName: `${user.names} ${user.lastNames}`,
+            idTypeDocument: user.idTypeDocument,
+            identification: user.identification,
+            email: userEmail,
+            avatar: user.avatar,
+
+            Roles: res.data.Roles || [],
+            Permissions: res.data.Permissions || [],
+            provider: provider
+              ? {
+                  idProvider: provider.idProvider,
+                  razonSocial: provider.razonSocial,
+                  email: provider.email
+                }
+              : null,
+            client: client
+              ? {
+                  idClientHoneSolutions: client.idClientHoneSolutions,
+                  clientHoneSolutions: client.clientHoneSolutions
+                }
+              : null
+          }
+        };
+
+        this.saveUserLogged(userLogged);
+      }),
     );
   }
 
@@ -177,22 +218,27 @@ export class AuthService {
     this.router.navigateByUrl('login');
   }
 
-  public logout() {
-    if (!this.isAuthenticated()) {
-      this.clearAuth();
-      return;
-    }
-    this.httpClient.post(
-      `${environment.url}Auth/Logout`,
-      null
-    ).subscribe({
-      next: (data: any) => {
+  public logout(): Promise<void> {
+    return new Promise<void>((resolve) => {
+      if (!this.isAuthenticated()) {
         this.clearAuth();
-      },
-      error: (err: any) => {
-        console.error(err);
-        this.clearAuth();
+        resolve();
+        return;
       }
+      this.httpClient.post(
+        `${environment.url}Auth/Logout`,
+        null
+      ).subscribe({
+        next: (data: any) => {
+          this.clearAuth();
+          resolve();
+        },
+        error: (err: any) => {
+          console.error(err);
+          this.clearAuth();
+          resolve();
+        }
+      });
     });
   }
 

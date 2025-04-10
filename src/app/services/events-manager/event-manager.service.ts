@@ -1,11 +1,11 @@
 import { Injectable, signal, computed, effect } from '@angular/core';
-import { UserInterface } from '../../models/user.interface';
+import { AuthUserState } from '../../models/user-state.interface';
 
 @Injectable({
    providedIn: 'root'
 })
 export class EventManagerService {
-   userLogged = signal<UserInterface>({});
+   userLogged = signal<AuthUserState>({});
    clientSelected = signal({});
    getPercentApi = signal<number>(0);
 

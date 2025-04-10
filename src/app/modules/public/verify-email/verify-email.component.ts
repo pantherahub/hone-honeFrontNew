@@ -18,6 +18,7 @@ import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service
 export class VerifyEmailComponent implements OnInit {
 
   loading: boolean = false;
+  isAuthenticated: boolean = false;
   temporalLoginData: TemporalLoginData | null = null;
   codeForm!: FormGroup;
 
@@ -38,10 +39,15 @@ export class VerifyEmailComponent implements OnInit {
       code: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
     });
 
+    this.isAuthenticated = this.authService.isAuthenticated();
     this.temporalLoginData = this.authService.getTemporalLoginData();
     const requiresEmailVerification = localStorage.getItem('requiresEmailVerification');
-    if (!requiresEmailVerification || !this.temporalLoginData) {
+
+    if (!this.isAuthenticated && (!requiresEmailVerification || !this.temporalLoginData)) {
       this.onCancel();
+      return;
+    } else if (this.isAuthenticated && !requiresEmailVerification) {
+      this.router.navigate(['/home']);
       return;
     }
 
@@ -87,6 +93,11 @@ export class VerifyEmailComponent implements OnInit {
 
 
   resendCode() {
+    if (this.isAuthenticated) {
+      this.resendCodeNoAuth();
+      return;
+    }
+
     if (!this.temporalLoginData) {
       this.onCancel();
       return;
@@ -117,10 +128,28 @@ export class VerifyEmailComponent implements OnInit {
     });
   }
 
+  resendCodeNoAuth() {
+    this.messageService.success('Código reenviado');
+    this.loading = false;
+    this.isResendDisabled = true;
+
+    localStorage.setItem('resendTimestamp', Date.now().toString());
+    this.startCountdown();
+  }
+
   onSubmit() {
     this.formUtils.markFormTouched(this.codeForm);
     if (this.codeForm.invalid) return;
-    else if (!this.temporalLoginData) {
+
+    if (this.isAuthenticated) {
+      this.submitAuth();
+      return;
+    }
+    this.submitNoAuth();
+  }
+
+  submitNoAuth() {
+    if (!this.temporalLoginData) {
       this.onCancel();
       return;
     }
@@ -164,6 +193,14 @@ export class VerifyEmailComponent implements OnInit {
         this.loading = false;
       },
     });
+  }
+
+  submitAuth() {
+    // Temporal
+    this.messageService.create('success', 'Correo verificado.');
+    localStorage.removeItem('resendTimestamp');
+    localStorage.removeItem('requiresEmailVerification');
+    this.router.navigateByUrl('home');
   }
 
 }

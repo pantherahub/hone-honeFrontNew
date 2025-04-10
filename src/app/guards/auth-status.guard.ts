@@ -7,6 +7,14 @@ export const authStatusGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
 
   if (!authService.isAuthenticated()) {
+    if (state.url === '/verify-email' || state.url === '/two-factor') {
+      const hasTemporalLoginData = authService.getTemporalLoginData();
+      if (!hasTemporalLoginData) {
+        authService.logout();
+        return false;
+      }
+      return true;
+    }
     authService.logout();
     return false;
   }

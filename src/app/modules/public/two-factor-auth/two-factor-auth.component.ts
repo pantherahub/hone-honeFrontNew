@@ -1,9 +1,8 @@
 import { CommonModule, Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { map } from 'rxjs';
 import { TemporalLoginData, VerifyEmailReq } from 'src/app/models/auth.interface';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { AuthService } from 'src/app/services/auth.service';
@@ -132,6 +131,7 @@ export class TwoFactorAuthComponent implements OnInit {
   }
 
   submitAuth() {
+    // Temporal
     this.authService.setTwoFactorAuthenticated(true);
     this.router.navigate([this.returnUrl]);
   }

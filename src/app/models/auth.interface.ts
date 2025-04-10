@@ -17,3 +17,8 @@ export interface TemporalLoginData {
 export interface VerifyEmailReq extends TemporalLoginData {
   code: string;
 }
+
+export interface AuthInfo {
+  with2FA: boolean;
+  // verificationEmailDate?: Date | null;
+}

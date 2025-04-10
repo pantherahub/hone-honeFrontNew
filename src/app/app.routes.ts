@@ -18,6 +18,8 @@ import { ForgotPasswordComponent } from './modules/public/forgot-password/forgot
 import { noauthGuard } from './guards/noauth.guard';
 import { TwoFactorAuthComponent } from './modules/public/two-factor-auth/two-factor-auth.component';
 import { twoFactorGuard } from './guards/two-factor.guard';
+import { ValidatePasswordComponent } from './modules/private/user/validate-password/validate-password.component';
+import { ProfileComponent } from './modules/private/user/profile/profile.component';
 
 export const routes: Routes = [
   //   PUBLIC ROUTES
@@ -45,17 +47,23 @@ export const routes: Routes = [
   },
   {
     path: 'verify-email',
-    canActivate: [noauthGuard],
+    canActivate: [authStatusGuard],
     component: VerifyEmailComponent
   },
   {
     path: 'two-factor',
+    canActivate: [authStatusGuard],
     component: TwoFactorAuthComponent
   },
   {
     path: 'reset-password',
     canActivate: [authGuard],
     component: ResetPasswordComponent
+  },
+  {
+    path: 'validate-password',
+    canActivate: [authGuard, authStatusGuard],
+    component: ValidatePasswordComponent
   },
 
 	//   PRIVATE ROUTES
@@ -71,6 +79,10 @@ export const routes: Routes = [
       {
         path: 'update-data',
         component: UpdateDataComponent
+      },
+      {
+        path: 'profile',
+        component: ProfileComponent
       },
       {
         path: 'user-management',
