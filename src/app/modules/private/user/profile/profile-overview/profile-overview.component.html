@@ -1,0 +1,127 @@
+
+<div class="bg-gray-50 p-5">
+  <h4 class="font-bold text-blue2h-400 mb-4">Información Personal</h4>
+
+  <form nz-form nzLayout="vertical" [formGroup]="form" (ngSubmit)="updateUserData()">
+    <div class="">
+
+      <div nz-row [nzGutter]="16">
+        <nz-col [nzSpan]="24" [nzSm]="12">
+          <nz-form-item nz-row>
+            <nz-form-label nzRequired nzFor="names">Nombre(s)</nz-form-label>
+            <nz-form-control [nzErrorTip]="namesErrorTip">
+              <ng-template #namesErrorTip>
+                <p *ngIf="form.controls['names'].hasError('required')">El campo es requerido.</p>
+              </ng-template>
+              <input nz-input id="names" formControlName="names" placeholder="Nombre(s)" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+
+        <nz-col [nzSpan]="24" [nzSm]="12">
+          <nz-form-item nz-row>
+            <nz-form-label nzRequired nzFor="lastNames">Apellido(s)</nz-form-label>
+            <nz-form-control [nzErrorTip]="lastNamesErrorTip">
+              <ng-template #lastNamesErrorTip>
+                <p *ngIf="form.controls['lastNames'].hasError('required')">El campo es requerido.</p>
+              </ng-template>
+              <input nz-input id="lastNames" formControlName="lastNames" placeholder="Apellido(s)" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+
+        <nz-col [nzSpan]="24" [nzSm]="12">
+          <nz-form-item>
+            <nz-form-label nzRequired nzFor="idTypeDocument">Tipo de identificación</nz-form-label>
+            <nz-form-control nzErrorTip="El campo es requerido.">
+              <nz-select
+                id="idTypeDocument"
+                formControlName="idTypeDocument"
+                nzPlaceHolder="Seleccionar"
+              >
+                <nz-option *ngFor="let type of identificationTypes" [nzValue]="type.idTypeDocument" [nzLabel]="type.typeDocument"></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+
+        <nz-col [nzSpan]="24" [nzSm]="12">
+          <nz-form-item>
+            <nz-form-label nzRequired nzFor="identification">Identificación</nz-form-label>
+            <nz-form-control [nzErrorTip]="identificationErrorTip">
+              <ng-template #identificationErrorTip>
+                @if (form.controls['identification'].hasError('required')) {
+                  <p>El campo es requerido.</p>
+                } @else if (form.controls['identification'].hasError('invalidNumber')) {
+                  <p>Ingresa un valor válido.</p>
+                }
+              </ng-template>
+              <input nz-input id="identification" formControlName="identification" placeholder="Identificación" type="text" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+
+        <nz-col [nzSpan]="24">
+          <nz-form-item>
+            <nz-form-label nzRequired nzFor="birthDate">Fecha de nacimiento</nz-form-label>
+            <nz-form-control>
+              <nz-date-picker id="birthDate" formControlName="birthDate" nzPlaceHolder="Fecha" [nzDisabledDate]="disableFutureDates"></nz-date-picker>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+
+        <nz-col [nzSpan]="24" [nzSm]="12">
+          <nz-form-item>
+            <nz-form-label nzRequired nzFor="phone1">Teléfono 1</nz-form-label>
+            <nz-form-control [nzErrorTip]="phone1ErrorTip">
+              <ng-template #phone1ErrorTip>
+                @if (form.get('phone1')?.hasError('invalidNumber')) {
+                  Ingresa un número válido.
+                } @else if (form.get('phone1')?.hasError('minlength') || form.get('number')?.hasError('maxlength')) {
+                  Debe tener entre 6 y 15 dígitos.
+                }
+              </ng-template>
+              <input
+                nz-input
+                type="text"
+                id="phone1"
+                placeholder="Número"
+                formControlName="phone1"
+              />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+
+        <nz-col [nzSpan]="24" [nzSm]="12">
+          <nz-form-item>
+            <nz-form-label nzFor="phone2">Teléfono 2</nz-form-label>
+            <nz-form-control [nzErrorTip]="phone2ErrorTip">
+              <ng-template #phone2ErrorTip>
+                @if (form.get('phone2')?.hasError('invalidNumber')) {
+                  Ingresa un número válido.
+                } @else if (form.get('phone2')?.hasError('minlength') || form.get('number')?.hasError('maxlength')) {
+                  Debe tener entre 6 y 15 dígitos.
+                }
+              </ng-template>
+              <input
+                nz-input
+                type="text"
+                id="phone2"
+                placeholder="Número"
+                formControlName="phone2"
+              />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+
+      </div>
+
+    </div>
+
+    <!-- <app-backend-errors [error]="backendError"></app-backend-errors> -->
+
+    <div class="flex justify-end pt-4">
+      <button nz-button nzType="primary" type="submit" [disabled]="loading">Actualizar datos</button>
+    </div>
+  </form>
+</div>

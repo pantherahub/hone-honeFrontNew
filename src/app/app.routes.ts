@@ -20,6 +20,8 @@ import { TwoFactorAuthComponent } from './modules/public/two-factor-auth/two-fac
 import { twoFactorGuard } from './guards/two-factor.guard';
 import { ValidatePasswordComponent } from './modules/private/user/validate-password/validate-password.component';
 import { ProfileComponent } from './modules/private/user/profile/profile.component';
+import { ProfileOverviewComponent } from './modules/private/user/profile/profile-overview/profile-overview.component';
+import { ProfileSecurityComponent } from './modules/private/user/profile/profile-security/profile-security.component';
 
 export const routes: Routes = [
   //   PUBLIC ROUTES
@@ -82,7 +84,11 @@ export const routes: Routes = [
       },
       {
         path: 'profile',
-        component: ProfileComponent
+        component: ProfileComponent,
+        children: [
+          { path: '', component: ProfileOverviewComponent },
+          { path: 'security', component: ProfileSecurityComponent }
+        ]
       },
       {
         path: 'user-management',

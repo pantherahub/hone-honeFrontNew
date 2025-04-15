@@ -92,23 +92,23 @@
 
       <nz-col [nzSpan]="24" [nzSm]="12">
         <nz-form-item>
-          <nz-form-label nzRequired>Nombre(s)</nz-form-label>
+          <nz-form-label nzRequired nzFor="names">Nombre(s)</nz-form-label>
           <nz-form-control [nzErrorTip]="'El campo es requerido'">
-            <input nz-input formControlName="names" placeholder="Nombre(s)" />
+            <input nz-input id="names" formControlName="names" placeholder="Nombre(s)" />
           </nz-form-control>
         </nz-form-item>
       </nz-col>
       <nz-col [nzSpan]="24" [nzSm]="12">
         <nz-form-item>
-          <nz-form-label nzRequired>Apellido(s)</nz-form-label>
+          <nz-form-label nzRequired nzFor="lastNames">Apellido(s)</nz-form-label>
           <nz-form-control [nzErrorTip]="'El campo es requerido'">
-            <input nz-input formControlName="lastNames" placeholder="Apellido(s)" />
+            <input nz-input id="lastNames" formControlName="lastNames" placeholder="Apellido(s)" />
           </nz-form-control>
         </nz-form-item>
       </nz-col>
       <nz-col [nzSpan]="24">
         <nz-form-item>
-          <nz-form-label nzRequired>Correo</nz-form-label>
+          <nz-form-label nzRequired nzFor="email">Correo</nz-form-label>
           <nz-form-control [nzErrorTip]="emailErrorTip">
             <ng-template #emailErrorTip>
               @if (userForm.get('email')?.hasError('required')) {
@@ -117,7 +117,7 @@
                 Ingresa un correo válido.
               }
             </ng-template>
-            <input nz-input formControlName="email" type="email" placeholder="Correo electrónico" />
+            <input nz-input id="email" formControlName="email" type="email" placeholder="Correo electrónico" />
           </nz-form-control>
         </nz-form-item>
       </nz-col>
@@ -137,23 +137,30 @@
       </nz-col>
       <nz-col [nzSpan]="24" [nzSm]="12">
         <nz-form-item>
-          <nz-form-label nzRequired>Identificación</nz-form-label>
-          <nz-form-control [nzErrorTip]="'El campo es requerido'">
-            <input nz-input formControlName="identification" placeholder="Número de identificación" />
+          <nz-form-label nzRequired nzFor="identification">Identificación</nz-form-label>
+          <nz-form-control [nzErrorTip]="identificationErrorTip">
+            <ng-template #identificationErrorTip>
+              @if (userForm.controls['identification'].hasError('required')) {
+                <p>El campo es requerido.</p>
+              } @else if (userForm.controls['identification'].hasError('invalidNumber')) {
+                <p>Ingresa un valor válido.</p>
+              }
+            </ng-template>
+            <input nz-input id="identification" formControlName="identification" placeholder="Número de identificación" type="text" />
           </nz-form-control>
         </nz-form-item>
       </nz-col>
       <nz-col [nzSpan]="24">
         <nz-form-item>
-          <nz-form-label>Fecha de nacimiento</nz-form-label>
+          <nz-form-label nzFor="birthDate">Fecha de nacimiento</nz-form-label>
           <nz-form-control>
-            <nz-date-picker formControlName="birthDate" nzPlaceHolder="Fecha" [nzDisabledDate]="disableFutureDates"></nz-date-picker>
+            <nz-date-picker id="birthDate" formControlName="birthDate" nzPlaceHolder="Fecha" [nzDisabledDate]="disableFutureDates"></nz-date-picker>
           </nz-form-control>
         </nz-form-item>
       </nz-col>
       <nz-col [nzSpan]="24" [nzSm]="12">
         <nz-form-item>
-          <nz-form-label>Teléfono 1</nz-form-label>
+          <nz-form-label nzFor="phone1">Teléfono 1</nz-form-label>
           <nz-form-control [nzErrorTip]="phone1ErrorTip">
             <ng-template #phone1ErrorTip>
               @if (userForm.get('phone1')?.hasError('invalidNumber')) {
@@ -165,6 +172,7 @@
             <input
               nz-input
               type="text"
+              id="phone1"
               placeholder="Número"
               formControlName="phone1"
             />
@@ -173,7 +181,7 @@
       </nz-col>
       <nz-col [nzSpan]="24" [nzSm]="12">
         <nz-form-item>
-          <nz-form-label>Teléfono 2</nz-form-label>
+          <nz-form-label nzFor="phone2">Teléfono 2</nz-form-label>
           <nz-form-control [nzErrorTip]="phone2ErrorTip">
             <ng-template #phone2ErrorTip>
               @if (userForm.get('phone2')?.hasError('invalidNumber')) {
@@ -185,6 +193,7 @@
             <input
               nz-input
               type="text"
+              id="phone2"
               placeholder="Número"
               formControlName="phone2"
             />

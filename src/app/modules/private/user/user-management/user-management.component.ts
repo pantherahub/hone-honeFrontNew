@@ -1,6 +1,7 @@
 import { CommonModule, Location } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { format } from 'date-fns';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { NzUploadFile, NzUploadXHRArgs } from 'ng-zorro-antd/upload';
@@ -100,7 +101,7 @@ export class UserManagementComponent implements OnInit {
       lastNames: ['', Validators.required],
       email: ['', [Validators.required, this.formUtils.emailValidator]],
       idTypeDocument: ['', [Validators.required]],
-      identification: ['', Validators.required],
+      identification: ['', [Validators.required, this.formUtils.numeric]],
       birthDate: [null],
       phone1: [null, [this.formUtils.numeric, Validators.minLength(6), Validators.maxLength(15)]],
       phone2: [null, [this.formUtils.numeric, Validators.minLength(6), Validators.maxLength(15)]],
@@ -109,7 +110,7 @@ export class UserManagementComponent implements OnInit {
 
   disableFutureDates = (current: Date): boolean => {
     return current > new Date();
-  };
+  }
 
   loadData(): void {
     // this.loadingPage = true;
@@ -178,7 +179,17 @@ export class UserManagementComponent implements OnInit {
   }
 
   saveUser(): void {
-    if (this.userForm.invalid) return;
+    this.formUtils.trimFormStrControls(this.userForm);
+    if (this.userForm.invalid) {
+      this.formUtils.markFormTouched(this.userForm);
+      return;
+    }
+    const birthDate = this.userForm.get('birthDate')?.value;
+    if (birthDate) {
+      this.userForm.patchValue({
+        birthDate: `${format(birthDate, 'yyyy-MM-dd')}T00:00:00`
+      });
+    }
 
     this.loading = true;
     this.loading = false;

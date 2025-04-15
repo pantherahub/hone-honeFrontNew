@@ -79,13 +79,13 @@ export class AuthService {
     return !!token;
   }
 
-  getUserData(): any | null {
+  getUserData(): AuthUserState | null {
     const user = localStorage.getItem("userLogged");
     return user ? JSON.parse(user) : null;
   }
 
   // Saves the logged-in user's data to storage
-  saveUserLogged(user: any) {
+  saveUserLogged(user: AuthUserState) {
     localStorage.removeItem('userLogged');
     localStorage.setItem('userLogged', JSON.stringify(user));
     this.eventManager.userLogged.set(user);
@@ -245,19 +245,9 @@ export class AuthService {
   /**
    * Forgot password - Send email and request code.
   */
-  forgotSendEmail(reqData: any): Observable<any> {
+  forgotSendCode(reqData: any): Observable<any> {
     return this.httpClient.post(
-      `${environment.url}Auth/Forgot/sendEmail`,
-      reqData
-    );
-  }
-
-  /**
-   * Forgot password - Verify code sent to email.
-  */
-  forgotVerifyCode(reqData: any): Observable<any> {
-    return this.httpClient.post(
-      `${environment.url}Auth/Forgot/verifyCode`,
+      `${environment.url}Auth/ForgotPassword/SendCode`,
       reqData
     );
   }
@@ -267,7 +257,27 @@ export class AuthService {
   */
   forgotResendCode(reqData: any): Observable<any> {
     return this.httpClient.post(
-      `${environment.url}Auth/Forgot/resendCode`,
+      `${environment.url}Auth/ForgotPassword/ResendCode`,
+      reqData
+    );
+  }
+
+  /**
+   * Forgot password - Verify code sent to email.
+  */
+  forgotVerifyCode(reqData: any): Observable<any> {
+    return this.httpClient.post(
+      `${environment.url}Auth/ForgotPassword/Validate`,
+      reqData
+    );
+  }
+
+  /**
+   * Forgot password - Update password.
+  */
+  updatePasswordNoAuth(reqData: any): Observable<any> {
+    return this.httpClient.put(
+      `${environment.url}Auth/Security/ChangePassword/ApiKey`,
       reqData
     );
   }
@@ -300,6 +310,16 @@ export class AuthService {
   verifyEmailResendCode(reqData: TemporalLoginData): Observable<any> {
     return this.httpClient.post(
       `${environment.url}Auth/ValidateEmail/Resend`,
+      reqData
+    );
+  }
+
+  /**
+   * Update password with auth.
+  */
+  updatePasswordAuth(reqData: any): Observable<any> {
+    return this.httpClient.put(
+      `${environment.url}Auth/Security/ChangePassword/AccessToken`,
       reqData
     );
   }

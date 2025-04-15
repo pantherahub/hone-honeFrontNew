@@ -1,10 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
-import { AlertService } from 'src/app/services/alerts/alert.service';
-import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
+import { AuthService } from 'src/app/services/auth.service';
 import { NewPasswordFormComponent } from 'src/app/shared/forms/new-password-form/new-password-form.component';
 
 @Component({
@@ -16,45 +15,27 @@ import { NewPasswordFormComponent } from 'src/app/shared/forms/new-password-form
 })
 export class UpdatePasswordComponent implements OnInit {
 
-  passwordForm!: FormGroup;
-  passwordVisible: boolean = false;
-
   constructor(
-    private fb: FormBuilder,
     private router: Router,
-    private alertService: AlertService,
-    private formUtils: FormUtilsService,
+    private authService: AuthService,
+    private messageService: NzMessageService,
   ) { }
 
-  ngOnInit() {
-    this.passwordForm = this.fb.group({
-      currentPassword: ['', [Validators.required]]
-    });
-  }
-
-  markFormAsTouched() {
-    this.formUtils.markFormTouched(this.passwordForm);
-  }
+  ngOnInit() { }
 
   onPasswordSubmitted(event: { newPassword: string, confirmPassword: string }) {
-    this.markFormAsTouched();
-    if (this.passwordForm.invalid) return;
-
-    const currentPassword = this.passwordForm.value.currentPassword;
     const newPassword = event.newPassword;
     const confirmPassword = event.confirmPassword;
-
-    // if (newPassword !== confirmPassword) {
-    //   alert('Las contraseñas no coinciden');
-    //   return;
-    // }
-
-    this.alertService.success('Actualizada', 'Contraseña actualizada con éxito');
-
-    console.log('Contraseña actual:', currentPassword);
     console.log('Nueva contraseña:', newPassword);
 
-    this.router.navigate(['/home']);
+    this.authService.updatePasswordAuth({ password: newPassword }).subscribe({
+      next: (res: any) => {
+        this.messageService.success('Contraseña actualizada con éxito');
+        // Close modal
+        this.router.navigate(['/home']);
+      },
+      error: () => this.messageService.error('Error actualizando la contraseña'),
+    });
   }
 
   onCancel() {

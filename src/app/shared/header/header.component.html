@@ -33,6 +33,10 @@
         <!-- Dropdown Menu -->
         <nz-dropdown-menu #userMenu="nzDropdownMenu">
           <ul nz-menu class="w-[200px]">
+            <li nz-menu-item routerLink="/profile">
+              <div nz-icon nzType="user" nzTheme="outline" class="mr-2"></div>
+              <span>Perfil</span>
+            </li>
             <li nz-menu-item routerLink="/user-management">
               <div nz-icon nzType="usergroup-add" nzTheme="outline" class="mr-2"></div>
               <span>Gestionar Usuarios</span>
@@ -46,6 +50,14 @@
 
         <!-- <nz-dropdown-menu #userMenu="nzDropdownMenu">
           <ul nz-menu class="w-[200px]">
+            <li nz-menu-item routerLink="/profile">
+              <div class="flex items-center gap-2 w-full py-2 text-gray-700">
+                <svg class="w-5 h-5">
+                  <use xlink:href="/assets/icons/header.svg#user" />
+                </svg>
+                <span>Perfil</span>
+              </div>
+            </li>
             <li nz-menu-item routerLink="/user-management">
               <div class="flex items-center gap-2 w-full py-2 text-gray-700">
                 <svg class="w-5 h-5">

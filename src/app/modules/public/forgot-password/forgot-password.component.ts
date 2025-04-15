@@ -2,8 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
-import { AlertService } from 'src/app/services/alerts/alert.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { NewPasswordFormComponent } from 'src/app/shared/forms/new-password-form/new-password-form.component';
@@ -26,10 +26,12 @@ export class ForgotPasswordComponent implements OnInit {
   isResendDisabled: boolean = false;
   private countdownInterval: any;
 
+  apiKey: string | null = null;
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private alertService: AlertService,
+    private messageService: NzMessageService,
     private authService: AuthService,
     private formUtils: FormUtilsService,
   ) { }
@@ -52,14 +54,14 @@ export class ForgotPasswordComponent implements OnInit {
   sendEmail() {
     this.formUtils.markFormTouched(this.emailForm);
     if (this.emailForm.invalid) return;
-    this.step = 1;
-    // this.authService.forgotSendEmail(this.emailForm.value).subscribe({
-    //   next: () => {
-    //     this.alertService.success('Código enviado al correo.');
-    //     this.step = 1;
-    //   },
-    //   error: () => this.alertService.error('Error enviando el código'),
-    // });
+    this.authService.forgotSendCode(this.emailForm.value).subscribe({
+      next: (res: any) => {
+        this.apiKey = res.data.apiKey;
+        this.messageService.success('Código enviado al correo.');
+        this.step = 1;
+      },
+      error: () => this.messageService.error('Error enviando el código'),
+    });
   }
 
   verifyCode() {
@@ -68,14 +70,15 @@ export class ForgotPasswordComponent implements OnInit {
     if (this.codeForm.invalid) return;
     const code = this.codeForm.value.code;
     // console.log('Código ingresado:', code);
-    this.step = 2;
-    // this.authService.forgotVerifyCode(this.codeForm.value).subscribe({
-    //   next: () => {
-    //     this.alertService.success('Código verificado.');
-    //     this.step = 2;
-    //   },
-    //   error: () => this.alertService.error('Código incorrecto'),
-    // });
+
+    this.authService.forgotVerifyCode(this.codeForm.value).subscribe({
+      next: (res: any) => {
+        this.apiKey = res.data.apiKey;
+        this.messageService.success('Código verificado.');
+        this.step = 2;
+      },
+      error: () => this.messageService.error('Código incorrecto'),
+    });
   }
 
   startCountdown() {
@@ -93,21 +96,30 @@ export class ForgotPasswordComponent implements OnInit {
     this.isResendDisabled = true;
     this.startCountdown();
 
-    // this.authService.forgotResendCode({ email: this.emailForm.value.email }).subscribe({
-    //   next: () => this.alertService.success('Código reenviado'),
-    //   error: () => this.alertService.error('Error re-enviando el código'),
-    // });
+    this.authService.forgotResendCode({ email: this.emailForm.value.email }).subscribe({
+      next: (res: any) => {
+        this.apiKey = res.data.apiKey;
+        this.messageService.success('Código reenviado');
+      },
+      error: () => this.messageService.error('Error reenviando el código'),
+    });
   }
 
   resetPassword(event: { newPassword: string, confirmPassword: string }) {
     const newPassword = event.newPassword;
     const confirmPassword = event.confirmPassword;
 
-    // this.alertService.success('Actualizada', 'Contraseña actualizada con éxito');
-
-    console.log('Nueva contraseña:', newPassword);
-    // localStorage.removeItem('requiresPasswordReset');
-    this.router.navigate(['/home']);
+    const reqData = {
+      apiKey: this.apiKey,
+      password: newPassword
+    };
+    this.authService.updatePasswordNoAuth(reqData).subscribe({
+      next: (res: any) => {
+        this.messageService.success('Contraseña actualizada con éxito');
+        this.onCancel();
+      },
+      error: () => this.messageService.error('Error actualizando la contraseña'),
+    });
   }
 
   onCancel() {

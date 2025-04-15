@@ -31,8 +31,8 @@ export interface UserState {
   avatar: string;
   Roles?: any[];
   Permissions?: any[];
-  provider: ProviderState | null;
-  client: ClientState | null;
+  provider?: ProviderState | null;
+  client?: ClientState | null;
 
   birthDate?: Date;
   phone1?: string;
