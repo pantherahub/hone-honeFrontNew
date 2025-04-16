@@ -163,10 +163,10 @@
 
     <nz-col [nzSpan]="24" [nzSm]="24">
       <nz-form-label [nzRequired]="true">Teléfono(s)</nz-form-label>
-      <div nz-row [nzGutter]="16" formArrayName="Phones">
+      <div nz-row [nzGutter]="4" formArrayName="Phones">
         @for (control of phonesArray.controls; track control; let i = $index) {
-          <nz-col [nzSpan]="isFijoPhone(control) ? 12 : 11" [nzSm]="7">
-            <nz-form-item [formGroupName]="i" class="sm:mb-0">
+          <nz-col [nzSpan]="isFijoPhone(control) ? 12 : 9" [nzSm]="5">
+            <nz-form-item [formGroupName]="i" class="sm:mb-0" [ngClass]="{ 'mb-0': !isFijoPhone(control) }">
               <nz-form-control nzErrorTip="El campo es requerido.">
                 <nz-select formControlName="type" nzPlaceHolder="Tipo">
                   <nz-option *ngFor="let option of phoneNumberTypes" [nzValue]="option" [nzLabel]="option"></nz-option>
@@ -176,7 +176,7 @@
           </nz-col>
 
           <nz-col [nzSpan]="12" [nzSm]="7" *ngIf="control.get('type')?.value === 'Fijo'">
-            <nz-form-item [formGroupName]="i" class="sm:mb-0">
+            <nz-form-item [formGroupName]="i" class="sm:mb-0" [ngClass]="{ 'mb-0': !isFijoPhone(control) }">
               <nz-form-control nzErrorTip="El campo es requerido.">
                 <nz-select formControlName="idCity" nzPlaceHolder="Indicativo" nzShowSearch [nzCustomTemplate]="selectedTemplate">
                   <nz-option *ngFor="let option of cities" [nzValue]="option.idCity" [nzLabel]="option.label"></nz-option>
@@ -188,24 +188,49 @@
             </nz-form-item>
           </nz-col>
 
-          <nz-col [nzSpan]="isFijoPhone(control) ? 24 : 13" [nzSm]="isFijoPhone(control) ? 10 : 7">
+          <nz-col [nzSpan]="isFijoPhone(control) ? 24 : 15" [nzSm]="isFijoPhone(control) ? 12 : 19">
             <nz-form-item [formGroupName]="i" class="mb-0">
-              <nz-form-control [nzErrorTip]="phoneErrorTip">
-                <ng-template #phoneErrorTip>
-                  @if (control.get('number')?.hasError('required')) {
-                    El campo es requerido.
-                  } @else if (control.get('number')?.hasError('invalidNumber')) {
-                    Ingresa un número válido.
-                  } @else if (control.get('number')?.hasError('invalidLength')) {
-                    {{ control.get('number')?.errors?.['invalidLength'] }}
-                  }
-                </ng-template>
-                <input
-                  nz-input
-                  type="text"
-                  placeholder="Número"
-                  formControlName="number"
-                />
+              <nz-form-control>
+                <nz-row>
+                  <nz-col [nzSpan]="13">
+                    <nz-form-item class="mb-0">
+                      <nz-form-control [nzErrorTip]="phoneErrorTip">
+                        <ng-template #phoneErrorTip>
+                          @if (control.get('number')?.hasError('required')) {
+                            El campo es requerido.
+                          } @else if (control.get('number')?.hasError('invalidNumber')) {
+                            Ingresa un número válido.
+                          } @else if (control.get('number')?.hasError('invalidLength')) {
+                            {{ control.get('number')?.errors?.['invalidLength'] }}
+                          }
+                        </ng-template>
+                        <input
+                          nz-input
+                          type="text"
+                          placeholder="Número"
+                          formControlName="number"
+                        />
+                      </nz-form-control>
+                    </nz-form-item>
+                  </nz-col>
+                  <nz-col [nzSpan]="11">
+                    <nz-form-item class="mb-0">
+                      <nz-form-control [nzErrorTip]="extensionErrorTip">
+                        <ng-template #extensionErrorTip>
+                          @if (control.get('extension')?.hasError('invalidExtension')) {
+                            {{ control.get('extension')?.errors?.['invalidExtension'] }}
+                          }
+                        </ng-template>
+                        <input
+                          nz-input
+                          type="text"
+                          placeholder="Ext. Opcional"
+                          formControlName="extension"
+                        />
+                      </nz-form-control>
+                    </nz-form-item>
+                  </nz-col>
+                </nz-row>
               </nz-form-control>
             </nz-form-item>
           </nz-col>

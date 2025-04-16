@@ -345,7 +345,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       : null;
 
     const modalRef = this.modalService.create<OfficeModalComponent, any>({
-      nzTitle: office ? 'Actualizar sede' : 'Agregar sede',
+      nzTitle: office ? 'Actualizar sede de prestación de servicio' : 'Agregar sede de prestación de servicio',
       nzContent: OfficeModalComponent,
       nzCentered: true,
       nzClosable: true,
@@ -404,7 +404,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       nzContent: ContactFormComponent,
       nzCentered: true,
       nzClosable: true,
-      nzWidth: '600px',
+      nzWidth: '650px',
       nzStyle: { 'max-width': '90%', 'margin': '22px 0' }
     });
     const instanceModal = modalRef.getContentComponent();
@@ -451,7 +451,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
   async deleteOffice(index: number) {
     const confirmed = await this.alertService.confirmDelete(
       '¿Eliminar sede?',
-      'Eliminar sede del listado'
+      'Eliminar sede de prestación de servicio del listado'
     );
     if (!confirmed) return;
 
@@ -561,7 +561,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     this.backendError = null;
 
     if (!this.existingOffices?.length) {
-      this.alertService.warning('Aviso', 'Debe agregar al menos una sede.');
+      this.alertService.warning('Aviso', 'Debe agregar al menos una sede de prestación de servicio.');
       return;
     }
     if (!this.existingContacts?.length) {
