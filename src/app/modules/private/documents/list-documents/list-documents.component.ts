@@ -146,15 +146,35 @@ export class ListDocumentsComponent implements OnInit {
   }
 
    /**
-    * Descargar para Axa el manual de prestadores de Servicios de Salud
+    * Descargar para Axa manuales de prestadores de Servicios de Salud
     */
   downloadAxaProviderManual() {
     if (this.loadManualDownload) return;
-    this.saveAs(
-      'https://honesolutions.blob.core.windows.net/documents/PresentacionInduccionSostenibilidad2025.pdf',
-      'Presentación inducción y sostenibilidad 2025.pdf',
-      (loading) => this.loadManualDownload = loading
-    );
+    const documents = [
+      {
+        url: 'https://honesolutions.blob.core.windows.net/documents/PresentacionInduccionSostenibilidad2025.pdf',
+        name: 'Presentación inducción y sostenibilidad 2025.pdf'
+      },
+      {
+        url: 'https://honesolutions.blob.core.windows.net/documents/Manual_Portal_de_Prestadores_Salud_VF_2.pdf',
+        name: 'Manual Portal de Prestadores Salud VF 2.pdf'
+      },
+      {
+        url: 'https://honesolutions.blob.core.windows.net/documents/AXA_Manual_Radicacion_Digital_Salud_1.30.25_(2275+2284).pdf',
+        name: 'AXA Manual Radicacion Digital Salud 1.30.25 (2275+2284).pdf'
+      },
+    ];
+
+    let downloadsInProgress = documents.length;
+    this.loadManualDownload = true;
+    documents.forEach(doc => {
+      this.saveAs(doc.url, doc.name, () => {
+        downloadsInProgress--;
+        if (downloadsInProgress === 0) {
+          this.loadManualDownload = false;
+        }
+      });
+    });
    }
 
    /**
@@ -189,11 +209,9 @@ export class ListDocumentsComponent implements OnInit {
     * Recibe la url de donde se toman los documentos locales y los descarga
     * @param url - ruta de los assets/container a descargar
     * @param name - nombre del archivo que se muestra en la descarga
-    * @param setLoading - metodo opcional para retornar el loading
+    * @param onComplete - callback opcional para cuando se complete la descarga
     */
-    saveAs(url: any, name: any, setLoading?: (loading: boolean) => void) {
-      if (setLoading) setLoading(true);
-
+    saveAs(url: any, name: any, onComplete?: () => void) {
       if (url.startsWith('http')) {
         fetch(url)
           .then(response => {
@@ -212,7 +230,7 @@ export class ListDocumentsComponent implements OnInit {
           })
           .catch(error => console.error('Error descargando el archivo:', error))
           .finally(() => {
-            if (setLoading) setLoading(false);
+            if (onComplete) onComplete();
           });
         return;
       }
@@ -224,7 +242,7 @@ export class ListDocumentsComponent implements OnInit {
       document.body.appendChild(link);
       link.click();
       link.remove();
-      if (setLoading) setLoading(false);
+      if (onComplete) onComplete();
     }
 
    navigateHome() {
