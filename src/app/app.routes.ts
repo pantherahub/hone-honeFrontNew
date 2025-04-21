@@ -10,7 +10,7 @@ import { ComplianceDocumentationComponent } from './modules/private/documents/co
 import { ProviderAssistancessComponent } from './modules/public/provider-assistancess/provider-assistancess.component';
 import { UpdateDataComponent } from './modules/private/update-data/update-data.component';
 import { UserManagementComponent } from './modules/private/user/user-management/user-management.component';
-import { UpdatePasswordComponent } from './modules/private/user/update-password/update-password.component';
+import { UpdatePasswordComponent } from './modules/private/user/modals/update-password/update-password.component';
 import { ResetPasswordComponent } from './modules/private/user/reset-password/reset-password.component';
 import { authStatusGuard } from './guards/auth-status.guard';
 import { VerifyEmailComponent } from './modules/public/verify-email/verify-email.component';
@@ -92,6 +92,7 @@ export const routes: Routes = [
       },
       {
         path: 'user-management',
+        canActivate: [twoFactorGuard],
         component: UserManagementComponent
       },
       {

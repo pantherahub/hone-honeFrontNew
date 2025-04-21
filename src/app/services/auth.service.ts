@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Type } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
@@ -7,6 +7,9 @@ import { catchError, delay, tap } from 'rxjs/operators';
 import { EventManagerService } from './events-manager/event-manager.service';
 import { RefreshTokenResponse, TemporalLoginData, VerifyEmailReq } from '../models/auth.interface';
 import { AuthUserState } from '../models/user-state.interface';
+import { NzModalService } from 'ng-zorro-antd/modal';
+import { TwoFactorAuthContentComponent } from '../modules/public/two-factor-auth/two-factor-auth-content/two-factor-auth-content.component';
+import { ValidatePasswordContentComponent } from '../modules/private/user/validate-password/validate-password-content/validate-password-content.component';
 
 @Injectable({
    providedIn: 'root'
@@ -21,7 +24,8 @@ export class AuthService {
   constructor(
     private httpClient: HttpClient,
     private router: Router,
-    private eventManager: EventManagerService
+    private eventManager: EventManagerService,
+    private modal: NzModalService,
   ) { }
 
   login(reqData: any): Observable<any> {
@@ -344,5 +348,21 @@ export class AuthService {
         }
       })
     );
+  }
+
+  /**
+   * 2fa modal auth.
+  */
+  openAuthModal(with2FA: boolean): Observable<'success' | 'cancel'> {
+    const componentToRender: Type<any> = with2FA
+      ? TwoFactorAuthContentComponent
+      : ValidatePasswordContentComponent;
+
+    const modalRef = this.modal.create({
+      nzContent: componentToRender,
+      nzFooter: null,
+    });
+
+    return modalRef.afterClose as Observable<'success' | 'cancel'>;
   }
 }

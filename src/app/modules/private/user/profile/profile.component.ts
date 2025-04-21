@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, RouterModule, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router, RouterModule, RouterOutlet } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { filter } from 'rxjs';
 import { UserState } from 'src/app/models/user-state.interface';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { AuthService } from 'src/app/services/auth.service';
@@ -23,7 +24,7 @@ export class ProfileComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    public router: Router,
+    private router: Router,
     // private notificationService: NzNotificationService,
     private messageService: NzMessageService,
     private route: ActivatedRoute,
@@ -35,9 +36,22 @@ export class ProfileComponent implements OnInit {
       this.userData = userState.user;
     }
 
-    const child = this.route.snapshot.firstChild?.routeConfig?.path;
-    if (child === 'security') {
+    // Initial module tab
+    this.updateTabFromRoute();
+
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.updateTabFromRoute();
+      });
+  }
+
+  updateTabFromRoute() {
+    const path = this.route.snapshot.firstChild?.routeConfig?.path;
+    if (path === 'security') {
       this.selectedIndex = 1;
+    } else {
+      this.selectedIndex = 0;
     }
   }
 
@@ -46,7 +60,6 @@ export class ProfileComponent implements OnInit {
       next: (resp: any) => {
         this.loading = false;
         this.userData = resp.data.User;
-        console.log("useData:", this.userData);
       },
       error: (err: any) => {
         this.loading = false;

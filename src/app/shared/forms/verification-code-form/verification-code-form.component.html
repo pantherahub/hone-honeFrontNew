@@ -1,0 +1,45 @@
+<form nz-form nzLayout="vertical" [formGroup]="codeForm" (ngSubmit)="onSubmit()">
+  <nz-form-item class="flex justify-center">
+    <nz-form-control class="max-w-[250px]" [nzErrorTip]="codeErrorTip">
+      <ng-template #codeErrorTip>
+        @if (codeForm.get('code')?.hasError('required')) {
+          El campo es requerido.
+        } @else if (codeForm.get('code')?.hasError('pattern') && codeForm.get('code')?.touched) {
+          Debe ser un número de 6 dígitos.
+        }
+      </ng-template>
+
+      <input
+        nz-input
+        type="text"
+        inputmode="numeric"
+        formControlName="code"
+        placeholder="000000"
+        maxlength="6"
+        pattern="\d{6}"
+        (keypress)="onlyNumbers($event)"
+        class="verification-code-input"
+      />
+    </nz-form-control>
+  </nz-form-item>
+
+  <div class="flex justify-between pt-3 sm:pt-6 items-center flex-wrap gap-4">
+    <button
+      *ngIf="showResend"
+      nz-button
+      nzType="link"
+      type="button"
+      class="text-blue-600 p-0"
+      (click)="onResend()"
+      [disabled]="isResendDisabled || loading"
+    >
+      Reenviar Código&nbsp;
+      <span *ngIf="isResendDisabled">({{ countdown }}s)</span>
+    </button>
+
+    <div class="flex justify-end gap-3 flex-grow">
+      <button nz-button nzType="default" type="button" (click)="onCancel()">Cancelar</button>
+      <button nz-button nzType="primary" type="submit" [disabled]="loading">{{ confirmButton }}</button>
+    </div>
+  </div>
+</form>

@@ -1,17 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { TemporalLoginData, VerifyEmailReq } from 'src/app/models/auth.interface';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { AuthService } from 'src/app/services/auth.service';
-import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
+import { VerificationCodeFormComponent } from 'src/app/shared/forms/verification-code-form/verification-code-form.component';
 
 @Component({
   selector: 'app-verify-email',
   standalone: true,
-  imports: [NgZorroModule, CommonModule],
+  imports: [NgZorroModule, CommonModule, VerificationCodeFormComponent],
   templateUrl: './verify-email.component.html',
   styleUrl: './verify-email.component.scss'
 })
@@ -20,25 +19,14 @@ export class VerifyEmailComponent implements OnInit {
   loading: boolean = false;
   isAuthenticated: boolean = false;
   temporalLoginData: TemporalLoginData | null = null;
-  codeForm!: FormGroup;
-
-  countdown: number = 30;
-  isResendDisabled: boolean = false;
-  private countdownInterval: any;
 
   constructor(
     private router: Router,
     private messageService: NzMessageService,
     private authService: AuthService,
-    private fb: FormBuilder,
-    private formUtils: FormUtilsService,
   ) { }
 
   ngOnInit(): void {
-    this.codeForm = this.fb.group({
-      code: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
-    });
-
     this.isAuthenticated = this.authService.isAuthenticated();
     this.temporalLoginData = this.authService.getTemporalLoginData();
     const requiresEmailVerification = localStorage.getItem('requiresEmailVerification');
@@ -50,26 +38,6 @@ export class VerifyEmailComponent implements OnInit {
       this.router.navigate(['/home']);
       return;
     }
-
-    // Reset the counter if there is a timestamp in localStorage
-    const lastResendTime = localStorage.getItem('resendTimestamp');
-    if (lastResendTime) {
-      const elapsedTime = Math.floor((Date.now() - Number(lastResendTime)) / 1000);
-      if (elapsedTime < this.countdown) {
-        this.countdown = this.countdown - elapsedTime;
-        this.isResendDisabled = true;
-        this.startCountdown();
-      } else {
-        localStorage.removeItem('resendTimestamp');
-        this.isResendDisabled = false;
-      }
-    }
-  }
-
-  onlyNumbers(event: KeyboardEvent) {
-    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Enter') {
-      event.preventDefault();
-    }
   }
 
   onCancel() {
@@ -77,24 +45,9 @@ export class VerifyEmailComponent implements OnInit {
     this.router.navigateByUrl('login');
   }
 
-  startCountdown() {
-    if (this.countdownInterval) {
-      clearInterval(this.countdownInterval);
-    }
-    this.countdownInterval = setInterval(() => {
-      this.countdown--;
-      if (this.countdown <= 0) {
-        clearInterval(this.countdownInterval);
-        this.isResendDisabled = false;
-        this.countdown = 30;
-      }
-    }, 1000);
-  }
-
-
-  resendCode() {
+  resendCode(callback: () => void) {
     if (this.isAuthenticated) {
-      this.resendCodeNoAuth();
+      this.resendCodeNoAuth(callback);
       return;
     }
 
@@ -113,42 +66,32 @@ export class VerifyEmailComponent implements OnInit {
         this.authService.saveTemporalLoginData(this.temporalLoginData);
         this.messageService.success('Código reenviado');
         this.loading = false;
-        this.isResendDisabled = true;
-
-        localStorage.setItem('resendTimestamp', Date.now().toString());
-        this.startCountdown();
+        callback();
       },
       error: (err: any) => {
         console.error(err);
         this.messageService.error('Error reenviando el código');
         this.loading = false;
-        this.isResendDisabled = true;
-        this.startCountdown();
+        // callback();
       },
     });
   }
 
-  resendCodeNoAuth() {
+  resendCodeNoAuth(callback: () => void) {
     this.messageService.success('Código reenviado');
     this.loading = false;
-    this.isResendDisabled = true;
-
-    localStorage.setItem('resendTimestamp', Date.now().toString());
-    this.startCountdown();
+    callback();
   }
 
-  onSubmit() {
-    this.formUtils.markFormTouched(this.codeForm);
-    if (this.codeForm.invalid) return;
-
+  onSubmit(code: string) {
     if (this.isAuthenticated) {
-      this.submitAuth();
+      this.submitAuth(code);
       return;
     }
-    this.submitNoAuth();
+    this.submitNoAuth(code);
   }
 
-  submitNoAuth() {
+  submitNoAuth(code: string) {
     if (!this.temporalLoginData) {
       this.onCancel();
       return;
@@ -158,7 +101,7 @@ export class VerifyEmailComponent implements OnInit {
     const verifyEmailReq: VerifyEmailReq = {
       apiKey,
       remember,
-      code: this.codeForm.value.code
+      code
     };
 
     this.loading = true;
@@ -195,7 +138,7 @@ export class VerifyEmailComponent implements OnInit {
     });
   }
 
-  submitAuth() {
+  submitAuth(code: string) {
     // Temporal
     this.messageService.create('success', 'Correo verificado.');
     localStorage.removeItem('resendTimestamp');

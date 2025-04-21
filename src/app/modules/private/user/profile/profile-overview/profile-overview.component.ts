@@ -29,7 +29,7 @@ export class ProfileOverviewComponent implements OnInit {
     private formUtils: FormUtilsService,
     private authService: AuthService,
     private clientProviderService: ClientProviderService,
-    public router: Router,
+    private router: Router,
     private messageService: NzMessageService,
   ) { }
 

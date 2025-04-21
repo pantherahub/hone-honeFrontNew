@@ -1,18 +1,17 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, Input, OnInit, Optional } from '@angular/core';
 import { Router } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalRef } from 'ng-zorro-antd/modal';
 import { TemporalLoginData, VerifyEmailReq } from 'src/app/models/auth.interface';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { AuthService } from 'src/app/services/auth.service';
-import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
+import { VerificationCodeFormComponent } from 'src/app/shared/forms/verification-code-form/verification-code-form.component';
 
 @Component({
   selector: 'app-two-factor-auth-content',
   standalone: true,
-  imports: [NgZorroModule, CommonModule],
+  imports: [NgZorroModule, CommonModule, VerificationCodeFormComponent],
   templateUrl: './two-factor-auth-content.component.html',
   styleUrl: './two-factor-auth-content.component.scss'
 })
@@ -22,25 +21,18 @@ export class TwoFactorAuthContentComponent implements OnInit {
 
   loading: boolean = false;
   temporalLoginData: TemporalLoginData | null = null;
-  codeForm!: FormGroup;
 
   returnUrl: string = '/home';
 
   constructor(
-    private modal: NzModalRef,
+    @Optional() private modal: NzModalRef,
     private router: Router,
     private messageService: NzMessageService,
     private authService: AuthService,
-    private fb: FormBuilder,
-    private formUtils: FormUtilsService,
     private location: Location,
   ) { }
 
   ngOnInit(): void {
-    this.codeForm = this.fb.group({
-      code: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
-    });
-
     const isAuthenticated = this.authService.isAuthenticated();
     this.temporalLoginData = this.authService.getTemporalLoginData();
     const requires2fa = localStorage.getItem('requires2fa');
@@ -62,12 +54,6 @@ export class TwoFactorAuthContentComponent implements OnInit {
     }
   }
 
-  onlyNumbers(event: KeyboardEvent) {
-    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Enter') {
-      event.preventDefault();
-    }
-  }
-
   onCancel() {
     if (this.isModal) {
       this.modal.close('cancel');
@@ -82,18 +68,15 @@ export class TwoFactorAuthContentComponent implements OnInit {
     this.router.navigateByUrl('home');
   }
 
-  onSubmit() {
-    this.formUtils.markFormTouched(this.codeForm);
-    if (this.codeForm.invalid) return;
-
+  onSubmit(code: string) {
     if (this.authService.isAuthenticated()) {
-      this.submitAuth();
+      this.submitAuth(code);
       return;
     }
-    this.submitNoAuth();
+    this.submitNoAuth(code);
   }
 
-  submitNoAuth() {
+  submitNoAuth(code: string) {
     if (!this.temporalLoginData) {
       this.onCancel();
       return;
@@ -103,7 +86,7 @@ export class TwoFactorAuthContentComponent implements OnInit {
     const verifyEmailReq: VerifyEmailReq = {
       apiKey,
       remember,
-      code: this.codeForm.value.code
+      code
     };
 
     this.loading = true;
@@ -148,14 +131,14 @@ export class TwoFactorAuthContentComponent implements OnInit {
     });
   }
 
-  submitAuth() {
+  submitAuth(code: string) {
     // Temporal
     if (this.isModal) {
       this.modal.close('success');
       return;
     }
     this.authService.setTwoFactorAuthenticated(true);
-    this.router.navigate([this.returnUrl]);
+    this.router.navigate([this.returnUrl], { replaceUrl: true });
   }
 
 }

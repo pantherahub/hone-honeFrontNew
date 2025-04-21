@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { Component, OnInit, Optional } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzModalRef } from 'ng-zorro-antd/modal';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { AuthService } from 'src/app/services/auth.service';
 import { NewPasswordFormComponent } from 'src/app/shared/forms/new-password-form/new-password-form.component';
@@ -16,7 +17,7 @@ import { NewPasswordFormComponent } from 'src/app/shared/forms/new-password-form
 export class UpdatePasswordComponent implements OnInit {
 
   constructor(
-    private router: Router,
+    @Optional() private modal: NzModalRef,
     private authService: AuthService,
     private messageService: NzMessageService,
   ) { }
@@ -31,14 +32,13 @@ export class UpdatePasswordComponent implements OnInit {
     this.authService.updatePasswordAuth({ password: newPassword }).subscribe({
       next: (res: any) => {
         this.messageService.success('Contraseña actualizada con éxito');
-        // Close modal
-        this.router.navigate(['/home']);
+        this.modal.close('success');
       },
       error: () => this.messageService.error('Error actualizando la contraseña'),
     });
   }
 
   onCancel() {
-    this.router.navigate(['/home']);
+    this.modal.close('cancel');
   }
 }

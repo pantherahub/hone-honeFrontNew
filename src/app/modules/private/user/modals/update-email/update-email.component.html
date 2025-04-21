@@ -1,0 +1,31 @@
+<div class="bg-white p-6 w-full max-w-[90vw] md:max-w-[600px]">
+  <div class="flex justify-center mb-4">
+    <img src="assets/img/logo-hone.png" alt="Logo" class="w-24">
+  </div>
+
+  <div class="text-center mb-4">
+    <h2 class="text-xl font-semibold text-gray-700">Actualizar correo</h2>
+  </div>
+
+  <form nz-form nzLayout="vertical" [formGroup]="emailForm" (ngSubmit)="onSubmit()">
+    <nz-form-item>
+      <nz-form-label nzRequired>Correo electrónico</nz-form-label>
+      <nz-form-control [nzErrorTip]="emailErrorTip">
+        <ng-template #emailErrorTip>
+          @if (emailForm.get('email')?.hasError('required')) {
+            <p>El campo es requerido.</p>
+          } @else if (emailForm.get('email')?.hasError('invalidEmail')) {
+            Ingresa un correo válido.
+          }
+        </ng-template>
+        <input nz-input type="email" formControlName="email" placeholder="Correo electrónico" />
+      </nz-form-control>
+    </nz-form-item>
+
+    <div class="flex justify-end gap-3 pt-6">
+      <button nz-button nzType="default" type="button" (click)="onCancel()">Cancelar</button>
+      <button nz-button nzType="primary" type="submit">Confirmar</button>
+    </div>
+  </form>
+
+</div>

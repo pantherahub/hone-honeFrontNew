@@ -10,34 +10,11 @@
         Introduce el código de 6 dígitos generado por tu aplicación de autenticación.
       </p>
     </div>
-    <form nz-form nzLayout="vertical" [formGroup]="codeForm" (ngSubmit)="onSubmit()">
-      <nz-form-item class="flex justify-center">
-        <nz-form-control class="max-w-[250px]" [nzErrorTip]="codeErrorTip">
-          <ng-template #codeErrorTip>
-            @if (codeForm.get('code')?.hasError('required')) {
-              El campo es requerido.
-            } @else if (codeForm.get('code')?.hasError('pattern') && codeForm.get('code')?.touched) {
-              Debe ser un número de 6 dígitos.
-            }
-          </ng-template>
-          <input
-            nz-input
-            type="text"
-            inputmode="numeric"
-            formControlName="code"
-            placeholder="000000"
-            pattern="\d{6}"
-            maxlength="6"
-            class="verification-code-input"
-            (keypress)="onlyNumbers($event)"
-          />
-        </nz-form-control>
-      </nz-form-item>
 
-      <div class="flex justify-end gap-3 pt-6">
-        <button nz-button nzType="default" type="button" (click)="onCancel()">Cancelar</button>
-        <button nz-button nzType="primary" type="submit">Continuar</button>
-      </div>
-    </form>
+    <app-verification-code-form
+      [loading]="loading"
+      (submitCode)="onSubmit($event)"
+      (cancel)="onCancel()"
+    />
 
 </div>

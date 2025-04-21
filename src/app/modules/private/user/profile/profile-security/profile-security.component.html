@@ -1,9 +1,20 @@
-<div class="bg-gray-50 p-5">
-  <h4 class="font-bold text-blue2h-400 mb-4">Seguridad</h4>
-  <p class="">Opciones de seguridad:</p>
-  <ul class="ml-4 list-disc list-inside">
-    <li>Cambiar contraseña</li>
-    <li>Actualizar correo</li>
-    <li>Habilitar/deshabilitar 2FA</li>
-  </ul>
+<div class="bg-gray-50 p-6 rounded-lg shadow-sm">
+  <h4 class="text-base font-semibold text-blue2h-400 mb-4">Seguridad</h4>
+
+  <div class="space-y-3">
+    <button (click)="openChangePasswordModal()"
+            class="w-full text-left bg-white border border-gray-200 hover:border-blue2h-300 hover:bg-blue2h-50 transition rounded-lg px-4 py-3 shadow-sm">
+      Cambiar contraseña
+    </button>
+
+    <button (click)="openUpdateEmailModal()"
+            class="w-full text-left bg-white border border-gray-200 hover:border-blue2h-300 hover:bg-blue2h-50 transition rounded-lg px-4 py-3 shadow-sm">
+      Actualizar correo electrónico
+    </button>
+
+    <button (click)="openToggle2FAModal()"
+            class="w-full text-left bg-white border border-gray-200 hover:border-blue2h-300 hover:bg-blue2h-50 transition rounded-lg px-4 py-3 shadow-sm">
+      {{ authData?.with2FA ? 'Deshabilitar' : 'Habilitar' }} autenticación en dos pasos
+    </button>
+  </div>
 </div>

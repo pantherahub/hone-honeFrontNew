@@ -1,0 +1,25 @@
+<div class="bg-white p-6 w-full max-w-[90vw] md:max-w-[600px]">
+    <div class="flex justify-center mb-4">
+        <img src="assets/img/logo-hone.png" alt="Logo" class="w-24">
+    </div>
+
+    <div class="text-center mb-4">
+      <h2 class="text-xl font-semibold text-gray-700">Habilitar autenticación de dos factores</h2>
+      <p class="text-gray-600 mt-2">
+        Escanea el código QR con tu aplicación de autenticación.
+        Luego introduce el código de 6 dígitos generado.
+      </p>
+    </div>
+
+    <div class="flex justify-center my-4">
+      <img [src]="qrCodeUrl" alt="Código QR de autenticación" />
+    </div>
+
+    <app-verification-code-form
+      [loading]="loading"
+      (submitCode)="onSubmit($event)"
+      (cancel)="onCancel()"
+      [confirmButton]="'Confirmar'"
+    />
+
+</div>

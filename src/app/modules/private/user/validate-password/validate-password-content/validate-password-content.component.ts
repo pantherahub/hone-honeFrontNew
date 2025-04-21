@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Optional, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { NzModalRef } from 'ng-zorro-antd/modal';
@@ -27,7 +27,7 @@ export class ValidatePasswordContentComponent implements OnInit {
   returnUrl: string = '/home';
 
   constructor(
-    private modal: NzModalRef,
+    @Optional() private modal: NzModalRef,
     private fb: FormBuilder,
     private router: Router,
     private authService: AuthService,
@@ -68,7 +68,7 @@ export class ValidatePasswordContentComponent implements OnInit {
       return;
     }
     this.authService.setTwoFactorAuthenticated(true);
-    this.router.navigate([this.returnUrl]);
+    this.router.navigate([this.returnUrl], { replaceUrl: true });
   }
 
   onCancel() {

@@ -7,24 +7,20 @@ import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { AuthService } from 'src/app/services/auth.service';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { NewPasswordFormComponent } from 'src/app/shared/forms/new-password-form/new-password-form.component';
+import { VerificationCodeFormComponent } from 'src/app/shared/forms/verification-code-form/verification-code-form.component';
 
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
-  imports: [NgZorroModule, CommonModule, NewPasswordFormComponent],
+  imports: [NgZorroModule, CommonModule, VerificationCodeFormComponent, NewPasswordFormComponent],
   templateUrl: './forgot-password.component.html',
   styleUrl: './forgot-password.component.scss'
 })
 export class ForgotPasswordComponent implements OnInit {
 
-  step = 0;
+  step: number = 0;
   emailForm!: FormGroup;
-  codeForm!: FormGroup;
   loading: boolean = false;
-
-  countdown: number = 30;
-  isResendDisabled: boolean = false;
-  private countdownInterval: any;
 
   apiKey: string | null = null;
 
@@ -40,15 +36,6 @@ export class ForgotPasswordComponent implements OnInit {
     this.emailForm = this.fb.group({
       email: ['', [Validators.required]],
     });
-    this.codeForm = this.fb.group({
-      code: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
-    });
-  }
-
-  onlyNumbers(event: KeyboardEvent) {
-    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Enter') {
-      event.preventDefault();
-    }
   }
 
   sendEmail() {
@@ -64,44 +51,38 @@ export class ForgotPasswordComponent implements OnInit {
     });
   }
 
-  verifyCode() {
-    // console.log("verifyCode", this.codeForm.value);
-    this.formUtils.markFormTouched(this.codeForm);
-    if (this.codeForm.invalid) return;
-    const code = this.codeForm.value.code;
+  verifyCode(code: string) {
     // console.log('Código ingresado:', code);
-
-    this.authService.forgotVerifyCode(this.codeForm.value).subscribe({
+    const reqData = {
+      apiKey: this.apiKey,
+      code
+    };
+    this.loading = true;
+    this.authService.forgotVerifyCode(reqData).subscribe({
       next: (res: any) => {
+        this.loading = false;
         this.apiKey = res.data.apiKey;
         this.messageService.success('Código verificado.');
         this.step = 2;
       },
-      error: () => this.messageService.error('Código incorrecto'),
+      error: () => {
+        this.loading = false;
+        this.messageService.error('Código incorrecto');
+      }
     });
   }
 
-  startCountdown() {
-    this.countdownInterval = setInterval(() => {
-      this.countdown--;
-      if (this.countdown <= 0) {
-        clearInterval(this.countdownInterval);
-        this.isResendDisabled = false;
-        this.countdown = 30;
-      }
-    }, 1000);
-  }
-
-  resendCode() {
-    this.isResendDisabled = true;
-    this.startCountdown();
-
-    this.authService.forgotResendCode({ email: this.emailForm.value.email }).subscribe({
+  resendCode(callback: () => void) {
+    this.authService.forgotResendCode({ apiKey: this.apiKey }).subscribe({
       next: (res: any) => {
         this.apiKey = res.data.apiKey;
         this.messageService.success('Código reenviado');
+        callback();
       },
-      error: () => this.messageService.error('Error reenviando el código'),
+      error: () => {
+        this.messageService.error('Error reenviando el código');
+        // callback();
+      }
     });
   }
 
