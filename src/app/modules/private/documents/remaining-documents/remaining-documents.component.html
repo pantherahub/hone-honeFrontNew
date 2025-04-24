@@ -24,45 +24,48 @@
             </div>
 
             <div class="container-grid">
-                @for (item of documentList; track $index) {
-                    <!-- @if (item.idTypeDocuments == 8 || item.idTypeDocuments == 22 || item.idTypeDocuments == 113 || item.idTypeDocuments == 108) {
-
-                        <form nz-form nz-row [formGroup]="formDate" class="form-documentList" nzJustify="center" nzAlign="bottom">
-                            <label id="upload" class="custom-file-upload btn rounded">
-                                <input type="file" name="file" id="upload-file" class="custom-file-input" appFileValidator (fileValidated)="loadFiles($event, item)" hidden>
-                                <img src="../../../../../assets/img/warning.png" alt="">
-                                {{ item.NameDocument }}
-
-                                @if (item.idTypeDocuments == 113 || item.idTypeDocuments == 108) {
-                                    <nz-date-picker
-                                        nzFormat="yyyy-MM-dd"
-                                        [nzDisabledDate]="disableDates"
-                                        formControlName="fecha">
-                                    </nz-date-picker>
-                                    <p style="color: red; font-size: 11px; text-align: justify;" >El documento No puede ser mayor a 30 días de la fecha de expedición.</p>
-
-                                }
-                                @if (item.idTypeDocuments == 8 || item.idTypeDocuments == 22) {
-                                    <nz-date-picker
-                                        nzFormat="yyyy-MM-dd"
-                                        formControlName="fecha">
-                                    </nz-date-picker>
-                                }
-                            </label>
-                        </form>
-                    }
-                    @else {
-                        <label id="upload" class="custom-file-upload btn rounded">
-                            <input type="file" name="file" id="upload-file" class="custom-file-input" appFileValidator (fileValidated)="loadFiles($event, item)" hidden>
-                            <img src="../../../../../assets/img/warning.png" alt="">
-                            {{ item.NameDocument }}
+                @for (item of documentList; track item; let i = $index) {
+                  <!-- <form nz-form nz-row [formGroup]="formDocList[i]" class="form-documentList" nzJustify="center" nzAlign="bottom">
+                      <div class="custom-file-upload gap-2">
+                        <label class="custom-file-upload__fileinput">
+                          <img class="custom-file-upload__img" src="../../../../../assets/img/warning.png" alt="">
+                          {{ item.NameDocument }}
                         </label>
-                    } -->
-                    <div class="custom-file-upload btn rounded" (click)="uploadDocumentModal(item)">
-                        <!-- <input type="file" name="file" id="upload-file" class="custom-file-input" appFileValidator (fileValidated)="loadFiles($event, item)" hidden> -->
-                        <img src="../../../../../assets/img/warning.png" alt="">
-                        {{ item.NameDocument }}
-                    </div>
+
+                        @if (item.idTypeDocuments == 8 || item.idTypeDocuments == 22) {
+                          <nz-form-item style="margin: 0;">
+                            <nz-form-control [nzErrorTip]="dateErrorTip">
+                              <ng-template #dateErrorTip>
+                                <p class="text-[13px] text-left">El campo es requerido.</p>
+                              </ng-template>
+                              <nz-date-picker
+                                  class="w-full"
+                                  nzFormat="yyyy-MM-dd"
+                                  formControlName="fecha"
+                                  nzPlaceHolder="Vencimiento"
+                                  [nzDisabledDate]="disableDates">
+                              </nz-date-picker>
+                            </nz-form-control>
+                          </nz-form-item>
+                        }
+
+                        <div class="flex flex-col">
+                          <button nz-button nzType="dashed" type="button" (click)="triggerFileInput(i)">
+                            Cargar +
+                          </button>
+                          <input type="file" name="file" #fileInput id="upload-file-{{i}}" class="custom-file-input" appFileValidator (fileValidated)="loadFiles($event, item, i)" hidden>
+                          <nz-tag *ngIf="formDocList[i].get('file')?.value?.name" class="m-0" (click)="triggerFileInput(i)">
+                            <span class="truncate block">{{ formDocList[i].get('file')?.value?.name }}</span>
+                          </nz-tag>
+                        </div>
+
+                        <button nz-button nzType="primary" type="button" [disabled]="formDocList[i].get('file')?.invalid" (click)="submitForm(i, item)">Enviar</button>
+                      </div>
+                  </form> -->
+                  <div class="custom-file-upload rounded cursor-pointer" (click)="uploadDocumentModal(item)">
+                    <img class="custom-file-upload__img" src="../../../../../assets/img/warning.png" alt="">
+                      {{ item.NameDocument }}
+                  </div>
                 }
             </div>
 
@@ -76,9 +79,6 @@
 
         }
 
-
-
     }
-
 
 </div>

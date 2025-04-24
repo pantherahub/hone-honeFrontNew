@@ -1,0 +1,214 @@
+@if (loading) {
+  <div class="loading-overlay fixed">
+    <nz-spin [nzSize]="'large'" nzTip="Cargando..."></nz-spin>
+  </div>
+}
+
+<nz-row nzJustify="center">
+  <nz-col [nzSpan]="24" [nzMd]="18" [nzXl]="12">
+    <div class="update-data">
+      <div class="update-data__header flex flex-col gap-2">
+        <button class="flex gap-1 items-center w-fit" nz-button nzType="primary" type="button" (click)="goBack()">
+          <svg width="20" height="20">
+            <use xlink:href="/assets/icons/layout.svg#arrow-left" />
+          </svg>
+          <span>Volver</span>
+        </button>
+        <h2 class="update-data__header__title text-center my-4">Información prestador</h2>
+      </div>
+
+      <form nz-form nzLayout="vertical" [formGroup]="providerForm" (ngSubmit)="onSubmit()">
+        <div class="update-data__body">
+
+          <div class="container-alerts">
+            <nz-alert
+              nzType="warning"
+              nzCloseable
+              nzMessage="Asegúrate de hacer el envío de todo el formulario para ver reflejados los cambios."
+            ></nz-alert>
+          </div>
+
+          <div nz-row [nzGutter]="16">
+            <nz-col [nzSpan]="24" [nzSm]="12">
+              <nz-form-item nz-row>
+                <nz-form-label [nzRequired]="true" nzFor="name">Nombre o razón social</nz-form-label>
+                <nz-form-control [nzErrorTip]="nameErrorTip">
+                  <ng-template #nameErrorTip>
+                    <p *ngIf="providerForm.controls['name'].hasError('required')">El campo es requerido.</p>
+                  </ng-template>
+                  <input nz-input id="name" formControlName="name" placeholder="Nombre" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+
+            <nz-col [nzSpan]="24" [nzSm]="12">
+              <nz-form-item>
+                <nz-form-label [nzRequired]="true" nzFor="email">Correo electrónico</nz-form-label>
+                <nz-form-control [nzErrorTip]="emailErrorTip">
+                  <ng-template #emailErrorTip>
+                    @if (providerForm.controls['email'].hasError('required')) {
+                      <p>El campo es requerido.</p>
+                    } @else if (providerForm.controls['email'].hasError('invalidEmail')) {
+                      <p>Ingresa un correo válido.</p>
+                    }
+                  </ng-template>
+                  <input nz-input id="email" formControlName="email" placeholder="Correo" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+
+            <nz-col [nzSpan]="24" [nzSm]="12">
+              <nz-form-item>
+                <nz-form-label [nzRequired]="true" nzFor="languages">Idiomas de prestación de servicio</nz-form-label>
+                <nz-form-control [nzErrorTip]="languagesErrorTip">
+                  <ng-template #languagesErrorTip>
+                    <p *ngIf="providerForm.controls['languages'].hasError('required')">El campo es requerido.</p>
+                  </ng-template>
+                  <nz-select
+                    nzMode="multiple"
+                    [nzMaxTagCount]="3"
+                    nzAllowClear
+                    [nzMaxTagPlaceholder]="langTagPlaceHolder"
+                    formControlName="languages"
+                    nzPlaceHolder="Seleccionar"
+                  >
+                    <nz-option *ngFor="let lang of languages" [nzLabel]="lang.name" [nzValue]="lang.code"></nz-option>
+                  </nz-select>
+                  <ng-template #langTagPlaceHolder let-selectedList>{{ selectedList.length }} más...</ng-template>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+
+            <nz-col [nzSpan]="24" [nzSm]="12">
+              <nz-form-item>
+                <nz-form-label [nzRequired]="true" nzFor="idTypeDocument">Tipo de identificación</nz-form-label>
+                <nz-form-control nzErrorTip="El campo es requerido.">
+                  <nz-select
+                    id="idTypeDocument"
+                    formControlName="idTypeDocument"
+                    nzPlaceHolder="Seleccionar"
+                  >
+                    <nz-option *ngFor="let type of identificationTypes" [nzValue]="type.idTypeDocument" [nzLabel]="type.typeDocument"></nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+
+            <nz-col [nzSpan]="24" [nzSm]="12">
+              <nz-form-item>
+                <nz-form-label [nzRequired]="true" nzFor="identification">Identificación</nz-form-label>
+                <nz-form-control [nzErrorTip]="identificationErrorTip">
+                  <ng-template #identificationErrorTip>
+                    @if (providerForm.controls['identification'].hasError('required')) {
+                      <p>El campo es requerido.</p>
+                    } @else if (providerForm.controls['identification'].hasError('invalidNumber')) {
+                      <p>Ingresa un valor válido.</p>
+                    }
+                  </ng-template>
+                  <input nz-input id="identification" formControlName="identification" placeholder="Identificación" type="text" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+
+            <nz-col *ngIf="providerForm.get('idTypeDocument')?.value !== 6" [nzSpan]="24" [nzSm]="12">
+              <nz-form-item>
+                <nz-form-label nzFor="dv">Dígito de verificación</nz-form-label>
+                <nz-form-control [nzErrorTip]="dvErrorTip">
+                  <ng-template #dvErrorTip>
+                    @if (providerForm.controls['dv'].hasError('invalidDigit')) {
+                      <p>{{ providerForm.controls['dv'].errors?.['invalidDigit'] }}</p>
+                    }
+                  </ng-template>
+                  <input nz-input id="dv" formControlName="dv" placeholder="Dígito" type="number" min="0" max="9" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+
+            <nz-col [nzSpan]="24" [nzSm]="12">
+              <nz-form-item>
+                <nz-form-label nzFor="website">Sitio o página web</nz-form-label>
+                <nz-form-control [nzErrorTip]="websiteErrorTip">
+                  <ng-template #websiteErrorTip>
+                    <p *ngIf="providerForm.controls['website'].hasError('invalidUrl')">Ingresa una url válida.</p>
+                  </ng-template>
+                  <input nz-input id="website" formControlName="website" placeholder="Web" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+
+          </div>
+
+          <div>
+            <div class="table-head">
+              <h3 class="table-head__title">Sedes de prestación de servicio</h3>
+              <button nz-button nzType="primary" type="button" (click)="openOfficeModal()">Agregar sede</button>
+            </div>
+
+            <!-- Table -->
+            <div class="responsive-table">
+              <nz-table #officeTable [nzData]="existingOffices" [nzPageSize]="officePageSize" [nzPageIndex]="officePage" (nzPageIndexChange)="officePage = $event" class="provider-table">
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Ciudad</th>
+                    <th>Dirección</th>
+                    <th nzWidth="100px">Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let data of officeTable.data; let i = index">
+                    <td>{{ data.name }}</td>
+                    <td>{{ data.cityName || data.TemporalAddress?.City?.city || '' }}</td>
+                    <td class="truncate max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap">{{ data.address?.formattedAddress || '' }}</td>
+                    <td class="provider-table__action">
+                      <button nz-button nzType="primary" type="button" (click)="openOfficeModal(getGlobalIndex(i, officePage, officePageSize))" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
+                      <button nz-button nzDanger nzType="primary" type="button" (click)="deleteOffice(getGlobalIndex(i, officePage, officePageSize))" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button>
+                    </td>
+                  </tr>
+                </tbody>
+              </nz-table>
+            </div>
+          </div>
+
+          <div>
+            <div class="table-head">
+              <h3 class="table-head__title">Contactos</h3>
+              <button nz-button nzType="primary" type="button" (click)="openContactModal()">Agregar contacto</button>
+            </div>
+
+            <!-- Table -->
+             <div class="responsive-table">
+               <nz-table #contactTable [nzData]="existingContacts" [nzPageSize]="contactPageSize" [nzPageIndex]="contactPage" (nzPageIndexChange)="contactPage = $event" class="provider-table">
+                 <thead>
+                   <tr>
+                     <th>Área / Cargo</th>
+                     <th>Nombre</th>
+                     <th nzWidth="100px">Acción</th>
+                   </tr>
+                 </thead>
+                 <tbody>
+                   <tr *ngFor="let data of contactTable.data; let i = index">
+                     <td>{{ data.occupationName || data.OccupationForProvider?.occupation || '' }}</td>
+                     <td>{{ data.name || 'N/A' }}</td>
+                     <td class="provider-table__action">
+                        <button nz-button nzType="primary" type="button" (click)="openContactModal(getGlobalIndex(i, contactPage, contactPageSize))" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
+                        <button nz-button nzDanger nzType="primary" type="button" (click)="deleteContact(getGlobalIndex(i, contactPage, contactPageSize))" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button>
+                     </td>
+                   </tr>
+                 </tbody>
+               </nz-table>
+             </div>
+          </div>
+
+        </div>
+
+        <app-backend-errors [error]="backendError"></app-backend-errors>
+
+        <div class="update-data__footer">
+          <button class="btn-primary bg-green-500 hover:bg-green-500/80" type="submit" [disabled]="loading">Actualizar datos</button>
+        </div>
+      </form>
+
+    </div>
+  </nz-col>
+</nz-row>

@@ -1,0 +1,48 @@
+.update-data {
+  padding: 20px;
+
+  &__header {
+    padding: 20px 0;
+    &__title {
+      font-size: 1.25rem;
+    }
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    .container-alerts {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .table-head {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin: 0.5rem 0;
+      &__title {
+        margin: 0;
+      }
+    }
+
+    .provider-table {
+      &__action {
+        button:first-child {
+          margin-right: 4px;
+        }
+      }
+    }
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 40px 0 20px 0;
+  }
+
+}

@@ -151,6 +151,15 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
     */
    validateDocumentType() { }
 
+   getTooltipContent() {
+      if (this.documentType === 4) {
+        return 'Debe ser del año inmediatamente presente.';
+      } else if (this.documentType === 108 || this.documentType === 113) {
+        return 'Debe ser no mayor a un mes.';
+      }
+      return '';
+   }
+
     /**
      *
      * @param current Bloquea las fechas antes de la fecha actual, habilita por un año y bloquea fechas posterior (para fecha de expedición)
@@ -165,10 +174,11 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-      if (this.documentType === 113) {
-         // Restriction by current month
-         const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-         return current < startOfMonth || current > today;
+      if (this.documentType === 108 || this.documentType === 113) {
+         // Restriction by last month
+         const lastMonth = new Date(today);
+         lastMonth.setMonth(today.getMonth() - 1);
+         return current < lastMonth || current > today;
       }
       // Restriction by current year
       const startOfYear = new Date(today.getFullYear(), 0, 1);

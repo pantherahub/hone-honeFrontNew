@@ -10,6 +10,7 @@ import { RecaptchaModule } from 'ng-recaptcha';
 import { environment } from 'src/environments/environment';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { ProviderTicketLoginComponent } from 'src/app/shared/modals/provider-ticket-login/provider-ticket-login.component';
+import { TutorialService } from 'src/app/services/tutorial/tutorial.service';
 
 @Component({
    selector: 'app-login',
@@ -20,123 +21,132 @@ import { ProviderTicketLoginComponent } from 'src/app/shared/modals/provider-tic
    styleUrl: './login.component.scss'
 })
 export class LoginComponent implements OnInit {
-   loader: boolean = false;
-   isSubmitData: boolean = false;
-   passwordVisible: boolean = false;
-   captchaValidation: boolean = false;
-   showError: boolean = false;
-   showButton: boolean = false;
-   siteKey = environment.PUBLIC_PASS_KEY;
-   loginForm!: FormGroup;
+  loader: boolean = false;
+  isSubmitData: boolean = false;
+  passwordVisible: boolean = false;
+  captchaValidation: boolean = false;
+  showError: boolean = false;
+  siteKey = environment.PUBLIC_PASS_KEY;
+  loginForm!: FormGroup;
+  menuOpen: boolean = false;
 
-   constructor (
-      private authService: AuthService,
-      public router: Router,
-      private formBuilder: FormBuilder,
-      private notificationService: NzNotificationService,
-      private modalService: NzModalService,
-   ) {
-      this.createForm();
-   }
+  constructor (
+    private authService: AuthService,
+    public router: Router,
+    private formBuilder: FormBuilder,
+    private notificationService: NzNotificationService,
+    private modalService: NzModalService,
+    private tutorialService: TutorialService
+  ) {
+    this.createForm();
+  }
 
-   ngOnInit (): void {
-      console.log('environment prod: ', environment.production);
-   }
+  ngOnInit (): void {
+    console.log('environment prod: ', environment.production);
 
-   //  Crea e Inicializa el formulario
-   createForm () {
-      this.loginForm = this.formBuilder.nonNullable.group({
-         email: [ '', [ Validators.required ] ],
-         password: [ '', [ Validators.required ] ]
+    const hasSupportParam = this.router.url.includes('?support=true');
+    if (hasSupportParam) this.openTicketModal();
+  }
+
+  //  Crea e Inicializa el formulario
+  createForm () {
+    this.loginForm = this.formBuilder.nonNullable.group({
+      email: [ '', [ Validators.required ] ],
+      password: [ '', [ Validators.required ] ]
+    });
+  }
+
+  toggleMenu() {
+    this.menuOpen = !this.menuOpen;
+  }
+
+  //  Envia peticion al servicio de login para obtener el token de acceso
+  submitRequest () {
+    if (this.loginForm.invalid) {
+      Object.values(this.loginForm.controls).forEach(control => {
+        if (control.invalid) {
+          control.markAsDirty();
+          control.updateValueAndValidity({ onlySelf: true });
+        }
       });
-   }
+      return;
+    }
 
-   //  Envia peticion al servicio de login para obtener el token de acceso
-   submitRequest () {
-      if (this.loginForm.invalid) {
-         Object.values(this.loginForm.controls).forEach(control => {
-            if (control.invalid) {
-               control.markAsDirty();
-               control.updateValueAndValidity({ onlySelf: true });
-            }
-         });
-         return;
-      }
-
-      if (!this.captchaValidation) {
-         this.showError = true;
-         return;
-      }
-      this.showError = false;
-      this.isSubmitData = true;
-
-      const { email, password } = this.loginForm.value;
-      const payload: any = {
-         email,
-         contrasena: password
-      };
-
-      this.authService.login(payload).subscribe({
-         next: (res: any) => {
-            this.isSubmitData = false;
-            this.router.navigateByUrl('tutorial');
-         },
-         error: (error: any) => {
-            this.isSubmitData = false;
-
-            if (error.status == 401) {
-               this.createNotificacion('error', 'Error', error.error.message);
-               return;
-            }
-
-            this.createNotificacion('error', 'Error', 'Lo sentimos, hubo un error en el servidor.');
-         },
-         complete: () => {}
-      });
-   }
-
-   /**
-    * Crea una notificacion de alerta
-    * @param type - string recibe el tipo de notificacion (error, success, warning, info)
-    * @param title - string recibe el titulo de la notificacion
-    * @param message - string recibe el mensaje de la notificacion
-    */
-   createNotificacion (type: string, title: string, message: string) {
-      this.notificationService.create(type, title, message);
-   }
-
-   resolved (captchaResponse: any) {
-      this.captchaValidation = true;
-      this.showError = false;
-   }
-
-   errored () {
-      this.captchaValidation = false;
+    if (!this.captchaValidation) {
       this.showError = true;
-      console.warn(`reCAPTCHA error encountered`);
-   }
+      return;
+    }
+    this.showError = false;
+    this.isSubmitData = true;
 
-   /**
-    * Abre una ventana modal para solicitar ticket por inicio de sesión erroneous
-    */
-   openTicketModal(): void {
-      const modal = this.modalService.create<ProviderTicketLoginComponent, any>({
-         nzContent: ProviderTicketLoginComponent,
-         nzCentered: true,
-         nzClosable: true,
-         // nzFooter: null
-         nzMaskClosable: false, // Para evitar que se cierre al hacer clic fuera del modal
-      });
-      const instance = modal.getContentComponent();
+    const { email, password } = this.loginForm.value;
+    const payload: any = {
+      email,
+      contrasena: password
+    };
 
-      // instance.message = message;
+    this.authService.login(payload).subscribe({
+      next: (res: any) => {
+        this.isSubmitData = false;
+        this.tutorialService.resetTutorial();
+        this.router.navigateByUrl('home');
+      },
+      error: (error: any) => {
+        this.isSubmitData = false;
 
-      // Return a result when opened
-      modal.afterOpen.subscribe(() => { });
-      // Return a result when closed
-      modal.afterClose.subscribe((result: any) => {
-         if (result) {
-         }
-      });
-   }
+        if (error.status == 401) {
+          this.createNotificacion('error', 'Error', error.error.message);
+          return;
+        }
+
+        this.createNotificacion('error', 'Error', 'Lo sentimos, hubo un error en el servidor.');
+      },
+      complete: () => {}
+    });
+  }
+
+  /**
+  * Crea una notificacion de alerta
+  * @param type - string recibe el tipo de notificacion (error, success, warning, info)
+  * @param title - string recibe el titulo de la notificacion
+  * @param message - string recibe el mensaje de la notificacion
+  */
+  createNotificacion (type: string, title: string, message: string) {
+    this.notificationService.create(type, title, message);
+  }
+
+  resolved (captchaResponse: any) {
+    this.captchaValidation = true;
+    this.showError = false;
+  }
+
+  errored () {
+    this.captchaValidation = false;
+    this.showError = true;
+    console.warn(`reCAPTCHA error encountered`);
+  }
+
+  /**
+  * Abre una ventana modal para solicitar ticket por inicio de sesión erroneous
+  */
+  openTicketModal(): void {
+    const modal = this.modalService.create<ProviderTicketLoginComponent, any>({
+      nzContent: ProviderTicketLoginComponent,
+      nzCentered: true,
+      nzClosable: true,
+      // nzFooter: null
+      nzMaskClosable: false, // Para evitar que se cierre al hacer clic fuera del modal
+    });
+    const instance = modal.getContentComponent();
+
+    // instance.message = message;
+
+    // Return a result when opened
+    modal.afterOpen.subscribe(() => { });
+    // Return a result when closed
+    modal.afterClose.subscribe((result: any) => {
+      if (result) {
+      }
+    });
+  }
 }

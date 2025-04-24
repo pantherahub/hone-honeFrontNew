@@ -1,0 +1,9 @@
+<nz-alert *ngIf="error?.error?.details" nzType="error" [nzDescription]="descriptionTemplate">
+  <ng-template #descriptionTemplate>
+    <ul class="backend-error-list">
+      <li *ngFor="let detail of error.error.details">
+        {{ detail.message }}
+      </li>
+    </ul>
+  </ng-template>
+</nz-alert>

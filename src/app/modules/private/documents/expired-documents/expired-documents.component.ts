@@ -132,7 +132,8 @@ export class ExpiredDocumentsComponent implements OnInit {
          nzCentered: true,
          nzClosable: true,
          nzTitle: 'Actualizar información',
-         nzFooter: null
+         nzFooter: null,
+         nzStyle: { 'max-width': '90%' }
       });
       const instance = modal.getContentComponent();
 

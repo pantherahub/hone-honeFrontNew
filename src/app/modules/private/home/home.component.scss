@@ -1,102 +1,62 @@
-@import "../../../../assets/styles/global.scss";
+.video-load {
+  width: 100%; /* Video width */
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
+  .video-container {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 aspect ratio */
+    overflow: hidden;
+    // background: #000;
 
-.generalContainer {
-    padding: 2vmax;
-    height: auto;
+    iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  }
+}
+
+::ng-deep .video-modal {
+  .ant-modal-content {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: space-around;
-    gap: 3rem;
-    width: 100%;
+    gap: 0.75rem;
+    padding: 1.25rem;
+    border-radius: 1rem;
+    .ant-modal-header {
+      padding: 0;
+      border-bottom: none;
+      .ant-modal-title {
+        font-weight: 700;
+        font-size: 1.15rem;
+        line-height: 1.25rem;
+        color: var(--color-gray-950);
+      }
+    }
+    .ant-modal-body {
+      padding: 0;
+    }
+  }
 }
 
-.container-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 350px);
-    width: 100%;
-    gap: 2rem;
-    justify-content: center;
+.tutorial-option-container.active-tutorial::before {
+  border-radius: 0.5rem;
 }
 
-.card-custom {
-    display: flex;
-    border-radius: 90px;
-    flex-direction: column;
-    cursor: pointer;
-
-    background-color: #fff;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0px 4px 0px 0px rgba(0, 0, 0, 0.24);
-    // max-width: 350px;
-    border: 1px solid;
-    min-height: 200px;
-
-    img {
-        max-width: 200px;
-        image-rendering: -webkit-optimize-contrast;
-        width: 100%;
-        padding: 1rem;
-    }
+::ng-deep .tutorial-popover__home-client .ant-popover-inner-content {
+  width: 368px;
 }
 
-.banner-home {
-    padding: 3rem;
-    background: rgba(92, 190, 188, 0.3);
-    border-radius: 25px;
-    text-align: center;
-    max-width: 1067px;
-
-    h1 {
-        margin-bottom: 0;
-    }
-
-    span {
-        font-size: 24px;
-    }
-
-    p {
-        font-size: 24px;
-    }
-}
-
-.gutter-row {
-    text-align: -webkit-center;
-}
-
-@media only screen and (max-width: 768px) {
-    .generalContainer {
-        padding: 2vmax;
-        justify-content: flex-start;
-    }
-
-    .banner-home {
-        padding: 1.5rem;
-
-        h1 {
-            margin-bottom: 0;
-            font-size: 18px;
-        }
-
-        span {
-            font-size: 18px;
-        }
-
-        p {
-            font-size: 18px;
-        }
-    }
-
-    .container-grid {
-        grid-template-columns: repeat(1, 350px);
-    }
-}
-
-@media only screen and (max-width: 480px) {
-    .container-grid {
-        display: grid;
-        grid-template-columns: repeat(1, 300px);
-    }
+@media (max-width: 380px) {
+  ::ng-deep .tutorial-popover__home-client .ant-popover-arrow {
+    left: 50%;
+  }
 }

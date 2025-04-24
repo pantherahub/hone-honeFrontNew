@@ -1,3 +1,29 @@
+/* .ant-popover-inner-content{
+  padding: 0!important;
+} */
+.ant-modal{
+  .ant-modal-content {
+    // .ant-modal-close-x{
+    //   width: 40px;
+    //   height: 40px;
+    //   background-color: #477AD2;
+    //   color: white;
+    //   position: absolute;
+    //   top: -20px;
+    //   right: -20px;
+    //   border-radius: 50%;
+    //   .anticon{
+    //     position: absolute;
+    //     top: 30%;
+    //     left: 30%;
+    //   }
+    // }
+    .ant-modal-footer{
+      display: none !important;
+    }
+  }
+}
+
 .ant-alert {
   border-radius: 5px;
   padding: 10px 15px;

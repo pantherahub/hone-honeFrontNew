@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TutorialVideoComponent } from './tutorial-video.component';
+import { OfficeModalComponent } from './office-modal.component';
 
-describe('TutorialVideoComponent', () => {
-  let component: TutorialVideoComponent;
-  let fixture: ComponentFixture<TutorialVideoComponent>;
+describe('OfficeModalComponent', () => {
+  let component: OfficeModalComponent;
+  let fixture: ComponentFixture<OfficeModalComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TutorialVideoComponent]
+      imports: [OfficeModalComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(TutorialVideoComponent);
+    fixture = TestBed.createComponent(OfficeModalComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

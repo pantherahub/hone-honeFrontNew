@@ -15,7 +15,7 @@
     width: 100%;
     gap: 2rem;
     justify-content: center;
-    grid-auto-rows: 250px;
+    grid-auto-rows: minmax(250px, auto);
 }
 
 .custom-file-upload {
@@ -23,17 +23,23 @@
     background: #FAFAFA;
     padding: 1rem;
     width: 100%;
-    cursor: pointer;
     text-align: center;
     display: flex;
     flex-direction: column;
     justify-content: center;
     color: #00000073;
 
-    img {
+    &__fileinput {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    &__img {
         width: 50px;
         align-self: center;
     }
+
 }
 
 .form-documentList {
@@ -49,6 +55,11 @@
     .container-grid {
         grid-template-columns: repeat(auto-fill, 45%);
         gap: 1rem;
-        grid-auto-rows: 150px;
+        grid-auto-rows: minmax(200px, auto);
+    }
+}
+@media only screen and (max-width: 456px) {
+    .container-grid {
+        grid-template-columns: repeat(auto-fill, 95%);
     }
 }

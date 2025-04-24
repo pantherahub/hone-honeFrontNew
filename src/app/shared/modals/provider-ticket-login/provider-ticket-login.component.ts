@@ -8,6 +8,7 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { EventManagerService } from '../../../services/events-manager/event-manager.service';
 import { TicketsService } from '../../../services/tickets/tickets.service';
 import { mailRegexpValidation } from '../../../utils/constant';
+import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 
 
 @Component({
@@ -36,6 +37,7 @@ export class ProviderTicketLoginComponent implements AfterContentChecked, OnInit
 
   constructor(
     private formBuilder: FormBuilder,
+    private formUtils: FormUtilsService,
     private notificationService: NzNotificationService,
     private eventManager: EventManagerService,
     private ticketService: TicketsService,
@@ -44,9 +46,7 @@ export class ProviderTicketLoginComponent implements AfterContentChecked, OnInit
     this.createForm();
   }
 
-  ngOnInit(): void {
-   
-  }
+  ngOnInit(): void { }
 
   ngAfterContentChecked(): void { }
 
@@ -61,7 +61,7 @@ export class ProviderTicketLoginComponent implements AfterContentChecked, OnInit
     this.requestForm = this.formBuilder.nonNullable.group({
       name: ['', [Validators.required]],
       lastname: ['', [Validators.required]],
-      identification: ['', [Validators.required]],
+      identification: ['', [Validators.required, this.formUtils.numeric]],
       email: ['', [Validators.required, Validators.pattern(mailRegexpValidation)]],
       phone: ['', [Validators.required]],
       address: ['', [Validators.required]],
@@ -99,7 +99,7 @@ export class ProviderTicketLoginComponent implements AfterContentChecked, OnInit
       idRole: this.role,
       userLogged: this.userId
     };
-    
+
     this.postTicket(data);
   }
 
@@ -128,12 +128,15 @@ export class ProviderTicketLoginComponent implements AfterContentChecked, OnInit
    * Mapea y retorna el formulario en una sola cadena de string
    */
   getObservations(): string {
+    const removeQuotes = (value: any): string => {
+      return typeof value === 'string' ? value.replace(/["']/g, '').trim() : value;
+    };
     const { name, lastname, identification, email, phone, address, observation } = this.requestForm.value;
 
     const observaciones = `
       Datos reportados del usuario:
-      <br> Nombre: ${name},  <br> Apellido: ${lastname},  <br> Identificación: ${identification},  <br> Teléfono: ${phone},  
-      <br> Email: ${email}, <br> Dirección: ${address},  <br> Observaciones: ${observation}, <br>
+      <br> Nombre: ${removeQuotes(name)},  <br> Apellido: ${removeQuotes(lastname)},  <br> Identificación: ${removeQuotes(identification)},  <br> Teléfono: ${removeQuotes(phone)},
+      <br> Email: ${removeQuotes(email)}, <br> Dirección: ${removeQuotes(address)},  <br> Observaciones: ${removeQuotes(observation)}, <br>
       `;
     return observaciones;
   }
