@@ -104,6 +104,9 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
   }
 
   initializeForm() {
+    const parsedDv = Number(this.user.dv);
+    const dvValue = this.user.dv !== '' && !isNaN(parsedDv) ? parsedDv : null;
+
     this.providerForm = this.fb.group({
       idProvider: [this.user.id],
       startTime: [this.formatDate(new Date())],
@@ -111,9 +114,9 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       email: [this.user.email || '', [Validators.required, this.formUtils.emailValidator]],
       name: [this.user.name || '', [Validators.required]],
       languages: [[], [Validators.required]],
-      idTypeDocument: ['', [Validators.required]],
-      identification: ['', [Validators.required, this.formUtils.numeric]],
-      dv: [null, [this.dvValidator]],
+      idTypeDocument: [this.user.idTypeDocument || '', [Validators.required]],
+      identification: [this.user.identification || '', [Validators.required, this.formUtils.numeric]],
+      dv: [dvValue, [this.dvValidator]],
       website: ['', this.formUtils.url],
 
       updatedBasicData: [false],
