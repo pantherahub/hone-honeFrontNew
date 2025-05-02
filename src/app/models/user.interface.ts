@@ -3,7 +3,7 @@ export interface UserInterface {
    email?: string;
    name?: string;
    idTypeDocument?: number;
-   identification?: string;
+   identificacion?: string;
    dv?: string | number;
    withData?: boolean;
    rejected?: boolean;
