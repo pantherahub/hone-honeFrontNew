@@ -118,18 +118,11 @@ export class RemainingDocumentsComponent implements OnInit {
     * @param item - recibe el tipo de documento que desea cargar
     */
   uploadDocumentModal(item: any): void {
-     const fileToUpload = new FormData();
-     const fechaForm = this.formDate.get("fecha")?.value;
-    const { idProvider } = this.clientSelected;
+    const fileToUpload = new FormData();
     const body: any = {
-        posicion: 0,
-        documento: item.idTypeDocuments,
-        nombredcoumentos: item.NameDocument,
-        idUser: idProvider
+        idDocumentType: item.idTypeDocuments,
+      //   nameRepresentative: item.NameDocument,
     };
-    if (fechaForm && fechaForm !== 0 && fechaForm !== '') {
-      body.fechavencimiento = fechaForm;
-   }
     fileToUpload.append('datos', JSON.stringify(body));
 
     const modal = this.modalService.create<ModalEditDocumentComponent, any>({
@@ -141,11 +134,9 @@ export class RemainingDocumentsComponent implements OnInit {
     });
     const instance = modal.getContentComponent();
 
-    instance.currentDoc = item;
-    instance.documentId = item.idDocumentsProvider;
-    instance.documentType = item.idTypeDocuments;
+    instance.idDocumentType = item.idTypeDocuments;
     instance.isNew = true;
-    instance.body = body;
+    instance.bodyData = body;
 
     // Return a result when opened
     modal.afterOpen.subscribe(() => {});
@@ -159,67 +150,6 @@ export class RemainingDocumentsComponent implements OnInit {
           }
        }
     });
- }
-
-   /**
-    * Carga un archivo y lo envia al api de carga de documentos
-    * @param file - recibe el archivo para cargar
-    * @param item - elemento de la lista para saber cual documento de carga ej (cedula, nit, rethus)
-    */
-  uploadDocuments(item: any, index: number) {
-      const docForm = this.formDocList[index];
-      const fileForm = docForm.get("file")?.value;
-      const fechaForm = docForm.get("fecha")?.value;
-
-      this.loadingData = true;
-      const { idProvider } = this.clientSelected;
-      const fileToUpload = new FormData();
-      fileToUpload.append('archivo', fileForm);
-      const body: any = {
-         posicion: 0,
-         nombre: fileForm.name,
-         documento: item.idTypeDocuments,
-         nombredcoumentos: item.NameDocument,
-         idUser: idProvider
-      };
-      if (fechaForm && fechaForm !== 0 && fechaForm !== '') {
-         body.fechavencimiento = fechaForm;
-      }
-      fileToUpload.append('datos', JSON.stringify(body));
-
-      this.documentService.uploadDocuments(idProvider, fileToUpload).subscribe({
-         next: (res: any) => {
-            this.loadingData = false;
-            this.createNotificacion('success', 'Carga exitosa', 'El documento se subió de manera satisfactoria');
-            this.getDocumentsToUpload();
-            // location.reload();
-            this.eventManager.getPercentApi.set(this.counterApi + 1);
-         },
-         error: (error: any) => {
-            this.loadingData = false;
-            this.createNotificacion('error', 'Error', 'Lo sentimos, hubo un error en el servidor.');
-         },
-         complete: () => { }
-      });
-  }
-
-  submitForm(index: number, item: DocumentInterface) {
-    const docForm = this.formDocList[index];
-    const file = docForm.get("file")?.value;
-    if (!file) {
-        this.createNotificacion("error", "Error", "Debe seleccionar un documento.");
-        return;
-    }
-    if (item.idTypeDocuments == 8 || item.idTypeDocuments == 22) {
-      const fechaControl = docForm.get("fecha");
-      fechaControl?.markAsTouched();
-      fechaControl?.updateValueAndValidity();
-
-      if (fechaControl?.invalid) {
-          return;
-      }
-  }
-    this.uploadDocuments(item, index);
   }
 
    /**

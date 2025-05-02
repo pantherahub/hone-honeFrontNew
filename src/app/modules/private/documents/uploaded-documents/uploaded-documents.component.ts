@@ -138,8 +138,7 @@ export class UploadedDocumentsComponent implements OnInit {
       const instance = modal.getContentComponent();
 
       instance.currentDoc = item;
-      instance.documentId = item.idDocumentsProvider;
-      instance.documentType = item.idTypeDocuments;
+      instance.idDocumentType = item.idTypeDocuments;
 
       // Return a result when opened
       modal.afterOpen.subscribe(() => {});
