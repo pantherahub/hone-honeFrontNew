@@ -22,6 +22,7 @@ export class DatePickerInputComponent implements ControlValueAccessor {
 
   @Input() disableDates: (current: Date) => boolean = () => false;
   @Input() nzShowToday: boolean = true;
+  @Input() inputId: string | null = null;
 
   // ControlValueAccessor callbacks
   onChange = (value: string | null) => {};
