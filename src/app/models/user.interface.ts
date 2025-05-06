@@ -2,6 +2,9 @@ export interface UserInterface {
    id?: number;
    email?: string;
    name?: string;
+   idTypeDocument?: number;
+   identificacion?: string;
+   dv?: string | number;
    withData?: boolean;
    rejected?: boolean;
    roles?: RoleInterface;

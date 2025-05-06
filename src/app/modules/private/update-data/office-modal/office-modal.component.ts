@@ -25,7 +25,9 @@ import { AddressFormComponent } from './address-form/address-form.component';
 })
 export class OfficeModalComponent implements OnInit {
 
+  @Input() providerCompanies: any[] = [];
   @Input() office: any | null = null;
+
   officeForm!: FormGroup;
   cities: any[] = [];
   companyList: CompanyInterface[] = [];
@@ -175,10 +177,13 @@ export class OfficeModalComponent implements OnInit {
   }
 
   getIdsCompanies(): number[] {
-    if (this.office?.idsCompanies) {
+    if (!this.office) {
+      // If office is new, initialize with the companies that already have an agreement
+      const companiesIds = this.providerCompanies.map((c: any) => c.idCompany);
+      return companiesIds;
+    } else if (this.office.idsCompanies) {
       return this.office.idsCompanies;
-    }
-    if (this.office?.Companies) {
+    } else if (this.office.Companies) {
       return this.office.Companies.map((company: any) => company.idCompany);
     }
     return [];

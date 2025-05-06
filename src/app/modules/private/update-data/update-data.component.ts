@@ -31,6 +31,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
 
   languages: any[] = LANGUAGES;
   identificationTypes: any[] = [];
+  providerCompanies: any[] = [];
 
   existingOffices: any[] = [];
   existingContacts: any[] = [];
@@ -64,6 +65,8 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
 
     this.getIdentificationTypes();
     this.initializeForm();
+
+    this.getCompanies();
 
     this.loadFormData();
 
@@ -104,6 +107,10 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
   }
 
   initializeForm() {
+    const dvValue = this.user.dv != null && this.user.dv !== '' && !isNaN(Number(this.user.dv))
+      ? Number(this.user.dv)
+      : null;
+
     this.providerForm = this.fb.group({
       idProvider: [this.user.id],
       startTime: [this.formatDate(new Date())],
@@ -111,9 +118,9 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       email: [this.user.email || '', [Validators.required, this.formUtils.emailValidator]],
       name: [this.user.name || '', [Validators.required]],
       languages: [[], [Validators.required]],
-      idTypeDocument: ['', [Validators.required]],
-      identification: ['', [Validators.required, this.formUtils.numeric]],
-      dv: [null, [this.dvValidator]],
+      idTypeDocument: [this.user.idTypeDocument || '', [Validators.required]],
+      identification: [this.user.identificacion || '', [Validators.required, this.formUtils.numeric]],
+      dv: [dvValue, [this.dvValidator]],
       website: ['', this.formUtils.url],
 
       updatedBasicData: [false],
@@ -151,6 +158,34 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => {
         console.error(err);
+      }
+    });
+  }
+
+  getCompanies() {
+    this.loading = true;
+    this.clientProviderService.getClientListByProviderId(this.user.id).subscribe({
+      next: (res: any) => {
+        const clientList = res;
+        const clientsIds = clientList.map((client: any) => client.idClientHoneSolutions);
+        this.getProviderCompanies(clientsIds);
+      },
+      error: (err: any) => {
+        console.error(err);
+        this.loading = false;
+      },
+    });
+  }
+
+  getProviderCompanies(clientsIds: number[]) {
+    this.clientProviderService.getCompaniesByIdClients({ clientsIds }).subscribe({
+      next: (res: any) => {
+        this.providerCompanies = res.data;
+        this.loading = false;
+      },
+      error: (err: any) => {
+        console.error(err);
+        this.loading = false;
       }
     });
   }
@@ -356,6 +391,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     if (office) {
       instanceModal.office = office;
     }
+    instanceModal.providerCompanies = this.providerCompanies;
 
     modalRef.afterClose.subscribe((result: any) => {
       if (result && result.office) {
