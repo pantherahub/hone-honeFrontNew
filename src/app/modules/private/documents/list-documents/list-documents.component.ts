@@ -13,6 +13,7 @@ import { ContactsProviderComponent } from '../../../../shared/modals/contacts-pr
 import { ContactsProviderServicesService } from '../../../../services/contacts-provider/contacts-provider.services.service';
 import { AssistanceProvidersComponent } from '../../../../shared/forms/assistance-forms/assistance-providers/assistance-providers.component';
 import { ProviderAssistanceComponent } from '../../../../shared/modals/provider-assistance/provider-assistance.component';
+import { FeedbackFivestarsComponent } from 'src/app/shared/modals/feedback-fivestars/feedback-fivestars.component';
 
 @Component({
    selector: 'app-list-documents',
@@ -22,6 +23,8 @@ import { ProviderAssistanceComponent } from '../../../../shared/modals/provider-
    styleUrl: './list-documents.component.scss'
 })
 export class ListDocumentsComponent implements OnInit {
+
+   user = this.eventManager.userLogged();
    clientSelected: any = this.eventManager.clientSelected();
    callApi: any = this.eventManager.getPercentApi();
    loadingData: boolean = false;
@@ -74,6 +77,9 @@ export class ListDocumentsComponent implements OnInit {
          next: (res: any) => {
             this.percentData = res;
             this.loadingData = false;
+            if (this.percentData.uploaded && this.user.doesNeedSurvey) {
+              this.open5starsFeedback();
+            }
          },
          error: (error: any) => {
             this.loadingData = false;
@@ -102,6 +108,20 @@ export class ListDocumentsComponent implements OnInit {
          }
       });
    }
+
+   open5starsFeedback(): void {
+    const modal = this.modalService.create<FeedbackFivestarsComponent, any>({
+      nzContent: FeedbackFivestarsComponent,
+      nzTitle: 'Nos gustaría conocer tu opinión',
+      nzCentered: true,
+      nzClosable: true,
+      // nzFooter: null,
+      nzMaskClosable: false, // Disable click on overlay
+      nzWidth: '600px',
+      nzStyle: { 'max-width': '90%' },
+      nzClassName: 'video-modal',
+    });
+  }
 
    /**
     * Valida el tipo de prestador y descarga un paquete de documentos

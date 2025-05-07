@@ -1,10 +1,9 @@
-import { Component, ElementRef, Input, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { Component, ElementRef, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { DocumentsCrudService } from '../../../../services/documents/documents-crud.service';
 import { DocumentInterface, PercentInterface } from '../../../../models/client.interface';
 import { EventManagerService } from '../../../../services/events-manager/event-manager.service';
 import { NgZorroModule } from '../../../../ng-zorro.module';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
-import { Observable, Observer } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
 import { NzUploadFile } from 'ng-zorro-antd/upload';
@@ -13,8 +12,6 @@ import { ProviderAssistanceComponent } from '../../../../shared/modals/provider-
 import { FetchBackend } from '@angular/common/http';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FileValidatorDirective } from 'src/app/directives/file-validator.directive';
-import { NzModalService } from 'ng-zorro-antd/modal';
-import { FeedbackFivestarsComponent } from 'src/app/shared/modals/feedback-fivestars/feedback-fivestars.component';
 
 @Component({
    selector: 'app-remaining-documents',
@@ -25,8 +22,6 @@ import { FeedbackFivestarsComponent } from 'src/app/shared/modals/feedback-fives
 })
 export class RemainingDocumentsComponent implements OnInit {
 
-   @Input() percentData: PercentInterface = {};
-
    loading: boolean = false;
    clientSelected: any = this.eventManager.clientSelected();
    counterApi: any = this.eventManager.getPercentApi();
@@ -36,7 +31,6 @@ export class RemainingDocumentsComponent implements OnInit {
    formDocList: FormGroup[] = [];
 
    formDate!: FormGroup;
-   user = this.eventManager.userLogged();
 
    @ViewChildren('fileInput') fileInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
@@ -45,29 +39,13 @@ export class RemainingDocumentsComponent implements OnInit {
       private documentService: DocumentsCrudService,
       private notificationService: NzNotificationService,
       public formBuilder: FormBuilder,
-      private modalService: NzModalService,
    ) {
       this.createtiektcForm();
    }
 
    ngOnInit(): void {
      this.getDocumentsToUpload();
-    //  this.open5starsFeedback();
    }
-
-  open5starsFeedback(): void {
-      const modal = this.modalService.create<FeedbackFivestarsComponent, any>({
-        nzContent: FeedbackFivestarsComponent,
-        nzTitle: 'Nos gustaría conocer tu opinión',
-        nzCentered: true,
-        nzClosable: true,
-        // nzFooter: null,
-        nzMaskClosable: false, // Disable click on overlay
-        nzWidth: '600px',
-        nzStyle: { 'max-width': '90%' },
-        nzClassName: 'video-modal',
-      });
-    }
 
    /**
     * Obtiene el listado de documentos sin cargar
@@ -130,16 +108,6 @@ export class RemainingDocumentsComponent implements OnInit {
         file: file
       });
     }
-
-  /**
-   * Carga un archivo y lo envia al api de carga de documentos
-   * @param file - recibe el archivo para cargar
-   * @param item - elemento de la lista para saber cual documento de carga ej (cedula, nit, rethus)
-   */
-  showFeedbackModal() {
-    if (!this.percentData.uploaded || !this.user.doesNeedSurvey) return;
-    this.open5starsFeedback();
-  }
 
    /**
     * Carga un archivo y lo envia al api de carga de documentos
