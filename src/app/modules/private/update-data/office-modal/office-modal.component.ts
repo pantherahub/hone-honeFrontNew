@@ -10,7 +10,6 @@ import { ContactsProviderServicesService } from 'src/app/services/contacts-provi
 import { ClientProviderService } from 'src/app/services/clients/client-provider.service';
 import { CompanyInterface } from 'src/app/models/client.interface';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
-import { distinctUntilChanged } from 'rxjs';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { AlertService } from 'src/app/services/alerts/alert.service';
 import { ScheduleFormComponent } from './schedule-form/schedule-form.component';
@@ -199,7 +198,7 @@ export class OfficeModalComponent implements OnInit {
       name: [this.office?.name || '', [Validators.required]],
       cityName: [this.office?.cityName || this.office?.City?.city || ''],
       schedulingLink: [this.office?.schedulingLink || '', [this.formUtils.url]],
-      idsCompanies : [this.getIdsCompanies(), [Validators.required]],
+      idsCompanies: [this.getIdsCompanies(), [Validators.required]],
 
       updatedSchedules: this.fb.array(this.office?.updatedSchedules ?? []),
       createdSchedules: this.fb.array(this.office?.createdSchedules ?? []),
