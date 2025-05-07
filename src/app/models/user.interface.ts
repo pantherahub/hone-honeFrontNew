@@ -7,6 +7,7 @@ export interface UserInterface {
    dv?: string | number;
    withData?: boolean;
    rejected?: boolean;
+   doesNeedSurvey?: boolean;
    roles?: RoleInterface;
 }
 
