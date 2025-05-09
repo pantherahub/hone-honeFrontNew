@@ -5,7 +5,7 @@
 }
 
 <nz-row nzJustify="center">
-  <nz-col [nzSpan]="24" [nzMd]="18" [nzXl]="12">
+  <nz-col [nzSpan]="24" [nzMd]="20" [nzLg]="16" [nzXXl]="12">
     <div class="update-data">
       <div class="update-data__header flex flex-col gap-2">
         <button class="flex gap-1 items-center w-fit" nz-button nzType="primary" type="button" (click)="goBack()">
@@ -59,28 +59,6 @@
 
             <nz-col [nzSpan]="24" [nzSm]="12">
               <nz-form-item>
-                <nz-form-label [nzRequired]="true" nzFor="languages">Idiomas de prestación de servicio</nz-form-label>
-                <nz-form-control [nzErrorTip]="languagesErrorTip">
-                  <ng-template #languagesErrorTip>
-                    <p *ngIf="providerForm.controls['languages'].hasError('required')">El campo es requerido.</p>
-                  </ng-template>
-                  <nz-select
-                    nzMode="multiple"
-                    [nzMaxTagCount]="3"
-                    nzAllowClear
-                    [nzMaxTagPlaceholder]="langTagPlaceHolder"
-                    formControlName="languages"
-                    nzPlaceHolder="Seleccionar"
-                  >
-                    <nz-option *ngFor="let lang of languages" [nzLabel]="lang.name" [nzValue]="lang.code"></nz-option>
-                  </nz-select>
-                  <ng-template #langTagPlaceHolder let-selectedList>{{ selectedList.length }} más...</ng-template>
-                </nz-form-control>
-              </nz-form-item>
-            </nz-col>
-
-            <nz-col [nzSpan]="24" [nzSm]="12">
-              <nz-form-item>
                 <nz-form-label [nzRequired]="true" nzFor="idTypeDocument">Tipo de identificación</nz-form-label>
                 <nz-form-control nzErrorTip="El campo es requerido.">
                   <nz-select
@@ -120,6 +98,28 @@
                     }
                   </ng-template>
                   <input nz-input id="dv" formControlName="dv" placeholder="Dígito" type="number" min="0" max="9" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+
+            <nz-col [nzSpan]="24" [nzSm]="12">
+              <nz-form-item>
+                <nz-form-label [nzRequired]="true" nzFor="languages">Idiomas de prestación de servicio</nz-form-label>
+                <nz-form-control [nzErrorTip]="languagesErrorTip">
+                  <ng-template #languagesErrorTip>
+                    <p *ngIf="providerForm.controls['languages'].hasError('required')">El campo es requerido.</p>
+                  </ng-template>
+                  <nz-select
+                    nzMode="multiple"
+                    [nzMaxTagCount]="3"
+                    nzAllowClear
+                    [nzMaxTagPlaceholder]="langTagPlaceHolder"
+                    formControlName="languages"
+                    nzPlaceHolder="Seleccionar"
+                  >
+                    <nz-option *ngFor="let lang of languages" [nzLabel]="lang.name" [nzValue]="lang.code"></nz-option>
+                  </nz-select>
+                  <ng-template #langTagPlaceHolder let-selectedList>{{ selectedList.length }} más...</ng-template>
                 </nz-form-control>
               </nz-form-item>
             </nz-col>
