@@ -194,7 +194,6 @@ export class OfficeModalComponent implements OnInit {
       idAddedTemporal: [this.office?.idTemporalOfficeProvider ? null : this.office?.idAddedTemporal ?? Date.now().toString()],
       idCity: [this.office?.idCity || '', [Validators.required]],
       address: [this.office?.address || null, [Validators.required]],
-      enableCode: [this.office?.enableCode || '', [Validators.required, this.formUtils.numeric, this.enableCodeValidator]],
       name: [this.office?.name || '', [Validators.required]],
       cityName: [this.office?.cityName || this.office?.City?.city || ''],
       schedulingLink: [this.office?.schedulingLink || '', [this.formUtils.url]],
@@ -244,15 +243,6 @@ export class OfficeModalComponent implements OnInit {
         this.updateCity(newIdCity);
         previousCityId = newIdCity;
       });
-  }
-
-  enableCodeValidator(control: AbstractControl) {
-    if (!control || !control.value) return null;
-    const length = control.value.length;
-    if (length < 9 || length > 12) {
-      return { invalidLength: 'Debe tener entre 9 y 12 dígitos.' };
-    }
-    return null;
   }
 
   updateCity(newIdCity: number) {

@@ -31,24 +31,6 @@
 
       <nz-col [nzSpan]="24" [nzSm]="12">
         <nz-form-item>
-          <nz-form-label [nzRequired]="true" nzFor="enableCode">Código habilitación</nz-form-label>
-          <nz-form-control [nzErrorTip]="enableCodeErrorTip">
-            <ng-template #enableCodeErrorTip>
-              @if (officeForm.controls['enableCode'].hasError('required')) {
-                El campo es requerido.
-              } @else if (officeForm.controls['enableCode'].hasError('invalidNumber')) {
-                Solo se permiten números.
-              } @else if (officeForm.controls['enableCode'].hasError('invalidLength')) {
-                {{ officeForm.controls['enableCode'].errors?.['invalidLength'] }}
-              }
-            </ng-template>
-            <input nz-input id="enableCode" formControlName="enableCode" placeholder="Código" />
-          </nz-form-control>
-        </nz-form-item>
-      </nz-col>
-
-      <nz-col [nzSpan]="24" [nzSm]="12">
-        <nz-form-item>
           <nz-form-label [nzRequired]="true" nzFor="officeName">Nombre</nz-form-label>
           <nz-form-control [nzErrorTip]="nameErrorTip">
             <ng-template #nameErrorTip>

@@ -104,6 +104,22 @@
 
             <nz-col [nzSpan]="24" [nzSm]="12">
               <nz-form-item>
+                <nz-form-label [nzRequired]="true" nzFor="RepsEnableCode">Código habilitación</nz-form-label>
+                <nz-form-control [nzErrorTip]="RepsEnableCodeErrorTip">
+                  <ng-template #RepsEnableCodeErrorTip>
+                    @if (providerForm.controls['RepsEnableCode'].hasError('required')) {
+                      El campo es requerido.
+                    } @else if (providerForm.controls['RepsEnableCode'].hasError('invalidNumber')) {
+                      Solo se permiten números.
+                    }
+                  </ng-template>
+                  <input nz-input id="RepsEnableCode" formControlName="RepsEnableCode" placeholder="Código" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+
+            <nz-col [nzSpan]="24" [nzSm]="12">
+              <nz-form-item>
                 <nz-form-label [nzRequired]="true" nzFor="languages">Idiomas de prestación de servicio</nz-form-label>
                 <nz-form-control [nzErrorTip]="languagesErrorTip">
                   <ng-template #languagesErrorTip>
