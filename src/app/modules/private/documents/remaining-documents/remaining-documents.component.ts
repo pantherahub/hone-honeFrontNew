@@ -13,11 +13,12 @@ import { ProviderAssistanceComponent } from '../../../../shared/modals/provider-
 import { FetchBackend } from '@angular/common/http';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FileValidatorDirective } from 'src/app/directives/file-validator.directive';
+import { PipesModule } from 'src/app/pipes/pipes.module';
 
 @Component({
    selector: 'app-remaining-documents',
    standalone: true,
-   imports: [NgZorroModule, CommonModule, FileValidatorDirective],
+   imports: [NgZorroModule, CommonModule, FileValidatorDirective, PipesModule],
    templateUrl: './remaining-documents.component.html',
    styleUrl: './remaining-documents.component.scss'
 })
@@ -33,6 +34,14 @@ export class RemainingDocumentsComponent implements OnInit {
    formDate!: FormGroup;
 
    @ViewChildren('fileInput') fileInputs!: QueryList<ElementRef<HTMLInputElement>>;
+
+  suraSoftwareTypes: string[] = [
+    'Evolve Hc', 'KloudSolutions', 'Medicarte', 'Simedica', 'Sunube',
+    'HIMED', 'Netmedik', 'Ekisa', 'Medsys', 'Luku', 'Ipsa', 'Otro'
+  ];
+  documentIdsWithExpiration: number[] = [
+    8, 22, 132, 133, 137, 142
+  ];
 
    constructor(
       private eventManager: EventManagerService,
@@ -53,9 +62,14 @@ export class RemainingDocumentsComponent implements OnInit {
     */
    createtiektcForm() {
       this.formDate = this.formBuilder.group({
-         fecha: [""],
+        fecha: [""],
+        software: [""],
       });
    }
+
+  hasExpirationField(idDoc: number | undefined): boolean {
+    return idDoc !== undefined && this.documentIdsWithExpiration.includes(idDoc)
+  }
 
    getDocumentsToUpload() {
       this.loadingData = true;
@@ -68,11 +82,16 @@ export class RemainingDocumentsComponent implements OnInit {
                 file: [null, Validators.required],
                 fecha: [
                   "",
-                  item.idTypeDocuments === 8 ||
-                  item.idTypeDocuments === 22
+                  this.hasExpirationField(item.idTypeDocuments)
                     ? [Validators.required]
                     : [],
                 ],
+                software: [
+                  "",
+                  item.idTypeDocuments === 138
+                    ? [Validators.required]
+                    : [],
+                ]
               })
             );
             this.loadingData = false;
@@ -119,6 +138,7 @@ export class RemainingDocumentsComponent implements OnInit {
       const docForm = this.formDocList[index];
       const fileForm = docForm.get("file")?.value;
       const fechaForm = docForm.get("fecha")?.value;
+      const softwareForm = docForm.get("software")?.value;
 
       this.loadingData = true;
       const { idProvider } = this.clientSelected;
@@ -133,6 +153,9 @@ export class RemainingDocumentsComponent implements OnInit {
       };
       if (fechaForm && fechaForm !== 0 && fechaForm !== '') {
          body.fechavencimiento = fechaForm;
+      }
+      if (softwareForm && softwareForm !== '') {
+         body.software = softwareForm;
       }
       fileToUpload.append('datos', JSON.stringify(body));
 
@@ -159,7 +182,7 @@ export class RemainingDocumentsComponent implements OnInit {
         this.createNotificacion("error", "Error", "Debe seleccionar un documento.");
         return;
     }
-    if (item.idTypeDocuments == 8 || item.idTypeDocuments == 22) {
+    if (this.hasExpirationField(item.idTypeDocuments)) {
       const fechaControl = docForm.get("fecha");
       fechaControl?.markAsTouched();
       fechaControl?.updateValueAndValidity();
@@ -167,7 +190,14 @@ export class RemainingDocumentsComponent implements OnInit {
       if (fechaControl?.invalid) {
           return;
       }
-  }
+    }
+    if (item.idTypeDocuments == 138) {
+      const softwareControl = docForm.get("software");
+      softwareControl?.markAsTouched();
+      softwareControl?.updateValueAndValidity();
+      if (softwareControl?.invalid) return;
+    }
+
     this.uploadDocuments(item, index);
   }
 

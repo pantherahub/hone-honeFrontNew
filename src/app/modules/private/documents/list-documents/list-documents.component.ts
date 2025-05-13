@@ -206,6 +206,16 @@ export class ListDocumentsComponent implements OnInit {
    downloadDocumentsBmi() { }
 
    /**
+    * Descarga Documentos de Sura
+    */
+   downloadDocumentsSura() {
+     // Natural person
+     if (this.clientSelected.idTypeProvider == 7) {
+        this.saveAs(`assets/documents-provider/CartaMipres.pdf`, `Carta_Mipres.pdf`);
+     }
+   }
+
+   /**
     * Recibe la url de donde se toman los documentos locales y los descarga
     * @param url - ruta de los assets/container a descargar
     * @param name - nombre del archivo que se muestra en la descarga

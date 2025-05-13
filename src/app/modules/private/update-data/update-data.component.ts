@@ -399,6 +399,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       nzContent: OfficeModalComponent,
       nzCentered: true,
       nzClosable: true,
+      nzMaskClosable: false,
       nzWidth: '900px',
       nzStyle: { 'max-width': '90%', 'margin': '22px 0' }
     });
@@ -455,6 +456,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       nzContent: ContactFormComponent,
       nzCentered: true,
       nzClosable: true,
+      nzMaskClosable: false,
       nzWidth: '650px',
       nzStyle: { 'max-width': '90%', 'margin': '22px 0' }
     });
