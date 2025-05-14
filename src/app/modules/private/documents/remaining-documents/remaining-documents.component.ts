@@ -31,8 +31,6 @@ export class RemainingDocumentsComponent implements OnInit {
    documentList: DocumentInterface[] = [];
    formDocList: FormGroup[] = [];
 
-   formDate!: FormGroup;
-
    @ViewChildren('fileInput') fileInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
   suraSoftwareTypes: string[] = [
@@ -47,24 +45,11 @@ export class RemainingDocumentsComponent implements OnInit {
       private eventManager: EventManagerService,
       private documentService: DocumentsCrudService,
       private notificationService: NzNotificationService,
-
       public formBuilder: FormBuilder,
-   ) {
-      this.createtiektcForm();
-   }
+   ) { }
 
    ngOnInit(): void {
       this.getDocumentsToUpload();
-   }
-
-   /**
-    * Obtiene el listado de documentos sin cargar
-    */
-   createtiektcForm() {
-      this.formDate = this.formBuilder.group({
-        fecha: [""],
-        software: [""],
-      });
    }
 
   hasExpirationField(idDoc: number | undefined): boolean {
@@ -164,7 +149,7 @@ export class RemainingDocumentsComponent implements OnInit {
             this.loadingData = false;
             this.createNotificacion('success', 'Carga exitosa', 'El documento se subió de manera satisfactoria');
             this.getDocumentsToUpload();
-            location.reload();
+            // location.reload();
             this.eventManager.getPercentApi.set(this.counterApi + 1);
          },
          error: (error: any) => {
