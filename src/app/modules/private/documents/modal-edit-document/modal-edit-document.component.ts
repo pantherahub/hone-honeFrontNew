@@ -59,12 +59,6 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
     134: 'last3Months'
   };
 
-  realizationDateRestrictions: { [key: number]: 'lastMonth' | 'last3Years' | 'last3Months' } = {
-    134: 'last3Months',
-    137: 'last3Years',
-    139: 'lastMonth'
-  };
-
    constructor (
       private formBuilder: FormBuilder,
       private notificationService: NzNotificationService,
@@ -149,7 +143,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
          'consultationDate': [16],
          'endorsedSpecialtyDate': [16],
          'validityStartDate': [20],
-         'dateofRealization': [36, 24, 23, 134, 137, 139],
+         'dateofRealization': [36, 24, 23],
          'receptionDate': [25, 29],
          'lastDosimetryDate': [0],
          'epsName': [13, 14, 135],
@@ -244,49 +238,6 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
           return false;
       }
    };
-
-   getRealizationTooltipContent(): string {
-      const restriction = this.realizationDateRestrictions[this.documentType];
-      switch (restriction) {
-        case 'lastMonth':
-          return 'Debe ser no mayor a un mes.';
-        case 'last3Months':
-          return 'Debe ser no mayor a tres meses.';
-        case 'last3Years':
-          return 'Debe ser no mayor a tres años.';
-        default:
-          return '';
-      }
-    }
-
-  disableRealizationDates = (current: Date): boolean => {
-    const restriction = this.realizationDateRestrictions[this.documentType];
-    if (!restriction) return false;
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    current.setHours(0, 0, 0, 0);
-
-    switch (restriction) {
-      case 'lastMonth':
-        const lastMonth = new Date(today);
-        lastMonth.setMonth(today.getMonth() - 1);
-        return current < lastMonth || current > today;
-
-      case 'last3Months':
-        const threeMonthsAgo = new Date(today);
-        threeMonthsAgo.setMonth(today.getMonth() - 3);
-        return current < threeMonthsAgo || current > today;
-
-      case 'last3Years':
-        const threeYearsAgo = new Date(today);
-        threeYearsAgo.setFullYear(today.getFullYear() - 3);
-        return current < threeYearsAgo || current > today;
-
-      default:
-        return false;
-    }
-  };
 
    /**
     * Carga un archivo y lo envia al api de carga de documentos

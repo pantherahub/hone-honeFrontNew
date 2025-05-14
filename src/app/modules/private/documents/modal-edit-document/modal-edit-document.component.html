@@ -344,17 +344,11 @@
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
                 *ngIf="documentType == 36
                     || documentType == 24
-                    || documentType == 23
-                    || documentType == 134
-                    || documentType == 137
-                    || documentType == 139">
+                    || documentType == 23">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
                         Fecha de Realización
-                        <div *ngIf="realizationDateRestrictions[documentType]" nz-tooltip [nzTooltipTitle]="getRealizationTooltipContent()" nzPlacement="top">
-                          <i nz-icon nzType="info-circle" nzTheme="fill" class="info-icon"></i>
-                        </div>
                     </nz-form-label>
 
                     <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
@@ -365,8 +359,7 @@
                             </p>
                         </ng-template>
                         <app-date-picker-input
-                          formControlName="dateofRealization"
-                          [disableDates]="disableRealizationDates">
+                          formControlName="dateofRealization">
                         </app-date-picker-input>
                     </nz-form-control>
                 </nz-form-item>
