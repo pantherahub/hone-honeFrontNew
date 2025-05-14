@@ -462,9 +462,9 @@ export class ContactFormComponent implements OnInit {
   }
   extensionValidator(control: AbstractControl): ValidationErrors | null {
     const value: string = control.value;
-    const regex = /^[0-9#*]+$/;
+    const regex = /^[0-9#*\s,-]+$/;
     if (value && !regex.test(value)) {
-      return { invalidExtension: 'Solo números, # y *' };
+      return { invalidExtension: 'Solo números, #, *, comas y guiones.' };
     }
     return null;
   }
