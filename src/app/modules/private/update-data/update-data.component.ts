@@ -111,12 +111,17 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       ? Number(this.user.dv)
       : null;
 
+    const isValidEmail = this.isValidEmail(this.user.email);
+
     this.providerForm = this.fb.group({
       idProvider: [this.user.id],
       startTime: [this.formatDate(new Date())],
       endTime: [''],
       email: [
-        { value: this.user.email || '', disabled: true },
+        {
+          value: isValidEmail ? this.user.email : '',
+          disabled: isValidEmail
+        },
         [Validators.required, this.formUtils.emailValidator]
       ],
       name: [
@@ -164,6 +169,11 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
 
   goBack(): void {
     this.location.back();
+  }
+
+  isValidEmail(email: string | undefined): boolean {
+    if (!email || typeof email != 'string') return false;
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email || '');
   }
 
   getIdentificationTypes() {
@@ -582,12 +592,13 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     const dvValue = this.user.dv != null && this.user.dv !== '' && !isNaN(Number(this.user.dv))
       ? Number(this.user.dv)
       : null;
+    const isValidEmail = this.isValidEmail(this.user.email);
 
     this.providerForm.reset({
       idProvider: this.user.id,
       startTime: this.formatDate(new Date()),
       endTime: '',
-      email: this.user.email || '',
+      email: isValidEmail ? this.user.email : '',
       name: this.user.name || '',
       languages: [],
       idTypeDocument: this.user.idTypeDocument || '',
