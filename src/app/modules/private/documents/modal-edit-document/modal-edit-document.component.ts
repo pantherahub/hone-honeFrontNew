@@ -163,7 +163,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
       const item = this.currentDoc;
 
       this.documentForm.patchValue({
-         software: this.convertDate(item.software),
+         software: item.software,
          consultationDate: this.convertDate(item.consultationDate),
          dateDiligence: this.convertDate(item.dateDiligence),
          dateFirm: this.convertDate(item.dateFirm),
