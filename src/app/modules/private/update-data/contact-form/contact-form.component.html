@@ -215,12 +215,7 @@
                   </nz-col>
                   <nz-col [nzSpan]="11">
                     <nz-form-item class="mb-0">
-                      <nz-form-control [nzErrorTip]="extensionErrorTip">
-                        <ng-template #extensionErrorTip>
-                          @if (control.get('extension')?.hasError('invalidExtension')) {
-                            {{ control.get('extension')?.errors?.['invalidExtension'] }}
-                          }
-                        </ng-template>
+                      <nz-form-control>
                         <input
                           nz-input
                           type="text"
