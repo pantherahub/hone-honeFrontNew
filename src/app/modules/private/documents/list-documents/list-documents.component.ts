@@ -39,7 +39,8 @@ export class ListDocumentsComponent implements OnInit {
       private contactProvider: ContactsProviderServicesService
    ) {
       effect(() => {
-         this.callApi = this.eventManager.getPercentApi();
+        this.callApi = this.eventManager.getPercentApi();
+        // console.log("Effect", this.callApi);
          if (this.callApi) {
             this.getDocumentPercent();
          }
@@ -204,6 +205,16 @@ export class ListDocumentsComponent implements OnInit {
       * Descarga Excel de BMI
       */
    downloadDocumentsBmi() { }
+
+   /**
+    * Descarga Documentos de Sura
+    */
+   downloadDocumentsSura() {
+     // Natural person
+     if (this.clientSelected.idTypeProvider == 7) {
+        this.saveAs(`assets/documents-provider/CartaMipres.pdf`, `Carta_Mipres.pdf`);
+     }
+   }
 
    /**
     * Recibe la url de donde se toman los documentos locales y los descarga

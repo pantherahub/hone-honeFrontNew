@@ -147,7 +147,8 @@ export class ExpiredDocumentsComponent implements OnInit {
       modal.afterClose.subscribe((result: any) => {
          if (result) {
             if (result.response) {
-               this.getExpiredDocuments();
+              this.getExpiredDocuments();
+              this.eventManager.getPercentApi.set(this.counterApi + 1);
             }
          }
       });
