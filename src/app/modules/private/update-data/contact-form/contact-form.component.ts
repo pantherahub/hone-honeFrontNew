@@ -399,7 +399,7 @@ export class ContactFormComponent implements OnInit {
       type: [phone?.type || '', [Validators.required]],
       number: [
         phone?.number || '',
-        [Validators.required, this.formUtils.numeric, this.phoneNumberValidator]
+        [Validators.required, this.formUtils.telephoneNumber, this.phoneNumberValidator]
       ],
       extension: [
         phone?.extension || null
