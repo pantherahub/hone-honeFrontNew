@@ -198,7 +198,7 @@
                         <ng-template #phoneErrorTip>
                           @if (control.get('number')?.hasError('required')) {
                             El campo es requerido.
-                          } @else if (control.get('number')?.hasError('invalidNumber')) {
+                          } @else if (control.get('number')?.hasError('invalidTelNumber')) {
                             Ingresa un número válido.
                           } @else if (control.get('number')?.hasError('invalidLength')) {
                             {{ control.get('number')?.errors?.['invalidLength'] }}
