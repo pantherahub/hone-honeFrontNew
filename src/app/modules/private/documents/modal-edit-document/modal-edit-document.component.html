@@ -56,7 +56,7 @@
 
             <!-- Campo Fecha de Expedición -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="docIdsWithExpedition.includes(idDocumentType)">
+                *ngIf="isFieldRequiredForDocumentType('dateExpedition')">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24" nzFor="dateExpedition">

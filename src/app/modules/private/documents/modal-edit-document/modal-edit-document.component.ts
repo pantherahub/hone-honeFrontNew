@@ -42,10 +42,6 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
     'ARP COLMENA', 'ARP COLPATRIA', 'LA EQUIDAD SEGUROS DE VIDA S.A',
     'LIBERTY SEGUROS DE VIDA S.A', 'MAPFRE', 'POSITIVA ARP',
   ];
-  docIdsWithExpedition: number[] = [
-    4, 113, 12, 110, 111, 108, 137,
-    130, 131, 132, 133, 134, 135, 136, 138, 139, 140, 141, 142
-  ];
 
   expeditionDateRestrictions: { [key: number]: 'lastMonth' | 'currentYear' | 'last3Years' | 'last3Months' } = {
     108: 'lastMonth',
