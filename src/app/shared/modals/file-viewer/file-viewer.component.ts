@@ -2,11 +2,12 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NgxDocViewerModule } from 'ngx-doc-viewer';
 import { CommonModule } from '@angular/common';
 import { NgZorroModule } from '../../../ng-zorro.module';
+import { PipesModule } from 'src/app/pipes/pipes.module';
 
 @Component({
   selector: 'app-file-viewer',
   standalone: true,
-  imports: [CommonModule, NgZorroModule, NgxDocViewerModule],
+  imports: [CommonModule, NgZorroModule, NgxDocViewerModule, PipesModule],
   templateUrl: './file-viewer.component.html',
   styleUrl: './file-viewer.component.scss'
 })

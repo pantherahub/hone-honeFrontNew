@@ -74,7 +74,7 @@
       <nz-col [nzSpan]="24" [nzSm]="12">
         <nz-form-item>
           <nz-form-label [nzRequired]="true" nzFor="idsCompanies">Compañías con convenio</nz-form-label>
-          <nz-form-control [nzErrorTip]="idsCompaniesErrorTip">
+          <nz-form-control [nzErrorTip]="idsCompaniesErrorTip" nzExtra="Puede seleccionar una o varias.">
             <ng-template #idsCompaniesErrorTip>
               <p *ngIf="officeForm.controls['idsCompanies'].hasError('required')">El campo es requerido.</p>
             </ng-template>
@@ -162,7 +162,7 @@
   </div>
   <div class="footer">
     <button nz-button nzType="primary" type="submit">
-      {{ office ? 'Actualizar sede' : 'Agregar sede' }}
+      {{ office ? 'Actualizar' : 'Guardar' }}
     </button>
   </div>
 </form>

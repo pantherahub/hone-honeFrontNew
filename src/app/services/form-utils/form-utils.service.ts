@@ -41,7 +41,17 @@ export class FormUtilsService {
   }
 
   /**
-   * Url validator. REVISAR
+   * Telephone number validator.
+   * Allows numbers and #
+   */
+  telephoneNumber(control: AbstractControl): ValidationErrors | null {
+    if (!control || !control.value) return null;
+    const regex = /^[0-9#]*$/;
+    return regex.test(control.value) ? null : { invalidTelNumber: true };
+  }
+
+  /**
+   * Url validator.
    */
   url(control: AbstractControl): ValidationErrors | null {
     if (!control || !control.value) return null;

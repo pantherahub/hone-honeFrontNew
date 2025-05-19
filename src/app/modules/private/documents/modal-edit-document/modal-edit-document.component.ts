@@ -33,12 +33,39 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
   readonly #modal = inject(NzModalRef);
   readonly nzModalData: any = inject(NZ_MODAL_DATA);
 
-  constructor(
-    private formBuilder: FormBuilder,
-    private notificationService: NzNotificationService,
-    private documentService: DocumentsCrudService,
-    private eventManager: EventManagerService
-  ) { }
+  suraSoftwareTypes: string[] = [
+    'Evolve Hc', 'KloudSolutions', 'Medicarte', 'Simedica', 'Sunube',
+    'HIMED', 'Netmedik', 'Ekisa', 'Medsys', 'Luku', 'Ipsa', 'Otro'
+  ];
+  suraArlEntities: string[] = [
+    'ARL COLSANITAS', 'ALFATEP', 'ARL SURA', 'ARP AURORA', 'ARP BOLIVAR',
+    'ARP COLMENA', 'ARP COLPATRIA', 'LA EQUIDAD SEGUROS DE VIDA S.A',
+    'LIBERTY SEGUROS DE VIDA S.A', 'MAPFRE', 'POSITIVA ARP',
+  ];
+  docIdsWithExpedition: number[] = [
+    4, 113, 12, 110, 111, 108, 137,
+    130, 131, 132, 133, 134, 135, 136, 138, 139, 140, 141, 142
+  ];
+
+  expeditionDateRestrictions: { [key: number]: 'lastMonth' | 'currentYear' | 'last3Years' | 'last3Months' } = {
+    108: 'lastMonth',
+    113: 'lastMonth',
+    135: 'lastMonth',
+    139: 'lastMonth',
+    140: 'lastMonth',
+    4: 'currentYear',
+    110: 'currentYear',
+    111: 'currentYear',
+    137: 'last3Years',
+    134: 'last3Months'
+  };
+
+   constructor (
+      private formBuilder: FormBuilder,
+      private notificationService: NzNotificationService,
+      private documentService: DocumentsCrudService,
+      private eventManager: EventManagerService
+   ) { }
 
   ngAfterContentChecked (): void {}
 
@@ -55,6 +82,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
   */
   createForm() {
     this.documentForm = this.formBuilder.nonNullable.group({
+      software: [ '', [Validators.required] ],
       dateExpedition: [ '', [Validators.required] ],
       dateDiligence: [ '', [Validators.required] ],
       dateFirm: [ '', [Validators.required] ],
@@ -92,32 +120,99 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
   */
   isFieldRequiredForDocumentType(controlName: string): boolean {
     const documentValidationMap: any = {
-      'dateExpedition': [4, 113, 12, 110, 111, 108],
+      'software': [138],
+      'dateExpedition': [
+        4, 113, 12, 110, 111, 108, 137,
+        130, 131, 132, 133, 134, 135, 136, 138, 139, 140, 141, 142
+      ],
       'dateDiligence': [1, 35],
       'dateFirm': [2, 19],
       'dateVaccination': [6, 32],
-      'dueDate': [8, 22, 37, 21],
+      'dueDate': [
+        8, 22, 37, 21, 133, 137,
+        132, 139, 140, 142
+      ],
       'legalRepresentative': [113],
       'NameAlternate': [113],
       'documentDeliveryDate': [10, 11],
-      'dateOfBirth': [12],
+      'dateOfBirth': [12, 130],
       'consultationDate': [16],
       'endorsedSpecialtyDate': [16],
       'validityStartDate': [20],
       'dateofRealization': [36, 24, 23],
       'receptionDate': [25, 29],
       'lastDosimetryDate': [0],
-      'epsName': [13, 14],
-      'riskClassifier': [13],
+      'epsName': [13, 14, 135],
+      'riskClassifier': [13, 135],
       'resolutionOfThePension': [15]
     };
     return documentValidationMap[controlName]?.includes(this.idDocumentType);
   }
 
+   /**
+    * Valida el tipo de documento que se va a editar
+    */
+   validateDocumentType() { }
+
+   getExpeditionTooltipContent(): string {
+      const restriction = this.expeditionDateRestrictions[this.idDocumentType];
+      switch (restriction) {
+        case 'lastMonth':
+          return 'Debe ser no mayor a un mes.';
+        case 'currentYear':
+          return 'Debe ser del año inmediatamente presente.';
+        case 'last3Years':
+          return 'Debe ser no mayor a tres años.';
+        case 'last3Months':
+          return 'Debe ser no mayor a tres meses.';
+        default:
+          return '';
+      }
+    }
+
+   /**
+    *
+    * @param current Bloquea las fechas antes de la fecha actual, habilita por un año y bloquea fechas posterior (para fecha de expedición)
+    * @returns
+    */
+   disableExpeditionDates = (current: Date): boolean => {
+      current.setHours(0, 0, 0, 0);
+      const restriction = this.expeditionDateRestrictions[this.idDocumentType];
+      if (!restriction) return false;
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      switch (restriction) {
+        case 'lastMonth':
+          const lastMonth = new Date(today);
+          lastMonth.setMonth(today.getMonth() - 1);
+          return current < lastMonth || current > today;
+
+        case 'last3Months':
+          const threeMonthsAgo = new Date(today);
+          threeMonthsAgo.setMonth(today.getMonth() - 3);
+          return current < threeMonthsAgo || current > today;
+
+        case 'currentYear':
+          const startOfYear = new Date(today.getFullYear(), 0, 1);
+          return current < startOfYear || current > today;
+
+        case 'last3Years':
+          const threeYearsAgo = new Date(today);
+          threeYearsAgo.setFullYear(today.getFullYear() - 3);
+          return current < threeYearsAgo || current > today;
+
+        default:
+          return false;
+      }
+   };
+
   patchForm() {
     const item = this.currentDoc;
 
     this.documentForm.patchValue({
+      software: item.software,
       consultationDate: this.convertDate(item.consultationDate),
       dateDiligence: this.convertDate(item.dateDiligence),
       dateFirm: this.convertDate(item.dateFirm),
@@ -138,40 +233,6 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
       validityStartDate: this.convertDate(item.validityStartDate)
     });
   }
-
-  getTooltipContent() {
-    if (this.idDocumentType === 4) {
-      return 'Debe ser del año inmediatamente presente.';
-    } else if (this.idDocumentType === 108 || this.idDocumentType === 113) {
-      return 'Debe ser no mayor a un mes.';
-    }
-    return '';
-  }
-
-  /**
-   *
-   * @param current Bloquea las fechas antes de la fecha actual, habilita por un año y bloquea fechas posterior (para fecha de expedición)
-   * @returns
-   */
-  disableDates = (current: Date): boolean => {
-    current.setHours(0, 0, 0, 0);
-    const withRestriction = [4, 113, 108, 110, 111];
-    if (!withRestriction.includes(this.idDocumentType)) {
-      return false;
-    }
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    if (this.idDocumentType === 108 || this.idDocumentType === 113) {
-      // Restriction by last month
-      const lastMonth = new Date(today);
-      lastMonth.setMonth(today.getMonth() - 1);
-      return current < lastMonth || current > today;
-    }
-    // Restriction by current year
-    const startOfYear = new Date(today.getFullYear(), 0, 1);
-    return current < startOfYear || current > today;
-  };
 
   /**
   * Carga un archivo y lo envia al api de carga de documentos

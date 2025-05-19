@@ -399,11 +399,10 @@ export class ContactFormComponent implements OnInit {
       type: [phone?.type || '', [Validators.required]],
       number: [
         phone?.number || '',
-        [Validators.required, this.formUtils.numeric, this.phoneNumberValidator]
+        [Validators.required, this.formUtils.telephoneNumber, this.phoneNumberValidator]
       ],
       extension: [
-        phone?.extension || null,
-        [this.extensionValidator]
+        phone?.extension || null
       ],
       idCity: [phone == null && this.officeIdCity ? this.officeIdCity : phone?.idCity || null],
       status: [phone ? phone.status || null : 'created'] // updated, created, null for existing phones
@@ -457,14 +456,6 @@ export class ContactFormComponent implements OnInit {
     }
     if (type === 'Fijo' && (number.length < 6 || number.length > 15)) {
       return { invalidLength: 'Debe tener entre 6 y 15 dígitos.' };
-    }
-    return null;
-  }
-  extensionValidator(control: AbstractControl): ValidationErrors | null {
-    const value: string = control.value;
-    const regex = /^[0-9#*]+$/;
-    if (value && !regex.test(value)) {
-      return { invalidExtension: 'Solo números, # y *' };
     }
     return null;
   }

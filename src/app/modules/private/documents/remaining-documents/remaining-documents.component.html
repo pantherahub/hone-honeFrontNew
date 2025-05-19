@@ -1,6 +1,5 @@
 <div class="generalContainer">
 
-
     @if (loadingData) {
     <div class="centerContent">
         <nz-spin nzSimple [nzSize]="'large'" nzTip="Cargando datos..."></nz-spin>
@@ -8,7 +7,6 @@
     } @else {
 
         @if (!loadingData && documentList.length > 0) {
-
             <div class="container-alerts">
               <nz-alert
                 nzType="warning"
@@ -27,21 +25,17 @@
                 @for (item of documentList; track item; let i = $index) {
                   <div class="custom-file-upload rounded cursor-pointer" (click)="uploadDocumentModal(item)">
                     <img class="custom-file-upload__img" src="../../../../../assets/img/warning.png" alt="">
-                      {{ item.NameDocument }}
+                      {{ item.NameDocument | formatNameDoc }}
                   </div>
                 }
             </div>
-
         } @else {
-
             <div nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
                 <h2 nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24">
                     No hay Documentos
                 </h2>
             </div>
-
         }
-
     }
 
 </div>

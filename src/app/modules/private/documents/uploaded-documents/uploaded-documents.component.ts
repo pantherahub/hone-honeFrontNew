@@ -146,7 +146,8 @@ export class UploadedDocumentsComponent implements OnInit {
       modal.afterClose.subscribe((result: any) => {
          if (result) {
             if (result.response) {
-               this.getUploadedDocuments();
+              this.getUploadedDocuments();
+              this.eventManager.getPercentApi.set(this.counterApi + 1);
             }
          }
       });
