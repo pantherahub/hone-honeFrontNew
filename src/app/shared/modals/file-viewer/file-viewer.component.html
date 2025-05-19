@@ -1,6 +1,6 @@
 <nz-modal
   [nzVisible]="visible"
-  [nzTitle]="currentItem?.NameDocument || 'No especifica'"
+  [nzTitle]="(currentItem?.NameDocument | formatNameDoc) || 'No especifica'"
   [nzFooter]="null"
   [nzWidth]="'800px'"
   [nzClassName]="'custom-modal'"

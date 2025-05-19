@@ -1,4 +1,5 @@
 import { Directive, HostListener, ElementRef, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import { AlertService } from '../services/alerts/alert.service';
 
 @Directive({
   selector: '[appFileValidator]',
@@ -9,27 +10,32 @@ export class FileValidatorDirective implements OnInit {
   @Input() allowedExtensions: string[] = [];
   @Output() fileValidated: EventEmitter<File> = new EventEmitter();
 
-  private defaultExtensions: string[] = [
-    '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.png', '.jpeg', '.jpg'
-  ];
+  private extensionToMimeType: { [ext: string]: string } = {
+    '.pdf': 'application/pdf',
+    '.doc': 'application/msword',
+    '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    '.xls': 'application/vnd.ms-excel',
+    '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    '.png': 'image/png',
+    '.jpeg': 'image/jpeg',
+    '.jpg': 'image/jpeg'
+  };
+  private validMimeTypes: string[] = [];
 
-  private validMimeTypes = [
-    'application/pdf',            // .pdf
-    'application/msword',         // .doc
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
-    'application/vnd.ms-excel',   // .xls
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
-    'image/png',                  // .png
-    'image/jpeg',                 // .jpeg, .jpg
-  ];
-
-  constructor(private el: ElementRef) {}
+  constructor(
+    private el: ElementRef,
+    private alertService: AlertService,
+  ) { }
 
   ngOnInit() {
     // Default extensions
     if (this.allowedExtensions.length === 0) {
-      this.allowedExtensions = this.defaultExtensions;
+      this.allowedExtensions = Object.keys(this.extensionToMimeType);
     }
+
+    this.validMimeTypes = this.allowedExtensions
+      .map(ext => this.extensionToMimeType[ext])
+      .filter((type): type is string => !!type);
 
     const inputElement: HTMLInputElement = this.el.nativeElement;
     // Set accept attribute
@@ -45,7 +51,7 @@ export class FileValidatorDirective implements OnInit {
     if (this.isFileTypeValid(file)) {
       this.fileValidated.emit(file);
     } else {
-      alert(`Archivo no permitido: ${file.name}`);
+      this.alertService.error('Oops...', `Archivo no permitido: ${file.name}`);
       // Reset input if file is invalid
       input.value = '';
     }

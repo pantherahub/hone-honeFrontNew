@@ -477,6 +477,7 @@ export class OfficeModalComponent implements OnInit {
       nzContent: ContactFormComponent,
       nzCentered: true,
       nzClosable: true,
+      nzMaskClosable: false,
       nzWidth: '650px',
       nzStyle: { 'max-width': '90%', 'margin': '22px 0' }
     });
