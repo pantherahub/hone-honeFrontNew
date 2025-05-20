@@ -67,7 +67,12 @@
                         }
 
                         <div class="flex flex-col">
-                          <button nz-button nzType="dashed" type="button" (click)="triggerFileInput(i)">
+                          <button
+                            nz-button
+                            nzType="dashed"
+                            type="button"
+                            (click)="triggerFileInput(i)"
+                            [nz-tooltip]="item.idTypeDocuments === 131 ? 'Debes de consolidar los certificados en un solo pdf' : null">
                             Cargar +
                           </button>
                           <input
