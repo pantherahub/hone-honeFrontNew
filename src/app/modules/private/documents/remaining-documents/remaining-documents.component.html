@@ -29,7 +29,7 @@
                       <div class="custom-file-upload gap-2">
                         <label class="custom-file-upload__fileinput">
                           <img src="../../../../../assets/img/warning.png" alt="">
-                          {{ item.NameDocument | formatNameDoc }}
+                          {{ item.NameDocument | formatNameDoc:item.idTypeDocuments }}
                         </label>
 
                         @if (hasExpirationField(item.idTypeDocuments)) {
@@ -67,7 +67,12 @@
                         }
 
                         <div class="flex flex-col">
-                          <button nz-button nzType="dashed" type="button" (click)="triggerFileInput(i)">
+                          <button
+                            nz-button
+                            nzType="dashed"
+                            type="button"
+                            (click)="triggerFileInput(i)"
+                            [nz-tooltip]="item.idTypeDocuments === 131 ? 'Debes de consolidar los certificados en un solo pdf' : null">
                             Cargar +
                           </button>
                           <input
