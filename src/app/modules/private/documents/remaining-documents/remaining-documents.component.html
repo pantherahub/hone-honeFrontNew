@@ -29,7 +29,7 @@
                       <div class="custom-file-upload gap-2">
                         <label class="custom-file-upload__fileinput">
                           <img src="../../../../../assets/img/warning.png" alt="">
-                          {{ item.NameDocument | formatNameDoc }}
+                          {{ item.NameDocument | formatNameDoc:item.idTypeDocuments }}
                         </label>
 
                         @if (hasExpirationField(item.idTypeDocuments)) {

@@ -14,7 +14,7 @@
         @for (item of documentList; track $index) {
 
         <div class="custom-file-upload">
-            <nz-card [nzTitle]="item.NameDocument | formatNameDoc" [nzActions]="[actionSetting, actionEdit, actionDelete]">
+            <nz-card [nzTitle]="item.NameDocument | formatNameDoc:item.idTypeDocuments" [nzActions]="[actionSetting, actionEdit, actionDelete]">
                 <div style="display: flex; flex-direction: column; gap: 0.5rem;">
                     <span>{{ item.nameDocument }}</span>
                     <span>{{ item.dateAdd | date: 'dd/MM/yyyy' }}</span>
