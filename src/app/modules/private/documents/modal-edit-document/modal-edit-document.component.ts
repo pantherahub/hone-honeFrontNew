@@ -53,7 +53,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
     110: 'currentYear',
     111: 'currentYear',
     137: 'last3Years',
-    134: 'last3Months'
+    134: 'currentYear'
   };
 
    constructor (

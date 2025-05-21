@@ -518,6 +518,13 @@
                 </label>
             </div>
 
+            <nz-alert
+                *ngIf="idDocumentType == 131"
+                class="mt-3"
+                nzType="warning"
+                nzMessage="Debes de consolidar los certificados en un solo pdf."
+            ></nz-alert>
+
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
                 style="text-align: center; margin-top: 3rem;">
                 <button type="submit" nz-button nzType="primary" class="btn-primary custom-btn" [disabled]="false"

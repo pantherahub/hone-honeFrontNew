@@ -25,7 +25,7 @@
                 @for (item of documentList; track item; let i = $index) {
                   <div class="custom-file-upload rounded cursor-pointer" (click)="uploadDocumentModal(item)">
                     <img class="custom-file-upload__img" src="../../../../../assets/img/warning.png" alt="">
-                      {{ item.NameDocument | formatNameDoc }}
+                      {{ item.NameDocument | formatNameDoc:item.idTypeDocuments }}
                   </div>
                 }
             </div>
