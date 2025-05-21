@@ -43,17 +43,17 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
     'LIBERTY SEGUROS DE VIDA S.A', 'MAPFRE', 'POSITIVA ARP',
   ];
 
-  expeditionDateRestrictions: { [key: number]: 'lastMonth' | 'currentYear' | 'last3Years' | 'last3Months' } = {
+  expeditionDateRestrictions: { [key: number]: 'lastMonth' | 'currentYear' | 'last3Years' | 'last2Months' } = {
     108: 'lastMonth',
     113: 'lastMonth',
-    135: 'lastMonth',
     139: 'lastMonth',
-    140: 'lastMonth',
+    140: 'last2Months',
     4: 'currentYear',
     110: 'currentYear',
     111: 'currentYear',
+    134: 'currentYear',
+    135: 'currentYear',
     137: 'last3Years',
-    134: 'currentYear'
   };
 
    constructor (
@@ -159,8 +159,8 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
           return 'Debe ser del año inmediatamente presente.';
         case 'last3Years':
           return 'Debe ser no mayor a tres años.';
-        case 'last3Months':
-          return 'Debe ser no mayor a tres meses.';
+        case 'last2Months':
+          return 'Debe ser no mayor a dos meses.';
         default:
           return '';
       }
@@ -185,10 +185,10 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
           lastMonth.setMonth(today.getMonth() - 1);
           return current < lastMonth || current > today;
 
-        case 'last3Months':
-          const threeMonthsAgo = new Date(today);
-          threeMonthsAgo.setMonth(today.getMonth() - 3);
-          return current < threeMonthsAgo || current > today;
+        case 'last2Months':
+          const twoMonthsAgo = new Date(today);
+          twoMonthsAgo.setMonth(today.getMonth() - 2);
+          return current < twoMonthsAgo || current > today;
 
         case 'currentYear':
           const startOfYear = new Date(today.getFullYear(), 0, 1);
