@@ -9,6 +9,7 @@ import { EventManagerService } from '../../../../services/events-manager/event-m
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { FileValidatorDirective } from 'src/app/directives/file-validator.directive';
 import { DatePickerInputComponent } from 'src/app/shared/forms/date-picker-input/date-picker-input.component';
+import { AlertService } from 'src/app/services/alerts/alert.service';
 
 @Component({
    selector: 'app-modal-edit-document',
@@ -63,7 +64,8 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
       private formBuilder: FormBuilder,
       private notificationService: NzNotificationService,
       private documentService: DocumentsCrudService,
-      private eventManager: EventManagerService
+      private eventManager: EventManagerService,
+      private alertService: AlertService,
    ) {
       // this.createForm();
    }
@@ -288,9 +290,14 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
             this.createNotificacion('success', 'Documento actualizado', 'El documento se actualizó correctamente.');
             this.destroyModal(true);
          },
-         error: (error: any) => {
-            this.createNotificacion('error', 'Error', 'Lo sentimos, hubo un error en el servidor.');
-            this.loader = false;
+        error: (err: any) => {
+          this.loader = false;
+          const msg = err.error && err.error.message;
+          if (err.status == 400 && msg) {
+            this.alertService.error('Oops...', msg);
+            return;
+          }
+          this.createNotificacion('error', 'Error', 'Lo sentimos, hubo un error en el servidor.');
          },
          complete: () => {}
       });
