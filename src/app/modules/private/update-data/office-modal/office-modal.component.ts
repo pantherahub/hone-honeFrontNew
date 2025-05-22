@@ -198,6 +198,7 @@ export class OfficeModalComponent implements OnInit {
       name: [this.office?.name || '', [Validators.required]],
       cityName: [this.office?.cityName || this.office?.City?.city || ''],
       schedulingLink: [this.office?.schedulingLink || '', [this.formUtils.url]],
+      emailGlosas: [this.office?.emailGlosas || '', [this.formUtils.emailValidator]],
       idsCompanies: [this.getIdsCompanies(), [Validators.required]],
 
       updatedSchedules: this.fb.array(this.office?.updatedSchedules ?? []),
@@ -585,8 +586,10 @@ export class OfficeModalComponent implements OnInit {
     }
 
     const schedulingLink = this.officeForm.get('schedulingLink')?.value?.toLowerCase() || null;
+    const emailGlosas = this.officeForm.get('emailGlosas')?.value?.toLowerCase() || null;
     this.officeForm.patchValue({
       schedulingLink: schedulingLink,
+      emailGlosas: emailGlosas,
     });
 
     this.modal.close({
