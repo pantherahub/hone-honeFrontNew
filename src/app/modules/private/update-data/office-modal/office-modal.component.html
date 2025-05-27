@@ -73,6 +73,20 @@
 
       <nz-col [nzSpan]="24" [nzSm]="12">
         <nz-form-item>
+          <nz-form-label nzFor="emailGlosas">Correo glosas</nz-form-label>
+          <nz-form-control [nzErrorTip]="emailGlosasErrorTip">
+            <ng-template #emailGlosasErrorTip>
+              @if (officeForm.controls['emailGlosas'].hasError('invalidEmail')) {
+                <p>Ingresa un correo válido.</p>
+              }
+            </ng-template>
+            <input nz-input id="emailGlosas" formControlName="emailGlosas" placeholder="Correo" />
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+
+      <nz-col [nzSpan]="24" [nzSm]="12">
+        <nz-form-item>
           <nz-form-label [nzRequired]="true" nzFor="idsCompanies">Compañías con convenio</nz-form-label>
           <nz-form-control [nzErrorTip]="idsCompaniesErrorTip" nzExtra="Puede seleccionar una o varias.">
             <ng-template #idsCompaniesErrorTip>
