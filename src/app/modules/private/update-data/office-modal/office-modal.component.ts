@@ -14,11 +14,12 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { AlertService } from 'src/app/services/alerts/alert.service';
 import { ScheduleFormComponent } from './schedule-form/schedule-form.component';
 import { AddressFormComponent } from './address-form/address-form.component';
+import { DatePickerInputComponent } from 'src/app/shared/forms/date-picker-input/date-picker-input.component';
 
 @Component({
   selector: 'app-office-modal',
   standalone: true,
-  imports: [NgZorroModule, CommonModule],
+  imports: [NgZorroModule, CommonModule, DatePickerInputComponent],
   templateUrl: './office-modal.component.html',
   styleUrl: './office-modal.component.scss'
 })
@@ -194,11 +195,15 @@ export class OfficeModalComponent implements OnInit {
       idAddedTemporal: [this.office?.idTemporalOfficeProvider ? null : this.office?.idAddedTemporal ?? Date.now().toString()],
       idCity: [this.office?.idCity || '', [Validators.required]],
       address: [this.office?.address || null, [Validators.required]],
-      enableCode: [this.office?.enableCode || '', [Validators.required, this.formUtils.numeric, this.enableCodeValidator]],
       name: [this.office?.name || '', [Validators.required]],
       cityName: [this.office?.cityName || this.office?.City?.city || ''],
       schedulingLink: [this.office?.schedulingLink || '', [this.formUtils.url]],
       emailGlosas: [this.office?.emailGlosas || '', [this.formUtils.emailValidator]],
+
+      enableCode: [this.office?.enableCode || '', [this.formUtils.numeric, this.enableCodeValidator]],
+      enableStartDateCode: [this.office?.enableStartDateCode || null, []],
+      enableEndDateCode: [this.office?.enableEndDateCode || null, []],
+
       idsCompanies: [this.getIdsCompanies(), [Validators.required]],
 
       updatedSchedules: this.fb.array(this.office?.updatedSchedules ?? []),
@@ -210,6 +215,8 @@ export class OfficeModalComponent implements OnInit {
       deletedContacts: this.fb.array(this.office?.deletedContacts ?? []),
 
       TemporalSchedules: [this.office?.TemporalSchedules], // Save schedules state
+    }, {
+        validators: [this.formUtils.validateDateRange('enableStartDateCode', 'enableEndDateCode', true)],
     });
 
     if (this.office) {
@@ -245,6 +252,10 @@ export class OfficeModalComponent implements OnInit {
         this.updateCity(newIdCity);
         previousCityId = newIdCity;
       });
+  }
+
+  get enableCode() {
+    return this.officeForm.get('enableCode')?.value;
   }
 
   enableCodeValidator(control: AbstractControl) {

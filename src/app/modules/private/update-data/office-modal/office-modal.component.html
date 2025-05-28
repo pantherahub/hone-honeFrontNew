@@ -31,24 +31,6 @@
 
       <nz-col [nzSpan]="24" [nzSm]="12">
         <nz-form-item>
-          <nz-form-label [nzRequired]="true" nzFor="enableCode">Código habilitación</nz-form-label>
-          <nz-form-control [nzErrorTip]="enableCodeErrorTip">
-            <ng-template #enableCodeErrorTip>
-              @if (officeForm.controls['enableCode'].hasError('required')) {
-                El campo es requerido.
-              } @else if (officeForm.controls['enableCode'].hasError('invalidNumber')) {
-                Solo se permiten números.
-              } @else if (officeForm.controls['enableCode'].hasError('invalidLength')) {
-                {{ officeForm.controls['enableCode'].errors?.['invalidLength'] }}
-              }
-            </ng-template>
-            <input nz-input id="enableCode" formControlName="enableCode" placeholder="Código" />
-          </nz-form-control>
-        </nz-form-item>
-      </nz-col>
-
-      <nz-col [nzSpan]="24" [nzSm]="12">
-        <nz-form-item>
           <nz-form-label [nzRequired]="true" nzFor="officeName">Nombre</nz-form-label>
           <nz-form-control [nzErrorTip]="nameErrorTip">
             <ng-template #nameErrorTip>
@@ -84,6 +66,64 @@
           </nz-form-control>
         </nz-form-item>
       </nz-col>
+
+      <nz-col [nzSpan]="24" [nzSm]="12">
+        <nz-form-item>
+          <nz-form-label nzFor="enableCode">Código habilitación</nz-form-label>
+          <nz-form-control [nzErrorTip]="enableCodeErrorTip">
+            <ng-template #enableCodeErrorTip>
+              @if (officeForm.controls['enableCode'].hasError('invalidNumber')) {
+                Solo se permiten números.
+              } @else if (officeForm.controls['enableCode'].hasError('invalidLength')) {
+                {{ officeForm.controls['enableCode'].errors?.['invalidLength'] }}
+              }
+            </ng-template>
+            <input nz-input id="enableCode" formControlName="enableCode" placeholder="Código" />
+          </nz-form-control>
+        </nz-form-item>
+      </nz-col>
+
+      <ng-container *ngIf="enableCode">
+        <nz-col [nzSpan]="24" [nzSm]="12">
+          <nz-form-item>
+            <nz-form-label class="form-label" nzFor="enableStartDateCode">
+              Expedición Habilitación
+            </nz-form-label>
+
+            <nz-form-control [nzErrorTip]="enableStartDateCodeErrorTip">
+              <ng-template #enableStartDateCodeErrorTip>
+                @if (officeForm.hasError('startDateRequired')) {
+                  Este campo es requerido porque tiene una fecha de vencimiento.
+                }
+              </ng-template>
+              <app-date-picker-input
+                formControlName="enableStartDateCode">
+              </app-date-picker-input>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+
+        <nz-col [nzSpan]="24" [nzSm]="12">
+          <nz-form-item>
+            <nz-form-label class="form-label" nzFor="enableEndDateCode">
+              Vencimiento Habilitación
+            </nz-form-label>
+
+            <nz-form-control [nzErrorTip]="enableEndDateCodeErrorTip">
+              <ng-template #enableEndDateCodeErrorTip>
+                @if (officeForm.hasError('endDateRequired')) {
+                  Este campo es requerido porque tiene una fecha de expedición.
+                } @else if (officeForm.hasError('invalidDateRange')) {
+                  La fecha de vencimiento no puede ser menor a la fecha de expedición.
+                }
+              </ng-template>
+              <app-date-picker-input
+                formControlName="enableEndDateCode">
+              </app-date-picker-input>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+      </ng-container>
 
       <nz-col [nzSpan]="24" [nzSm]="12">
         <nz-form-item>

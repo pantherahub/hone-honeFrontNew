@@ -186,4 +186,51 @@ export class FormUtilsService {
         .join(' ');
   }
 
+  /**
+   * Validates date ranges.
+   * @param startField - The name of the initial date field.
+   * @param endField - The name of the final date field.
+   * @param bothRequired - If both dates are required when one is filled out.
+   * @param untilToday - Whether dates must be up to today.
+   */
+  validateDateRange(
+    startField: string,
+    endField: string,
+    bothRequired: boolean = false,
+    untilToday: boolean = false,
+    errorPrefix: string = '',
+  ) {
+    return (formGroup: AbstractControl): ValidationErrors | null => {
+      const startDateControl = formGroup.get(startField);
+      const endDateControl = formGroup.get(endField);
+
+      if (!startDateControl || !endDateControl) return null;
+
+      const parseDate = (value: any) => (value ? new Date(value + "T00:00:00") : null);
+      const startDate = parseDate(startDateControl.value);
+      const endDate = parseDate(endDateControl.value);
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      // Prefix to keep error names unique in forms
+      const prefix = errorPrefix ? `${errorPrefix}_` : '';
+
+      if (untilToday) {
+        if (startDate && startDate > today) return { [`${prefix}invalidStartDate`]: true };
+        if (endDate && endDate > today) return { [`${prefix}invalidEndDate`]: true };
+      }
+
+      if (bothRequired) {
+        if (!startDate && endDate) return { [`${prefix}startDateRequired`]: true };
+        if (startDate && !endDate) return { [`${prefix}endDateRequired`]: true };
+      }
+
+      if (startDate && endDate && endDate < startDate) {
+        return { [`${prefix}invalidDateRange`]: true };
+      }
+      return null; // Validation passes
+    };
+  }
+
 }
