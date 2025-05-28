@@ -106,7 +106,8 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
          lastDosimetryDate: [ '', [Validators.required] ],
          epsName: [ '', [Validators.required] ],
          riskClassifier: [ '', [Validators.required] ],
-         resolutionOfThePension: [ '', [Validators.required] ]
+         resolutionOfThePension: ['', [Validators.required]],
+         tipodocumento: [ '' ],
       });
 
       // Clear validations of fields that do not apply
@@ -178,7 +179,8 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
          receptionDate: this.convertDate(item.receptionDate),
          resolutionOfThePension: item.resolutionOfThePension,
          riskClassifier: item.riskClassifier,
-         validityStartDate: this.convertDate(item.validityStartDate)
+         validityStartDate: this.convertDate(item.validityStartDate),
+         tipodocumento: item.idTypeDocuments,
       });
    }
 
