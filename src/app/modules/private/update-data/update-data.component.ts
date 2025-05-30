@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
@@ -49,6 +49,9 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
   backendError: any = null;
 
   private formSubscription: any;
+
+  showFloatingButton = true;
+  @ViewChild('footerButton') footerButton!: ElementRef;
 
   constructor (
     private eventManager: EventManagerService,
@@ -123,6 +126,41 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
   unsubscribeForm() {
     if (this.formSubscription) {
       this.formSubscription.unsubscribe();
+    }
+  }
+
+  @HostListener('window:scroll', [])
+  onWindowScroll() {
+    if (!this.footerButton) return;
+
+    const rect = this.footerButton.nativeElement.getBoundingClientRect();
+    const isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
+
+    this.showFloatingButton = !isVisible;
+  }
+
+  scrollToFooter(): void {
+    this.footerButton?.nativeElement?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    this.highlightSubmitBtn();
+  }
+
+  highlightSubmitBtn() {
+    const element = this.footerButton?.nativeElement;
+    if (element) {
+      setTimeout(() => {
+        element.classList.add(
+          'ring-2',
+          'ring-green-400',
+          'ring-offset-2',
+          'scale-105',
+          'transition',
+          'duration-500'
+        );
+      }, 280);
+
+      setTimeout(() => {
+        element.classList.remove('ring-2', 'ring-green-400', 'ring-offset-2', 'scale-105');
+      }, 2000);
     }
   }
 

@@ -24,8 +24,12 @@
             <nz-alert
               nzType="warning"
               nzCloseable
-              nzMessage="Asegúrate de hacer el envío de todo el formulario para ver reflejados los cambios."
+              [nzMessage]="alertDescription"
             ></nz-alert>
+            <ng-template #alertDescription>
+              Asegúrate de hacer el envío de todo el formulario para ver reflejados los cambios.
+              <a (click)="scrollToFooter()" class="text-blue-600 hover:underline cursor-pointer">Ir al botón de envío</a>.
+            </ng-template>
           </div>
 
           <div nz-row [nzGutter]="16">
@@ -221,10 +225,24 @@
         <app-backend-errors [error]="backendError"></app-backend-errors>
 
         <div class="update-data__footer">
-          <button class="btn-primary bg-green-500 hover:bg-green-500/80" type="submit" [disabled]="loading">Actualizar datos</button>
+          <button #footerButton class="btn-primary bg-green-500 hover:bg-green-500/80" type="submit" [disabled]="loading">Actualizar datos</button>
         </div>
       </form>
 
     </div>
   </nz-col>
 </nz-row>
+
+
+<button
+  [ngClass]="{
+    'opacity-100 pointer-events-auto': showFloatingButton,
+    'opacity-0 pointer-events-none': !showFloatingButton
+  }"
+  class="fixed bottom-6 right-6 lg:bottom-10 lg:right-10 z-50 bg-blue-600 text-white rounded-full p-3 shadow-lg hover:bg-blue-700 transition-opacity duration-500 ease-in-out"
+  (click)="scrollToFooter()"
+>
+  <svg width="20" height="20">
+    <use xlink:href="/assets/icons/layout.svg#angle-down" />
+  </svg>
+</button>
