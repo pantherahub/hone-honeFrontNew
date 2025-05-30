@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
@@ -15,6 +15,9 @@ import { format } from 'date-fns';
 import { BackendErrorsComponent } from 'src/app/shared/forms/backend-errors/backend-errors.component';
 import { debounceTime, firstValueFrom } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
+import { CanComponentDeactivate } from 'src/app/guards/can-deactivate.interface';
+import { Router } from '@angular/router';
+import { NavigationService } from 'src/app/services/navigation/navigation.service';
 
 @Component({
   selector: 'app-update-data',
@@ -23,7 +26,7 @@ import { AuthService } from 'src/app/services/auth.service';
   templateUrl: './update-data.component.html',
   styleUrl: './update-data.component.scss'
 })
-export class UpdateDataComponent implements OnInit, OnDestroy {
+export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeactivate {
 
   user = this.eventManager.userLogged();
   providerForm!: FormGroup;
@@ -45,7 +48,6 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
   loading: boolean = false;
   backendError: any = null;
 
-  autoSaveInterval: any;
   private formSubscription: any;
 
   constructor (
@@ -57,7 +59,9 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     private modalService: NzModalService,
     private clientProviderService: ClientProviderService,
     private location: Location,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router,
+    private navigationService: NavigationService,
   ) { }
 
   ngOnInit(): void {
@@ -74,6 +78,21 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.unsubscribeForm();
+  }
+
+  async canDeactivate(): Promise<boolean> {
+    return !this.hasSavedState() || await this.alertService.confirm(
+      'Aviso', 'Tienes cambios pendientes. ¿Deseas salir?', {
+        nzOkText: 'Salir',
+        nzCancelText: 'Cancelar',
+    });
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  handleUnload($event: BeforeUnloadEvent): void {
+    if (this.hasSavedState()) {
+      $event.preventDefault();
+    }
   }
 
   subscribeOnChange() {
@@ -172,8 +191,9 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  goBack(): void {
-    this.location.back();
+  async goBack(): Promise<void> {
+    const backRoute = this.navigationService.getBackRoute();
+    this.router.navigateByUrl(backRoute);
   }
 
   isValidEmail(email: string | undefined): boolean {
@@ -418,7 +438,25 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       nzClosable: true,
       nzMaskClosable: false,
       nzWidth: '900px',
-      nzStyle: { 'max-width': '90%', 'margin': '22px 0' }
+      nzStyle: { 'max-width': '90%', 'margin': '22px 0' },
+      nzOnCancel: () => {
+        const componentInstance = modalRef.getContentComponent();
+        if (componentInstance.hasChanges) {
+          this.alertService.confirm(
+            'Cambios sin guardar',
+            'Tienes cambios en la sede. Si sales sin guardar, se perderán.',
+            {
+              nzOkText: 'Salir',
+              nzCancelText: 'Cancelar',
+              nzOnOk: () => {
+                modalRef.destroy();
+              },
+            }
+          );
+          return false;
+        }
+        return true; // Close modal
+      }
     });
     const instanceModal = modalRef.getContentComponent();
     if (office) {
@@ -475,7 +513,25 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       nzClosable: true,
       nzMaskClosable: false,
       nzWidth: '650px',
-      nzStyle: { 'max-width': '90%', 'margin': '22px 0' }
+      nzStyle: { 'max-width': '90%', 'margin': '22px 0' },
+      nzOnCancel: () => {
+        const componentInstance = modalRef.getContentComponent();
+        if (componentInstance.hasChanges) {
+          this.alertService.confirm(
+            'Cambios sin guardar',
+            'Tienes cambios en el contacto. Si sales sin guardar, se perderán.',
+            {
+              nzOkText: 'Salir',
+              nzCancelText: 'Cancelar',
+              nzOnOk: () => {
+                modalRef.destroy();
+              },
+            }
+          );
+          return false;
+        }
+        return true; // Close modal
+      }
     });
     const instanceModal = modalRef.getContentComponent();
     instanceModal.contactModelType = 'Prestador';

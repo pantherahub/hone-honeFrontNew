@@ -83,14 +83,14 @@ export class FormUtilsService {
   /**
    * Validate and mark an entire form recursively.
    */
-  markFormTouched(control: AbstractControl) {
+  markFormTouched(control: AbstractControl, propagateToParent: boolean = false) {
     if (control instanceof FormGroup || control instanceof FormArray) {
       // Recursive call
-      Object.values(control.controls).forEach(ctrl => this.markFormTouched(ctrl));
+      Object.values(control.controls).forEach(ctrl => this.markFormTouched(ctrl, propagateToParent));
     } else {
       control.markAsTouched();
       control.markAsDirty();
-      control.updateValueAndValidity({ onlySelf: true });
+      control.updateValueAndValidity({ onlySelf: !propagateToParent });
     }
   }
 
@@ -190,21 +190,39 @@ export class FormUtilsService {
    * Validates date ranges.
    * @param startField - The name of the initial date field.
    * @param endField - The name of the final date field.
+   * @param errorPrefix - Prefix to identify range in form.
    * @param bothRequired - If both dates are required when one is filled out.
    * @param untilToday - Whether dates must be up to today.
    */
   validateDateRange(
     startField: string,
     endField: string,
+    errorPrefix: string,
     bothRequired: boolean = false,
     untilToday: boolean = false,
-    errorPrefix: string = '',
   ) {
     return (formGroup: AbstractControl): ValidationErrors | null => {
       const startDateControl = formGroup.get(startField);
       const endDateControl = formGroup.get(endField);
 
       if (!startDateControl || !endDateControl) return null;
+
+      // Const to clear errors
+      const cleanErrors = (control: AbstractControl, prefix: string) => {
+        const currentErrors = control.errors || {};
+        Object.keys(currentErrors)
+          .filter(key => key.startsWith(prefix))
+          .forEach(key => delete currentErrors[key]);
+
+        control.setErrors(Object.keys(currentErrors).length ? currentErrors : null);
+      };
+
+      // Const to set errors
+      const setError = (control: AbstractControl, errorKey: string) => {
+        const currentErrors = control.errors || {};
+        currentErrors[errorKey] = true;
+        control.setErrors(currentErrors);
+      };
 
       const parseDate = (value: any) => (value ? new Date(value + "T00:00:00") : null);
       const startDate = parseDate(startDateControl.value);
@@ -213,24 +231,44 @@ export class FormUtilsService {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-      // Prefix to keep error names unique in forms
       const prefix = errorPrefix ? `${errorPrefix}_` : '';
 
+      // Clear previous errors
+      cleanErrors(startDateControl, prefix);
+      cleanErrors(endDateControl, prefix);
+
+      let hasError = false;
+
       if (untilToday) {
-        if (startDate && startDate > today) return { [`${prefix}invalidStartDate`]: true };
-        if (endDate && endDate > today) return { [`${prefix}invalidEndDate`]: true };
+        if (startDate && startDate > today) {
+          setError(startDateControl, `${prefix}invalidStartDate`);
+          hasError = true;
+        }
+        if (endDate && endDate > today) {
+          setError(endDateControl, `${prefix}invalidEndDate`);
+          hasError = true;
+        }
       }
 
       if (bothRequired) {
-        if (!startDate && endDate) return { [`${prefix}startDateRequired`]: true };
-        if (startDate && !endDate) return { [`${prefix}endDateRequired`]: true };
+        if (!startDate && endDate) {
+          setError(startDateControl, `${prefix}startDateRequired`);
+          hasError = true;
+        }
+        if (startDate && !endDate) {
+          setError(endDateControl, `${prefix}endDateRequired`);
+          hasError = true;
+        }
       }
 
       if (startDate && endDate && endDate < startDate) {
-        return { [`${prefix}invalidDateRange`]: true };
+        setError(endDateControl, `${prefix}invalidDateRange`);
+        hasError = true;
       }
-      return null; // Validation passes
+
+      return hasError ? {} : null;
     };
   }
+
 
 }

@@ -92,7 +92,7 @@
 
             <nz-form-control [nzErrorTip]="enableStartDateCodeErrorTip">
               <ng-template #enableStartDateCodeErrorTip>
-                @if (officeForm.hasError('startDateRequired')) {
+                @if (officeForm.controls['enableStartDateCode'].hasError('enableDateRange_startDateRequired')) {
                   Este campo es requerido porque tiene una fecha de vencimiento.
                 }
               </ng-template>
@@ -111,9 +111,9 @@
 
             <nz-form-control [nzErrorTip]="enableEndDateCodeErrorTip">
               <ng-template #enableEndDateCodeErrorTip>
-                @if (officeForm.hasError('endDateRequired')) {
+                @if (officeForm.controls['enableEndDateCode'].hasError('enableDateRange_endDateRequired')) {
                   Este campo es requerido porque tiene una fecha de expedición.
-                } @else if (officeForm.hasError('invalidDateRange')) {
+                } @else if (officeForm.controls['enableEndDateCode'].hasError('enableDateRange_invalidDateRange')) {
                   La fecha de vencimiento no puede ser menor a la fecha de expedición.
                 }
               </ng-template>
@@ -215,7 +215,7 @@
 
   </div>
   <div class="footer">
-    <button nz-button nzType="primary" type="submit">
+    <button class="btn-primary bg-green-500 hover:bg-green-500/80" type="submit">
       {{ office ? 'Actualizar' : 'Guardar' }}
     </button>
   </div>
