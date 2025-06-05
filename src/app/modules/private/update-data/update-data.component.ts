@@ -191,7 +191,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.clientProviderService.getClientListByProviderId(this.user.id).subscribe({
       next: (res: any) => {
-        const clientList = res;
+        const clientList = res.filter((client: any) => client.active);
         const clientsIds = clientList.map((client: any) => client.idClientHoneSolutions);
         this.getProviderCompanies(clientsIds);
       },

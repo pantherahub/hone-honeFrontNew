@@ -9,6 +9,7 @@ export interface ClientInterface {
    typeProvider?: string;
    idTypeProvider?: number;
    email?: string;
+   active?: boolean;
 }
 
 export interface PercentInterface {

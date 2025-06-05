@@ -22,10 +22,6 @@ export class ClientProviderService {
     return this.httpClient.get(this.url + "getTypeDocument");
   }
 
-  getProviderData(idProvider: any): Observable<any> {
-    return this.httpClient.get(`${this.url}getHoneProvider/${idProvider}`);
-  }
-
   getCompanies(): Observable<any> {
     return this.httpClient.get(this.url + "Companies/GetAll");
   }
