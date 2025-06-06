@@ -167,6 +167,10 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     return null;
   }
 
+  enableFormControls() {
+    Object.values(this.providerForm.controls).forEach(control => control.enable());
+  }
+
   goBack(): void {
     this.location.back();
   }
@@ -263,6 +267,10 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     const formState = state.formValue;
 
     this.isFirstForm = state.isFirstForm;
+    if (this.isFirstForm === false) {
+      this.enableFormControls();
+    }
+
     this.providerForm.patchValue({
       startTime: formState.startTime,
       email: formState.email,
@@ -317,6 +325,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
         };
 
         this.isFirstForm = false;
+        this.enableFormControls();
 
         // Convert to an array
         let languages = [];

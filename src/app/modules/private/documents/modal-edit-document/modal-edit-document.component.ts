@@ -9,6 +9,7 @@ import { EventManagerService } from '../../../../services/events-manager/event-m
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { FileValidatorDirective } from 'src/app/directives/file-validator.directive';
 import { DatePickerInputComponent } from 'src/app/shared/forms/date-picker-input/date-picker-input.component';
+import { AlertService } from 'src/app/services/alerts/alert.service';
 
 @Component({
    selector: 'app-modal-edit-document',
@@ -41,6 +42,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
     'ARP COLMENA', 'ARP COLPATRIA', 'LA EQUIDAD SEGUROS DE VIDA S.A',
     'LIBERTY SEGUROS DE VIDA S.A', 'MAPFRE', 'POSITIVA ARP',
   ];
+  riskClassifierOptions = ['1', '2', '3', '4', '5'];
   docIdsWithExpedition: number[] = [
     4, 113, 12, 110, 111, 108, 137,
     130, 131, 132, 133, 134, 135, 136, 138, 139, 140, 141, 142
@@ -63,7 +65,8 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
       private formBuilder: FormBuilder,
       private notificationService: NzNotificationService,
       private documentService: DocumentsCrudService,
-      private eventManager: EventManagerService
+      private eventManager: EventManagerService,
+      private alertService: AlertService,
    ) {
       // this.createForm();
    }
@@ -104,7 +107,8 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
          lastDosimetryDate: [ '', [Validators.required] ],
          epsName: [ '', [Validators.required] ],
          riskClassifier: [ '', [Validators.required] ],
-         resolutionOfThePension: [ '', [Validators.required] ]
+         resolutionOfThePension: ['', [Validators.required]],
+         tipodocumento: [ '' ],
       });
 
       // Clear validations of fields that do not apply
@@ -156,6 +160,11 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
    patchForm () {
       const item = this.currentDoc;
 
+      let riskClassifier = item.riskClassifier;
+      if (!this.riskClassifierOptions.includes(riskClassifier)) {
+        riskClassifier = null;
+      }
+
       this.documentForm.patchValue({
          software: item.software,
          consultationDate: this.convertDate(item.consultationDate),
@@ -175,8 +184,9 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
          nombredocumento: item.nombredocumento,
          receptionDate: this.convertDate(item.receptionDate),
          resolutionOfThePension: item.resolutionOfThePension,
-         riskClassifier: item.riskClassifier,
-         validityStartDate: this.convertDate(item.validityStartDate)
+         riskClassifier: riskClassifier,
+         validityStartDate: this.convertDate(item.validityStartDate),
+         tipodocumento: item.idTypeDocuments,
       });
    }
 
@@ -288,9 +298,14 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
             this.createNotificacion('success', 'Documento actualizado', 'El documento se actualizó correctamente.');
             this.destroyModal(true);
          },
-         error: (error: any) => {
-            this.createNotificacion('error', 'Error', 'Lo sentimos, hubo un error en el servidor.');
-            this.loader = false;
+        error: (err: any) => {
+          this.loader = false;
+          const msg = err.error && err.error.message;
+          if (err.status == 400 && msg) {
+            this.alertService.error('Oops...', msg);
+            return;
+          }
+          this.createNotificacion('error', 'Error', 'Lo sentimos, hubo un error en el servidor.');
          },
          complete: () => {}
       });
