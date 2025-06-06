@@ -66,7 +66,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   /**
   * Obtiene la lista de clientes del prestador que inicia sesión
   */
-  getClientList () {
+  getClientList() {
     this.loadingData = true;
     this.clientService.getClientListByProviderId(this.user.id).subscribe({
       next: (res: any) => {
