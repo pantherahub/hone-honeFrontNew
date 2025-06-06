@@ -14,6 +14,7 @@ import { FetchBackend } from '@angular/common/http';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FileValidatorDirective } from 'src/app/directives/file-validator.directive';
 import { PipesModule } from 'src/app/pipes/pipes.module';
+import { AlertService } from 'src/app/services/alerts/alert.service';
 
 @Component({
    selector: 'app-remaining-documents',
@@ -46,6 +47,7 @@ export class RemainingDocumentsComponent implements OnInit {
       private documentService: DocumentsCrudService,
       private notificationService: NzNotificationService,
       public formBuilder: FormBuilder,
+      private alertService: AlertService,
    ) { }
 
    ngOnInit(): void {
@@ -152,8 +154,13 @@ export class RemainingDocumentsComponent implements OnInit {
             // location.reload();
             this.eventManager.getPercentApi.set(this.counterApi + 1);
          },
-         error: (error: any) => {
-            this.loadingData = false;
+         error: (err: any) => {
+           this.loadingData = false;
+           const msg = err.error && err.error.message;
+           if (err.status == 400 && msg) {
+             this.alertService.error('Oops...', msg);
+             return;
+           }
             this.createNotificacion('error', 'Error', 'Lo sentimos, hubo un error en el servidor.');
          },
          complete: () => { }

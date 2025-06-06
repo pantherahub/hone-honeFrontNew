@@ -52,8 +52,10 @@ export class FileValidatorDirective implements OnInit {
     if (!this.isFileTypeValid(file)) {
       this.alertService.error(
         'Oops...',
-        `Archivo no permitido: ${file.name}`
+        `Archivo no permitido: "${file.name}".<br>
+        Formatos permitidos: ${this.allowedExtensions.join(', ')}`
       );
+      // Reset input if file is invalid
       input.value = '';
       return;
     } else if (!this.isFileSizeValid(file)) {
