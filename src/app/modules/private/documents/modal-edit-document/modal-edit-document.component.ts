@@ -9,6 +9,7 @@ import { EventManagerService } from '../../../../services/events-manager/event-m
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { FileValidatorDirective } from 'src/app/directives/file-validator.directive';
 import { DatePickerInputComponent } from 'src/app/shared/forms/date-picker-input/date-picker-input.component';
+import { AlertService } from 'src/app/services/alerts/alert.service';
 
 @Component({
    selector: 'app-modal-edit-document',
@@ -42,6 +43,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
     'ARP COLMENA', 'ARP COLPATRIA', 'LA EQUIDAD SEGUROS DE VIDA S.A',
     'LIBERTY SEGUROS DE VIDA S.A', 'MAPFRE', 'POSITIVA ARP',
   ];
+  riskClassifierOptions = ['1', '2', '3', '4', '5'];
 
   expeditionDateRestrictions: { [key: number]: 'lastMonth' | 'currentYear' | 'last3Years' | 'last2Months' } = {
     108: 'lastMonth',
@@ -60,7 +62,8 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
       private formBuilder: FormBuilder,
       private notificationService: NzNotificationService,
       private documentService: DocumentsCrudService,
-      private eventManager: EventManagerService
+      private eventManager: EventManagerService,
+      private alertService: AlertService,
    ) { }
 
   ngAfterContentChecked (): void {}
@@ -96,7 +99,8 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
       lastDosimetryDate: [ '', [Validators.required] ],
       epsName: [ '', [Validators.required] ],
       riskClassifier: [ '', [Validators.required] ],
-      resolutionOfThePension: [ '', [Validators.required] ]
+      resolutionOfThePension: [ '', [Validators.required] ],
+      idDocumentType: [ '', [Validators.required] ],
     });
 
     // Clear validations of fields that do not apply
@@ -207,6 +211,11 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
   patchForm() {
     const item = this.currentDoc;
 
+    let riskClassifier = item.riskClassifier;
+    if (!this.riskClassifierOptions.includes(riskClassifier)) {
+      riskClassifier = null;
+    }
+
     this.documentForm.patchValue({
       software: item.software,
       consultationDate: this.convertDate(item.consultationDate),
@@ -225,8 +234,9 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
       NameAlternate: item.NameAlternate,
       receptionDate: this.convertDate(item.receptionDate),
       resolutionOfThePension: item.resolutionOfThePension,
-      riskClassifier: item.riskClassifier,
-      validityStartDate: this.convertDate(item.validityStartDate)
+      riskClassifier: riskClassifier,
+      validityStartDate: this.convertDate(item.validityStartDate),
+      idDocumentType: item.idDocumentType,
     });
   }
 

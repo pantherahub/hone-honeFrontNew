@@ -473,7 +473,9 @@
                                 ¡Este campo es obligatorio!
                             </p>
                         </ng-template>
-                        <input nz-input placeholder="Clasificación" id="riskClassifier" formControlName="riskClassifier">
+                        <nz-select id="riskClassifier" formControlName="riskClassifier" nzPlaceHolder="Seleccionar">
+                          <nz-option *ngFor="let option of riskClassifierOptions" [nzValue]="option" [nzLabel]="option"></nz-option>
+                        </nz-select>
                     </nz-form-control>
                 </nz-form-item>
             </div>
