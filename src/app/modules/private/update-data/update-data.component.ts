@@ -234,6 +234,10 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
     this.router.navigateByUrl(backRoute);
   }
 
+  enableFormControls() {
+    Object.values(this.providerForm.controls).forEach(control => control.enable());
+  }
+
   isValidEmail(email: string | undefined): boolean {
     if (!email || typeof email != 'string') return false;
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email || '');
@@ -326,6 +330,10 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
     const formState = state.formValue;
 
     this.isFirstForm = state.isFirstForm;
+    if (this.isFirstForm === false) {
+      this.enableFormControls();
+    }
+
     this.providerForm.patchValue({
       startTime: formState.startTime,
       email: formState.email,
@@ -381,6 +389,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
         };
 
         this.isFirstForm = false;
+        this.enableFormControls();
 
         // Convert to an array
         let languages = [];
