@@ -51,7 +51,7 @@ export class FeedbackFivestarsComponent {
     });
   }
 
-  destroyModal(): void {
+  closeModal(): void {
     this.modal.destroy();
   }
 

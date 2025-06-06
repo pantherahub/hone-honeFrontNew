@@ -115,7 +115,7 @@ export class ListDocumentsComponent implements OnInit {
       nzContent: FeedbackFivestarsComponent,
       nzTitle: 'Nos gustaría conocer tu opinión',
       nzCentered: true,
-      nzClosable: true,
+      nzClosable: false,
       // nzFooter: null,
       nzMaskClosable: false, // Disable click on overlay
       nzWidth: '600px',
