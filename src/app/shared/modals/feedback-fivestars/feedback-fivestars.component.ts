@@ -21,6 +21,7 @@ export class FeedbackFivestarsComponent {
   tooltips = ['Muy mala', 'Mala', 'Regular', 'Buena', 'Excelente'];
   form: FormGroup;
   user = this.eventManager.userLogged();
+  enableCloseModal: boolean = false;
 
   private fb = inject(FormBuilder);
   private modal = inject(NzModalRef);
@@ -74,6 +75,7 @@ export class FeedbackFivestarsComponent {
         this.modal.close();
       },
       error: (error: any) => {
+        this.enableCloseModal = true;
         this.notificationService.create('error', 'Error', 'Lo sentimos, hubo un error en el servidor.');
       },
     });
