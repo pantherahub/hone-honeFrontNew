@@ -8,7 +8,7 @@ import { AlertService } from '../services/alerts/alert.service';
 export class FileValidatorDirective implements OnInit {
 
   @Input() allowedExtensions: string[] = [];
-  @Input() maxFileSizeMB: number = 5;
+  @Input() maxFileSizeMB: number = 10;
   @Output() fileValidated: EventEmitter<File> = new EventEmitter();
 
   private extensionToMimeType: { [ext: string]: string } = {

@@ -82,7 +82,7 @@
                             class="custom-file-input"
                             appFileValidator
                             [allowedExtensions]="clientSelected?.idClientHoneSolutions === 13 ? ['.pdf'] : []"
-                            [maxFileSizeMB]="1"
+                            [maxFileSizeMB]="7"
                             (fileValidated)="loadFiles($event, item, i)"
                             hidden>
                           <nz-tag *ngIf="formDocList[i].get('file')?.value?.name" class="m-0" (click)="triggerFileInput(i)">
