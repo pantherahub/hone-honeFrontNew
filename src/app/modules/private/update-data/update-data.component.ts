@@ -108,7 +108,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
           'idTypeDocument',
           'identification',
           'dv',
-          'RepsEnableCode',
+          'repsEnableCode',
           'website'
         ];
         // Check if any of these specific controls have changed
@@ -199,8 +199,8 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
         { value: dvValue, disabled: true },
         [this.dvValidator]
       ],
-      RepsEnableCode: [
-        { value: this.user.RepsEnableCode || '', disabled: true },
+      repsEnableCode: [
+        { value: this.user.repsEnableCode || '', disabled: true },
         [Validators.required]
       ],
       website: ['', this.formUtils.url],
@@ -342,7 +342,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
       idTypeDocument: formState.idTypeDocument,
       identification: formState.identification,
       dv: formState.dv,
-      RepsEnableCode: formState.RepsEnableCode,
+      repsEnableCode: formState.repsEnableCode,
       website: formState.website,
       updatedBasicData: formState.updatedBasicData,
     });
@@ -414,7 +414,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
           idTypeDocument: data.idTypeDocument,
           identification: data.identification,
           dv: data.dv,
-          RepsEnableCode: data.RepsEnableCode,
+          repsEnableCode: data.repsEnableCode,
           website: data.website
         });
 
@@ -714,7 +714,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
       idTypeDocument: this.user.idTypeDocument || '',
       identification: this.user.identificacion || '',
       dv: dvValue,
-      RepsEnableCode: this.user.RepsEnableCode || '',
+      repsEnableCode: this.user.repsEnableCode || '',
       website: ''
     }, { emitEvent: false });
     this.formUtils.clearFormArray(this.updatedOffices);

@@ -15,6 +15,7 @@ import { AlertService } from 'src/app/services/alerts/alert.service';
 import { ScheduleFormComponent } from './schedule-form/schedule-form.component';
 import { AddressFormComponent } from './address-form/address-form.component';
 import { DatePickerInputComponent } from 'src/app/shared/forms/date-picker-input/date-picker-input.component';
+import { format } from 'date-fns';
 
 @Component({
   selector: 'app-office-modal',
@@ -197,6 +198,11 @@ export class OfficeModalComponent implements OnInit {
     });
   }
 
+  convertDate(date: string) {
+    if (!date) return null;
+    return date.split('T')[0];
+  }
+
   initializeForm() {
     this.officeForm = this.fb.group({
       idTemporalOfficeProvider: [this.office?.idTemporalOfficeProvider || null],
@@ -209,8 +215,8 @@ export class OfficeModalComponent implements OnInit {
       emailGlosas: [this.office?.emailGlosas || '', [this.formUtils.emailValidator]],
 
       enableCode: [this.office?.enableCode || '', [this.formUtils.numeric, this.enableCodeValidator]],
-      enableStartDateCode: [this.office?.enableStartDateCode || null],
-      enableEndDateCode: [this.office?.enableEndDateCode || null],
+      enableStartDateCode: [this.convertDate(this.office?.enableStartDateCode) || null],
+      enableEndDateCode: [this.convertDate(this.office?.enableEndDateCode) || null],
 
       idsCompanies: [this.getIdsCompanies(), [Validators.required]],
 
@@ -635,6 +641,7 @@ export class OfficeModalComponent implements OnInit {
 
     const schedulingLink = this.officeForm.get('schedulingLink')?.value?.toLowerCase() || null;
     const emailGlosas = this.officeForm.get('emailGlosas')?.value?.toLowerCase() || null;
+
     this.officeForm.patchValue({
       schedulingLink: schedulingLink,
       emailGlosas: emailGlosas,
