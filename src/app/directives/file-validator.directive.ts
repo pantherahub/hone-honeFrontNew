@@ -61,7 +61,9 @@ export class FileValidatorDirective implements OnInit {
     } else if (!this.isFileSizeValid(file)) {
       this.alertService.error(
         'Archivo demasiado grande',
-        `El archivo excede el tamaño máximo de ${this.maxFileSizeMB}MB`
+        `El archivo excede el tamaño máximo de ${this.maxFileSizeMB}MB.<br>
+        Puedes usar este compresor para reducir su tamaño: <a href="https://www.wecompress.com/es/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">
+        ir al compresor</a>.`
       );
       input.value = '';
       return;
