@@ -641,10 +641,12 @@ export class OfficeModalComponent implements OnInit {
 
     const schedulingLink = this.officeForm.get('schedulingLink')?.value?.toLowerCase() || null;
     const emailGlosas = this.officeForm.get('emailGlosas')?.value?.toLowerCase() || null;
+    const enableCode = this.officeForm.get('enableCode')?.value?.toLowerCase() || null;
 
     this.officeForm.patchValue({
       schedulingLink: schedulingLink,
       emailGlosas: emailGlosas,
+      enableCode: enableCode,
       idsCompanies: companiesIds,
     });
 
