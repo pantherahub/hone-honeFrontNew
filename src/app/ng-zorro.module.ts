@@ -44,6 +44,7 @@ import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzBadgeModule } from 'ng-zorro-antd/badge';
+import { NzRateModule } from 'ng-zorro-antd/rate';
 
 @NgModule({
    declarations: [],
@@ -93,7 +94,8 @@ import { NzBadgeModule } from 'ng-zorro-antd/badge';
       NzTabsModule,
       NzCollapseModule,
       NzBadgeModule,
-      NzProgressModule
+      NzProgressModule,
+      NzRateModule,
    ]
 })
 export class NgZorroModule {}

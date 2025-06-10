@@ -8,6 +8,7 @@ export interface UserInterface {
    repsEnableCode?: string;
    withData?: boolean;
    rejected?: boolean;
+   doesNeedSurvey?: boolean;
    roles?: RoleInterface;
 }
 

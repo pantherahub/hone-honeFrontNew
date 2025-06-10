@@ -1,10 +1,9 @@
 import { Component, ElementRef, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { DocumentsCrudService } from '../../../../services/documents/documents-crud.service';
-import { DocumentInterface } from '../../../../models/client.interface';
+import { DocumentInterface, PercentInterface } from '../../../../models/client.interface';
 import { EventManagerService } from '../../../../services/events-manager/event-manager.service';
 import { NgZorroModule } from '../../../../ng-zorro.module';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
-import { Observable, Observer } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
 import { NzUploadFile } from 'ng-zorro-antd/upload';
@@ -24,6 +23,7 @@ import { AlertService } from 'src/app/services/alerts/alert.service';
    styleUrl: './remaining-documents.component.scss'
 })
 export class RemainingDocumentsComponent implements OnInit {
+
    loading: boolean = false;
    clientSelected: any = this.eventManager.clientSelected();
    counterApi: any = this.eventManager.getPercentApi();
@@ -51,7 +51,7 @@ export class RemainingDocumentsComponent implements OnInit {
    ) { }
 
    ngOnInit(): void {
-      this.getDocumentsToUpload();
+     this.getDocumentsToUpload();
    }
 
   hasExpirationField(idDoc: number | undefined): boolean {
