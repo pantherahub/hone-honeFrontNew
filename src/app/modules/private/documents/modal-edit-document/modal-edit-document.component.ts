@@ -43,10 +43,6 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
     'LIBERTY SEGUROS DE VIDA S.A', 'MAPFRE', 'POSITIVA ARP',
   ];
   riskClassifierOptions = ['1', '2', '3', '4', '5'];
-  docIdsWithExpedition: number[] = [
-    4, 113, 12, 110, 111, 108, 137,
-    130, 131, 132, 133, 134, 135, 136, 138, 139, 140, 141, 142
-  ];
 
   expeditionDateRestrictions: { [key: number]: 'lastMonth' | 'currentYear' | 'last3Years' | 'last2Months' } = {
     108: 'lastMonth',
