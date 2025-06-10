@@ -434,7 +434,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
         this.subscribeOnChange();
 
         // If repsEnableCode is not saved, add it automatically
-        if (!this.providerForm.get('repsEnableCode')?.value) {
+        if (!this.providerForm.get('repsEnableCode')?.value && this.user.repsEnableCode) {
           this.providerForm.patchValue({
             repsEnableCode: this.user.repsEnableCode,
           });
