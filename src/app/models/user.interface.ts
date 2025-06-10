@@ -5,6 +5,7 @@ export interface UserInterface {
    idTypeDocument?: number;
    identificacion?: string;
    dv?: string | number;
+   repsEnableCode?: string;
    withData?: boolean;
    rejected?: boolean;
    roles?: RoleInterface;

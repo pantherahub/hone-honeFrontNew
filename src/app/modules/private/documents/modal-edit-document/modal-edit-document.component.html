@@ -56,7 +56,7 @@
 
             <!-- Campo Fecha de Expedición -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="docIdsWithExpedition.includes(documentType)">
+                *ngIf="isFieldRequiredForDocumentType('fechadedocumento')">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
@@ -503,6 +503,7 @@
                       class="custom-file-input"
                       appFileValidator
                       [allowedExtensions]="clientSelected?.idClientHoneSolutions === 13 ? ['.pdf'] : []"
+                      [maxFileSizeMB]="7"
                       (fileValidated)="loadFile($event)"
                       hidden>
                     <img src="../../../../../assets/img/folder.png" alt="" srcset="">
