@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzModalRef } from 'ng-zorro-antd/modal';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
+import { AlertService } from 'src/app/services/alerts/alert.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
@@ -32,6 +33,7 @@ export class FeedbackFivestarsComponent {
     private surveysService: SurveysService,
     private notificationService: NzNotificationService,
     private authService: AuthService,
+    private alertService: AlertService,
   ) {
     this.form = this.fb.group({
       rating: [null, [Validators.required]],
@@ -71,7 +73,11 @@ export class FeedbackFivestarsComponent {
         const user = this.user;
         user.doesNeedSurvey = false;
         this.authService.saveUserLogged(user);
-        this.notificationService.create('success', 'Enviado', 'Comentarios enviados satisfactoriamente');
+        this.alertService.success(
+          '¡Gracias por tu feedback!',
+          'Tu opinión nos ayuda a mejorar.',
+          { nzMaskClosable: true }
+        );
         this.modal.close();
       },
       error: (error: any) => {
