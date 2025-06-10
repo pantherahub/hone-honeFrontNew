@@ -196,11 +196,11 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
         [Validators.required, this.formUtils.numeric]
       ],
       dv: [
-        { value: dvValue, disabled: true },
+        { value: dvValue, disabled: dvValue != null },
         [this.dvValidator]
       ],
       repsEnableCode: [
-        { value: this.user.repsEnableCode || '', disabled: true },
+        { value: this.user.repsEnableCode || '', disabled: !!this.user.repsEnableCode },
         [Validators.required]
       ],
       website: ['', this.formUtils.url],
@@ -432,6 +432,13 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
         this.existingContacts = data.TemporalContactsForProvider;
 
         this.subscribeOnChange();
+
+        // If repsEnableCode is not saved, add it automatically
+        if (!this.providerForm.get('repsEnableCode')?.value) {
+          this.providerForm.patchValue({
+            repsEnableCode: this.user.repsEnableCode,
+          });
+        }
 
         const user = this.user;
         user.rejected = res.rejected;
