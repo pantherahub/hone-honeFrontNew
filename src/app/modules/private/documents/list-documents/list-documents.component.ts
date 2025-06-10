@@ -115,9 +115,10 @@ export class ListDocumentsComponent implements OnInit {
       nzContent: FeedbackFivestarsComponent,
       nzTitle: 'Nos gustaría conocer tu opinión',
       nzCentered: true,
+      nzFooter: null,
       nzClosable: false,
-      // nzFooter: null,
-      nzMaskClosable: false, // Disable click on overlay
+      nzMaskClosable: false, // Overlay
+      nzKeyboard: false, // Esc
       nzWidth: '600px',
       nzStyle: { 'max-width': '90%' },
       nzClassName: 'video-modal',
