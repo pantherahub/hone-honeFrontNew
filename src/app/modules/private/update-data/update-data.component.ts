@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
@@ -15,6 +15,9 @@ import { format } from 'date-fns';
 import { BackendErrorsComponent } from 'src/app/shared/forms/backend-errors/backend-errors.component';
 import { debounceTime, firstValueFrom } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
+import { CanComponentDeactivate } from 'src/app/guards/can-deactivate.interface';
+import { Router } from '@angular/router';
+import { NavigationService } from 'src/app/services/navigation/navigation.service';
 
 @Component({
   selector: 'app-update-data',
@@ -23,7 +26,7 @@ import { AuthService } from 'src/app/services/auth.service';
   templateUrl: './update-data.component.html',
   styleUrl: './update-data.component.scss'
 })
-export class UpdateDataComponent implements OnInit, OnDestroy {
+export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeactivate {
 
   user = this.eventManager.userLogged();
   providerForm!: FormGroup;
@@ -45,8 +48,10 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
   loading: boolean = false;
   backendError: any = null;
 
-  autoSaveInterval: any;
   private formSubscription: any;
+
+  showFloatingButton = true;
+  @ViewChild('footerButton') footerButton!: ElementRef;
 
   constructor (
     private eventManager: EventManagerService,
@@ -57,7 +62,9 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     private modalService: NzModalService,
     private clientProviderService: ClientProviderService,
     private location: Location,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router,
+    private navigationService: NavigationService,
   ) { }
 
   ngOnInit(): void {
@@ -76,6 +83,21 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     this.unsubscribeForm();
   }
 
+  async canDeactivate(): Promise<boolean> {
+    return !this.hasSavedState() || await this.alertService.confirm(
+      'Aviso', 'Tienes cambios pendientes. ¿Deseas salir?', {
+        nzOkText: 'Salir',
+        nzCancelText: 'Cancelar',
+    });
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  handleUnload($event: BeforeUnloadEvent): void {
+    if (this.hasSavedState()) {
+      $event.preventDefault();
+    }
+  }
+
   subscribeOnChange() {
     this.formSubscription = this.providerForm.valueChanges.pipe(debounceTime(500)).subscribe(() => {
       if (!this.providerForm.get('updatedBasicData')?.value) {
@@ -86,6 +108,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
           'idTypeDocument',
           'identification',
           'dv',
+          'repsEnableCode',
           'website'
         ];
         // Check if any of these specific controls have changed
@@ -103,6 +126,41 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
   unsubscribeForm() {
     if (this.formSubscription) {
       this.formSubscription.unsubscribe();
+    }
+  }
+
+  @HostListener('window:scroll', [])
+  onWindowScroll() {
+    if (!this.footerButton) return;
+
+    const rect = this.footerButton.nativeElement.getBoundingClientRect();
+    const isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
+
+    this.showFloatingButton = !isVisible;
+  }
+
+  scrollToFooter(): void {
+    this.footerButton?.nativeElement?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    this.highlightSubmitBtn();
+  }
+
+  highlightSubmitBtn() {
+    const element = this.footerButton?.nativeElement;
+    if (element) {
+      setTimeout(() => {
+        element.classList.add(
+          'ring-2',
+          'ring-green-400',
+          'ring-offset-2',
+          'scale-105',
+          'transition',
+          'duration-500'
+        );
+      }, 280);
+
+      setTimeout(() => {
+        element.classList.remove('ring-2', 'ring-green-400', 'ring-offset-2', 'scale-105');
+      }, 2000);
     }
   }
 
@@ -138,8 +196,12 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
         [Validators.required, this.formUtils.numeric]
       ],
       dv: [
-        { value: dvValue, disabled: true },
+        { value: dvValue, disabled: dvValue != null },
         [this.dvValidator]
+      ],
+      repsEnableCode: [
+        { value: this.user.repsEnableCode || '', disabled: !!this.user.repsEnableCode },
+        [Validators.required]
       ],
       website: ['', this.formUtils.url],
 
@@ -167,12 +229,13 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  enableFormControls() {
-    Object.values(this.providerForm.controls).forEach(control => control.enable());
+  async goBack(): Promise<void> {
+    const backRoute = this.navigationService.getBackRoute();
+    this.router.navigateByUrl(backRoute);
   }
 
-  goBack(): void {
-    this.location.back();
+  enableFormControls() {
+    Object.values(this.providerForm.controls).forEach(control => control.enable());
   }
 
   isValidEmail(email: string | undefined): boolean {
@@ -279,6 +342,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       idTypeDocument: formState.idTypeDocument,
       identification: formState.identification,
       dv: formState.dv,
+      repsEnableCode: formState.repsEnableCode,
       website: formState.website,
       updatedBasicData: formState.updatedBasicData,
     });
@@ -350,6 +414,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
           idTypeDocument: data.idTypeDocument,
           identification: data.identification,
           dv: data.dv,
+          repsEnableCode: data.repsEnableCode,
           website: data.website
         });
 
@@ -367,6 +432,13 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
         this.existingContacts = data.TemporalContactsForProvider;
 
         this.subscribeOnChange();
+
+        // If repsEnableCode is not saved, add it automatically
+        if (!this.providerForm.get('repsEnableCode')?.value) {
+          this.providerForm.patchValue({
+            repsEnableCode: this.user.repsEnableCode,
+          });
+        }
 
         const user = this.user;
         user.rejected = res.rejected;
@@ -420,7 +492,25 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       nzClosable: true,
       nzMaskClosable: false,
       nzWidth: '900px',
-      nzStyle: { 'max-width': '90%', 'margin': '22px 0' }
+      nzStyle: { 'max-width': '90%', 'margin': '22px 0' },
+      nzOnCancel: () => {
+        const componentInstance = modalRef.getContentComponent();
+        if (componentInstance.hasChanges) {
+          this.alertService.confirm(
+            'Cambios sin guardar',
+            'Tienes cambios en la sede. Si sales sin guardar, se perderán.',
+            {
+              nzOkText: 'Salir',
+              nzCancelText: 'Cancelar',
+              nzOnOk: () => {
+                modalRef.destroy();
+              },
+            }
+          );
+          return false;
+        }
+        return true; // Close modal
+      }
     });
     const instanceModal = modalRef.getContentComponent();
     if (office) {
@@ -477,7 +567,25 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       nzClosable: true,
       nzMaskClosable: false,
       nzWidth: '650px',
-      nzStyle: { 'max-width': '90%', 'margin': '22px 0' }
+      nzStyle: { 'max-width': '90%', 'margin': '22px 0' },
+      nzOnCancel: () => {
+        const componentInstance = modalRef.getContentComponent();
+        if (componentInstance.hasChanges) {
+          this.alertService.confirm(
+            'Cambios sin guardar',
+            'Tienes cambios en el contacto. Si sales sin guardar, se perderán.',
+            {
+              nzOkText: 'Salir',
+              nzCancelText: 'Cancelar',
+              nzOnOk: () => {
+                modalRef.destroy();
+              },
+            }
+          );
+          return false;
+        }
+        return true; // Close modal
+      }
     });
     const instanceModal = modalRef.getContentComponent();
     instanceModal.contactModelType = 'Prestador';
@@ -613,6 +721,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       idTypeDocument: this.user.idTypeDocument || '',
       identification: this.user.identificacion || '',
       dv: dvValue,
+      repsEnableCode: this.user.repsEnableCode || '',
       website: ''
     }, { emitEvent: false });
     this.formUtils.clearFormArray(this.updatedOffices);

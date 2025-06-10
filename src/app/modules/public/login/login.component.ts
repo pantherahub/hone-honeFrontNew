@@ -43,6 +43,7 @@ export class LoginComponent implements OnInit {
 
   ngOnInit (): void {
     console.log('environment prod: ', environment.production);
+    localStorage.clear();
 
     const hasSupportParam = this.router.url.includes('?support=true');
     if (hasSupportParam) this.openTicketModal();
