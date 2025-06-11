@@ -26,13 +26,13 @@ export class ListDocumentsComponent implements OnInit {
 
    user = this.eventManager.userLogged();
    clientSelected: any = this.eventManager.clientSelected();
-   callApi: any = this.eventManager.getPercentApi();
    loadingData: boolean = false;
    loadManualDownload: boolean = false;
    hiddenCard: boolean = false;
    contactsOfProviders: any = [];
 
    percentData: PercentInterface = {};
+   feedbackModalShown = false;
 
    constructor(
       private eventManager: EventManagerService,
@@ -41,15 +41,18 @@ export class ListDocumentsComponent implements OnInit {
       private modalService: NzModalService,
       private contactProvider: ContactsProviderServicesService
    ) {
-      effect(() => {
-        this.callApi = this.eventManager.getPercentApi();
-        // console.log("Effect", this.callApi);
-         if (this.callApi) {
-            this.getDocumentPercent();
+     effect(
+       () => {
+         const shouldCallApi = this.eventManager.getPercentApi();
+         if (shouldCallApi) {
+           this.getDocumentPercent();
+           // Reset to avoid double querying with ngOnInit when re-rendering the component
+           this.eventManager.getPercentApi.set(0);
          }
-      });
+       }, { allowSignalWrites: true }
+     );
 
-      if (this.clientSelected.idTypeProvider ==7) {
+      if (this.clientSelected.idTypeProvider == 7) {
          this.hiddenCard = true;
       }
    }
@@ -78,7 +81,9 @@ export class ListDocumentsComponent implements OnInit {
          next: (res: any) => {
             this.percentData = res;
             this.loadingData = false;
-            if (this.percentData.uploaded && this.user.doesNeedSurvey) {
+
+            if (this.percentData.uploaded && this.user.doesNeedSurvey && !this.feedbackModalShown) {
+              this.feedbackModalShown = true;
               this.open5starsFeedback();
             }
          },
