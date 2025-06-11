@@ -66,7 +66,6 @@ export class FeedbackFivestarsComponent {
       ...this.form.value,
       idProvider: this.user.id
     }
-    console.log(this.form.value);
 
     this.surveysService.sendFeedback(reqData).subscribe({
       next: (res: any) => {

@@ -176,4 +176,6 @@ transition-all animated-border" (click)="resetTutorial()">
 </ng-template>
 
 <!-- Popover overlay -->
-<div *ngIf="clientTutorialVisible && filteredClients.length" class="tutorial-popover-overlay" (click)="nextTutorialStep()"></div>
+@if (clientTutorialVisible && filteredClients.length) {
+  <div class="tutorial-popover-overlay" (click)="nextTutorialStep()"></div>
+}
