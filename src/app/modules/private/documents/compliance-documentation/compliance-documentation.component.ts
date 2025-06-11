@@ -1,4 +1,4 @@
-import { Component, OnInit, effect } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgZorroModule } from '../../../../ng-zorro.module';
 import { Router } from '@angular/router';
 import { EventManagerService } from '../../../../services/events-manager/event-manager.service';
@@ -18,7 +18,6 @@ import { ProviderAssistanceComponent } from '../../../../shared/modals/provider-
 })
 export class ComplianceDocumentationComponent implements OnInit {
   clientSelected: any = this.eventManager.clientSelected();
-  callApi: any = this.eventManager.getPercentApi();
   loadingData: boolean = false;
   percentData: PercentInterface = {};
   providerAssistance: GetAssistanceProvider = {}
@@ -32,14 +31,7 @@ export class ComplianceDocumentationComponent implements OnInit {
     private documentService: DocumentsCrudService,
     private asistProviderService: ProviderAsisstService,
     private modalService: NzModalService,
-  ) {
-    effect(() => {
-      this.callApi = this.eventManager.getPercentApi();
-      if (this.callApi) {
-        this.getDocumentPercent();
-      }
-    });
-  }
+  ) { }
 
   ngOnInit() {
     this.getDocumentPercent();
@@ -71,7 +63,7 @@ export class ComplianceDocumentationComponent implements OnInit {
   }
 
   /**
-  * realiza consumo del api para ver la asistencia del prestador  
+  * realiza consumo del api para ver la asistencia del prestador
   * @param payload - recibe el objeto tipo formData
   */
   getAssistencesProvider() {
@@ -90,8 +82,9 @@ export class ComplianceDocumentationComponent implements OnInit {
       complete: () => { }
     });
   }
+
   /**
-   * Abre una ventana modal para actualizar el nombre del representante legal, 
+   * Abre una ventana modal para actualizar el nombre del representante legal,
    * donde se puede abrir mediante funcion del mismo modal de contacts-provider
    * y tambien se abre por defecto o automaticamente cuando elija allianz
    */
