@@ -104,6 +104,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
          epsName: [ '', [Validators.required] ],
          riskClassifier: [ '', [Validators.required] ],
          resolutionOfThePension: ['', [Validators.required]],
+         amount: ['', [Validators.required, Validators.min(1000)]],
          tipodocumento: [ '' ],
       });
 
@@ -148,7 +149,8 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
          'lastDosimetryDate': [0],
          'epsName': [13, 14, 135],
          'riskClassifier': [13, 135],
-         'resolutionOfThePension': [15]
+         'resolutionOfThePension': [15],
+         'amount': [133],
       };
       return documentValidationMap[controlName]?.includes(this.documentType);
    }
@@ -182,6 +184,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
          resolutionOfThePension: item.resolutionOfThePension,
          riskClassifier: riskClassifier,
          validityStartDate: this.convertDate(item.validityStartDate),
+         amount: item.amount,
          tipodocumento: item.idTypeDocuments,
       });
    }

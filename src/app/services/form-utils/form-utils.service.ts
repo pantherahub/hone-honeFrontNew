@@ -55,7 +55,7 @@ export class FormUtilsService {
    */
   url(control: AbstractControl): ValidationErrors | null {
     if (!control || !control.value) return null;
-    const urlPattern = /(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?)|(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9]{2,})?/g;
+    const urlPattern = /^(?![\w.+-]+@[\w-]+\.[\w.-]+$)(https?:\/\/)?((localhost)|((\d{1,3}\.){3}\d{1,3})|([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})(:\d+)?(\/[^\s]*)?(#\S*)?$/;
     return urlPattern.test(control.value) ? null : { invalidUrl: true };
   }
 
