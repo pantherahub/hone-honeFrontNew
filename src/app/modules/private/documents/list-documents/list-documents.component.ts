@@ -14,6 +14,7 @@ import { ContactsProviderServicesService } from '../../../../services/contacts-p
 import { AssistanceProvidersComponent } from '../../../../shared/forms/assistance-forms/assistance-providers/assistance-providers.component';
 import { ProviderAssistanceComponent } from '../../../../shared/modals/provider-assistance/provider-assistance.component';
 import { FeedbackFivestarsComponent } from 'src/app/shared/modals/feedback-fivestars/feedback-fivestars.component';
+import { AlertService } from 'src/app/services/alerts/alert.service';
 
 @Component({
   selector: 'app-list-documents',
@@ -33,13 +34,15 @@ export class ListDocumentsComponent implements OnInit {
 
   percentData: PercentInterface = {};
   feedbackModalShown = false;
+  dataformAlertShown = false;
 
   constructor(
     private eventManager: EventManagerService,
     private documentService: DocumentsCrudService,
     private router: Router,
     private modalService: NzModalService,
-    private contactProvider: ContactsProviderServicesService
+    private contactProvider: ContactsProviderServicesService,
+    private alertService: AlertService,
   ) {
     effect(
       () => {
@@ -83,8 +86,9 @@ export class ListDocumentsComponent implements OnInit {
         this.loadingData = false;
 
         if (this.percentData.uploaded && this.user.doesNeedSurvey && !this.feedbackModalShown) {
-          this.feedbackModalShown = true;
           this.open5starsFeedback();
+        } else {
+          this.showDataformAlert();
         }
       },
       error: (error: any) => {
@@ -116,7 +120,8 @@ export class ListDocumentsComponent implements OnInit {
   }
 
   open5starsFeedback(): void {
-    const modal = this.modalService.create<FeedbackFivestarsComponent, any>({
+    this.feedbackModalShown = true;
+    const feedbackModalRef = this.modalService.create<FeedbackFivestarsComponent, any>({
       nzContent: FeedbackFivestarsComponent,
       nzTitle: 'Nos gustaría conocer tu opinión',
       nzCentered: true,
@@ -128,6 +133,48 @@ export class ListDocumentsComponent implements OnInit {
       nzStyle: { 'max-width': '90%' },
       nzClassName: 'video-modal',
     });
+
+    feedbackModalRef.afterClose.subscribe((result) => {
+      if (result?.submitted) {
+        const alertRef = this.alertService.success(
+          '¡Gracias por tu feedback!',
+          'Tu opinión nos ayuda a mejorar.',
+          { nzMaskClosable: true }
+        );
+        alertRef.afterClose.subscribe(() => {
+          this.showDataformAlert();
+        });
+      } else {
+        this.showDataformAlert();
+      }
+    });
+  }
+
+  showDataformAlert(): void {
+    if (this.dataformAlertShown || (this.user.withData && !this.user.rejected)) {
+      return;
+    }
+    this.dataformAlertShown = true;
+    const modalRef = this.modalService.warning({
+      nzTitle: 'Atención',
+      nzContent: this.user.withData
+        ? 'Tu información no concuerda con lo guardado en base de datos, por favor revisa nuevamente el formulario.'
+        : 'Recuerda actualizar tus datos garantizando así el cumplimiento total de tu gestión contractual.',
+      nzClosable: false,
+      nzKeyboard: false,
+      nzMaskClosable: true,
+      nzOnOk: () => {
+        modalRef.close();
+        this.navigateTo('/update-data');
+      },
+      nzOnCancel: () => {
+        this.navigateTo('/update-data');
+      }
+    });
+  }
+
+  navigateTo(url: string): void {
+    this.router.navigate([url]);
   }
 
   /**
@@ -280,10 +327,6 @@ export class ListDocumentsComponent implements OnInit {
     link.click();
     link.remove();
     if (onComplete) onComplete();
-  }
-
-  navigateHome() {
-    this.router.navigateByUrl('/home');
   }
 
   /**
