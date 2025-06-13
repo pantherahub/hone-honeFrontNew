@@ -65,6 +65,26 @@
                             </nz-form-control>
                           </nz-form-item>
                         }
+                        @if (item.idTypeDocuments == 133) {
+                          <nz-form-item style="margin: 0;">
+                            <nz-form-control [nzErrorTip]="amountPolicyErrorTip">
+                              <ng-template #amountPolicyErrorTip>
+                                <p class="text-[13px] text-left">El campo es requerido.</p>
+                              </ng-template>
+                              <!-- <input nz-input type="number" placeholder="Valor Póliza" formControlName="amountPolicy" id="amountPolicy"> -->
+                               <nz-input-number
+                                  formControlName="amountPolicy"
+                                  [nzMin]="0"
+                                  [nzStep]="1"
+                                  [nzPrecision]="0"
+                                  [nzFormatter]="formatterPeso"
+                                  [nzParser]="parserPeso"
+                                  style="width: 100%"
+                                  nzPlaceHolder="Valor Póliza"
+                                ></nz-input-number>
+                            </nz-form-control>
+                          </nz-form-item>
+                        }
 
                         <div class="flex flex-col">
                           <button

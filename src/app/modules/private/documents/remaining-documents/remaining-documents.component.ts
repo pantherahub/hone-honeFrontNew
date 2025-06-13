@@ -78,7 +78,13 @@ export class RemainingDocumentsComponent implements OnInit {
                   item.idTypeDocuments === 138
                     ? [Validators.required]
                     : [],
-                ]
+                ],
+                amountPolicy: [
+                  "",
+                  item.idTypeDocuments === 133
+                    ? [Validators.required]
+                    : [],
+                ],
               })
             );
             this.loadingData = false;
@@ -95,6 +101,18 @@ export class RemainingDocumentsComponent implements OnInit {
       reader.addEventListener('load', () => callback(reader.result!.toString()));
       reader.readAsDataURL(img);
    }
+
+  formatterPeso = (value: number | string): string => {
+    if (value == null || value === '') return '';
+    const number = typeof value === 'string' ? parseInt(value, 10) : Math.floor(value);
+    return `$ ${number.toLocaleString('es-CO')}`;
+  };
+  parserPeso = (value: string): string => {
+    if (!value) return '';
+    const cleaned = value.replace(/[$\s.]/g, '');
+    return cleaned;
+  };
+
 
    triggerFileInput(index: number): void {
       const fileInput = this.fileInputs.toArray()[index].nativeElement;
@@ -126,6 +144,7 @@ export class RemainingDocumentsComponent implements OnInit {
       const fileForm = docForm.get("file")?.value;
       const fechaForm = docForm.get("fecha")?.value;
       const softwareForm = docForm.get("software")?.value;
+      const amountPolicyForm = docForm.get("amountPolicy")?.value;
 
       this.loadingData = true;
       const { idProvider } = this.clientSelected;
@@ -143,6 +162,9 @@ export class RemainingDocumentsComponent implements OnInit {
       }
       if (softwareForm && softwareForm !== '') {
          body.software = softwareForm;
+      }
+      if (amountPolicyForm) {
+         body.amountPolicy = amountPolicyForm;
       }
       fileToUpload.append('datos', JSON.stringify(body));
 
@@ -188,6 +210,12 @@ export class RemainingDocumentsComponent implements OnInit {
       softwareControl?.markAsTouched();
       softwareControl?.updateValueAndValidity();
       if (softwareControl?.invalid) return;
+    }
+    if (item.idTypeDocuments == 133) {
+      const amountPolicyControl = docForm.get("amountPolicy");
+      amountPolicyControl?.markAsTouched();
+      amountPolicyControl?.updateValueAndValidity();
+      if (amountPolicyControl?.invalid) return;
     }
 
     this.uploadDocuments(item, index);

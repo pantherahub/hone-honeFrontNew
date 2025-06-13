@@ -490,26 +490,33 @@
                 </nz-form-item>
             </div>
 
-            <!-- Campo Monto -->
+            <!-- Campo Valor Póliza / Monto -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="isFieldRequiredForDocumentType('amount')">
+                *ngIf="isFieldRequiredForDocumentType('amountPolicy')">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
-                        Monto
+                        Valor Póliza
                     </nz-form-label>
 
                     <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="amountErrorTip">
-                        <ng-template #amountErrorTip>
-                            <p *ngIf="documentForm.controls['amount'].hasError('required')">
+                        [nzErrorTip]="amountPolicyErrorTip">
+                        <ng-template #amountPolicyErrorTip>
+                            <p *ngIf="documentForm.controls['amountPolicy'].hasError('required')">
                               ¡Este campo es obligatorio!
                             </p>
-                            <p *ngIf="documentForm.controls['amount'].hasError('required')">
-                              Debe ser mayor o igual a 1000.
-                            </p>
                         </ng-template>
-                        <input nz-input type="number" placeholder="Monto" formControlName="amount">
+                        <!-- <input nz-input type="number" placeholder="Valor Póliza" formControlName="amountPolicy"> -->
+                        <input
+                          nz-input
+                          type="text"
+                          name="amountPolicy"
+                          id="amountPolicy"
+                          [value]="amountPolicyFormatted"
+                          (input)="onAmountPolicyInput($event)"
+                          autocomplete="off"
+                          placeholder="Valor Póliza"
+                        />
                     </nz-form-control>
                 </nz-form-item>
             </div>

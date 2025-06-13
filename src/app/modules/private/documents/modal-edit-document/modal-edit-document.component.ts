@@ -57,6 +57,8 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
     137: 'last3Years',
   };
 
+  amountPolicyFormatted: string = '';
+
    constructor (
       private formBuilder: FormBuilder,
       private notificationService: NzNotificationService,
@@ -104,7 +106,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
          epsName: [ '', [Validators.required] ],
          riskClassifier: [ '', [Validators.required] ],
          resolutionOfThePension: ['', [Validators.required]],
-         amount: ['', [Validators.required, Validators.min(1000)]],
+         amountPolicy: ['', [Validators.required]],
          tipodocumento: [ '' ],
       });
 
@@ -150,7 +152,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
          'epsName': [13, 14, 135],
          'riskClassifier': [13, 135],
          'resolutionOfThePension': [15],
-         'amount': [133],
+         'amountPolicy': [133],
       };
       return documentValidationMap[controlName]?.includes(this.documentType);
    }
@@ -162,6 +164,8 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
       if (!this.riskClassifierOptions.includes(riskClassifier)) {
         riskClassifier = null;
       }
+      const rawAmount = item.amountPolicy;
+      this.amountPolicyFormatted = rawAmount ? rawAmount.toLocaleString('es-CO') : '';
 
       this.documentForm.patchValue({
          software: item.software,
@@ -184,7 +188,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
          resolutionOfThePension: item.resolutionOfThePension,
          riskClassifier: riskClassifier,
          validityStartDate: this.convertDate(item.validityStartDate),
-         amount: item.amount,
+         amountPolicy: item.amountPolicy,
          tipodocumento: item.idTypeDocuments,
       });
    }
@@ -215,38 +219,52 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
     * @param current Bloquea las fechas antes de la fecha actual, habilita por un año y bloquea fechas posterior (para fecha de expedición)
     * @returns
     */
-   disableExpeditionDates = (current: Date): boolean => {
-      current.setHours(0, 0, 0, 0);
-      const restriction = this.expeditionDateRestrictions[this.documentType];
-      if (!restriction) return false;
+  disableExpeditionDates = (current: Date): boolean => {
+    current.setHours(0, 0, 0, 0);
+    const restriction = this.expeditionDateRestrictions[this.documentType];
+    if (!restriction) return false;
 
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-      switch (restriction) {
-        case 'lastMonth':
-          const lastMonth = new Date(today);
-          lastMonth.setMonth(today.getMonth() - 1);
-          return current < lastMonth || current > today;
+    switch (restriction) {
+      case 'lastMonth':
+        const lastMonth = new Date(today);
+        lastMonth.setMonth(today.getMonth() - 1);
+        return current < lastMonth || current > today;
 
-        case 'last2Months':
-          const twoMonthsAgo = new Date(today);
-          twoMonthsAgo.setMonth(today.getMonth() - 2);
-          return current < twoMonthsAgo || current > today;
+      case 'last2Months':
+        const twoMonthsAgo = new Date(today);
+        twoMonthsAgo.setMonth(today.getMonth() - 2);
+        return current < twoMonthsAgo || current > today;
 
-        case 'currentYear':
-          const startOfYear = new Date(today.getFullYear(), 0, 1);
-          return current < startOfYear || current > today;
+      case 'currentYear':
+        const startOfYear = new Date(today.getFullYear(), 0, 1);
+        return current < startOfYear || current > today;
 
-        case 'last3Years':
-          const threeYearsAgo = new Date(today);
-          threeYearsAgo.setFullYear(today.getFullYear() - 3);
-          return current < threeYearsAgo || current > today;
+      case 'last3Years':
+        const threeYearsAgo = new Date(today);
+        threeYearsAgo.setFullYear(today.getFullYear() - 3);
+        return current < threeYearsAgo || current > today;
 
-        default:
-          return false;
-      }
-   };
+      default:
+        return false;
+    }
+  };
+
+  onAmountPolicyInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const rawValue = input.value.replace(/[^\d]/g, '');
+    const numericValue = parseInt(rawValue, 10);
+
+    if (!isNaN(numericValue)) {
+      this.amountPolicyFormatted = numericValue.toLocaleString('es-CO');
+      this.documentForm.get('amountPolicy')?.setValue(numericValue);
+    } else {
+      this.amountPolicyFormatted = '';
+      this.documentForm.get('amountPolicy')?.setValue(null);
+    }
+  }
 
    /**
     * Carga un archivo y lo envia al api de carga de documentos
