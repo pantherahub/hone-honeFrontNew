@@ -497,6 +497,9 @@
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
                         Valor Póliza
+                        <div (click)="amountPolicyInfoAlert()" class="cursor-pointer">
+                          <i nz-icon nzType="info-circle" nzTheme="fill" class="info-icon"></i>
+                        </div>
                     </nz-form-label>
 
                     <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
@@ -513,6 +516,7 @@
                           id="amountPolicy"
                           formControlName="amountPolicy"
                           (input)="onAmountPolicyChange()"
+                          (focus)="amountPolicyInfoAlert(true)"
                           autocomplete="off"
                           placeholder="Valor Póliza"
                         />

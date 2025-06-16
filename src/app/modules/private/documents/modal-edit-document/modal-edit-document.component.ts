@@ -45,6 +45,17 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
   ];
   riskClassifierOptions = ['1', '2', '3', '4', '5'];
 
+  readonly SMLV: number = 1423500;
+  readonly typePolicyProviderConfig: { [key: string]: number } = {
+    'Psicólogo': 200,
+    'Nutricionista': 200,
+    'Terapeuta': 200,
+    'Fonoaudiólogo': 200,
+    'Profesional médico': 420,
+    'IPS': 420,
+  };
+  hasShownAmountMessage: boolean = false;
+
   expeditionDateRestrictions: { [key: number]: 'lastMonth' | 'currentYear' | 'last3Years' | 'last2Months' } = {
     108: 'lastMonth',
     113: 'lastMonth',
@@ -254,6 +265,45 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
     let value = control?.value;
     const formatted = this.formUtils.formatCurrency(value);
     control?.setValue(formatted, { emitEvent: false });
+  }
+
+  amountPolicyInfoAlert(onFocus: boolean = false): void {
+    if (onFocus && this.hasShownAmountMessage) return;
+    this.hasShownAmountMessage = true;
+
+    // Group by SMLVs num max
+    const groups: { [smlvNum: number]: string[] } = {};
+    for (let type in this.typePolicyProviderConfig) {
+      let smlvNum = this.typePolicyProviderConfig[type];
+      if (!groups[smlvNum]) groups[smlvNum] = [];
+      groups[smlvNum].push(type);
+    }
+
+    // Generate dinamic message
+    let html = '';
+    for (let smlvNum in groups) {
+      let provTypes = groups[smlvNum];
+      let value = this.SMLV * parseInt(smlvNum);
+      html += `
+        <p>
+          Para <strong>${provTypes.join(', ')}</strong> el valor no debe superar el tope de
+          <strong>${smlvNum} SMLV</strong>
+          (<strong>${smlvNum} x ${this.SMLV.toLocaleString('es-CO')} = $${value.toLocaleString('es-CO')}</strong>)
+        </p>
+      `;
+    }
+    html += `<p class="mt-3">Por favor verifica este monto.</p>`;
+
+    this.alertService.info(
+      'Información sobre topes de póliza',
+      html,
+      {
+        nzOkText: 'Entendido',
+        nzClosable: true,
+        nzWidth: 600,
+        nzContent: html,
+      }
+    );
   }
 
    /**
