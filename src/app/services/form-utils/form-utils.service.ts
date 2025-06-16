@@ -276,11 +276,11 @@ export class FormUtilsService {
    * @param toNumberType - Boolean to determine return in string or number.
    * @returns Formatted value.
    */
-  sanitizeToNumeric(value: string, toNumberType: boolean = false): string | number {
+  sanitizeToNumeric(value: string, toNumberType: boolean = false): string | number | null {
     const sanitized = value.replace(/\D/g, '');
     if (toNumberType) {
       const numeric = parseInt(sanitized, 10);
-      return isNaN(numeric) ? '' : numeric;
+      return isNaN(numeric) ? null : numeric;
     }
     return sanitized;
   }

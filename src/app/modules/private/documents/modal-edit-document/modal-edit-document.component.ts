@@ -48,7 +48,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
   expeditionDateRestrictions: { [key: number]: 'lastMonth' | 'currentYear' | 'last3Years' | 'last2Months' } = {
     108: 'lastMonth',
     113: 'lastMonth',
-    139: 'lastMonth',
+    139: 'last2Months',
     140: 'last2Months',
     4: 'currentYear',
     110: 'currentYear',
