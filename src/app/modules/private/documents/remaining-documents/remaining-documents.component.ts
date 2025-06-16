@@ -14,6 +14,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FileValidatorDirective } from 'src/app/directives/file-validator.directive';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { AlertService } from 'src/app/services/alerts/alert.service';
+import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 
 @Component({
    selector: 'app-remaining-documents',
@@ -48,6 +49,7 @@ export class RemainingDocumentsComponent implements OnInit {
       private notificationService: NzNotificationService,
       public formBuilder: FormBuilder,
       private alertService: AlertService,
+      private formUtils: FormUtilsService,
    ) { }
 
    ngOnInit(): void {
@@ -78,7 +80,13 @@ export class RemainingDocumentsComponent implements OnInit {
                   item.idTypeDocuments === 138
                     ? [Validators.required]
                     : [],
-                ]
+                ],
+                amountPolicy: [
+                  "",
+                  item.idTypeDocuments === 133
+                    ? [Validators.required]
+                    : [],
+                ],
               })
             );
             this.loadingData = false;
@@ -95,6 +103,13 @@ export class RemainingDocumentsComponent implements OnInit {
       reader.addEventListener('load', () => callback(reader.result!.toString()));
       reader.readAsDataURL(img);
    }
+
+  onAmountPolicyChange(index: number): void {
+    const control = this.formDocList[index].get('amountPolicy');
+    let value = control?.value;
+    const formatted = this.formUtils.formatCurrency(value);
+    control?.setValue(formatted, { emitEvent: false });
+  }
 
    triggerFileInput(index: number): void {
       const fileInput = this.fileInputs.toArray()[index].nativeElement;
@@ -126,6 +141,7 @@ export class RemainingDocumentsComponent implements OnInit {
       const fileForm = docForm.get("file")?.value;
       const fechaForm = docForm.get("fecha")?.value;
       const softwareForm = docForm.get("software")?.value;
+      const amountPolicyForm = docForm.get("amountPolicy")?.value;
 
       this.loadingData = true;
       const { idProvider } = this.clientSelected;
@@ -143,6 +159,9 @@ export class RemainingDocumentsComponent implements OnInit {
       }
       if (softwareForm && softwareForm !== '') {
          body.software = softwareForm;
+      }
+      if (amountPolicyForm) {
+         body.amountPolicy = this.formUtils.sanitizeToNumeric(amountPolicyForm, true);
       }
       fileToUpload.append('datos', JSON.stringify(body));
 
@@ -188,6 +207,12 @@ export class RemainingDocumentsComponent implements OnInit {
       softwareControl?.markAsTouched();
       softwareControl?.updateValueAndValidity();
       if (softwareControl?.invalid) return;
+    }
+    if (item.idTypeDocuments == 133) {
+      const amountPolicyControl = docForm.get("amountPolicy");
+      amountPolicyControl?.markAsTouched();
+      amountPolicyControl?.updateValueAndValidity();
+      if (amountPolicyControl?.invalid) return;
     }
 
     this.uploadDocuments(item, index);

@@ -72,12 +72,7 @@ export class FeedbackFivestarsComponent {
         const user = this.user;
         user.doesNeedSurvey = false;
         this.authService.saveUserLogged(user);
-        this.alertService.success(
-          '¡Gracias por tu feedback!',
-          'Tu opinión nos ayuda a mejorar.',
-          { nzMaskClosable: true }
-        );
-        this.modal.close();
+        this.modal.close({ submitted: true });
       },
       error: (error: any) => {
         this.enableCloseModal = true;

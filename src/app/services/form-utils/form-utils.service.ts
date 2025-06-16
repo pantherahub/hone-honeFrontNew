@@ -55,7 +55,7 @@ export class FormUtilsService {
    */
   url(control: AbstractControl): ValidationErrors | null {
     if (!control || !control.value) return null;
-    const urlPattern = /(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?)|(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9]{2,})?/g;
+    const urlPattern = /^(?![\w.+-]+@[\w-]+\.[\w.-]+$)(https?:\/\/)?((localhost)|((\d{1,3}\.){3}\d{1,3})|([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})(:\d+)?(\/[^\s]*)?(#\S*)?$/;
     return urlPattern.test(control.value) ? null : { invalidUrl: true };
   }
 
@@ -268,6 +268,33 @@ export class FormUtilsService {
 
       return hasError ? {} : null;
     };
+  }
+
+  /**
+   * Removes all non-numeric characters from a string.
+   * @param value - Value to be cleaned.
+   * @param toNumberType - Boolean to determine return in string or number.
+   * @returns Formatted value.
+   */
+  sanitizeToNumeric(value: string, toNumberType: boolean = false): string | number | null {
+    const sanitized = value.replace(/\D/g, '');
+    if (toNumberType) {
+      const numeric = parseInt(sanitized, 10);
+      return isNaN(numeric) ? null : numeric;
+    }
+    return sanitized;
+  }
+
+  /**
+   * Formats a string value as Colombian currency.
+   * @param numberValue - Value to format.
+   * @returns El valor formateado en formato 'es-CO' (ej: 34.500).
+   */
+  formatCurrency(numberValue: string | number): string {
+    if (numberValue == null) return '';
+    const raw = this.sanitizeToNumeric(numberValue.toString());
+    if (!raw) return '';
+    return Number(raw).toLocaleString('es-CO');
   }
 
 
