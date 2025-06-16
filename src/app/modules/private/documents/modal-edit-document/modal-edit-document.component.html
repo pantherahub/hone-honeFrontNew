@@ -506,14 +506,13 @@
                               ¡Este campo es obligatorio!
                             </p>
                         </ng-template>
-                        <!-- <input nz-input type="number" placeholder="Valor Póliza" formControlName="amountPolicy"> -->
                         <input
                           nz-input
                           type="text"
                           name="amountPolicy"
                           id="amountPolicy"
-                          [value]="amountPolicyFormatted"
-                          (input)="onAmountPolicyInput($event)"
+                          formControlName="amountPolicy"
+                          (input)="onAmountPolicyChange()"
                           autocomplete="off"
                           placeholder="Valor Póliza"
                         />

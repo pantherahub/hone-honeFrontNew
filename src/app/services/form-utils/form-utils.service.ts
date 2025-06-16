@@ -270,5 +270,32 @@ export class FormUtilsService {
     };
   }
 
+  /**
+   * Removes all non-numeric characters from a string.
+   * @param value - Value to be cleaned.
+   * @param toNumberType - Boolean to determine return in string or number.
+   * @returns Formatted value.
+   */
+  sanitizeToNumeric(value: string, toNumberType: boolean = false): string | number {
+    const sanitized = value.replace(/\D/g, '');
+    if (toNumberType) {
+      const numeric = parseInt(sanitized, 10);
+      return isNaN(numeric) ? '' : numeric;
+    }
+    return sanitized;
+  }
+
+  /**
+   * Formats a string value as Colombian currency.
+   * @param numberValue - Value to format.
+   * @returns El valor formateado en formato 'es-CO' (ej: 34.500).
+   */
+  formatCurrency(numberValue: string | number): string {
+    if (numberValue == null) return '';
+    const raw = this.sanitizeToNumeric(numberValue.toString());
+    if (!raw) return '';
+    return Number(raw).toLocaleString('es-CO');
+  }
+
 
 }

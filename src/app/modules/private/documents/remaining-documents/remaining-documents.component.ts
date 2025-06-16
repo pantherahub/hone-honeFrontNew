@@ -14,6 +14,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FileValidatorDirective } from 'src/app/directives/file-validator.directive';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { AlertService } from 'src/app/services/alerts/alert.service';
+import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 
 @Component({
    selector: 'app-remaining-documents',
@@ -48,6 +49,7 @@ export class RemainingDocumentsComponent implements OnInit {
       private notificationService: NzNotificationService,
       public formBuilder: FormBuilder,
       private alertService: AlertService,
+      private formUtils: FormUtilsService,
    ) { }
 
    ngOnInit(): void {
@@ -102,17 +104,12 @@ export class RemainingDocumentsComponent implements OnInit {
       reader.readAsDataURL(img);
    }
 
-  formatterPeso = (value: number | string): string => {
-    if (value == null || value === '') return '';
-    const number = typeof value === 'string' ? parseInt(value, 10) : Math.floor(value);
-    return `$ ${number.toLocaleString('es-CO')}`;
-  };
-  parserPeso = (value: string): string => {
-    if (!value) return '';
-    const cleaned = value.replace(/[$\s.]/g, '');
-    return cleaned;
-  };
-
+  onAmountPolicyChange(index: number): void {
+    const control = this.formDocList[index].get('amountPolicy');
+    let value = control?.value;
+    const formatted = this.formUtils.formatCurrency(value);
+    control?.setValue(formatted, { emitEvent: false });
+  }
 
    triggerFileInput(index: number): void {
       const fileInput = this.fileInputs.toArray()[index].nativeElement;
@@ -164,7 +161,7 @@ export class RemainingDocumentsComponent implements OnInit {
          body.software = softwareForm;
       }
       if (amountPolicyForm) {
-         body.amountPolicy = amountPolicyForm;
+         body.amountPolicy = this.formUtils.sanitizeToNumeric(amountPolicyForm, true);
       }
       fileToUpload.append('datos', JSON.stringify(body));
 

@@ -10,6 +10,7 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { FileValidatorDirective } from 'src/app/directives/file-validator.directive';
 import { DatePickerInputComponent } from 'src/app/shared/forms/date-picker-input/date-picker-input.component';
 import { AlertService } from 'src/app/services/alerts/alert.service';
+import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 
 @Component({
    selector: 'app-modal-edit-document',
@@ -57,17 +58,14 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
     137: 'last3Years',
   };
 
-  amountPolicyFormatted: string = '';
-
    constructor (
       private formBuilder: FormBuilder,
       private notificationService: NzNotificationService,
       private documentService: DocumentsCrudService,
       private eventManager: EventManagerService,
       private alertService: AlertService,
-   ) {
-      // this.createForm();
-   }
+      private formUtils: FormUtilsService,
+   ) { }
 
    ngAfterContentChecked (): void {}
 
@@ -164,8 +162,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
       if (!this.riskClassifierOptions.includes(riskClassifier)) {
         riskClassifier = null;
       }
-      const rawAmount = item.amountPolicy;
-      this.amountPolicyFormatted = rawAmount ? rawAmount.toLocaleString('es-CO') : '';
+      const amountPolicy = this.formUtils.formatCurrency(item.amountPolicy);
 
       this.documentForm.patchValue({
          software: item.software,
@@ -188,7 +185,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
          resolutionOfThePension: item.resolutionOfThePension,
          riskClassifier: riskClassifier,
          validityStartDate: this.convertDate(item.validityStartDate),
-         amountPolicy: item.amountPolicy,
+         amountPolicy: amountPolicy,
          tipodocumento: item.idTypeDocuments,
       });
    }
@@ -252,18 +249,11 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
     }
   };
 
-  onAmountPolicyInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const rawValue = input.value.replace(/[^\d]/g, '');
-    const numericValue = parseInt(rawValue, 10);
-
-    if (!isNaN(numericValue)) {
-      this.amountPolicyFormatted = numericValue.toLocaleString('es-CO');
-      this.documentForm.get('amountPolicy')?.setValue(numericValue);
-    } else {
-      this.amountPolicyFormatted = '';
-      this.documentForm.get('amountPolicy')?.setValue(null);
-    }
+  onAmountPolicyChange(): void {
+    const control = this.documentForm.get('amountPolicy');
+    let value = control?.value;
+    const formatted = this.formUtils.formatCurrency(value);
+    control?.setValue(formatted, { emitEvent: false });
   }
 
    /**
@@ -299,14 +289,18 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
 
       const docForm: Object = { ...this.documentForm.value };
 
-    for (const [key, value] of Object.entries(docForm)) {
-         if (value && value instanceof Date) {
-            fileToUpload.append(key, value.toString().split('T')[0]);
-         } else if (value != null && value.toString().trim() != '') {
-            fileToUpload.append(key, value);
-         } else {
-            fileToUpload.append(key, '');
-         }
+      for (const [key, value] of Object.entries(docForm)) {
+        if (value && value instanceof Date) {
+          fileToUpload.append(key, value.toString().split('T')[0]);
+        } else if (value != null && value.toString().trim() != '') {
+          let appendValue = value;
+          if (key === 'amountPolicy') {
+            appendValue = this.formUtils.sanitizeToNumeric(value, true);
+          }
+          fileToUpload.append(key, appendValue);
+        } else {
+          fileToUpload.append(key, '');
+        }
       }
 
       this.documentService.updateDocuments(this.documentId, fileToUpload).subscribe({

@@ -71,17 +71,15 @@
                               <ng-template #amountPolicyErrorTip>
                                 <p class="text-[13px] text-left">El campo es requerido.</p>
                               </ng-template>
-                              <!-- <input nz-input type="number" placeholder="Valor Póliza" formControlName="amountPolicy" id="amountPolicy"> -->
-                               <nz-input-number
+                                <input
+                                  nz-input
+                                  id="amountPolicy"
                                   formControlName="amountPolicy"
-                                  [nzMin]="0"
-                                  [nzStep]="1"
-                                  [nzPrecision]="0"
-                                  [nzFormatter]="formatterPeso"
-                                  [nzParser]="parserPeso"
-                                  style="width: 100%"
-                                  nzPlaceHolder="Valor Póliza"
-                                ></nz-input-number>
+                                  type="text"
+                                  placeholder="Valor Póliza"
+                                  (input)="onAmountPolicyChange(i)"
+                                  autocomplete="off"
+                                />
                             </nz-form-control>
                           </nz-form-item>
                         }
