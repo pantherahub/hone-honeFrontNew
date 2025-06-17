@@ -153,40 +153,6 @@ export class FormUtilsService {
   }
 
   /**
-   * Capitalize connectors in string.
-   */
-  capitalizeWords(value: string): string {
-    const connectors = [
-        'de',
-        'del',
-        'la',
-        'las',
-        'los',
-        'y',
-        'a',
-        'en',
-        'el',
-        'al',
-        'por',
-        'para',
-        'con',
-        'o'
-    ];
-    if (typeof value != 'string') return value;
-
-    return value
-        .toLowerCase()
-        .split(' ')
-        .map((word, index) => {
-            if (index !== 0 && connectors.includes(word)) {
-                return word;
-            }
-            return word.charAt(0).toUpperCase() + word.slice(1);
-        })
-        .join(' ');
-  }
-
-  /**
    * Validates date ranges.
    * @param startField - The name of the initial date field.
    * @param endField - The name of the final date field.
