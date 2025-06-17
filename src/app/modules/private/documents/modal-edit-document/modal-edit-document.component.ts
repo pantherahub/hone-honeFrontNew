@@ -11,6 +11,7 @@ import { FileValidatorDirective } from 'src/app/directives/file-validator.direct
 import { DatePickerInputComponent } from 'src/app/shared/forms/date-picker-input/date-picker-input.component';
 import { AlertService } from 'src/app/services/alerts/alert.service';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
+import { formatListWithY } from 'src/app/utils/string-utils';
 
 @Component({
    selector: 'app-modal-edit-document',
@@ -271,7 +272,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
     if (onFocus && this.hasShownAmountMessage) return;
     this.hasShownAmountMessage = true;
 
-    // Group by SMLVs num max
+    // Group by SMLVs num min
     const groups: { [smlvNum: number]: string[] } = {};
     for (let type in this.typePolicyProviderConfig) {
       let smlvNum = this.typePolicyProviderConfig[type];
@@ -286,16 +287,16 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
       let value = this.SMLV * parseInt(smlvNum);
       html += `
         <p>
-          Para <strong>${provTypes.join(', ')}</strong> el valor no debe superar el tope de
+          Para <strong>${formatListWithY(provTypes)}</strong>, el valor mínimo requerido de la póliza es equivalente a
           <strong>${smlvNum} SMLV</strong>
-          (<strong>${smlvNum} x ${this.SMLV.toLocaleString('es-CO')} = $${value.toLocaleString('es-CO')}</strong>)
+          (<strong>${smlvNum} x $${this.SMLV.toLocaleString('es-CO')} = $${value.toLocaleString('es-CO')}</strong>)
         </p>
       `;
     }
     html += `<p class="mt-3">Por favor verifica este monto.</p>`;
 
     this.alertService.info(
-      'Información sobre topes de póliza',
+      'Información sobre valores de póliza',
       html,
       {
         nzOkText: 'Entendido',
