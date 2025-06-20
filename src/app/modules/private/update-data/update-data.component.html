@@ -47,7 +47,21 @@
 
             <nz-col [nzSpan]="24" [nzSm]="12">
               <nz-form-item>
-                <nz-form-label [nzRequired]="true" nzFor="email">Correo electrónico</nz-form-label>
+                <nz-form-label [nzRequired]="true" nzFor="email">
+                  Correo electrónico del prestador
+                  <div
+                    nz-tooltip
+                    [nzTooltipTitle]="emailTooltip"
+                    nzPlacement="top"
+                    nzTooltipOverlayClassName="large-tooltip-custom">
+                    <i nz-icon nzType="info-circle" nzTheme="fill" class="info-icon"></i>
+                  </div>
+                  <ng-template #emailTooltip>
+                    @for (msg of emailInfoMessage; track $index) {
+                      <p>{{ msg }}</p>
+                    }
+                  </ng-template>
+                </nz-form-label>
                 <nz-form-control [nzErrorTip]="emailErrorTip">
                   <ng-template #emailErrorTip>
                     @if (providerForm.controls['email'].hasError('required')) {

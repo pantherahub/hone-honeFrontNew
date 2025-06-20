@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { isEmail, isNumeric, isTelephoneNumber, isUrl } from 'src/app/utils/validation-utils';
 
 @Injectable({
   providedIn: 'root'
@@ -37,7 +38,7 @@ export class FormUtilsService {
    */
   numeric(control: AbstractControl): ValidationErrors | null {
     if (!control || !control.value) return null;
-    return /^[0-9]+$/.test(control.value) ? null : { invalidNumber: true };
+    return isNumeric(control.value) ? null : { invalidNumber: true };
   }
 
   /**
@@ -46,8 +47,7 @@ export class FormUtilsService {
    */
   telephoneNumber(control: AbstractControl): ValidationErrors | null {
     if (!control || !control.value) return null;
-    const regex = /^[0-9#]*$/;
-    return regex.test(control.value) ? null : { invalidTelNumber: true };
+    return isTelephoneNumber(control.value) ? null : { invalidTelNumber: true };
   }
 
   /**
@@ -55,17 +55,15 @@ export class FormUtilsService {
    */
   url(control: AbstractControl): ValidationErrors | null {
     if (!control || !control.value) return null;
-    const urlPattern = /^(?![\w.+-]+@[\w-]+\.[\w.-]+$)(https?:\/\/)?((localhost)|((\d{1,3}\.){3}\d{1,3})|([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})(:\d+)?(\/[^\s]*)?(#\S*)?$/;
-    return urlPattern.test(control.value) ? null : { invalidUrl: true };
+    return isUrl(control.value) ? null : { invalidUrl: true };
   }
 
   /**
    * Email validator.
    */
-  emailValidator(control: AbstractControl): ValidationErrors | null {
+  email(control: AbstractControl): ValidationErrors | null {
     if (!control || !control.value) return null;
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return emailPattern.test(control.value) ? null : { invalidEmail: true };
+    return isEmail(control.value) ? null : { invalidEmail: true };
   }
 
   /**

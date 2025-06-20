@@ -5,8 +5,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { EventManagerService } from '../../../services/events-manager/event-manager.service';
 import { ContactsProviderServicesService } from '../../../services/contacts-provider/contacts-provider.services.service';
-import { mailRegexpValidation } from '../../../utils/constant';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { REGEX_PATTERNS } from 'src/app/constants/regex-patterns';
 
 
 @Component({
@@ -52,12 +52,11 @@ export class ContactsProviderComponent implements OnInit {
       name: ['', Validators.required,],
       SurName: ['', Validators.required,],
       phone: [''],
-      email: ['', [Validators.required, Validators.pattern(mailRegexpValidation)]]
-
+      email: ['', [Validators.required, Validators.pattern(REGEX_PATTERNS.email)]],
     });
   }
   /**
-     * getContactsByIDProvider, función que consume servicios de todos los contactos por el prestador logueado 
+     * getContactsByIDProvider, función que consume servicios de todos los contactos por el prestador logueado
      */
   getContactsByIDProvider(idProvider: any) {
     this.contact.getContactById(idProvider).subscribe((data: any) => {

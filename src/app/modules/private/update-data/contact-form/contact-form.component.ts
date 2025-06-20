@@ -382,7 +382,7 @@ export class ContactFormComponent implements OnInit {
   createEmailGroup(email: any | null = null): FormGroup {
     const emailGroup = this.fb.group({
       idEmail: [email?.idEmail || null],
-      email: [email?.email || '', [Validators.required, this.formUtils.emailValidator]],
+      email: [email?.email || '', [Validators.required, this.formUtils.email]],
       status: [email ? email.status || null : 'created'] // updated, created, null for existing emails
     });
     return emailGroup;
