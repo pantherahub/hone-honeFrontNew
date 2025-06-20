@@ -1,10 +1,9 @@
 import { Component, ElementRef, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { DocumentsCrudService } from '../../../../services/documents/documents-crud.service';
-import { DocumentInterface } from '../../../../models/client.interface';
+import { DocumentInterface, PercentInterface } from '../../../../models/client.interface';
 import { EventManagerService } from '../../../../services/events-manager/event-manager.service';
 import { NgZorroModule } from '../../../../ng-zorro.module';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
-import { Observable, Observer } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
 import { NzUploadFile } from 'ng-zorro-antd/upload';
@@ -15,6 +14,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FileValidatorDirective } from 'src/app/directives/file-validator.directive';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { AlertService } from 'src/app/services/alerts/alert.service';
+import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
+import { formatListWithY } from 'src/app/utils/string-utils';
 
 @Component({
    selector: 'app-remaining-documents',
@@ -24,6 +25,7 @@ import { AlertService } from 'src/app/services/alerts/alert.service';
    styleUrl: './remaining-documents.component.scss'
 })
 export class RemainingDocumentsComponent implements OnInit {
+
    loading: boolean = false;
    clientSelected: any = this.eventManager.clientSelected();
    counterApi: any = this.eventManager.getPercentApi();
@@ -42,16 +44,29 @@ export class RemainingDocumentsComponent implements OnInit {
     8, 22, 132, 133, 137, 142
   ];
 
+  readonly SMLV: number = 1423500;
+  readonly typePolicyProviderConfig: { [key: string]: number } = {
+    'Psicólogo': 200,
+    'Nutricionista': 200,
+    'Terapeuta': 200,
+    'Fonoaudiólogo': 200,
+    'Profesional médico': 420,
+    'IPS': 420,
+  };
+
+  hasShownAmountMessage: boolean = false;
+
    constructor(
       private eventManager: EventManagerService,
       private documentService: DocumentsCrudService,
       private notificationService: NzNotificationService,
       public formBuilder: FormBuilder,
       private alertService: AlertService,
+      private formUtils: FormUtilsService,
    ) { }
 
    ngOnInit(): void {
-      this.getDocumentsToUpload();
+     this.getDocumentsToUpload();
    }
 
   hasExpirationField(idDoc: number | undefined): boolean {
@@ -78,7 +93,13 @@ export class RemainingDocumentsComponent implements OnInit {
                   item.idTypeDocuments === 138
                     ? [Validators.required]
                     : [],
-                ]
+                ],
+                amountPolicy: [
+                  "",
+                  item.idTypeDocuments === 133
+                    ? [Validators.required]
+                    : [],
+                ],
               })
             );
             this.loadingData = false;
@@ -95,6 +116,52 @@ export class RemainingDocumentsComponent implements OnInit {
       reader.addEventListener('load', () => callback(reader.result!.toString()));
       reader.readAsDataURL(img);
    }
+
+  onAmountPolicyChange(index: number): void {
+    const control = this.formDocList[index].get('amountPolicy');
+    let value = control?.value;
+    const formatted = this.formUtils.formatCurrency(value);
+    control?.setValue(formatted, { emitEvent: false });
+  }
+
+  amountPolicyInfoAlert(onFocus: boolean = false): void {
+    if (onFocus && this.hasShownAmountMessage) return;
+    this.hasShownAmountMessage = true;
+
+    // Group by SMLVs num min
+    const groups: { [smlvNum: number]: string[] } = {};
+    for (let type in this.typePolicyProviderConfig) {
+      let smlvNum = this.typePolicyProviderConfig[type];
+      if (!groups[smlvNum]) groups[smlvNum] = [];
+      groups[smlvNum].push(type);
+    }
+
+    // Generate dinamic message
+    let html = '';
+    for (let smlvNum in groups) {
+      let provTypes = groups[smlvNum];
+      let value = this.SMLV * parseInt(smlvNum);
+      html += `
+        <p>
+          Para <strong>${formatListWithY(provTypes)}</strong>, el valor mínimo requerido de la póliza es equivalente a
+          <strong>${smlvNum} SMLV</strong>
+          (<strong>${smlvNum} x $${this.SMLV.toLocaleString('es-CO')} = $${value.toLocaleString('es-CO')}</strong>)
+        </p>
+      `;
+    }
+    html += `<p class="mt-3">Por favor verifica este monto.</p>`;
+
+    this.alertService.info(
+      'Información sobre valores de póliza',
+      html,
+      {
+        nzOkText: 'Entendido',
+        nzClosable: true,
+        nzWidth: 600,
+        nzContent: html,
+      }
+    );
+  }
 
    triggerFileInput(index: number): void {
       const fileInput = this.fileInputs.toArray()[index].nativeElement;
@@ -126,6 +193,7 @@ export class RemainingDocumentsComponent implements OnInit {
       const fileForm = docForm.get("file")?.value;
       const fechaForm = docForm.get("fecha")?.value;
       const softwareForm = docForm.get("software")?.value;
+      const amountPolicyForm = docForm.get("amountPolicy")?.value;
 
       this.loadingData = true;
       const { idProvider } = this.clientSelected;
@@ -143,6 +211,9 @@ export class RemainingDocumentsComponent implements OnInit {
       }
       if (softwareForm && softwareForm !== '') {
          body.software = softwareForm;
+      }
+      if (amountPolicyForm) {
+         body.amountPolicy = this.formUtils.sanitizeToNumeric(amountPolicyForm, true);
       }
       fileToUpload.append('datos', JSON.stringify(body));
 
@@ -188,6 +259,12 @@ export class RemainingDocumentsComponent implements OnInit {
       softwareControl?.markAsTouched();
       softwareControl?.updateValueAndValidity();
       if (softwareControl?.invalid) return;
+    }
+    if (item.idTypeDocuments == 133) {
+      const amountPolicyControl = docForm.get("amountPolicy");
+      amountPolicyControl?.markAsTouched();
+      amountPolicyControl?.updateValueAndValidity();
+      if (amountPolicyControl?.invalid) return;
     }
 
     this.uploadDocuments(item, index);

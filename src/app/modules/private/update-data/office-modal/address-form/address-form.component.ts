@@ -4,6 +4,7 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { NzModalRef } from 'ng-zorro-antd/modal';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
+import { capitalizeWords } from 'src/app/utils/string-utils';
 
 @Component({
   selector: 'app-address-form',
@@ -134,7 +135,7 @@ export class AddressFormComponent implements OnInit {
 
     const roadNameControl = this.addressForm.get('roadName');
     roadNameControl?.setValue(
-      this.formUtils.capitalizeWords(roadNameControl?.value)
+      capitalizeWords(roadNameControl?.value)
     );
 
     this.addressForm.patchValue({

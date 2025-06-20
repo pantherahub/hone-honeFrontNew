@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { isEmail, isNumeric, isTelephoneNumber, isUrl } from 'src/app/utils/validation-utils';
 
 @Injectable({
   providedIn: 'root'
@@ -37,7 +38,7 @@ export class FormUtilsService {
    */
   numeric(control: AbstractControl): ValidationErrors | null {
     if (!control || !control.value) return null;
-    return /^[0-9]+$/.test(control.value) ? null : { invalidNumber: true };
+    return isNumeric(control.value) ? null : { invalidNumber: true };
   }
 
   /**
@@ -46,8 +47,7 @@ export class FormUtilsService {
    */
   telephoneNumber(control: AbstractControl): ValidationErrors | null {
     if (!control || !control.value) return null;
-    const regex = /^[0-9#]*$/;
-    return regex.test(control.value) ? null : { invalidTelNumber: true };
+    return isTelephoneNumber(control.value) ? null : { invalidTelNumber: true };
   }
 
   /**
@@ -55,17 +55,15 @@ export class FormUtilsService {
    */
   url(control: AbstractControl): ValidationErrors | null {
     if (!control || !control.value) return null;
-    const urlPattern = /(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?)|(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9]{2,})?/g;
-    return urlPattern.test(control.value) ? null : { invalidUrl: true };
+    return isUrl(control.value) ? null : { invalidUrl: true };
   }
 
   /**
    * Email validator.
    */
-  emailValidator(control: AbstractControl): ValidationErrors | null {
+  email(control: AbstractControl): ValidationErrors | null {
     if (!control || !control.value) return null;
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return emailPattern.test(control.value) ? null : { invalidEmail: true };
+    return isEmail(control.value) ? null : { invalidEmail: true };
   }
 
   /**
@@ -153,40 +151,6 @@ export class FormUtilsService {
   }
 
   /**
-   * Capitalize connectors in string.
-   */
-  capitalizeWords(value: string): string {
-    const connectors = [
-        'de',
-        'del',
-        'la',
-        'las',
-        'los',
-        'y',
-        'a',
-        'en',
-        'el',
-        'al',
-        'por',
-        'para',
-        'con',
-        'o'
-    ];
-    if (typeof value != 'string') return value;
-
-    return value
-        .toLowerCase()
-        .split(' ')
-        .map((word, index) => {
-            if (index !== 0 && connectors.includes(word)) {
-                return word;
-            }
-            return word.charAt(0).toUpperCase() + word.slice(1);
-        })
-        .join(' ');
-  }
-
-  /**
    * Validates date ranges.
    * @param startField - The name of the initial date field.
    * @param endField - The name of the final date field.
@@ -268,6 +232,33 @@ export class FormUtilsService {
 
       return hasError ? {} : null;
     };
+  }
+
+  /**
+   * Removes all non-numeric characters from a string.
+   * @param value - Value to be cleaned.
+   * @param toNumberType - Boolean to determine return in string or number.
+   * @returns Formatted value.
+   */
+  sanitizeToNumeric(value: string, toNumberType: boolean = false): string | number | null {
+    const sanitized = value.replace(/\D/g, '');
+    if (toNumberType) {
+      const numeric = parseInt(sanitized, 10);
+      return isNaN(numeric) ? null : numeric;
+    }
+    return sanitized;
+  }
+
+  /**
+   * Formats a string value as Colombian currency.
+   * @param numberValue - Value to format.
+   * @returns El valor formateado en formato 'es-CO' (ej: 34.500).
+   */
+  formatCurrency(numberValue: string | number): string {
+    if (numberValue == null) return '';
+    const raw = this.sanitizeToNumeric(numberValue.toString());
+    if (!raw) return '';
+    return Number(raw).toLocaleString('es-CO');
   }
 
 

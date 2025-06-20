@@ -3,8 +3,8 @@ import { NgZorroModule } from '../../../../ng-zorro.module';
 import { CommonModule } from '@angular/common';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { mailRegexpValidation } from '../../../../utils/constant';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
+import { REGEX_PATTERNS } from 'src/app/constants/regex-patterns';
 
 @Component({
   selector: 'app-assistance-providers',
@@ -40,7 +40,7 @@ export class AssistanceProvidersComponent implements OnInit {
       identification: ['', [Validators.required]],
       nameProvider: ['', [Validators.required]],
       address: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.pattern(mailRegexpValidation)]],
+      email: ['', [Validators.required, Validators.pattern(REGEX_PATTERNS.email)]],
       phone: ['', [Validators.required]],
       provider_new: [null, [Validators.required]],
       provider_attached: [null, [Validators.required]],
@@ -50,12 +50,12 @@ export class AssistanceProvidersComponent implements OnInit {
       nameAssistante: [''],
       idProvider : [''],
       idOfficeProvider : [''],
-      idClientHoneSolutions: [''],     
-      dateAssistance: [''],     
+      idClientHoneSolutions: [''],
+      dateAssistance: [''],
     });
   }
   /**
-   * cambio de evento para el check, donde selecciona uno y descomenta el otro chekc, ademas 
+   * cambio de evento para el check, donde selecciona uno y descomenta el otro chekc, ademas
    * de enviar tipo de dato number segun el boolean
    * @param type -boolean
    * @param value - 1 for TRUE, OR 0 for FALSE
@@ -77,9 +77,9 @@ export class AssistanceProvidersComponent implements OnInit {
   }
 
   /**
-   * @message deshabilitacion de campos del fomulario 
+   * @message deshabilitacion de campos del fomulario
    * @data Cuando la url tiene datos
-   * @param controlsToDisable 
+   * @param controlsToDisable
    */
   disableFormControls(controlsToDisable: string[]) {
     controlsToDisable.forEach(controlName => {
