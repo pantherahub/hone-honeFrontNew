@@ -6,7 +6,7 @@ import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 import { OfficeModalComponent } from './office-modal/office-modal.component';
 import { ClientProviderService } from 'src/app/services/clients/client-provider.service';
-import { LANGUAGES } from 'src/app/utils/languages';
+import { LANGUAGES } from 'src/app/constants/languages';
 import { ContactFormComponent } from './contact-form/contact-form.component';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -18,6 +18,7 @@ import { AuthService } from 'src/app/services/auth.service';
 import { CanComponentDeactivate } from 'src/app/guards/can-deactivate.interface';
 import { Router } from '@angular/router';
 import { NavigationService } from 'src/app/services/navigation/navigation.service';
+import { isEmail } from 'src/app/utils/validation-utils';
 
 @Component({
   selector: 'app-update-data',
@@ -180,7 +181,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
           value: isValidEmail ? this.user.email : '',
           disabled: isValidEmail
         },
-        [Validators.required, this.formUtils.emailValidator]
+        [Validators.required, this.formUtils.email]
       ],
       name: [
         { value: this.user.name || '', disabled: true },
@@ -240,7 +241,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
 
   isValidEmail(email: string | undefined): boolean {
     if (!email || typeof email != 'string') return false;
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email || '');
+    return isEmail(email || '');
   }
 
   getIdentificationTypes() {

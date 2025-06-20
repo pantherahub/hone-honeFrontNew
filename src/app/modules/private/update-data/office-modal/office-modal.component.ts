@@ -212,7 +212,7 @@ export class OfficeModalComponent implements OnInit {
       name: [this.office?.name || '', [Validators.required]],
       cityName: [this.office?.cityName || this.office?.City?.city || ''],
       schedulingLink: [this.office?.schedulingLink || '', [this.formUtils.url]],
-      emailGlosas: [this.office?.emailGlosas || '', [this.formUtils.emailValidator]],
+      emailGlosas: [this.office?.emailGlosas || '', [this.formUtils.email]],
 
       enableCode: [this.office?.enableCode || '', [this.formUtils.numeric, this.enableCodeValidator]],
       enableStartDateCode: [this.convertDate(this.office?.enableStartDateCode) || null],
