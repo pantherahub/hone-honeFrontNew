@@ -51,10 +51,16 @@
                   Correo electrónico del prestador
                   <div
                     nz-tooltip
-                    nzTooltipTitle="Correo único corporativo o personal del prestador"
-                    nzPlacement="top">
+                    [nzTooltipTitle]="emailTooltip"
+                    nzPlacement="top"
+                    nzTooltipOverlayClassName="large-tooltip-custom">
                     <i nz-icon nzType="info-circle" nzTheme="fill" class="info-icon"></i>
                   </div>
+                  <ng-template #emailTooltip>
+                    @for (msg of emailInfoMessage; track $index) {
+                      <p>{{ msg }}</p>
+                    }
+                  </ng-template>
                 </nz-form-label>
                 <nz-form-control [nzErrorTip]="emailErrorTip">
                   <ng-template #emailErrorTip>

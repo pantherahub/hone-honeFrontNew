@@ -54,6 +54,11 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
   showFloatingButton = true;
   @ViewChild('footerButton') footerButton!: ElementRef;
 
+  emailInfoMessage: string[] = [
+    "Correo único corporativo o personal del prestador.",
+    "En caso de que administres o gestiones mas de un prestador, asegúrate de que el correo electrónico registrado sea el personal o corporativo correspondiente a cada uno de ellos."
+  ];
+
   constructor (
     private eventManager: EventManagerService,
     private fb: FormBuilder,
