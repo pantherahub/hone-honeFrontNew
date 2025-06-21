@@ -24,8 +24,12 @@
             <nz-alert
               nzType="warning"
               nzCloseable
-              nzMessage="Asegúrate de hacer el envío de todo el formulario para ver reflejados los cambios."
+              [nzMessage]="alertDescription"
             ></nz-alert>
+            <ng-template #alertDescription>
+              Asegúrate de hacer el envío de todo el formulario para ver reflejados los cambios.
+              <a (click)="scrollToFooter()" class="text-blue-600 hover:underline cursor-pointer">Ir al botón de envío</a>.
+            </ng-template>
           </div>
 
           <div nz-row [nzGutter]="16">
@@ -43,7 +47,21 @@
 
             <nz-col [nzSpan]="24" [nzSm]="12">
               <nz-form-item>
-                <nz-form-label [nzRequired]="true" nzFor="email">Correo electrónico</nz-form-label>
+                <nz-form-label [nzRequired]="true" nzFor="email">
+                  Correo electrónico del prestador
+                  <div
+                    nz-tooltip
+                    [nzTooltipTitle]="emailTooltip"
+                    nzPlacement="top"
+                    nzTooltipOverlayClassName="large-tooltip-custom">
+                    <i nz-icon nzType="info-circle" nzTheme="fill" class="info-icon"></i>
+                  </div>
+                  <ng-template #emailTooltip>
+                    @for (msg of emailInfoMessage; track $index) {
+                      <p>{{ msg }}</p>
+                    }
+                  </ng-template>
+                </nz-form-label>
                 <nz-form-control [nzErrorTip]="emailErrorTip">
                   <ng-template #emailErrorTip>
                     @if (providerForm.controls['email'].hasError('required')) {
@@ -98,6 +116,22 @@
                     }
                   </ng-template>
                   <input nz-input id="dv" formControlName="dv" placeholder="Dígito" type="number" min="0" max="9" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+
+            <nz-col [nzSpan]="24" [nzSm]="12">
+              <nz-form-item>
+                <nz-form-label [nzRequired]="true" nzFor="repsEnableCode">Código habilitación REPS</nz-form-label>
+                <nz-form-control [nzErrorTip]="repsEnableCodeErrorTip">
+                  <ng-template #repsEnableCodeErrorTip>
+                    @if (providerForm.controls['repsEnableCode'].hasError('required')) {
+                      El campo es requerido.
+                    } @else if (providerForm.controls['repsEnableCode'].hasError('invalidNumber')) {
+                      Solo se permiten números.
+                    }
+                  </ng-template>
+                  <input nz-input id="repsEnableCode" formControlName="repsEnableCode" placeholder="Código" />
                 </nz-form-control>
               </nz-form-item>
             </nz-col>
@@ -205,10 +239,24 @@
         <app-backend-errors [error]="backendError"></app-backend-errors>
 
         <div class="update-data__footer">
-          <button class="btn-primary bg-green-500 hover:bg-green-500/80" type="submit" [disabled]="loading">Actualizar datos</button>
+          <button #footerButton class="btn-primary bg-green-500 hover:bg-green-500/80" type="submit" [disabled]="loading">Actualizar datos</button>
         </div>
       </form>
 
     </div>
   </nz-col>
 </nz-row>
+
+
+<button
+  [ngClass]="{
+    'opacity-100 pointer-events-auto': showFloatingButton,
+    'opacity-0 pointer-events-none': !showFloatingButton
+  }"
+  class="fixed bottom-6 right-6 lg:bottom-10 lg:right-10 z-50 bg-blue-600 text-white rounded-full p-3 shadow-lg hover:bg-blue-700 transition-opacity duration-500 ease-in-out"
+  (click)="scrollToFooter()"
+>
+  <svg width="20" height="20">
+    <use xlink:href="/assets/icons/layout.svg#angle-down" />
+  </svg>
+</button>

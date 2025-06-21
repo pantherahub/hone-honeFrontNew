@@ -1,0 +1,58 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="feedback-container space-y-4">
+
+  <div class="flex flex-col">
+    <label class="block text-sm font-medium">* Califica la experiencia</label>
+    <div>
+      <nz-rate formControlName="rating" [nzTooltips]="tooltips" [nzAllowClear]="false"></nz-rate>
+      @if (form.value.rating) {
+        <span class="ant-rate-text text-sm text-gray-600">{{ tooltips[form.value.rating - 1] }}</span>
+      }
+    </div>
+    <small class="text-red-500" *ngIf="form.get('rating')?.invalid && form.get('rating')?.touched">
+      El campo es requerido.
+    </small>
+  </div>
+
+  <div>
+    <label for="comments" class="block text-sm font-medium mb-1">Cuentános sobre tu experiencia en Lissom</label>
+    <textarea id="comments" formControlName="comments" maxlength="500" rows="4"
+      class="w-full border rounded p-2 text-sm focus:outline-none focus:ring resize-y min-h-24 max-h-48"
+      placeholder="Escribe tus comentarios..."></textarea>
+  </div>
+
+  <div>
+    <label class="block text-sm font-medium">¿Podemos ponernos en contacto contigo?</label>
+    <div class="flex space-x-4 mt-1">
+      <label class="flex items-center gap-2 cursor-pointer">
+        <input type="radio" formControlName="canContact" [value]="true" class="cursor-pointer" />
+        Sí
+      </label>
+      <label class="flex items-center gap-2 cursor-pointer">
+        <input type="radio" formControlName="canContact" [value]="false" class="cursor-pointer" />
+        No
+      </label>
+    </div>
+  </div>
+
+  @if (form.value.canContact === true) {
+    <div>
+      <label for="phoneNumber" class="block text-sm font-medium mb-1">* Número telefónico</label>
+      <input type="tel" id="phoneNumber" formControlName="phoneNumber"
+        class="w-full border rounded p-2 text-sm focus:outline-none focus:ring"
+        placeholder="Ej. 3001234567" />
+      <small class="text-red-500" *ngIf="form.get('phoneNumber')?.invalid && form.get('phoneNumber')?.touched">
+        @if (form.get('phoneNumber')?.hasError('required')) {
+          El campo es requerido.
+        } @else if (form.get('phoneNumber')?.hasError('invalidNumber')) {
+          Ingresa un número válido.
+        }
+      </small>
+    </div>
+  }
+
+  <div class="flex justify-end gap-2 mt-4">
+    <button *ngIf="enableCloseModal" type="button" nz-button (click)="closeModal()">Cancelar</button>
+    <button type="submit" nz-button  nzType="primary">Enviar</button>
+  </div>
+
+</form>

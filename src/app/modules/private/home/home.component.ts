@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, TemplateRef, ViewChild, effect } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, TemplateRef, ViewChild, effect } from '@angular/core';
 import { ClientInterface } from '../../../models/client.interface';
 import { ClientProviderService } from '../../../services/clients/client-provider.service';
 
@@ -39,7 +39,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     private tutorialService: TutorialService,
     private eventManager: EventManagerService,
     private router: Router,
-    private modal: NzModalService
+    private modal: NzModalService,
   ) {
     localStorage.removeItem('clientSelected');
     this.eventManager.clientSelected.set({});

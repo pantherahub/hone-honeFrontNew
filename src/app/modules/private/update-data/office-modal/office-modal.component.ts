@@ -14,11 +14,13 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { AlertService } from 'src/app/services/alerts/alert.service';
 import { ScheduleFormComponent } from './schedule-form/schedule-form.component';
 import { AddressFormComponent } from './address-form/address-form.component';
+import { DatePickerInputComponent } from 'src/app/shared/forms/date-picker-input/date-picker-input.component';
+import { format } from 'date-fns';
 
 @Component({
   selector: 'app-office-modal',
   standalone: true,
-  imports: [NgZorroModule, CommonModule],
+  imports: [NgZorroModule, CommonModule, DatePickerInputComponent],
   templateUrl: './office-modal.component.html',
   styleUrl: './office-modal.component.scss'
 })
@@ -28,6 +30,8 @@ export class OfficeModalComponent implements OnInit {
   @Input() office: any | null = null;
 
   officeForm!: FormGroup;
+  hasChanges = false;
+
   cities: any[] = [];
   companyList: CompanyInterface[] = [];
 
@@ -61,7 +65,9 @@ export class OfficeModalComponent implements OnInit {
   ngOnInit(): void {
     this.getCities();
     this.getCompanyList();
+
     this.initializeForm();
+    this.detectFormChanges();
   }
 
   getCities() {
@@ -177,9 +183,7 @@ export class OfficeModalComponent implements OnInit {
 
   getIdsCompanies(): number[] {
     if (!this.office) {
-      // If office is new, initialize with the companies that already have an agreement
-      const companiesIds = this.providerCompanies.map((c: any) => c.idCompany);
-      return companiesIds;
+      return [];
     } else if (this.office.idsCompanies) {
       return this.office.idsCompanies;
     } else if (this.office.Companies) {
@@ -188,16 +192,32 @@ export class OfficeModalComponent implements OnInit {
     return [];
   }
 
+  detectFormChanges() {
+    this.officeForm.valueChanges.subscribe(() => {
+      this.hasChanges = true;
+    });
+  }
+
+  convertDate(date: string) {
+    if (!date) return null;
+    return date.split('T')[0];
+  }
+
   initializeForm() {
     this.officeForm = this.fb.group({
       idTemporalOfficeProvider: [this.office?.idTemporalOfficeProvider || null],
       idAddedTemporal: [this.office?.idTemporalOfficeProvider ? null : this.office?.idAddedTemporal ?? Date.now().toString()],
       idCity: [this.office?.idCity || '', [Validators.required]],
       address: [this.office?.address || null, [Validators.required]],
-      enableCode: [this.office?.enableCode || '', [Validators.required, this.formUtils.numeric, this.enableCodeValidator]],
       name: [this.office?.name || '', [Validators.required]],
       cityName: [this.office?.cityName || this.office?.City?.city || ''],
       schedulingLink: [this.office?.schedulingLink || '', [this.formUtils.url]],
+      emailGlosas: [this.office?.emailGlosas || '', [this.formUtils.email]],
+
+      enableCode: [this.office?.enableCode || '', [this.formUtils.numeric, this.enableCodeValidator]],
+      enableStartDateCode: [this.convertDate(this.office?.enableStartDateCode) || null],
+      enableEndDateCode: [this.convertDate(this.office?.enableEndDateCode) || null],
+
       idsCompanies: [this.getIdsCompanies(), [Validators.required]],
 
       updatedSchedules: this.fb.array(this.office?.updatedSchedules ?? []),
@@ -209,6 +229,8 @@ export class OfficeModalComponent implements OnInit {
       deletedContacts: this.fb.array(this.office?.deletedContacts ?? []),
 
       TemporalSchedules: [this.office?.TemporalSchedules], // Save schedules state
+    }, {
+        validators: [this.formUtils.validateDateRange('enableStartDateCode', 'enableEndDateCode', 'enableDateRange', true)],
     });
 
     if (this.office) {
@@ -219,7 +241,6 @@ export class OfficeModalComponent implements OnInit {
 
     let previousCityId = this.office?.idCity || null;
     this.officeForm.get('idCity')?.valueChanges
-      .pipe()
       .subscribe(async (newIdCity) => {
         if (newIdCity === previousCityId) return;
         else if (!previousCityId) {
@@ -244,6 +265,21 @@ export class OfficeModalComponent implements OnInit {
         this.updateCity(newIdCity);
         previousCityId = newIdCity;
       });
+
+    this.officeForm.get('enableCode')?.valueChanges.subscribe(value => {
+      if (!value) {
+        this.officeForm.patchValue({
+          enableStartDateCode: null,
+          enableEndDateCode: null,
+        });
+        this.officeForm.get('enableStartDateCode')?.setErrors(null);
+        this.officeForm.get('enableEndDateCode')?.setErrors(null);
+      }
+    });
+  }
+
+  get enableCode() {
+    return this.officeForm.get('enableCode')?.value;
   }
 
   enableCodeValidator(control: AbstractControl) {
@@ -387,7 +423,6 @@ export class OfficeModalComponent implements OnInit {
 
     const modalRef = this.modalService.create<ScheduleFormComponent, any>({
       nzTitle: schedule ? 'Actualizar horario de atención' : 'Agregar horario de atención',
-      // nzTitle: 'Seleccionar Horarios de Atención',
       nzContent: ScheduleFormComponent,
       nzCentered: true,
       nzClosable: true,
@@ -489,7 +524,25 @@ export class OfficeModalComponent implements OnInit {
       nzClosable: true,
       nzMaskClosable: false,
       nzWidth: '650px',
-      nzStyle: { 'max-width': '90%', 'margin': '22px 0' }
+      nzStyle: { 'max-width': '90%', 'margin': '22px 0' },
+      nzOnCancel: () => {
+        const componentInstance = modalRef.getContentComponent();
+        if (componentInstance.hasChanges) {
+          this.alertService.confirm(
+            'Cambios sin guardar',
+            'Tienes cambios en el contacto. Si sales sin guardar, se perderán.',
+            {
+              nzOkText: 'Salir',
+              nzCancelText: 'Cancelar',
+              nzOnOk: () => {
+                modalRef.destroy();
+              },
+            }
+          );
+          return false;
+        }
+        return true; // Close modal
+      }
     });
     const instanceModal = modalRef.getContentComponent();
     instanceModal.contactModelType = this.modelType;
@@ -570,10 +623,8 @@ export class OfficeModalComponent implements OnInit {
 
   onSubmit() {
     this.formUtils.trimFormStrControls(this.officeForm);
-    if (this.officeForm.invalid) {
-      this.formUtils.markFormTouched(this.officeForm);
-      return;
-    }
+    this.formUtils.markFormTouched(this.officeForm, true);
+    if (this.officeForm.invalid) return;
 
     if (!this.existingSchedules?.length) {
       this.alertService.warning('Aviso', 'Debe agregar al menos un horario de atención.');
@@ -584,9 +635,19 @@ export class OfficeModalComponent implements OnInit {
       return;
     }
 
+    const selectedCompanyIds: number[] = this.officeForm.get('idsCompanies')?.value || [];
+    const providerCompanyIds: number[] = this.providerCompanies.map((c: any) => c.idCompany);
+    const companiesIds = Array.from(new Set([...selectedCompanyIds, ...providerCompanyIds]));
+
     const schedulingLink = this.officeForm.get('schedulingLink')?.value?.toLowerCase() || null;
+    const emailGlosas = this.officeForm.get('emailGlosas')?.value?.toLowerCase() || null;
+    const enableCode = this.officeForm.get('enableCode')?.value?.toLowerCase() || null;
+
     this.officeForm.patchValue({
       schedulingLink: schedulingLink,
+      emailGlosas: emailGlosas,
+      enableCode: enableCode,
+      idsCompanies: companiesIds,
     });
 
     this.modal.close({

@@ -13,125 +13,198 @@ import { ContactsProviderComponent } from '../../../../shared/modals/contacts-pr
 import { ContactsProviderServicesService } from '../../../../services/contacts-provider/contacts-provider.services.service';
 import { AssistanceProvidersComponent } from '../../../../shared/forms/assistance-forms/assistance-providers/assistance-providers.component';
 import { ProviderAssistanceComponent } from '../../../../shared/modals/provider-assistance/provider-assistance.component';
+import { FeedbackFivestarsComponent } from 'src/app/shared/modals/feedback-fivestars/feedback-fivestars.component';
+import { AlertService } from 'src/app/services/alerts/alert.service';
 
 @Component({
-   selector: 'app-list-documents',
-   standalone: true,
-   imports: [NgZorroModule, RemainingDocumentsComponent, ExpiredDocumentsComponent, UploadedDocumentsComponent, AssistanceProvidersComponent],
-   templateUrl: './list-documents.component.html',
-   styleUrl: './list-documents.component.scss'
+  selector: 'app-list-documents',
+  standalone: true,
+  imports: [NgZorroModule, RemainingDocumentsComponent, ExpiredDocumentsComponent, UploadedDocumentsComponent, AssistanceProvidersComponent],
+  templateUrl: './list-documents.component.html',
+  styleUrl: './list-documents.component.scss'
 })
 export class ListDocumentsComponent implements OnInit {
-   clientSelected: any = this.eventManager.clientSelected();
-   callApi: any = this.eventManager.getPercentApi();
-   loadingData: boolean = false;
-   loadManualDownload: boolean = false;
-   hiddenCard: boolean = false;
-   contactsOfProviders: any = [];
 
-   percentData: PercentInterface = {};
+  user = this.eventManager.userLogged();
+  clientSelected: any = this.eventManager.clientSelected();
+  loadingData: boolean = false;
+  loadManualDownload: boolean = false;
+  hiddenCard: boolean = false;
+  contactsOfProviders: any = [];
 
-   constructor(
-      private eventManager: EventManagerService,
-      private documentService: DocumentsCrudService,
-      private router: Router,
-      private modalService: NzModalService,
-      private contactProvider: ContactsProviderServicesService
-   ) {
-      effect(() => {
-        this.callApi = this.eventManager.getPercentApi();
-        // console.log("Effect", this.callApi);
-         if (this.callApi) {
-            this.getDocumentPercent();
-         }
-      });
+  percentData: PercentInterface = {};
+  feedbackModalShown = false;
+  dataformAlertShown = false;
 
-      if (this.clientSelected.idTypeProvider ==7) {
-         this.hiddenCard = true;
-      }
-   }
+  constructor(
+    private eventManager: EventManagerService,
+    private documentService: DocumentsCrudService,
+    private router: Router,
+    private modalService: NzModalService,
+    private contactProvider: ContactsProviderServicesService,
+    private alertService: AlertService,
+  ) {
+    effect(
+      () => {
+        const shouldCallApi = this.eventManager.getPercentApi();
+        if (shouldCallApi) {
+          this.getDocumentPercent();
+          // Reset to avoid double querying with ngOnInit when re-rendering the component
+          this.eventManager.getPercentApi.set(0);
+        }
+      }, { allowSignalWrites: true }
+    );
 
-   ngOnInit(): void {
-      this.getDocumentPercent();
-      this.getContactsByIDProvider(this.clientSelected.idProvider);
-   }
+    if (this.clientSelected.idTypeProvider == 7) {
+        this.hiddenCard = true;
+    }
+  }
+
+  ngOnInit(): void {
+    this.getDocumentPercent();
+    this.getContactsByIDProvider(this.clientSelected.idProvider);
+  }
 
 
-   /**
-    * Cambia el titulo de la pagina de autogestion por el nombre que obtenga del tab seleccionado
-    * inicialmente el titulo es MI PERFIL
-    * recibe un arreglo de eventos, en el cual esta el index y la informacion del tab
-    * @params event: any
-    */
-   tabChange(event: any) { }
+  /**
+  * Cambia el titulo de la pagina de autogestion por el nombre que obtenga del tab seleccionado
+  * inicialmente el titulo es MI PERFIL
+  * recibe un arreglo de eventos, en el cual esta el index y la informacion del tab
+  * @params event: any
+  */
+  tabChange(event: any) { }
 
-   /**
-    * Obtiene desde un api el porcentaje de documentos cargado, sin cargas y vencidos
-    */
-   getDocumentPercent() {
-      this.loadingData = true;
-      const { idProvider, idTypeProvider, idClientHoneSolutions } = this.clientSelected;
-      this.documentService.getPercentDocuments(idProvider, idTypeProvider, idClientHoneSolutions).subscribe({
-         next: (res: any) => {
-            this.percentData = res;
-            this.loadingData = false;
-         },
-         error: (error: any) => {
-            this.loadingData = false;
-         },
-         complete: () => { }
-      });
-   }
+  /**
+   * Obtiene desde un api el porcentaje de documentos cargado, sin cargas y vencidos
+   */
+  getDocumentPercent() {
+    this.loadingData = true;
+    const { idProvider, idTypeProvider, idClientHoneSolutions } = this.clientSelected;
+    this.documentService.getPercentDocuments(idProvider, idTypeProvider, idClientHoneSolutions).subscribe({
+      next: (res: any) => {
+        this.percentData = res;
+        this.loadingData = false;
 
-   /**
+        if (this.percentData.uploaded && this.user.doesNeedSurvey && !this.feedbackModalShown) {
+          this.open5starsFeedback();
+        } else {
+          this.showDataformAlert();
+        }
+      },
+      error: (error: any) => {
+        this.loadingData = false;
+      },
+      complete: () => { }
+    });
+  }
+
+  /**
    * Retorna los contactos por prestador y abre el modal para actualizar y cerrar,
    * y se hace el llamando de this.getContactsByIDProvider(this.clientSelected.idProvider); en el  ngOnInit() para que funcione
    */
-   getContactsByIDProvider(idProvider: any) {
-      const client = this.clientSelected.idClientHoneSolutions === 4;
-      this.contactProvider.getContactById(idProvider).subscribe((data: any) => {
-         this.contactsOfProviders = data.contacts;
-         const contactWithOccupation15 = this.contactsOfProviders.find((contact: any) => contact.idOccupation === 15);
-         if (contactWithOccupation15) {
-            if (client) {
-               this.openContactsProvider();
-            }
-         } else {
-            if (client) {
-               this.openContactsProvider();
-            }
-         }
-      });
-   }
-
-   /**
-    * Valida el tipo de prestador y descarga un paquete de documentos
-    */
-   downloadDocuments() {
-      if (this.clientSelected.idTypeProvider == 3 || this.clientSelected.idTypeProvider == 6) {
-         this.saveAs(
-            `assets/documents-provider/A.Persona-Juridica.zip`,
-            `A. Documentos para diligenciar Persona Juridica.zip`
-         );
-         this.saveAs(
-            `assets/documents-provider/B.Persona-Juridica.zip`,
-            `B. Documentos solo lectura Persona Juridica.zip`
-         );
+  getContactsByIDProvider(idProvider: any) {
+    const client = this.clientSelected.idClientHoneSolutions === 4;
+    this.contactProvider.getContactById(idProvider).subscribe((data: any) => {
+      this.contactsOfProviders = data.contacts;
+      const contactWithOccupation15 = this.contactsOfProviders.find((contact: any) => contact.idOccupation === 15);
+      if (contactWithOccupation15) {
+        if (client) {
+          this.openContactsProvider();
+        }
       } else {
-         this.saveAs(
-            `assets/documents-provider/A.Persona-Natural.zip`,
-            `A. Documentos para diligenciar  Persona Natural.zip`
-         );
-         this.saveAs(
-            `assets/documents-provider/B.Persona-Natural.zip`,
-            `B. Documentos solo lectura Persona  Natural.zip`
-         );
+        if (client) {
+          this.openContactsProvider();
+        }
       }
-   }
+    });
+  }
 
-   /**
-    * Valida el tipo de prestador y descarga un paquete de documentos
-    */
+  open5starsFeedback(): void {
+    this.feedbackModalShown = true;
+    const feedbackModalRef = this.modalService.create<FeedbackFivestarsComponent, any>({
+      nzContent: FeedbackFivestarsComponent,
+      nzTitle: 'Nos gustaría conocer tu opinión',
+      nzCentered: true,
+      nzFooter: null,
+      nzClosable: false,
+      nzMaskClosable: false, // Overlay
+      nzKeyboard: false, // Esc
+      nzWidth: '600px',
+      nzStyle: { 'max-width': '90%' },
+      nzClassName: 'video-modal',
+    });
+
+    feedbackModalRef.afterClose.subscribe((result) => {
+      if (result?.submitted) {
+        const alertRef = this.alertService.success(
+          '¡Gracias por tu feedback!',
+          'Tu opinión nos ayuda a mejorar.',
+          { nzMaskClosable: true }
+        );
+        alertRef.afterClose.subscribe(() => {
+          this.showDataformAlert();
+        });
+      } else {
+        this.showDataformAlert();
+      }
+    });
+  }
+
+  showDataformAlert(): void {
+    if (this.dataformAlertShown || (this.user.withData && !this.user.rejected)) {
+      return;
+    }
+    this.dataformAlertShown = true;
+    const modalRef = this.modalService.warning({
+      nzTitle: 'Atención',
+      nzContent: this.user.withData
+        ? 'Tu información no concuerda con lo guardado en base de datos, por favor revisa nuevamente el formulario.'
+        : 'Recuerda actualizar tus datos garantizando así el cumplimiento total de tu gestión contractual.',
+      nzClosable: false,
+      nzKeyboard: false,
+      nzMaskClosable: true,
+      nzOnOk: () => {
+        modalRef.close();
+        this.navigateTo('/update-data');
+      },
+      nzOnCancel: () => {
+        this.navigateTo('/update-data');
+      }
+    });
+  }
+
+  navigateTo(url: string): void {
+    this.router.navigate([url]);
+  }
+
+  /**
+   * Valida el tipo de prestador y descarga un paquete de documentos
+   */
+  downloadDocuments() {
+    if (this.clientSelected.idTypeProvider == 3 || this.clientSelected.idTypeProvider == 6) {
+      this.saveAs(
+        `assets/documents-provider/A.Persona-Juridica.zip`,
+        `A. Documentos para diligenciar Persona Juridica.zip`
+      );
+      this.saveAs(
+        `assets/documents-provider/B.Persona-Juridica.zip`,
+        `B. Documentos solo lectura Persona Juridica.zip`
+      );
+    } else {
+      this.saveAs(
+        `assets/documents-provider/A.Persona-Natural.zip`,
+        `A. Documentos para diligenciar  Persona Natural.zip`
+      );
+      this.saveAs(
+        `assets/documents-provider/B.Persona-Natural.zip`,
+        `B. Documentos solo lectura Persona  Natural.zip`
+      );
+    }
+  }
+
+  /**
+   * Valida el tipo de prestador y descarga un paquete de documentos
+   */
   downloadDocumentsAxa() {
     if (this.clientSelected.idTypeProvider == 9) {
       this.saveAs(
@@ -146,9 +219,9 @@ export class ListDocumentsComponent implements OnInit {
     );
   }
 
-   /**
-    * Descargar para Axa manuales de prestadores de Servicios de Salud
-    */
+  /**
+   * Descargar para Axa manuales de prestadores de Servicios de Salud
+   */
   downloadAxaProviderManual() {
     if (this.loadManualDownload) return;
     const documents = [
@@ -176,166 +249,162 @@ export class ListDocumentsComponent implements OnInit {
         }
       });
     });
-   }
+  }
 
-   /**
+  /**
    * Valida el tipo de prestador y descarga un paquete de documentos de mundial de seguros
    */
-   downloadDocumentsMundialSeguros() {
-      this.saveAs(`assets/documents-provider/SARLAFT.zip`, `Documentos para diligenciar SARLAFT.zip`);
-   }
+  downloadDocumentsMundialSeguros() {
+    this.saveAs(`assets/documents-provider/SARLAFT.zip`, `Documentos para diligenciar SARLAFT.zip`);
+  }
 
-   /**
+  /**
    * Valida el tipo de prestador y descarga un paquete de documentos de mundial de seguros
    */
-   downloadDocumentsMundialSegurosInformative() {
-      this.saveAs(`assets/documents-provider/documentos-informativos-seguros-mundial.zip`, `Documentos informativos documentos-informativos-seguros-mundial.zip`);
-   }
+  downloadDocumentsMundialSegurosInformative() {
+    this.saveAs(`assets/documents-provider/documentos-informativos-seguros-mundial.zip`, `Documentos informativos documentos-informativos-seguros-mundial.zip`);
+  }
 
 
-   /**
+  /**
    * Descarga Excel de BMI
    */
-   downloadExcelFareBmi() {
-      if (this.clientSelected.idTypeProvider == 7) {
-         this.saveAs(`assets/documents-provider/excel-bmi/Anexo_Tarifas_2024.xlsx`, `Anexo_Tarifas_2024.xlsx`);
-      }
-   }
-   /**
-      * Descarga Excel de BMI
-      */
-   downloadDocumentsBmi() { }
+  downloadExcelFareBmi() {
+    if (this.clientSelected.idTypeProvider == 7) {
+      this.saveAs(`assets/documents-provider/excel-bmi/Anexo_Tarifas_2024.xlsx`, `Anexo_Tarifas_2024.xlsx`);
+    }
+  }
+  /**
+   * Descarga Excel de BMI
+   */
+  downloadDocumentsBmi() { }
 
-   /**
-    * Descarga Documentos de Sura
-    */
-   downloadDocumentsSura() {
-     // Natural person
-     if (this.clientSelected.idTypeProvider == 7) {
-        this.saveAs(`assets/documents-provider/CartaMipres.pdf`, `Carta_Mipres.pdf`);
-     }
-   }
+  /**
+   * Descarga Documentos de Sura
+   */
+  downloadDocumentsSura() {
+    // Natural person
+    if (this.clientSelected.idTypeProvider == 7) {
+      this.saveAs(`assets/documents-provider/CartaMipres.pdf`, `Carta_Mipres.pdf`);
+    }
+  }
 
-   /**
-    * Recibe la url de donde se toman los documentos locales y los descarga
-    * @param url - ruta de los assets/container a descargar
-    * @param name - nombre del archivo que se muestra en la descarga
-    * @param onComplete - callback opcional para cuando se complete la descarga
-    */
-    saveAs(url: any, name: any, onComplete?: () => void) {
-      if (url.startsWith('http')) {
-        fetch(url)
-          .then(response => {
-            if (!response.ok) throw new Error('Error al descargar el archivo');
-            return response.blob();
-          })
-          .then(blob => {
-            const blobUrl = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = blobUrl;
-            link.download = name;
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            window.URL.revokeObjectURL(blobUrl);
-          })
-          .catch(error => console.error('Error descargando el archivo:', error))
-          .finally(() => {
-            if (onComplete) onComplete();
-          });
-        return;
-      }
-
-      const link = document.createElement('a');
-      link.setAttribute('type', 'hidden');
-      link.href = url;
-      link.download = name;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      if (onComplete) onComplete();
+  /**
+   * Recibe la url de donde se toman los documentos locales y los descarga
+   * @param url - ruta de los assets/container a descargar
+   * @param name - nombre del archivo que se muestra en la descarga
+   * @param onComplete - callback opcional para cuando se complete la descarga
+   */
+  saveAs(url: any, name: any, onComplete?: () => void) {
+    if (url.startsWith('http')) {
+      fetch(url)
+        .then(response => {
+          if (!response.ok) throw new Error('Error al descargar el archivo');
+          return response.blob();
+        })
+        .then(blob => {
+          const blobUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = blobUrl;
+          link.download = name;
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          window.URL.revokeObjectURL(blobUrl);
+        })
+        .catch(error => console.error('Error descargando el archivo:', error))
+        .finally(() => {
+          if (onComplete) onComplete();
+        });
+      return;
     }
 
-   navigateHome() {
-      this.router.navigateByUrl('/home');
-   }
+    const link = document.createElement('a');
+    link.setAttribute('type', 'hidden');
+    link.href = url;
+    link.download = name;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    if (onComplete) onComplete();
+  }
 
-   /**
-    * Abre una ventana modal para solicitar ticket
-    */
-   openTicketModal(): void {
-      const modal = this.modalService.create<ContactTicketComponent, any>({
-         nzContent: ContactTicketComponent,
-         nzCentered: true,
-         nzClosable: true,
-         // nzFooter: null
-         nzMaskClosable: false, // Para evitar que se cierre al hacer clic fuera del modal
-      });
-      const instance = modal.getContentComponent();
+  /**
+   * Abre una ventana modal para solicitar ticket
+   */
+  openTicketModal(): void {
+    const modal = this.modalService.create<ContactTicketComponent, any>({
+      nzContent: ContactTicketComponent,
+      nzCentered: true,
+      nzClosable: true,
+      // nzFooter: null
+      nzMaskClosable: false, // Para evitar que se cierre al hacer clic fuera del modal
+    });
+    const instance = modal.getContentComponent();
 
-      // instance.message = message;
+    // instance.message = message;
 
-      // Return a result when opened
-      modal.afterOpen.subscribe(() => { });
-      // Return a result when closed
-      modal.afterClose.subscribe((result: any) => {
-         if (result) {
-         }
-      });
-   }
+    // Return a result when opened
+    modal.afterOpen.subscribe(() => { });
+    // Return a result when closed
+    modal.afterClose.subscribe((result: any) => {
+      if (result) {
+      }
+    });
+  }
 
-   /**
+  /**
    * Abre una ventana modal para actualizar el nombre del representante legal,
    * donde se puede abrir mediante funcion del mismo modal de contacts-provider
    * y tambien se abre por defecto o automaticamente cuando elija allianz
    */
-   openContactsProvider() {
-      const modal = this.modalService.create<ContactsProviderComponent, any>({
-         nzContent: ContactsProviderComponent,
-         nzCentered: true,
-         nzClosable: false, //en false para ocultar la X del modal y que no pueda cerrarlo
-         // nzFooter: null
-         nzMaskClosable: false, // Para evitar que se cierre al hacer clic fuera del modal
-         nzOnOk: () => console.log('OK'),
-         nzOnCancel: () => console.log('Cancelar') // Maneja el evento de cancelación
-      });
-      const instance = modal.getContentComponent();
+  openContactsProvider() {
+    const modal = this.modalService.create<ContactsProviderComponent, any>({
+      nzContent: ContactsProviderComponent,
+      nzCentered: true,
+      nzClosable: false, //en false para ocultar la X del modal y que no pueda cerrarlo
+      // nzFooter: null
+      nzMaskClosable: false, // Para evitar que se cierre al hacer clic fuera del modal
+      nzOnOk: () => console.log('OK'),
+      nzOnCancel: () => console.log('Cancelar') // Maneja el evento de cancelación
+    });
+    const instance = modal.getContentComponent();
 
-      // instance.message = message;
+    // instance.message = message;
 
-      // Return a result when opened
-      modal.afterOpen.subscribe(() => { });
-      // Return a result when closed
-      modal.afterClose.subscribe((result: any) => {
-         if (result) {
-         }
-      });
-   }
-   /**
+    // Return a result when opened
+    modal.afterOpen.subscribe(() => { });
+    // Return a result when closed
+    modal.afterClose.subscribe((result: any) => {
+      if (result) {
+      }
+    });
+  }
+  /**
    * Abre una ventana modal para actualizar el nombre del representante legal,
    * donde se puede abrir mediante funcion del mismo modal de contacts-provider
    * y tambien se abre por defecto o automaticamente cuando elija allianz
    */
-   openModalProviderAssistance() {
-      const modal = this.modalService.create<ProviderAssistanceComponent, any>({
-         nzContent: ProviderAssistanceComponent,
-         nzCentered: true,
-         nzClosable: true, //en false para ocultar la X del modal y que no pueda cerrarlo
-         // nzFooter: null
-         nzMaskClosable: false, // Para evitar que se cierre al hacer clic fuera del modal
-         nzOnOk: () => console.log('OK'),
-         nzOnCancel: () => console.log('Cancelar') // Maneja el evento de cancelación
-      });
-      const instance = modal.getContentComponent();
+  openModalProviderAssistance() {
+    const modal = this.modalService.create<ProviderAssistanceComponent, any>({
+      nzContent: ProviderAssistanceComponent,
+      nzCentered: true,
+      nzClosable: true, //en false para ocultar la X del modal y que no pueda cerrarlo
+      // nzFooter: null
+      nzMaskClosable: false, // Para evitar que se cierre al hacer clic fuera del modal
+      nzOnOk: () => console.log('OK'),
+      nzOnCancel: () => console.log('Cancelar') // Maneja el evento de cancelación
+    });
+    const instance = modal.getContentComponent();
 
-      // instance.message = message;
+    // instance.message = message;
 
-      // Return a result when opened
-      modal.afterOpen.subscribe(() => { });
-      // Return a result when closed
-      modal.afterClose.subscribe((result: any) => {
-         if (result) {
-         }
-      });
-   }
+    // Return a result when opened
+    modal.afterOpen.subscribe(() => { });
+    // Return a result when closed
+    modal.afterClose.subscribe((result: any) => {
+      if (result) {
+      }
+    });
+  }
 }

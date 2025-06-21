@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DocumentsCrudService } from '../../../../services/documents/documents-crud.service';
-import { DocumentInterface } from '../../../../models/client.interface';
+import { DocumentInterface, PercentInterface } from '../../../../models/client.interface';
 import { EventManagerService } from '../../../../services/events-manager/event-manager.service';
 import { NgZorroModule } from '../../../../ng-zorro.module';
 import { CommonModule } from '@angular/common';
@@ -19,12 +19,25 @@ import { PipesModule } from 'src/app/pipes/pipes.module';
    styleUrl: './remaining-documents.component.scss'
 })
 export class RemainingDocumentsComponent implements OnInit {
+
    loading: boolean = false;
    clientSelected: any = this.eventManager.clientSelected();
    counterApi: any = this.eventManager.getPercentApi();
    loadingData: boolean = false;
 
    documentList: DocumentInterface[] = [];
+
+  readonly SMLV: number = 1423500;
+  readonly typePolicyProviderConfig: { [key: string]: number } = {
+    'Psicólogo': 200,
+    'Nutricionista': 200,
+    'Terapeuta': 200,
+    'Fonoaudiólogo': 200,
+    'Profesional médico': 420,
+    'IPS': 420,
+  };
+
+  hasShownAmountMessage: boolean = false;
 
    constructor(
     private eventManager: EventManagerService,
@@ -33,7 +46,7 @@ export class RemainingDocumentsComponent implements OnInit {
    ) { }
 
    ngOnInit(): void {
-      this.getDocumentsToUpload();
+     this.getDocumentsToUpload();
    }
 
    getDocumentsToUpload() {

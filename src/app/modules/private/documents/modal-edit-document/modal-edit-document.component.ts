@@ -10,6 +10,8 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { FileValidatorDirective } from 'src/app/directives/file-validator.directive';
 import { DatePickerInputComponent } from 'src/app/shared/forms/date-picker-input/date-picker-input.component';
 import { AlertService } from 'src/app/services/alerts/alert.service';
+import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
+import { formatListWithY } from 'src/app/utils/string-utils';
 
 @Component({
    selector: 'app-modal-edit-document',
@@ -45,10 +47,21 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
   ];
   riskClassifierOptions = ['1', '2', '3', '4', '5'];
 
+  readonly SMLV: number = 1423500;
+  readonly typePolicyProviderConfig: { [key: string]: number } = {
+    'Psicólogo': 200,
+    'Nutricionista': 200,
+    'Terapeuta': 200,
+    'Fonoaudiólogo': 200,
+    'Profesional médico': 420,
+    'IPS': 420,
+  };
+  hasShownAmountMessage: boolean = false;
+
   expeditionDateRestrictions: { [key: number]: 'lastMonth' | 'currentYear' | 'last3Years' | 'last2Months' } = {
     108: 'lastMonth',
     113: 'lastMonth',
-    139: 'lastMonth',
+    139: 'last2Months',
     140: 'last2Months',
     4: 'currentYear',
     110: 'currentYear',
@@ -64,6 +77,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
       private documentService: DocumentsCrudService,
       private eventManager: EventManagerService,
       private alertService: AlertService,
+      private formUtils: FormUtilsService,
    ) { }
 
   ngAfterContentChecked (): void {}
@@ -99,7 +113,8 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
       lastDosimetryDate: [ '', [Validators.required] ],
       epsName: [ '', [Validators.required] ],
       riskClassifier: [ '', [Validators.required] ],
-      resolutionOfThePension: [ '', [Validators.required] ],
+      resolutionOfThePension: ['', [Validators.required]],
+      amountPolicy: ['', [Validators.required]],
       idDocumentType: [ '', [Validators.required] ],
     });
 
@@ -144,7 +159,8 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
       'lastDosimetryDate': [0],
       'epsName': [13, 14, 135],
       'riskClassifier': [13, 135],
-      'resolutionOfThePension': [15]
+      'resolutionOfThePension': [15],
+      'amountPolicy': [133],
     };
     return documentValidationMap[controlName]?.includes(this.idDocumentType);
   }
@@ -170,43 +186,89 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
       }
     }
 
-   /**
-    *
-    * @param current Bloquea las fechas antes de la fecha actual, habilita por un año y bloquea fechas posterior (para fecha de expedición)
-    * @returns
-    */
-   disableExpeditionDates = (current: Date): boolean => {
-      current.setHours(0, 0, 0, 0);
-      const restriction = this.expeditionDateRestrictions[this.idDocumentType];
-      if (!restriction) return false;
+  /**
+   *
+   * @param current Bloquea las fechas antes de la fecha actual, habilita por un año y bloquea fechas posterior (para fecha de expedición)
+   * @returns
+   */
+  disableExpeditionDates = (current: Date): boolean => {
+    current.setHours(0, 0, 0, 0);
+    const restriction = this.expeditionDateRestrictions[this.idDocumentType];
+    if (!restriction) return false;
 
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-      switch (restriction) {
-        case 'lastMonth':
-          const lastMonth = new Date(today);
-          lastMonth.setMonth(today.getMonth() - 1);
-          return current < lastMonth || current > today;
+    switch (restriction) {
+      case 'lastMonth':
+        const lastMonth = new Date(today);
+        lastMonth.setMonth(today.getMonth() - 1);
+        return current < lastMonth || current > today;
 
-        case 'last2Months':
-          const twoMonthsAgo = new Date(today);
-          twoMonthsAgo.setMonth(today.getMonth() - 2);
-          return current < twoMonthsAgo || current > today;
+      case 'last2Months':
+        const twoMonthsAgo = new Date(today);
+        twoMonthsAgo.setMonth(today.getMonth() - 2);
+        return current < twoMonthsAgo || current > today;
 
-        case 'currentYear':
-          const startOfYear = new Date(today.getFullYear(), 0, 1);
-          return current < startOfYear || current > today;
+      case 'currentYear':
+        const startOfYear = new Date(today.getFullYear(), 0, 1);
+        return current < startOfYear || current > today;
 
-        case 'last3Years':
-          const threeYearsAgo = new Date(today);
-          threeYearsAgo.setFullYear(today.getFullYear() - 3);
-          return current < threeYearsAgo || current > today;
+      case 'last3Years':
+        const threeYearsAgo = new Date(today);
+        threeYearsAgo.setFullYear(today.getFullYear() - 3);
+        return current < threeYearsAgo || current > today;
 
-        default:
-          return false;
+      default:
+        return false;
+    }
+  };
+
+  onAmountPolicyChange(): void {
+    const control = this.documentForm.get('amountPolicy');
+    let value = control?.value;
+    const formatted = this.formUtils.formatCurrency(value);
+    control?.setValue(formatted, { emitEvent: false });
+  }
+
+  amountPolicyInfoAlert(onFocus: boolean = false): void {
+    if (onFocus && this.hasShownAmountMessage) return;
+    this.hasShownAmountMessage = true;
+
+    // Group by SMLVs num min
+    const groups: { [smlvNum: number]: string[] } = {};
+    for (let type in this.typePolicyProviderConfig) {
+      let smlvNum = this.typePolicyProviderConfig[type];
+      if (!groups[smlvNum]) groups[smlvNum] = [];
+      groups[smlvNum].push(type);
+    }
+
+    // Generate dinamic message
+    let html = '';
+    for (let smlvNum in groups) {
+      let provTypes = groups[smlvNum];
+      let value = this.SMLV * parseInt(smlvNum);
+      html += `
+        <p>
+          Para <strong>${formatListWithY(provTypes)}</strong>, el valor mínimo requerido de la póliza es equivalente a
+          <strong>${smlvNum} SMLV</strong>
+          (<strong>${smlvNum} x $${this.SMLV.toLocaleString('es-CO')} = $${value.toLocaleString('es-CO')}</strong>)
+        </p>
+      `;
+    }
+    html += `<p class="mt-3">Por favor verifica este monto.</p>`;
+
+    this.alertService.info(
+      'Información sobre valores de póliza',
+      html,
+      {
+        nzOkText: 'Entendido',
+        nzClosable: true,
+        nzWidth: 600,
+        nzContent: html,
       }
-   };
+    );
+  }
 
   patchForm() {
     const item = this.currentDoc;
@@ -215,6 +277,8 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
     if (!this.riskClassifierOptions.includes(riskClassifier)) {
       riskClassifier = null;
     }
+
+    const amountPolicy = this.formUtils.formatCurrency(item.amountPolicy);
 
     this.documentForm.patchValue({
       software: item.software,
@@ -236,6 +300,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
       resolutionOfThePension: item.resolutionOfThePension,
       riskClassifier: riskClassifier,
       validityStartDate: this.convertDate(item.validityStartDate),
+      amountPolicy: amountPolicy,
       idDocumentType: item.idDocumentType,
     });
   }
@@ -271,7 +336,11 @@ createFormData(): FormData {
     if (value && value instanceof Date) {
       unifiedData[key] = value.toString().split('T')[0];
     } else if (value != null && value.toString().trim() != '') {
-      unifiedData[key] = value;
+      let appendValue: any = value;
+      if (key === 'amountPolicy') {
+        appendValue = this.formUtils.sanitizeToNumeric(value.toString(), true);
+      }
+      unifiedData[key] = appendValue;
     } else {
       // unifiedData[key] = '';
     }

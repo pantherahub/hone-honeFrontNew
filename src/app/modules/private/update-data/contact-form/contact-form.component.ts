@@ -22,7 +22,10 @@ export class ContactFormComponent implements OnInit {
   @Input() contact: any | null = null;
   @Input() contactModelType: string = 'Prestador'; // 'Prestador' or 'Sede'
   @Input() officeIdCity: number | null = null;
+
   contactForm!: FormGroup;
+  formInitialized = false;
+  hasChanges = false;
 
   contactOccupationTypes: any[] = [];
   contactOccupations: any[] = [];
@@ -48,11 +51,12 @@ export class ContactFormComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.initializeForm();
-
     this.loadContactOccupationTypes();
     this.loadIdentificationTypes();
     this.loadCities();
+
+    this.initializeForm();
+    this.detectFormChanges();
   }
 
   loadContactOccupationTypes() {
@@ -77,10 +81,12 @@ export class ContactFormComponent implements OnInit {
           this.contactOccupations = data[0].Occupations;
         }
         if (validateForm) this.formValidationsLoadData();
+        this.formInitialized = true;
       },
       error: (err: any) => {
         console.error(err);
         if (validateForm) this.formValidationsLoadData();
+        this.formInitialized = true;
       }
     });
   }
@@ -116,6 +122,14 @@ export class ContactFormComponent implements OnInit {
   getSelectedIndicative(id: number): string {
     const option = this.getSelectedCity(id);
     return option ? option.indicative : '';
+  }
+
+  detectFormChanges() {
+    this.contactForm.valueChanges.subscribe(() => {
+      if (this.formInitialized) {
+        this.hasChanges = true;
+      }
+    });
   }
 
   initializeForm() {
@@ -304,6 +318,7 @@ export class ContactFormComponent implements OnInit {
     } else {
       this.loading = false;
       this.loadingSetupContactData = false;
+      this.formInitialized = true;
     }
 
     // Load emails
@@ -367,7 +382,7 @@ export class ContactFormComponent implements OnInit {
   createEmailGroup(email: any | null = null): FormGroup {
     const emailGroup = this.fb.group({
       idEmail: [email?.idEmail || null],
-      email: [email?.email || '', [Validators.required, this.formUtils.emailValidator]],
+      email: [email?.email || '', [Validators.required, this.formUtils.email]],
       status: [email ? email.status || null : 'created'] // updated, created, null for existing emails
     });
     return emailGroup;

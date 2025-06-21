@@ -8,6 +8,7 @@ import { AlertService } from '../services/alerts/alert.service';
 export class FileValidatorDirective implements OnInit {
 
   @Input() allowedExtensions: string[] = [];
+  @Input() maxFileSizeMB: number = 10;
   @Output() fileValidated: EventEmitter<File> = new EventEmitter();
 
   private extensionToMimeType: { [ext: string]: string } = {
@@ -48,9 +49,7 @@ export class FileValidatorDirective implements OnInit {
     const file = input.files?.[0];
     if (!file) return;
 
-    if (this.isFileTypeValid(file)) {
-      this.fileValidated.emit(file);
-    } else {
+    if (!this.isFileTypeValid(file)) {
       this.alertService.error(
         'Oops...',
         `Archivo no permitido: "${file.name}".<br>
@@ -58,12 +57,30 @@ export class FileValidatorDirective implements OnInit {
       );
       // Reset input if file is invalid
       input.value = '';
+      return;
+    } else if (!this.isFileSizeValid(file)) {
+      this.alertService.error(
+        'Archivo demasiado grande',
+        `El archivo excede el tamaño máximo de ${this.maxFileSizeMB}MB.<br>
+        Puedes usar este compresor para reducir su tamaño: <a href="https://www.wecompress.com/es/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">
+        ir al compresor</a>.`
+      );
+      input.value = '';
+      return;
     }
+
+    this.fileValidated.emit(file);
   }
 
   // Validate MIME type
   isFileTypeValid(file: File): boolean {
     return this.validMimeTypes.includes(file.type);
+  }
+
+  // Validate max file size
+  isFileSizeValid(file: File): boolean {
+    const maxSizeBytes = this.maxFileSizeMB * 1024 * 1024;
+    return file.size <= maxSizeBytes;
   }
 
 }

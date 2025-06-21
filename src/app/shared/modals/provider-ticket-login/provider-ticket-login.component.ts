@@ -7,8 +7,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { EventManagerService } from '../../../services/events-manager/event-manager.service';
 import { TicketsService } from '../../../services/tickets/tickets.service';
-import { mailRegexpValidation } from '../../../utils/constant';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
+import { REGEX_PATTERNS } from 'src/app/constants/regex-patterns';
 
 
 @Component({
@@ -62,7 +62,7 @@ export class ProviderTicketLoginComponent implements AfterContentChecked, OnInit
       name: ['', [Validators.required]],
       lastname: ['', [Validators.required]],
       identification: ['', [Validators.required, this.formUtils.numeric]],
-      email: ['', [Validators.required, Validators.pattern(mailRegexpValidation)]],
+      email: ['', [Validators.required, Validators.pattern(REGEX_PATTERNS.email)]],
       phone: ['', [Validators.required]],
       address: ['', [Validators.required]],
       observation: ['', [Validators.required]]
