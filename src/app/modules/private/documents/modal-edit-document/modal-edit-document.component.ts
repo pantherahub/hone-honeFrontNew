@@ -42,7 +42,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
   suraArlEntities: string[] = [
     'ARL COLSANITAS', 'ALFATEP', 'ARL SURA', 'ARP AURORA', 'ARP BOLIVAR',
     'ARP COLMENA', 'ARP COLPATRIA', 'LA EQUIDAD SEGUROS DE VIDA S.A',
-    'LIBERTY SEGUROS DE VIDA S.A', 'MAPFRE', 'POSITIVA ARP',
+    'LIBERTY SEGUROS DE VIDA S.A', 'MAPFRE', 'POSITIVA ARP', 'AXA ARL', 'OTRAS',
   ];
   riskClassifierOptions = ['1', '2', '3', '4', '5'];
 
@@ -167,17 +167,15 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
       return documentValidationMap[controlName]?.includes(this.documentType);
    }
 
+  sanitizeWithOptions(value: any, validValues: any[]): any | null {
+    return validValues.includes(value) ? value : null;
+  }
+
    patchForm () {
       const item = this.currentDoc;
 
-      let riskClassifier = item.riskClassifier;
-      if (!this.riskClassifierOptions.includes(riskClassifier)) {
-        riskClassifier = null;
-      }
-      const amountPolicy = this.formUtils.formatCurrency(item.amountPolicy);
-
       this.documentForm.patchValue({
-         software: item.software,
+         software: this.sanitizeWithOptions(item.software, this.suraSoftwareTypes),
          consultationDate: this.convertDate(item.consultationDate),
          dateDiligence: this.convertDate(item.dateDiligence),
          dateFirm: this.convertDate(item.dateFirm),
@@ -187,7 +185,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
          documentDeliveryDate: this.convertDate(item.documentDeliveryDate),
          dueDate: this.convertDate(item.dueDate),
          endorsedSpecialtyDate: this.convertDate(item.endorsedSpecialtyDate),
-         epsName: item.epsName,
+         epsName: this.sanitizeWithOptions(item.epsName, this.suraArlEntities),
          fechadedocumento: this.convertDate(item.fechadedocumento),
          lastDosimetryDate: this.convertDate(item.lastDosimetryDate),
          legalRepresentative: item.legalRepresentative,
@@ -195,9 +193,9 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
          nombredocumento: item.nombredocumento,
          receptionDate: this.convertDate(item.receptionDate),
          resolutionOfThePension: item.resolutionOfThePension,
-         riskClassifier: riskClassifier,
+         riskClassifier: this.sanitizeWithOptions(item.riskClassifier, this.riskClassifierOptions),
          validityStartDate: this.convertDate(item.validityStartDate),
-         amountPolicy: amountPolicy,
+         amountPolicy: this.formUtils.formatCurrency(item.amountPolicy),
          tipodocumento: item.idTypeDocuments,
       });
    }
