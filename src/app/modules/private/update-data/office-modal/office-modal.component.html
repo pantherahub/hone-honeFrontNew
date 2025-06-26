@@ -149,13 +149,13 @@
 
       <nz-col [nzSpan]="24" [nzSm]="12" *ngIf="citasContactMissing && !loadingContacts">
         <nz-form-item>
-          <nz-form-label [nzRequired]="true">Teléfonos de agendamiento de citas</nz-form-label>
-          <nz-form-control nzExtra="Contacto requerido.">
+          <nz-form-label>Teléfonos de agendamiento de citas</nz-form-label>
+          <nz-form-control>
             <button
               nz-button nzType="primary"
               type="button" class="w-full"
               (click)="openContactShortcut(citasContactMissing)">
-              Diligenciar
+              Agregar
             </button>
           </nz-form-control>
         </nz-form-item>
@@ -228,19 +228,20 @@
     </div>
 
     <nz-alert
-      *ngIf="missingContacts.length > 0 && !loadingContacts"
+      *ngIf="getMissingContacts(true).length > 0 && !loadingContacts"
       nzType="warning"
       class="mt-2"
       [nzMessage]="alertContent"
-    ></nz-alert>
-    <ng-template #alertContent>
-      <ul class="pl-4 list-disc">
-        <li *ngFor="let contact of missingContacts">
-          El contacto de {{ contact.label }} es requerido.
-          <a (click)="openContactShortcut(contact)" class="text-blue-600 hover:underline cursor-pointer">Ir a diligenciar</a>.
-        </li>
-      </ul>
-    </ng-template>
+    >
+      <ng-template #alertContent>
+        <ul class="pl-4 list-disc">
+          <li *ngFor="let contact of getMissingContacts(true)">
+            El contacto de {{ contact.label }} es requerido.
+            <a (click)="openContactShortcut(contact)" class="text-blue-600 hover:underline cursor-pointer">Ir a diligenciar</a>.
+          </li>
+        </ul>
+      </ng-template>
+    </nz-alert>
   </div>
 
   <div class="footer">
