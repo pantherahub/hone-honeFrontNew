@@ -50,3 +50,22 @@ export function capitalizeWords(value: string): string {
     })
     .join(' ');
 }
+
+/**
+ * Trim all string values in an object.
+ * @param obj - The object to trim.
+ * @returns New object with trimmed string values.
+ */
+export function trimObjectStrings(obj: Record<string, any>): Record<string, any> {
+  const result: Record<string, any> = {};
+  for (const key in obj) {
+    if (!obj.hasOwnProperty(key)) continue;
+
+    const value = obj[key];
+    result[key] =
+      typeof value === 'string' && value !== null
+        ? value.trim()
+        : value;
+  }
+  return result;
+}

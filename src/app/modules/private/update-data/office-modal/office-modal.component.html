@@ -147,7 +147,7 @@
         </nz-form-item>
       </nz-col>
 
-      <nz-col [nzSpan]="24" [nzSm]="12" *ngIf="citasContactMissing">
+      <nz-col [nzSpan]="24" [nzSm]="12" *ngIf="citasContactMissing && !loadingContacts">
         <nz-form-item>
           <nz-form-label [nzRequired]="true">Teléfonos de agendamiento de citas</nz-form-label>
           <nz-form-control nzExtra="Contacto requerido.">
@@ -228,7 +228,7 @@
     </div>
 
     <nz-alert
-      *ngIf="missingContacts.length > 0"
+      *ngIf="missingContacts.length > 0 && !loadingContacts"
       nzType="warning"
       class="mt-2"
       [nzMessage]="alertContent"
