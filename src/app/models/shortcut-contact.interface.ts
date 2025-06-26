@@ -1,5 +1,6 @@
-export interface RequiredContact {
+export interface ShortcutContact {
   label: string;
+  isContactRequired: boolean;
   shortcut: {
     idOccupationType: number;
     idOccupation: number;

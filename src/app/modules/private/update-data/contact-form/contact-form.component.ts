@@ -557,6 +557,10 @@ export class ContactFormComponent implements OnInit {
     return current > new Date();
   };
 
+  enableControls(form: FormGroup, controls: string[]) {
+    controls.forEach(control => form.get(control)?.enable({ emitEvent: false }));
+  }
+
   onSubmit() {
     this.formUtils.trimFormStrControls(this.contactForm);
     if (this.contactForm.invalid) {
@@ -633,6 +637,8 @@ export class ContactFormComponent implements OnInit {
         expeditionDate: `${format(expeditionDate, 'yyyy-MM-dd')}T00:00:00`
       });
     }
+
+    this.enableControls(this.contactForm, ['idOccupationType', 'idOccupation']);
 
     this.modal.close({
       contact: this.contactForm,

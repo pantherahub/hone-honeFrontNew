@@ -8,6 +8,10 @@ export function isAlphanumeric(value: string): boolean {
   return REGEX_PATTERNS.alphanumeric.test(value);
 }
 
+export function isAlphanumericWithSpaces(value: string): boolean {
+  return REGEX_PATTERNS.alphanumericWithSpaces.test(value);
+}
+
 export function isEmail(value: string): boolean {
   return REGEX_PATTERNS.email.test(value);
 }
