@@ -64,11 +64,19 @@
 
     <nz-col [nzSpan]="12" [nzSm]="12" [nzMd]="6">
       <nz-form-item>
-        <nz-form-label>Complemento</nz-form-label>
+        <nz-form-label>
+          Complemento
+          <div
+            nz-tooltip
+            nzTooltipTitle="Si no esta el complemento de tu dirección puedes seleccionar la opción de 'Otro Valor' para digitarlo"
+            nzTooltipPlacement="top">
+            <i nz-icon nzType="info-circle" nzTheme="fill" class="info-icon"></i>
+          </div>
+        </nz-form-label>
         <nz-form-control>
           <nz-select nzSize="small" nzAllowClear formControlName="mainNumberComplement" nzPlaceHolder="Opcional">
-            <nz-option *ngFor="let option of lettersWithBis" [nzValue]="option" [nzLabel]="option"></nz-option>
             <nz-option [nzValue]="otherOption" [nzLabel]="otherOption"></nz-option>
+            <nz-option *ngFor="let option of lettersWithBis" [nzValue]="option" [nzLabel]="option"></nz-option>
           </nz-select>
         </nz-form-control>
         @if (addressForm.get('mainNumberComplement')?.value === otherOption) {
@@ -106,11 +114,19 @@
 
     <nz-col [nzSpan]="12" [nzSm]="12" [nzMd]="6">
       <nz-form-item>
-        <nz-form-label>Complemento</nz-form-label>
+        <nz-form-label>
+          Complemento
+          <div
+            nz-tooltip
+            nzTooltipTitle="Si no esta el complemento de tu dirección puedes seleccionar la opción de 'Otro Valor' para digitarlo"
+            nzTooltipPlacement="top">
+            <i nz-icon nzType="info-circle" nzTheme="fill" class="info-icon"></i>
+          </div>
+        </nz-form-label>
         <nz-form-control>
           <nz-select nzSize="small" nzAllowClear formControlName="secondaryNumberComplement" nzPlaceHolder="Opcional">
-            <nz-option *ngFor="let option of allNumberComplementOptions" [nzValue]="option" [nzLabel]="option"></nz-option>
             <nz-option [nzValue]="otherOption" [nzLabel]="otherOption"></nz-option>
+            <nz-option *ngFor="let option of allNumberComplementOptions" [nzValue]="option" [nzLabel]="option"></nz-option>
           </nz-select>
         </nz-form-control>
         @if (addressForm.get('secondaryNumberComplement')?.value === otherOption) {
