@@ -9,6 +9,7 @@ import { AdminLayoutComponent } from './views/admin-layout/admin-layout.componen
 import { ComplianceDocumentationComponent } from './modules/private/documents/compliance-documentation/compliance-documentation.component';
 import { ProviderAssistancessComponent } from './modules/public/provider-assistancess/provider-assistancess.component';
 import { UpdateDataComponent } from './modules/private/update-data/update-data.component';
+import { canDeactivateGuard } from './guards/can-deactivate.guard';
 
 export const routes: Routes = [
   //   PUBLIC ROUTES
@@ -42,7 +43,8 @@ export const routes: Routes = [
       },
       {
         path: 'update-data',
-        component: UpdateDataComponent
+        component: UpdateDataComponent,
+        canDeactivate: [canDeactivateGuard]
       },
       {
         path: 'cargar-documentos/:id',

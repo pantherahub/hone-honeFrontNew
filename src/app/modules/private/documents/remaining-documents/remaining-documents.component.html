@@ -65,6 +65,25 @@
                             </nz-form-control>
                           </nz-form-item>
                         }
+                        @if (item.idTypeDocuments == 133) {
+                          <nz-form-item style="margin: 0;">
+                            <nz-form-control [nzErrorTip]="amountPolicyErrorTip">
+                              <ng-template #amountPolicyErrorTip>
+                                <p class="text-[13px] text-left">El campo es requerido.</p>
+                              </ng-template>
+                                <input
+                                  nz-input
+                                  id="amountPolicy"
+                                  formControlName="amountPolicy"
+                                  type="text"
+                                  placeholder="Valor Póliza"
+                                  (input)="onAmountPolicyChange(i)"
+                                  (focus)="amountPolicyInfoAlert(true)"
+                                  autocomplete="off"
+                                />
+                            </nz-form-control>
+                          </nz-form-item>
+                        }
 
                         <div class="flex flex-col">
                           <button
@@ -82,6 +101,7 @@
                             class="custom-file-input"
                             appFileValidator
                             [allowedExtensions]="clientSelected?.idClientHoneSolutions === 13 ? ['.pdf'] : []"
+                            [maxFileSizeMB]="7"
                             (fileValidated)="loadFiles($event, item, i)"
                             hidden>
                           <nz-tag *ngIf="formDocList[i].get('file')?.value?.name" class="m-0" (click)="triggerFileInput(i)">
