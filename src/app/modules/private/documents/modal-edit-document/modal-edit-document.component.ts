@@ -43,7 +43,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
   suraArlEntities: string[] = [
     'ARL COLSANITAS', 'ALFATEP', 'ARL SURA', 'ARP AURORA', 'ARP BOLIVAR',
     'ARP COLMENA', 'ARP COLPATRIA', 'LA EQUIDAD SEGUROS DE VIDA S.A',
-    'LIBERTY SEGUROS DE VIDA S.A', 'MAPFRE', 'POSITIVA ARP',
+    'LIBERTY SEGUROS DE VIDA S.A', 'MAPFRE', 'POSITIVA ARP', 'AXA ARL', 'OTRAS',
   ];
   riskClassifierOptions = ['1', '2', '3', '4', '5'];
 
@@ -165,6 +165,10 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
     return documentValidationMap[controlName]?.includes(this.idDocumentType);
   }
 
+  sanitizeWithOptions(value: any, validValues: any[]): any | null {
+    return validValues.includes(value) ? value : null;
+  }
+
    /**
     * Valida el tipo de documento que se va a editar
     */
@@ -281,7 +285,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
     const amountPolicy = this.formUtils.formatCurrency(item.amountPolicy);
 
     this.documentForm.patchValue({
-      software: item.software,
+      software: this.sanitizeWithOptions(item.software, this.suraSoftwareTypes),
       consultationDate: this.convertDate(item.consultationDate),
       dateDiligence: this.convertDate(item.dateDiligence),
       dateFirm: this.convertDate(item.dateFirm),
@@ -291,14 +295,14 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
       documentDeliveryDate: this.convertDate(item.documentDeliveryDate),
       dueDate: this.convertDate(item.dueDate),
       endorsedSpecialtyDate: this.convertDate(item.endorsedSpecialtyDate),
-      epsName: item.epsName,
+      epsName: this.sanitizeWithOptions(item.epsName, this.suraArlEntities),
       dateExpedition: this.convertDate(item.dateExpedition),
       lastDosimetryDate: this.convertDate(item.lastDosimetryDate),
       legalRepresentative: item.legalRepresentative,
       NameAlternate: item.NameAlternate,
       receptionDate: this.convertDate(item.receptionDate),
       resolutionOfThePension: item.resolutionOfThePension,
-      riskClassifier: riskClassifier,
+      riskClassifier: this.sanitizeWithOptions(item.riskClassifier, this.riskClassifierOptions),
       validityStartDate: this.convertDate(item.validityStartDate),
       amountPolicy: amountPolicy,
       idDocumentType: item.idDocumentType,

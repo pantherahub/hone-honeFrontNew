@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
-import { isEmail, isNumeric, isTelephoneNumber, isUrl } from 'src/app/utils/validation-utils';
+import { isAlphanumeric, isAlphanumericWithSpaces, isEmail, isNumeric, isTelephoneNumber, isUrl } from 'src/app/utils/validation-utils';
 
 @Injectable({
   providedIn: 'root'
@@ -39,6 +39,22 @@ export class FormUtilsService {
   numeric(control: AbstractControl): ValidationErrors | null {
     if (!control || !control.value) return null;
     return isNumeric(control.value) ? null : { invalidNumber: true };
+  }
+
+  /**
+   * Alphanumeric validator.
+   */
+  alphanumeric(control: AbstractControl): ValidationErrors | null {
+    if (!control || !control.value) return null;
+    return isAlphanumeric(control.value) ? null : { invalidAlphanumeric: true };
+  }
+
+  /**
+   * Alphanumeric validator.
+   */
+  alphanumericWithSpaces(control: AbstractControl): ValidationErrors | null {
+    if (!control || !control.value) return null;
+    return isAlphanumericWithSpaces(control.value) ? null : { invalidAlphanumWithSpaces: true };
   }
 
   /**
@@ -99,55 +115,6 @@ export class FormUtilsService {
     while (formArray.length !== 0) {
       formArray.removeAt(0);
     }
-  }
-
-  /**
-   * Format address object to string.
-   */
-  formatAddress(addressObj: any): string {
-    const {
-      typeOfRoad,
-      roadName,
-      roadMainComplement,
-      roadSecondaryComplement,
-
-      mainNumber,
-      mainNumberComplement,
-      secondaryNumber,
-      secondaryNumberComplement,
-
-      neighborhood,
-      addressMainComplement,
-      addressMainNameComplement,
-      addressSecondaryComplement,
-      addressSecondaryNameComplement
-    } = addressObj;
-
-    let address = `${typeOfRoad || ''} ${roadName || ''}`;
-
-    if (roadMainComplement) address += ` ${roadMainComplement}`;
-    if (roadSecondaryComplement) address += ` ${roadSecondaryComplement}`;
-
-    if (mainNumber || secondaryNumber) {
-      address += ` #${mainNumber || ''}`;
-      if (mainNumberComplement) address += ` ${mainNumberComplement}`;
-
-      address += ` - ${secondaryNumber || ''}`;
-      if (secondaryNumberComplement) address += ` ${secondaryNumberComplement}`;
-    }
-
-    if (addressMainComplement) {
-      address += `, ${addressMainComplement}`;
-      if (addressMainNameComplement) address += ` ${addressMainNameComplement}`;
-    }
-    if (addressSecondaryComplement) {
-      address += `, ${addressSecondaryComplement}`;
-      if (addressSecondaryNameComplement) address += ` ${addressSecondaryNameComplement}`;
-    }
-
-    if (neighborhood) address += `, Barrio ${neighborhood}`;
-
-    return address.trim();
   }
 
   /**

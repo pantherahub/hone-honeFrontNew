@@ -22,6 +22,7 @@ export class ContactFormComponent implements OnInit {
   @Input() contact: any | null = null;
   @Input() contactModelType: string = 'Prestador'; // 'Prestador' or 'Sede'
   @Input() officeIdCity: number | null = null;
+  @Input() shortcut: any | null = null; // Shortcut in creation to add default values
 
   contactForm!: FormGroup;
   formInitialized = false;
@@ -37,6 +38,9 @@ export class ContactFormComponent implements OnInit {
 
   savedEmails: any[] = [];
   savedPhones: any[] = [];
+
+  isEmailRequired = false;
+  isPhoneRequired = false;
 
   loading: boolean = false;
   loadingSetupContactData: boolean = false;
@@ -80,6 +84,16 @@ export class ContactFormComponent implements OnInit {
         if (data && data.length) {
           this.contactOccupations = data[0].Occupations;
         }
+        const selectedIdOccupation = this.contactForm.get('idOccupation')?.value;
+        if (selectedIdOccupation) {
+          this.updateRequiredFlags(selectedIdOccupation);
+        }
+
+        const occupationName = this.contactForm.get('occupationName')?.value;
+        if (this.shortcut && !occupationName) {
+          this.setOccupationName(selectedIdOccupation);
+        }
+
         if (validateForm) this.formValidationsLoadData();
         this.formInitialized = true;
       },
@@ -140,8 +154,8 @@ export class ContactFormComponent implements OnInit {
       idOccupation: [{ value: null, disabled: true }, [Validators.required]],
       occupationName: [''],
       name: [null],
-      Emails: this.fb.array([], [this.formUtils.minArrayLength(1), this.formUtils.maxArrayLength(5)]),
-      Phones: this.fb.array([], [this.formUtils.minArrayLength(1), this.formUtils.maxArrayLength(5)]),
+      Emails: this.fb.array([], [this.formUtils.maxArrayLength(5)]),
+      Phones: this.fb.array([], [this.formUtils.maxArrayLength(5)]),
 
       idTypeDocument: [null],
       identification: [null],
@@ -168,10 +182,56 @@ export class ContactFormComponent implements OnInit {
       .pipe(distinctUntilChanged())
       .subscribe((value) => {
         if (this.loadingSetupContactData) return;
+        this.updateRequiredFlags(value);
         this.onChangeOccupation(value);
       });
 
     this.loadContactData();
+  }
+
+  private shouldAddByRequired(array: FormArray, isRequired: boolean): boolean {
+    return isRequired && array.length === 0;
+  }
+  private shouldRemoveByRequired(
+    array: FormArray,
+    isRequired: boolean,
+  ): boolean {
+    if (isRequired || array.length !== 1) return false;
+
+    const group = array.at(0) as FormGroup;
+    const fields = ["email", "type", "number", "extension"];
+    const hasAnyValue = fields.some(field => {
+      const value = group.get(field)?.value;
+      return value !== null && value !== undefined && value !== '';
+    });
+
+    // Delete if the field comes as default, without data and unmodified
+    return group.pristine && !hasAnyValue;
+  }
+
+  updateRequiredFlags(idOccupation: number): void {
+    const occupation = this.getOccupation(idOccupation);
+    if (occupation) {
+      this.isEmailRequired = !!occupation.requiredEmail;
+      this.isPhoneRequired = !!occupation.requiredPhone;
+    } else {
+      this.isEmailRequired = false;
+      this.isPhoneRequired = false;
+    }
+
+    // Add or remove default email field
+    if (this.shouldAddByRequired(this.emailsArray, this.isEmailRequired)) {
+      this.addEmail();
+    } else if (this.shouldRemoveByRequired(this.emailsArray, this.isEmailRequired)) {
+      this.removeEmail(0);
+    }
+
+    // Add or remove default phone field
+    if (this.shouldAddByRequired(this.phonesArray, this.isPhoneRequired)) {
+      this.addPhone();
+    } else if (this.shouldRemoveByRequired(this.phonesArray, this.isPhoneRequired)) {
+      this.removePhone(0);
+    }
   }
 
   onChangeContactType(newValue: any) {
@@ -207,7 +267,7 @@ export class ContactFormComponent implements OnInit {
 
   onChangeOccupation(newValue: any) {
     // Person and unique occupation
-    const enabled = newValue != null && this.getOccupation(newValue)?.unique && this.selectedOccupationType === 2;
+    const enabled = newValue != null && !!this.getOccupation(newValue)?.unique && this.selectedOccupationType === 2;
     if (enabled != this.identificationEnabled) {
       this.identificationEnabled = enabled;
       this.updateIdentificationValidators();
@@ -270,13 +330,25 @@ export class ContactFormComponent implements OnInit {
       this.identificationEnabled = enabled;
       this.updateIdentificationValidators(false);
     }
-    idOccupationControl?.enable();
+    if (!this.shortcut) idOccupationControl?.enable();
     this.loading = false;
     this.loadingSetupContactData = false;
   }
 
   loadContactData(): void {
-    if (this.contact) {
+    if (this.shortcut) {
+      this.loading = true;
+      this.loadingSetupContactData = true;
+      this.contactForm.patchValue({
+        ...this.shortcut
+      });
+      if (this.shortcut.idOccupationType) {
+        this.contactForm.get('idOccupationType')?.disable({ emitEvent: false });
+      }
+      if (this.shortcut.idOccupation) {
+        this.contactForm.get('idOccupation')?.disable({ emitEvent: false });
+      }
+    } else if (this.contact) {
       this.loading = true;
       this.loadingSetupContactData = true;
 
@@ -313,8 +385,9 @@ export class ContactFormComponent implements OnInit {
     }
 
     // Validate form and initialize change events
-    if (this.contact?.idOccupationType) {
-      this.loadFilteredContactOccupations(this.contact.idOccupationType, true);
+    const idOccupationType = this.contactForm.get('idOccupationType')?.value;
+    if (idOccupationType) {
+      this.loadFilteredContactOccupations(idOccupationType, true);
     } else {
       this.loading = false;
       this.loadingSetupContactData = false;
@@ -327,8 +400,6 @@ export class ContactFormComponent implements OnInit {
       this.contact.Emails.forEach((email: string) => {
         this.emailsArray.push(this.createEmailGroup(email));
       });
-    } else {
-      this.addEmail();
     }
 
     // Load phone numbers
@@ -337,8 +408,6 @@ export class ContactFormComponent implements OnInit {
       this.contact.Phones.forEach((phone: any) => {
         this.phonesArray.push(this.createPhoneGroup(phone));
       });
-    } else {
-      this.addPhone();
     }
   }
 
@@ -392,17 +461,20 @@ export class ContactFormComponent implements OnInit {
       this.emailsArray.push(this.createEmailGroup());
     }
   }
+  get canRemoveEmail(): boolean {
+    return (!this.isEmailRequired && this.emailsArray.length > 0)
+          || this.emailsArray.length > 1;
+  }
   removeEmail(index: number): void {
-    if (this.emailsArray.length > 1) {
-      const emailGroup = this.emailsArray.at(index);
-      const idEmail = emailGroup.get('idEmail')?.value;
-      // Push to deleted array if it already existed
-      if (idEmail != null) {
-        const deletedEmails = this.contactForm.get('deletedEmails') as FormArray;
-        deletedEmails.push(this.fb.control(idEmail));
-      }
-      this.emailsArray.removeAt(index);
+    if (!this.canRemoveEmail) return;
+    const emailGroup = this.emailsArray.at(index);
+    const idEmail = emailGroup.get('idEmail')?.value;
+    // Push to deleted array if it already existed
+    if (idEmail != null) {
+      const deletedEmails = this.contactForm.get('deletedEmails') as FormArray;
+      deletedEmails.push(this.fb.control(idEmail));
     }
+    this.emailsArray.removeAt(index);
   }
 
   get phonesArray(): FormArray {
@@ -449,17 +521,20 @@ export class ContactFormComponent implements OnInit {
       this.phonesArray.push(this.createPhoneGroup());
     }
   }
+  get canRemovePhone(): boolean {
+    return (!this.isPhoneRequired && this.phonesArray.length > 0)
+          || this.phonesArray.length > 1;
+  }
   removePhone(index: number): void {
-    if (this.phonesArray.length > 1) {
-      const phoneGroup = this.phonesArray.at(index);
-      const idPhone = phoneGroup.get('idPhone')?.value;
-      // Push to deleted array if it already existed
-      if (idPhone != null) {
-        const deletedPhones = this.contactForm.get('deletedPhones') as FormArray;
-        deletedPhones.push(this.fb.control(idPhone));
-      }
-      this.phonesArray.removeAt(index);
+    if (!this.canRemovePhone) return;
+    const phoneGroup = this.phonesArray.at(index);
+    const idPhone = phoneGroup.get('idPhone')?.value;
+    // Push to deleted array if it already existed
+    if (idPhone != null) {
+      const deletedPhones = this.contactForm.get('deletedPhones') as FormArray;
+      deletedPhones.push(this.fb.control(idPhone));
     }
+    this.phonesArray.removeAt(index);
   }
   phoneNumberValidator(control: AbstractControl) {
     if (!control || !control.value || !control.parent) return null;
@@ -481,6 +556,10 @@ export class ContactFormComponent implements OnInit {
   disableFutureDates = (current: Date): boolean => {
     return current > new Date();
   };
+
+  enableControls(form: FormGroup, controls: string[]) {
+    controls.forEach(control => form.get(control)?.enable({ emitEvent: false }));
+  }
 
   onSubmit() {
     this.formUtils.trimFormStrControls(this.contactForm);
@@ -558,6 +637,8 @@ export class ContactFormComponent implements OnInit {
         expeditionDate: `${format(expeditionDate, 'yyyy-MM-dd')}T00:00:00`
       });
     }
+
+    this.enableControls(this.contactForm, ['idOccupationType', 'idOccupation']);
 
     this.modal.close({
       contact: this.contactForm,

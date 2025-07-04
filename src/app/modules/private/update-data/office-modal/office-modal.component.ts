@@ -16,6 +16,7 @@ import { ScheduleFormComponent } from './schedule-form/schedule-form.component';
 import { AddressFormComponent } from './address-form/address-form.component';
 import { DatePickerInputComponent } from 'src/app/shared/forms/date-picker-input/date-picker-input.component';
 import { format } from 'date-fns';
+import { ShortcutContact } from 'src/app/models/shortcut-contact.interface';
 
 @Component({
   selector: 'app-office-modal',
@@ -48,6 +49,17 @@ export class OfficeModalComponent implements OnInit {
 
   user = this.eventManager.userLogged();
   modelType: string = 'Sede';
+
+  shortcutContacts: ShortcutContact[] = [
+    {
+      label: 'agendamiento de citas',
+      isContactRequired: false,
+      shortcut: {
+        idOccupationType: 1,
+        idOccupation: 12,
+      },
+    },
+  ];
 
   constructor(
     private eventManager: EventManagerService,
@@ -390,6 +402,22 @@ export class OfficeModalComponent implements OnInit {
     return this.officeForm.get('deletedContacts') as FormArray;
   }
 
+  // Missing shortcut contacts
+  getMissingContacts(filterRequiredOnly: boolean = false): ShortcutContact[] {
+    return this.shortcutContacts.filter(contact => {
+      const saved = this.existingContacts.some(c => c.idOccupation === contact.shortcut.idOccupation);
+      return !saved && (!filterRequiredOnly || contact.isContactRequired);
+    });
+  }
+
+  get citasContactMissing(): ShortcutContact | undefined {
+    return this.getMissingContacts().find(c => c.shortcut.idOccupation === 12);
+  }
+
+  openContactShortcut(shortcutContact: ShortcutContact) {
+    this.openContactModal(null, shortcutContact);
+  }
+
   openAddressModal() {
     const modalRef = this.modalService.create<AddressFormComponent, any>({
       nzTitle: 'Dirección de atención de usuarios',
@@ -505,7 +533,7 @@ export class OfficeModalComponent implements OnInit {
     this.messageService.create('info', 'Horario por eliminar.');
   }
 
-  openContactModal(contactIndex: number | null = null) {
+  openContactModal(contactIndex: number | null = null, contactShortcut: ShortcutContact | null = null) {
     this.formUtils.trimFormStrControls(this.officeForm);
     if (this.officeForm.invalid) {
       this.formUtils.markFormTouched(this.officeForm);
@@ -547,6 +575,7 @@ export class OfficeModalComponent implements OnInit {
     const instanceModal = modalRef.getContentComponent();
     instanceModal.contactModelType = this.modelType;
     instanceModal.officeIdCity = this.officeForm.value.idCity;
+    instanceModal.shortcut = contactShortcut ? contactShortcut.shortcut : null;
     if (contact) instanceModal.contact = contact;
 
     modalRef.afterClose.subscribe((result: any) => {
@@ -569,6 +598,9 @@ export class OfficeModalComponent implements OnInit {
             'info',
             `Contacto por ${contactIndex != null ? 'actualizar' : 'agregar'}.`
           );
+          if (contactShortcut) {
+            this.alertService.success('Agregado', `Contacto de ${contactShortcut.label} agregado para crear`);
+          }
         } else if (!result.isNew && contactIndex != null) {
           const updatedContactsIndex = this.updatedContacts.controls.findIndex(
             (control) => control.value.idTemporalContact === newContact.value.idTemporalContact
@@ -632,6 +664,10 @@ export class OfficeModalComponent implements OnInit {
     }
     if (!this.existingContacts?.length) {
       this.alertService.warning('Aviso', 'Debe agregar al menos un contacto.');
+      return;
+    }
+    if (this.getMissingContacts(true).length > 0) {
+      this.alertService.warning('Aviso', 'Faltan algunos contactos requeridos. Por favor diligéncialos.');
       return;
     }
 
