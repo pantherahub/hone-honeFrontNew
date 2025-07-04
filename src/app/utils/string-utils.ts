@@ -69,3 +69,13 @@ export function trimObjectStrings(obj: Record<string, any>): Record<string, any>
   }
   return result;
 }
+
+/**
+ * Sanitize string values.
+ * @param string - The string to sanitize.
+ * @returns Sanitized string.
+ */
+export function sanitizeString(strValue: string): string {
+  const safeText = strValue.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return safeText;
+}

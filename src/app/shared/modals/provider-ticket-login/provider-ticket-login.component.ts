@@ -9,7 +9,7 @@ import { EventManagerService } from '../../../services/events-manager/event-mana
 import { TicketsService } from '../../../services/tickets/tickets.service';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { REGEX_PATTERNS } from 'src/app/constants/regex-patterns';
-
+import { sanitizeString } from 'src/app/utils/string-utils';
 
 @Component({
   selector: 'app-provider-ticket-login',
@@ -128,15 +128,23 @@ export class ProviderTicketLoginComponent implements AfterContentChecked, OnInit
    * Mapea y retorna el formulario en una sola cadena de string
    */
   getObservations(): string {
-    const removeQuotes = (value: any): string => {
-      return typeof value === 'string' ? value.replace(/["']/g, '').trim() : value;
+    const sanitize = (value: any): string => {
+      return typeof value === 'string'
+        ? sanitizeString(value.trim())
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;")
+        : value;
     };
     const { name, lastname, identification, email, phone, address, observation } = this.requestForm.value;
 
-    const observaciones = `
-      Datos reportados del usuario:
-      <br> Nombre: ${removeQuotes(name)},  <br> Apellido: ${removeQuotes(lastname)},  <br> Identificación: ${removeQuotes(identification)},  <br> Teléfono: ${removeQuotes(phone)},
-      <br> Email: ${removeQuotes(email)}, <br> Dirección: ${removeQuotes(address)},  <br> Observaciones: ${removeQuotes(observation)}, <br>
+    const observaciones = `<strong>Datos reportados del usuario:</strong>
+      Nombre: ${sanitize(name)}
+      Apellido: ${sanitize(lastname)}
+      Identificación: ${sanitize(identification)}
+      Email: ${sanitize(email)}
+      Teléfono: ${sanitize(phone)}
+      Dirección: ${sanitize(address)}
+      Observaciones: ${sanitize(observation)}
       `;
     return observaciones;
   }

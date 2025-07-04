@@ -11,6 +11,7 @@ import { NzModalService } from 'ng-zorro-antd/modal';
 import { ResponseCreateTicketComponent } from '../response-create-ticket/response-create-ticket.component';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { REGEX_PATTERNS } from 'src/app/constants/regex-patterns';
+import { sanitizeString } from 'src/app/utils/string-utils';
 
 @Component({
    selector: 'app-contact-ticket',
@@ -127,16 +128,27 @@ export class ContactTicketComponent implements AfterContentChecked, OnInit {
     */
   getObservations(): string {
       const removeQuotes = (value: any): string => {
-        return typeof value === 'string' ? value.replace(/["']/g, '').trim() : value;
+        return typeof value === 'string'
+          ? sanitizeString(value.trim())
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;")
+          : value;
       };
       const { name, lastname, identification, email, phone, address, observation } = this.requestForm.value;
 
-      const observaciones = `
-      Información del usuario que genera caso:  Nombre: ${this.clientSelected.razonSocial} ,   identificacion: ${this.clientSelected.identificacion} ,   cliente: ${this.clientSelected.clientHoneSolutions}
-      <br>
-      Datos reportados del usuario:
-      <br> Nombre: ${removeQuotes(name)},  <br> Apellido: ${removeQuotes(lastname)},  <br> Identificación: ${removeQuotes(identification)},  <br> Teléfono: ${removeQuotes(phone)},
-      <br> Email: ${removeQuotes(email)}, <br> Dirección: ${removeQuotes(address)},  <br> Observaciones: ${removeQuotes(observation)}, <br>
+    const observaciones = `<strong>Información del usuario que genera caso:</strong>
+      Nombre: ${this.clientSelected.razonSocial}
+      Identificacion: ${this.clientSelected.identificacion}
+      Cliente: ${this.clientSelected.clientHoneSolutions}
+
+      <strong>Datos reportados del usuario:</strong>
+      Nombre: ${removeQuotes(name)}
+      Apellido: ${removeQuotes(lastname)}
+      Identificación: ${removeQuotes(identification)}
+      Teléfono: ${removeQuotes(phone)}
+      Email: ${removeQuotes(email)}
+      Dirección: ${removeQuotes(address)}
+      Observaciones: ${removeQuotes(observation)}
       `;
       return observaciones;
    }
