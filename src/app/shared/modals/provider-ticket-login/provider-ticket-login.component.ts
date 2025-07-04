@@ -138,13 +138,13 @@ export class ProviderTicketLoginComponent implements AfterContentChecked, OnInit
     const { name, lastname, identification, email, phone, address, observation } = this.requestForm.value;
 
     const observaciones = `<strong>Datos reportados del usuario:</strong>
-      Nombre: ${sanitize(name)}
-      Apellido: ${sanitize(lastname)}
-      Identificación: ${sanitize(identification)}
-      Email: ${sanitize(email)}
-      Teléfono: ${sanitize(phone)}
-      Dirección: ${sanitize(address)}
-      Observaciones: ${sanitize(observation)}
+      <br>Nombre: ${sanitize(name)}
+      <br>Apellido: ${sanitize(lastname)}
+      <br>Identificación: ${sanitize(identification)}
+      <br>Email: ${sanitize(email)}
+      <br>Teléfono: ${sanitize(phone)}
+      <br>Dirección: ${sanitize(address)}
+      <br>Observaciones: ${sanitize(observation)}
       `;
     return observaciones;
   }

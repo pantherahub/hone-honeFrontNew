@@ -137,18 +137,18 @@ export class ContactTicketComponent implements AfterContentChecked, OnInit {
       const { name, lastname, identification, email, phone, address, observation } = this.requestForm.value;
 
     const observaciones = `<strong>Información del usuario que genera caso:</strong>
-      Nombre: ${this.clientSelected.razonSocial}
-      Identificacion: ${this.clientSelected.identificacion}
-      Cliente: ${this.clientSelected.clientHoneSolutions}
-
-      <strong>Datos reportados del usuario:</strong>
-      Nombre: ${removeQuotes(name)}
-      Apellido: ${removeQuotes(lastname)}
-      Identificación: ${removeQuotes(identification)}
-      Teléfono: ${removeQuotes(phone)}
-      Email: ${removeQuotes(email)}
-      Dirección: ${removeQuotes(address)}
-      Observaciones: ${removeQuotes(observation)}
+      <br>Nombre: ${this.clientSelected.razonSocial}
+      <br>Identificacion: ${this.clientSelected.identificacion}
+      <br>Cliente: ${this.clientSelected.clientHoneSolutions}
+      <br>
+      <br><strong>Datos reportados del usuario:</strong>
+      <br>Nombre: ${removeQuotes(name)}
+      <br>Apellido: ${removeQuotes(lastname)}
+      <br>Identificación: ${removeQuotes(identification)}
+      <br>Teléfono: ${removeQuotes(phone)}
+      <br>Email: ${removeQuotes(email)}
+      <br>Dirección: ${removeQuotes(address)}
+      <br>Observaciones: ${removeQuotes(observation)}
       `;
       return observaciones;
    }
