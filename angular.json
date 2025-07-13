@@ -40,7 +40,9 @@
 							"src/theme.less",
 							"src/styles.scss"
 						],
-						"scripts": []
+						"scripts": [
+              "node_modules/flowbite/dist/flowbite.js"
+            ]
 					},
 					"configurations": {
 						"production": {

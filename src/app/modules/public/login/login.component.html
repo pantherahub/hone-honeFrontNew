@@ -49,53 +49,13 @@
 
         <form nz-form [formGroup]="loginForm" class="form-login">
 
-            <!-- Campo Usuario / email -->
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24">
-                <nz-form-item nz-row>
-                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
-                        [nzXl]="24">
-                        Usuario
-                    </nz-form-label>
-
-                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="emailErrorTip">
-                        <ng-template #emailErrorTip>
-                            <p *ngIf="loginForm.controls['email'].hasError('required')">¡El usuario es
-                                obligatorio!
-                            </p>
-                        </ng-template>
-                        <input nz-input placeholder="" formControlName="email">
-                    </nz-form-control>
-
-                </nz-form-item>
+            <div class="mt-4">
+              <app-text-input [id]="'email'" formControlName="email" [type]="'email'" label="Correo electrónico" />
+              <app-input-error [control]="loginForm.get('email')" />
             </div>
-
-            <!-- Campo contraseña -->
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24">
-                <nz-form-item nz-row>
-                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
-                        [nzXl]="24">
-                        Contraseña
-                    </nz-form-label>
-
-                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="passwordErrorTip">
-                        <ng-template #passwordErrorTip>
-                            <p *ngIf="loginForm.controls['password'].hasError('required')">¡La contraseña es
-                                obligatoria!
-                            </p>
-                        </ng-template>
-                        <nz-input-group [nzSuffix]="suffixTemplate">
-                            <input [type]="passwordVisible ? 'text' : 'password'" nz-input placeholder=""
-                                formControlName="password" />
-                        </nz-input-group>
-                        <ng-template #suffixTemplate>
-                            <span style="cursor: pointer" nz-icon [nzType]="passwordVisible ? 'eye-invisible' : 'eye'"
-                                (click)="passwordVisible = !passwordVisible"></span>
-                        </ng-template>
-                    </nz-form-control>
-
-                </nz-form-item>
+            <div class="my-4">
+              <app-text-input [id]="'password'" formControlName="password" [type]="'password'" label="Contraseña" [togglePassword]="true" />
+              <app-input-error [control]="loginForm.get('password')" />
             </div>
 
             <!-- Campo re-captcha -->

@@ -12,7 +12,9 @@ delete colors['blueGray'];
 module.exports = {
   content: [
     "./src/**/*.{html,ts}",
+    "./node_modules/flowbite/**/*.js"
   ],
+  darkMode: 'class',
   theme: {
     container: {
       center: true,
@@ -169,6 +171,7 @@ module.exports = {
 
       addBase({ ":root": cssVars });
     }),
+    require("flowbite/plugin"),
   ],
 }
 

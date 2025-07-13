@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { RouterOutlet, ActivatedRoute, Router } from '@angular/router';
 import { NgZorroModule } from './ng-zorro.module';
 import { IconsProviderModule } from './icons-provider.module';
 import { HeaderComponent } from './shared/header/header.component';
 import { EventManagerService } from './services/events-manager/event-manager.service';
+import { initFlowbite } from 'flowbite';
 
 @Component({
   selector: 'app-root',
@@ -13,12 +14,16 @@ import { EventManagerService } from './services/events-manager/event-manager.ser
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'template-login';
 
   constructor (private eventManager: EventManagerService, private readonly location: Location) {
     this.eventManager.getDataUser();
     this.eventManager.getDataClient();
+  }
+
+  ngOnInit(): void {
+    initFlowbite();
   }
 
 }

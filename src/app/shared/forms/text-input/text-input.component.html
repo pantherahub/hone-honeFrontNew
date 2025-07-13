@@ -1,0 +1,51 @@
+<div class="relative">
+  <input
+    [attr.id]="id"
+    [attr.name]="name"
+    [type]="actualInputType"
+    [placeholder]="placeholder"
+    [disabled]="disabled"
+    [value]="value"
+    (input)="handleInput($event)"
+    (blur)="onTouched()"
+    class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 appearance-none dark:text-white focus:outline-none focus:ring-0 peer autofill:bg-yellow-200"
+    [ngClass]="{
+      'border-gray-300 dark:border-gray-600 focus:border-blue-600 dark:focus:border-blue-500':
+        !showError,
+      'bg-red-50 border-red-600 dark:border-red-500 focus:border-red-600 dark:focus:border-red-500':
+        showError
+    }"
+  />
+
+  <label
+    [attr.for]="id"
+    class="absolute text-sm duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
+    [ngClass]="{
+      'text-gray-500 dark:text-gray-400 peer-focus:text-blue-600 peer-focus:dark:text-blue-500':
+        !showError,
+      'text-red-600 dark:text-red-500':
+        showError
+    }"
+  >
+    {{ label }}
+  </label>
+
+  <button
+    *ngIf="type === 'password' && togglePassword"
+    type="button"
+    class="absolute inset-y-0 end-0 flex items-center px-3 text-sm text-gray-600 dark:text-gray-300"
+    (click)="showPassword = !showPassword"
+    tabindex="-1"
+  >
+    @if(!showPassword) {
+      <svg width="18" height="18">
+        <use xlink:href="/assets/icons/outline/general.svg#eye" />
+      </svg>
+    } @else {
+      <svg width="18" height="18">
+        <use xlink:href="/assets/icons/outline/general.svg#eye-slash" />
+      </svg>
+    }
+  </button>
+
+</div>

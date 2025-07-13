@@ -11,11 +11,13 @@ import { environment } from 'src/environments/environment';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { ProviderTicketLoginComponent } from 'src/app/shared/modals/provider-ticket-login/provider-ticket-login.component';
 import { TutorialService } from 'src/app/services/tutorial/tutorial.service';
+import { TextInputComponent } from 'src/app/shared/forms/text-input/text-input.component';
+import { InputErrorComponent } from 'src/app/shared/forms/input-error/input-error.component';
 
 @Component({
    selector: 'app-login',
    standalone: true,
-   imports: [ NgZorroModule, CommonModule, RecaptchaModule ],
+   imports: [ NgZorroModule, CommonModule, RecaptchaModule, TextInputComponent, InputErrorComponent ],
 
    templateUrl: './login.component.html',
    styleUrl: './login.component.scss'
