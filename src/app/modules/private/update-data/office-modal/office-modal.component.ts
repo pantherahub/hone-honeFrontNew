@@ -14,7 +14,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { AlertService } from 'src/app/services/alerts/alert.service';
 import { ScheduleFormComponent } from './schedule-form/schedule-form.component';
 import { AddressFormComponent } from './address-form/address-form.component';
-import { DatePickerInputComponent } from 'src/app/shared/forms/date-picker-input/date-picker-input.component';
+import { DatePickerInputComponent } from 'src/app/shared/components/date-picker-input/date-picker-input.component';
 import { format } from 'date-fns';
 import { ShortcutContact } from 'src/app/models/shortcut-contact.interface';
 
@@ -26,7 +26,6 @@ import { ShortcutContact } from 'src/app/models/shortcut-contact.interface';
   styleUrl: './office-modal.component.scss'
 })
 export class OfficeModalComponent implements OnInit {
-
   @Input() providerCompanies: any[] = [];
   @Input() office: any | null = null;
 

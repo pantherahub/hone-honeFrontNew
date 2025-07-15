@@ -41,7 +41,7 @@ export class TextInputComponent implements ControlValueAccessor, OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.ngControl = this.injector.get(NgControl, undefined);
+    this.ngControl = this.injector.get(NgControl, { optional: true, self: true });
     if (this.ngControl) {
       this.ngControl.valueAccessor = this;
     }
@@ -61,6 +61,10 @@ export class TextInputComponent implements ControlValueAccessor, OnInit {
 
   registerOnTouched(fn: any): void {
     this.onTouched = fn;
+  }
+
+  setDisabledState?(isDisabled: boolean): void {
+    this.disabled = isDisabled;
   }
 
   handleInput(event: Event) {

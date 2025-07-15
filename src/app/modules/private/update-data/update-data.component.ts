@@ -12,7 +12,7 @@ import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { AlertService } from 'src/app/services/alerts/alert.service';
 import { format } from 'date-fns';
-import { BackendErrorsComponent } from 'src/app/shared/forms/backend-errors/backend-errors.component';
+import { BackendErrorsComponent } from 'src/app/shared/components/backend-errors/backend-errors.component';
 import { debounceTime, firstValueFrom } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
 import { CanComponentDeactivate } from 'src/app/guards/can-deactivate.interface';
