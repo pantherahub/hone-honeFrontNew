@@ -18,23 +18,34 @@ import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, NgControl } from 
 })
 export class SelectComponent implements ControlValueAccessor {
 
-  @Input() items: { label: string; value: any }[] = [];
+  @Input() items: any[] = [];
   @Input() placeholder: string = 'Seleccionar';
+  @Input() clearable = false;
   @Input() searchable = false;
   @Input() selected: any = null;
   @Input() hasError = false;
+  @Input() bindLabel?: string;
+  @Input() bindValue?: string;
+
   @Output() selectedChange = new EventEmitter<any>();
 
   @ViewChild('dropdownRef') dropdownRef!: ElementRef<HTMLDivElement>;
+  @ViewChild('searchInput') searchInputRef!: ElementRef<HTMLInputElement>;
 
+  dropdownAbove = false;
+
+  isDropdownInDOM = false;
   isOpen = false;
+
   searchTerm = '';
 
   private _disabled = false;
   @Input()
   set disabled(value: boolean) {
     this._disabled = value;
-    if (value) this.isOpen = false;
+    if (value) {
+      this.closeDropdown();
+    }
   }
   get disabled(): boolean {
     return this._disabled;
@@ -53,38 +64,124 @@ export class SelectComponent implements ControlValueAccessor {
     }
   }
 
+  closeDropdown() {
+    this.isOpen = false;
+    this.isDropdownInDOM = false;
+    this.clearSearch();
+  }
+
   toggleDropdown() {
     if (this.disabled) return;
-    this.isOpen = !this.isOpen;
-    if (!this.isOpen) this.clearSearch();
+
+    if (this.isOpen || this.isDropdownInDOM) {
+      this.closeDropdown();
+      return;
+    }
+
+    this.isDropdownInDOM = true;
+    setTimeout(() => {
+      this.setDropdownPosition();
+      this.isOpen = true;
+
+      if (this.searchable) {
+        this.searchInputRef?.nativeElement?.focus({ preventScroll: true });
+      }
+    });
+  }
+
+  setDropdownPosition() {
+    setTimeout(() => {
+      const rect = this.dropdownRef.nativeElement.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const dropdownEl = this.dropdownRef.nativeElement.querySelector('.dropdown-menu');
+      let dropdownHeight = 200;
+
+      if (dropdownEl instanceof HTMLElement) {
+        dropdownHeight = dropdownEl.offsetHeight;
+      }
+
+      // Available space below
+      const spaceBelow = viewportHeight - rect.bottom;
+
+      this.dropdownAbove = spaceBelow < dropdownHeight;
+    });
+  }
+
+  get filteredItems() {
+    if (!this.searchable || !this.searchTerm.trim()) return this.items;
+    return this.items.filter(i =>
+      this.getItemLabel(i).toLowerCase().includes(this.searchTerm.toLowerCase())
+    );
+  }
+
+  clearSearch() {
+    this.searchTerm = '';
+  }
+
+  getItemLabel(item: any): string {
+    if (this.bindLabel) {
+      return item?.[this.bindLabel] ?? '';
+    }
+
+    if (typeof item === 'string' || typeof item === 'number' || typeof item === 'boolean') {
+      return String(item);
+    }
+    return '';
+  }
+
+  getItemValue(item: any): any {
+    if (!this.bindValue) return item;
+    return item?.[this.bindValue];
+  }
+
+  isSelected(item: any): boolean {
+    const itemValue = this.getItemValue(item);
+
+    if (typeof itemValue === 'object' && itemValue !== null) {
+      return JSON.stringify(itemValue) === JSON.stringify(this.selected);
+    }
+    return itemValue === this.selected;
   }
 
   selectItem(item: any) {
     if (this.disabled) return;
-    this.selected = item.value;
+    this.selected = this.getItemValue(item);
     this.onChange(this.selected);
     this.onTouched();
     this.selectedChange.emit(this.selected);
-    this.isOpen = false;
+    this.closeDropdown();
+  }
+
+  clearSelection(event: MouseEvent) {
+    // Prevents the dropdown from closing
+    event.stopPropagation();
+
+    if (this.disabled) return;
+    this.selected = null;
+    this.onChange(null);
+    this.onTouched();
+    this.selectedChange.emit(null);
     this.clearSearch();
   }
 
   get selectedLabel(): string {
-    const found = this.items.find(i => i.value === this.selected);
-    return found?.label || this.placeholder;
+    const found = this.items.find(i => this.isSelected(i));
+    return found
+      ? this.getItemLabel(found)
+      : this.placeholder;
   }
 
-  // Cierra si se hace click afuera
-  @HostListener('document:click', ['$event.target'])
+  // Closes if clicked outside
+  @HostListener('document:mousedown', ['$event.target'])
   onClickOutside(target: HTMLElement) {
     if (!this.dropdownRef?.nativeElement.contains(target)) {
-      this.isOpen = false;
+      this.closeDropdown();
     }
   }
 
   // ControlValueAccessor
   onChange = (_: any) => {};
-  onTouched = () => {};
+  onTouched = () => { };
 
   writeValue(value: any): void {
     this.selected = value;
@@ -105,17 +202,6 @@ export class SelectComponent implements ControlValueAccessor {
   get showError(): boolean {
     const control = this.ngControl?.control;
     return this.hasError || !!(control && control.invalid && control.touched);
-  }
-
-  get filteredItems() {
-    if (!this.searchable || !this.searchTerm.trim()) return this.items;
-    return this.items.filter(i =>
-      i.label.toLowerCase().includes(this.searchTerm.toLowerCase())
-    );
-  }
-
-  clearSearch() {
-    this.searchTerm = '';
   }
 
 }

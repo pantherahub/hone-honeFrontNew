@@ -1,4 +1,4 @@
-<div class="relative w-full" #dropdownRef>
+<div class="mt-4 relative w-full" #dropdownRef>
   <!-- Selector -->
   <button type="button"
     (click)="toggleDropdown()"
@@ -16,21 +16,50 @@
     }"
   >
     <span>{{ selectedLabel }}</span>
-    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+    <div class="flex items-center gap-1">
+      <!-- Clearable X icon -->
+      @if (clearable && selected != null) {
+        <button
+          type="button"
+          (click)="clearSelection($event)"
+          class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-0.5 rounded"
+          tabindex="-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      }
+
+      <!-- Dropdown arrow icon -->
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+      </svg>
+    </div>
+
+    <!-- <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-    </svg>
+    </svg> -->
   </button>
 
   <!-- Dropdown -->
-  @if (isOpen) {
-    <div class="absolute mt-1 z-50 w-full bg-white border border-gray-200 rounded-md shadow-lg dark:bg-gray-700 dark:border-gray-600">
+  @if (isDropdownInDOM) {
+    <div class="absolute z-50 w-full dropdown-menu bg-white border border-gray-200 rounded-md shadow-lg dark:bg-gray-700 dark:border-gray-600"
+      [ngClass]="{
+        'mt-1': !dropdownAbove,
+        'bottom-full mb-1': dropdownAbove,
+        'opacity-100': isOpen,
+        'opacity-0 pointer-events-none': !isOpen
+      }">
 
       <!-- Searchbox -->
       <div *ngIf="searchable" class="p-2 border-b dark:border-gray-600">
         <input
+          #searchInput
           type="text"
           [(ngModel)]="searchTerm"
-          class="w-full px-2 py-1 text-sm rounded border border-gray-300 focus:outline-none focus:ring focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-500 dark:text-white"
+          class="w-full px-2 py-1 text-sm rounded border border-gray-300 focus:outline-none focus:ring-0 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-500 dark:text-white"
           placeholder="Buscar..." />
       </div>
 
@@ -39,9 +68,9 @@
             (click)="selectItem(item)"
             class="px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-white"
             [ngClass]="{
-              'bg-blue-100 dark:bg-blue-600 text-blue-800 dark:text-white': item.value === selected,
+              'bg-blue-100 dark:bg-blue-600 text-blue-800 dark:text-white': isSelected(item),
             }">
-          {{ item.label }}
+          {{ getItemLabel(item) }}
         </li>
         @if (filteredItems.length === 0) {
           <li class="px-4 py-2 text-gray-400 dark:text-gray-500">
