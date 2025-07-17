@@ -1,4 +1,5 @@
 <div class="mt-4 relative w-full" #dropdownRef>
+
   <!-- Selector -->
   <button type="button"
     (click)="toggleDropdown()"
@@ -25,22 +26,17 @@
           (click)="clearSelection($event)"
           class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-0.5 rounded"
           tabindex="-1">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          <svg width="16" height="16">
+            <use xlink:href="/assets/icons/outline/general.svg#close" />
           </svg>
         </button>
       }
 
       <!-- Dropdown arrow icon -->
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+      <svg width="16" height="16">
+        <use xlink:href="/assets/icons/outline/arrows.svg#angle-down" />
       </svg>
     </div>
-
-    <!-- <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-    </svg> -->
   </button>
 
   <!-- Dropdown -->
@@ -53,15 +49,27 @@
         'opacity-0 pointer-events-none': !isOpen
       }">
 
-      <!-- Searchbox -->
-      <div *ngIf="searchable" class="p-2 border-b dark:border-gray-600">
-        <input
-          #searchInput
-          type="text"
-          [(ngModel)]="searchTerm"
-          class="w-full px-2 py-1 text-sm rounded border border-gray-300 focus:outline-none focus:ring-0 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-500 dark:text-white"
-          placeholder="Buscar..." />
-      </div>
+      @if (searchable) {
+        <!-- Searchbox -->
+        <div class="px-4 pt-2 pb-1 dark:border-gray-600">
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 start-0 flex items-center px-3 text-sm text-gray-600 dark:text-gray-300"
+              tabindex="-1"
+            >
+              <svg width="16" height="16">
+                <use xlink:href="/assets/icons/outline/general.svg#search" />
+              </svg>
+            </div>
+            <input
+              #searchInput
+              type="text"
+              [(ngModel)]="searchTerm"
+              class="w-full px-2 py-1 ps-9 text-sm rounded-md border border-gray-300 focus:outline-none focus:ring-0 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-500 dark:text-white"
+              placeholder="Buscar..." />
+          </div>
+        </div>
+      }
 
       <ul class="max-h-60 overflow-y-auto text-sm">
         <li *ngFor="let item of filteredItems"
@@ -80,4 +88,5 @@
       </ul>
     </div>
   }
+
 </div>
