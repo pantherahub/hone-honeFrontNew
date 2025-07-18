@@ -18,15 +18,15 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR, NgControl } from '@angular/for
 })
 export class TextInputComponent implements ControlValueAccessor, OnInit {
 
-  @Input() id = '';
-  @Input() label = '';
-  @Input() type = 'text';
-  @Input() placeholder = ' ';
-  @Input() disabled = false;
-  @Input() name = '';
+  @Input() id?: string;
+  @Input() label: string = '';
+  @Input() type: string = 'text';
+  @Input() placeholder: string = ' ';
+  @Input() disabled: boolean = false;
+  @Input() name: string = '';
   @Input() value: any = '';
-  @Input() hasError = false;
-  @Input() togglePassword = false;
+  @Input() invalid: boolean = false;
+  @Input() togglePassword: boolean = false;
   @Output() valueChange = new EventEmitter<any>();
 
   onChange: any = () => {};
@@ -81,7 +81,7 @@ export class TextInputComponent implements ControlValueAccessor, OnInit {
 
   get showError(): boolean {
     const control = this.ngControl?.control;
-    return this.hasError || !!(control && control.invalid && control.touched);
+    return this.invalid || !!(control && control.invalid && control.touched);
   }
 
 }

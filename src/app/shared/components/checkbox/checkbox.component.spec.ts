@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { MultiselectTestComponent } from './multiselect-test.component';
+import { CheckboxComponent } from './checkbox.component';
 
-describe('MultiselectTestComponent', () => {
-  let component: MultiselectTestComponent;
-  let fixture: ComponentFixture<MultiselectTestComponent>;
+describe('CheckboxComponent', () => {
+  let component: CheckboxComponent;
+  let fixture: ComponentFixture<CheckboxComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MultiselectTestComponent]
+      imports: [CheckboxComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(MultiselectTestComponent);
+    fixture = TestBed.createComponent(CheckboxComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

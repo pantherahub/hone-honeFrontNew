@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, EventEmitter, forwardRef, HostListener, Injector, Input, Output, ViewChild } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, NgControl } from '@angular/forms';
+import { PipesModule } from 'src/app/pipes/pipes.module';
+import { CheckboxComponent } from '../checkbox/checkbox.component';
 
 @Component({
   selector: 'app-select',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PipesModule, CheckboxComponent],
   templateUrl: './select.component.html',
   styleUrl: './select.component.scss',
   providers: [
@@ -19,13 +21,16 @@ import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, NgControl } from 
 export class SelectComponent implements ControlValueAccessor {
 
   @Input() items: any[] = [];
+  @Input() multiple: boolean = false;
+
   @Input() placeholder: string = 'Seleccionar';
-  @Input() clearable = false;
-  @Input() searchable = false;
+  @Input() clearable: boolean = false;
+  @Input() searchable: boolean = false;
   @Input() selected: any = null;
-  @Input() hasError = false;
+  @Input() invalid: boolean = false;
   @Input() bindLabel?: string;
   @Input() bindValue?: string;
+  @Input() maxVisibleSelected?: number;
 
   @Output() selectedChange = new EventEmitter<any>();
 
@@ -134,37 +139,67 @@ export class SelectComponent implements ControlValueAccessor {
     return item?.[this.bindValue];
   }
 
+  areEqual(a: any, b: any): boolean {
+    return typeof a === 'object' ? JSON.stringify(a) === JSON.stringify(b) : a === b;
+  }
+
   isSelected(item: any): boolean {
     const itemValue = this.getItemValue(item);
 
-    if (typeof itemValue === 'object' && itemValue !== null) {
-      return JSON.stringify(itemValue) === JSON.stringify(this.selected);
+    if (this.multiple) {
+      return this.selected?.some((s: any) => this.areEqual(s, itemValue));
     }
-    return itemValue === this.selected;
+    return this.areEqual(this.selected, itemValue);
   }
 
   selectItem(item: any) {
     if (this.disabled) return;
-    this.selected = this.getItemValue(item);
+
+    const value = this.getItemValue(item);
+
+    if (this.multiple) {
+      if (!Array.isArray(this.selected)) {
+        this.selected = [];
+      }
+
+      const index = this.selected.findIndex((s: any) => this.areEqual(s, value));
+      if (index > -1) {
+        this.selected.splice(index, 1);
+      } else {
+        this.selected.push(value);
+      }
+    } else {
+      this.selected = value;
+      this.closeDropdown();
+    }
+
     this.onChange(this.selected);
-    this.onTouched();
     this.selectedChange.emit(this.selected);
-    this.closeDropdown();
+    this.onTouched();
   }
 
   clearSelection(event: MouseEvent) {
     // Prevents the dropdown from closing
     event.stopPropagation();
-
     if (this.disabled) return;
-    this.selected = null;
-    this.onChange(null);
+
+    this.selected = this.multiple ? [] : null;
+    this.onChange(this.selected);
     this.onTouched();
-    this.selectedChange.emit(null);
+    this.selectedChange.emit(this.selected);
     this.clearSearch();
   }
 
+  removeItem(item: any) {
+    const value = this.getItemValue(item);
+    this.selected = this.selected.filter((s: any) => !this.areEqual(s, value));
+    this.onChange(this.selected);
+    this.selectedChange.emit(this.selected);
+    this.onTouched();
+  }
+
   get selectedLabel(): string {
+    if (this.multiple) return this.placeholder || '';
     const found = this.items.find(i => this.isSelected(i));
     return found
       ? this.getItemLabel(found)
@@ -201,7 +236,7 @@ export class SelectComponent implements ControlValueAccessor {
 
   get showError(): boolean {
     const control = this.ngControl?.control;
-    return this.hasError || !!(control && control.invalid && control.touched);
+    return this.invalid || !!(control && control.invalid && control.touched);
   }
 
 }

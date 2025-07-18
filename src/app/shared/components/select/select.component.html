@@ -16,7 +16,26 @@
         showError
     }"
   >
-    <span>{{ selectedLabel }}</span>
+    @if (multiple && selected?.length) {
+      @if(maxVisibleSelected != null && selected.length > maxVisibleSelected) {
+        <span>{{ selected.length }} {{ selected.length | pluralize:'seleccionado':'seleccionados' }}</span>
+      } @else {
+        <span class="flex flex-wrap gap-1">
+          @for (item of selected; track $index) {
+            <span class="flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs dark:bg-blue-600 dark:text-white">
+              {{ getItemLabel(item) }}
+              <button type="button" class="hover:text-red-600" (click)="removeItem(item); $event.stopPropagation()" tabindex="-1">
+                <svg width="12" height="12">
+                  <use xlink:href="/assets/icons/outline/general.svg#close" />
+                </svg>
+              </button>
+            </span>
+          }
+        </span>
+      }
+    } @else {
+      <span>{{ selectedLabel }}</span>
+    }
 
     <div class="flex items-center gap-1">
       <!-- Clearable X icon -->
@@ -72,14 +91,23 @@
       }
 
       <ul class="max-h-60 overflow-y-auto text-sm">
-        <li *ngFor="let item of filteredItems"
-            (click)="selectItem(item)"
-            class="px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-white"
-            [ngClass]="{
-              'bg-blue-100 dark:bg-blue-600 text-blue-800 dark:text-white': isSelected(item),
-            }">
-          {{ getItemLabel(item) }}
-        </li>
+        @for (item of filteredItems; track $index) {
+          <li (click)="selectItem(item)"
+              class="px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-white flex items-center gap-2"
+              [ngClass]="{
+                'bg-blue-100 dark:bg-blue-600 text-blue-800 dark:text-white': isSelected(item),
+              }">
+            @if (multiple) {
+              <app-checkbox
+                [checked]="isSelected(item)"
+                (click)="selectItem(item); $event.stopPropagation()"
+              />
+            }
+            <span class="block truncate max-w-full">
+              {{ getItemLabel(item) }}
+            </span>
+          </li>
+        }
         @if (filteredItems.length === 0) {
           <li class="px-4 py-2 text-gray-400 dark:text-gray-500">
             No hay resultados
