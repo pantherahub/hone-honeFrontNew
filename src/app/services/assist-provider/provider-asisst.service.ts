@@ -18,7 +18,4 @@ export class ProviderAsisstService {
     return this.httpClient.post(`${this.url}createAsistenceProvider`, query);
   }
 
-  public getAssistencesProvider(idProvider: number, idClient: number): Observable<any> {
-    return this.httpClient.get(`${this.url}getAssistencesProvider/${idProvider}/${idClient}`);
-  }
 }
