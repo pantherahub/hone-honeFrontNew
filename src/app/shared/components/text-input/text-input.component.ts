@@ -23,6 +23,8 @@ export class TextInputComponent implements ControlValueAccessor, OnInit {
   @Input() type: string = 'text';
   @Input() placeholder: string = ' ';
   @Input() disabled: boolean = false;
+  @Input() clearable: boolean = false;
+  @Input() searcher: boolean = false;
   @Input() name: string = '';
   @Input() value: any = '';
   @Input() invalid: boolean = false;
@@ -82,6 +84,10 @@ export class TextInputComponent implements ControlValueAccessor, OnInit {
   get showError(): boolean {
     const control = this.ngControl?.control;
     return this.invalid || !!(control && control.invalid && control.touched);
+  }
+
+  clearValue() {
+    this.onChange(null);
   }
 
 }
