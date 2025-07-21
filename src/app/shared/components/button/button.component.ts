@@ -24,7 +24,7 @@ export class ButtonComponent {
 
   readonly variants: Record<string, Record<string, string[]>> = {
     primary: {
-      solid: ['text-blue1h-50', 'bg-main-blue1h', 'hover:bg-blue1h-800', 'active:bg-blue1h-700', 'active:ring-4', 'active:ring-blue1h-50', 'focus:bg-blue1h-700', 'focus:ring-4', 'focus:ring-blue1h-50', 'disabled:bg-main-blue1h', 'disabled:ring-4', 'disabled:ring-blue1h-50'],
+      solid: ['text-blue1h-50', 'bg-main-blue1h', 'hover:bg-blue1h-800', 'active:bg-blue1h-700', 'active:ring-2', 'active:ring-blue1h-50', 'focus:bg-blue1h-700', 'focus:ring-2', 'focus:ring-blue1h-50', 'disabled:bg-main-blue1h', 'disabled:ring-2', 'disabled:ring-blue1h-50'],
       soft: ['text-main-blue1h', 'bg-blue1h-100', 'hover:bg-blue1h-200', 'active:bg-blue1h-300', 'focus:bg-blue1h-300', 'disabled:bg-blue1h-100'],
       ghost: ['bg-main-blue1h', 'bg-transparent', 'hover:bg-blue1h-100', 'active:bg-blue1h-200', 'focus:bg-blue1h-200', 'disabled:bg-transparent']
     },
@@ -34,12 +34,12 @@ export class ButtonComponent {
       ghost: ['text-gray-700', 'bg-transparent', 'hover:bg-gray-600/5', 'active:text-gray-800', 'active:bg-gray-600/15', 'focus:text-gray-800', 'focus:bg-gray-600/15', 'disabled:text-gray-700', 'disabled:bg-transparent']
     },
     red: {
-      solid: ['text-red-100', 'bg-red-700', 'hover:bg-red-800', 'active:bg-red-900', 'active:ring-4', 'active:ring-red-100', 'focus:ring-4', 'focus:bg-red-900', 'focus:ring-red-100', 'disabled:bg-red-700', 'disabled:ring-4', 'disabled:ring-red-100'],
+      solid: ['text-red-100', 'bg-red-700', 'hover:bg-red-800', 'active:bg-red-900', 'active:ring-2', 'active:ring-red-100', 'focus:ring-2', 'focus:bg-red-900', 'focus:ring-red-100', 'disabled:bg-red-700', 'disabled:ring-2', 'disabled:ring-red-100'],
       soft: ['text-red-700', 'bg-red-100', 'hover:bg-red-200', 'active:bg-red-300', 'focus:bg-red-300', 'disabled:bg-red-100'],
       ghost: ['text-red-700', 'bg-transparent', 'hover:bg-red-200', 'active:bg-red-300', 'focus:bg-red-300', 'disabled:bg-transparent']
     },
     green: {
-      solid: ['text-green-100', 'bg-green-800', 'hover:bg-green-700', 'active:bg-green-900', 'active:ring-4', 'active:ring-green-100', 'focus:ring-4', 'focus:bg-green-900', 'focus:ring-green-100', 'disabled:bg-green-800', 'disabled:ring-4', 'disabled:ring-green-100'],
+      solid: ['text-green-100', 'bg-green-800', 'hover:bg-green-700', 'active:bg-green-900', 'active:ring-2', 'active:ring-green-100', 'focus:ring-2', 'focus:bg-green-900', 'focus:ring-green-100', 'disabled:bg-green-800', 'disabled:ring-2', 'disabled:ring-green-100'],
       soft: ['text-green-800', 'bg-green-100', 'hover:bg-green-300', 'active:bg-green-500', 'focus:bg-green-500', 'disabled:bg-green-100'],
       ghost: ['text-green-800', 'bg-transparent', 'hover:bg-green-300', 'active:bg-green-500', 'focus:bg-green-500', 'disabled:bg-transparent']
     },
