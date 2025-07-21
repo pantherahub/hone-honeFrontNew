@@ -1,0 +1,13 @@
+<button
+  class=""
+  [attr.type]="type"
+  [disabled]="disabled"
+  [ngClass]="computedClasses"
+  (click)="onClick($event)">
+  @if (loading) {
+    <svg class="w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-current">
+      <use xlink:href="/assets/icons/extras/animations.svg#spin" />
+    </svg>
+  }
+  <ng-content></ng-content>
+</button>
