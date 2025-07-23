@@ -27,7 +27,7 @@ export class CheckboxComponent implements ControlValueAccessor {
    */
   @Input() checked?: boolean;
 
-  @Output() click = new EventEmitter<Event>();
+  @Output() onClick = new EventEmitter<Event>();
 
   private isNgModelUsed = false;
   private _checkedStatus: boolean = false;
@@ -73,7 +73,7 @@ export class CheckboxComponent implements ControlValueAccessor {
       this.onChange(this._checkedStatus);
       this.onTouched();
     } else {
-      this.click.emit(event);
+      this.onClick.emit(event);
     }
   }
 

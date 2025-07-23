@@ -1,20 +1,41 @@
-<header class="login-header-container h-[97px] bg-gray-0 flex items-center justify-between py-4 px-5">
-  <img class="h-[65px]" src="assets/img/logo-hone.png" alt="Logo">
+<header class="login-header-container h-[80px] bg-gray-0 flex justify-center border-b-[1px]">
+  <div class="w-full flex items-center justify-between max-w-screen-2xl py-3 px-4 2xl:py-4 2xl:px-5">
 
-  <nav class="hidden lg:block">
-    <ul class="flex space-x-6">
-        <li><a href="https://www.hone-solutions.com/nosotros">Nosotros</a></li>
-        <li><a href="https://www.hone-solutions.com/services">Nuestros servicios</a></li>
-        <li><a href="#">Lissom</a></li>
-    </ul>
-  </nav>
+    <img class="h-[48px]" src="assets/img/logo-hone.png" alt="Logo">
 
-  <!-- Menu button on mobile -->
-  <button class="lg:hidden p-1.5 text-gray-700 rounded-full hover:bg-gray-100" (click)="toggleMenu()">
-      <svg width="28" height="28">
-        <use xlink:href="/assets/icons/layout.svg#bars" width="28" height="28" />
+    <nav class="hidden md:block">
+      <ul class="flex gap-2 list-none">
+          <li>
+            <app-button variant="gray" styleType="ghost" size="sm" customClass="leading-4" [href]="'https://www.hone-solutions.com/nosotros'">
+              Nosotros
+            </app-button>
+          </li>
+          <li>
+            <app-button variant="gray" styleType="ghost" size="sm" customClass="leading-4" [href]="'https://www.hone-solutions.com/services'">
+              Nuestros servicios
+            </app-button>
+          </li>
+          <li>
+            <app-button variant="gray" styleType="ghost" size="sm" customClass="leading-4" [href]="'#'">
+              Lissom
+            </app-button>
+          </li>
+      </ul>
+    </nav>
+
+    <!-- Menu button on mobile -->
+    <app-button
+      variant="gray"
+      size="xs"
+      styleType="ghost"
+      class="md:hidden"
+      (onClick)="toggleMenu()">
+      <svg width="16" height="16">
+        <use xlink:href="/assets/icons/outline/general.svg#bars" />
       </svg>
-  </button>
+    </app-button>
+
+  </div>
 </header>
 
 <!-- Side menu in mobile -->
@@ -23,11 +44,15 @@
 }
 <nav class="sidebar" [ngClass]="{'sidebar-open': menuOpen}" [attr.aria-hidden]="!menuOpen">
   <div class="px-5 py-4">
-    <button class="lg:hidden p-1.5 text-gray-700 rounded-full hover:bg-gray-100" (click)="toggleMenu()">
-      <svg width="28" height="28">
-        <use xlink:href="/assets/icons/alert.svg#close" width="28" height="28" />
+    <app-button
+      variant="gray"
+      size="xs"
+      styleType="ghost"
+      (onClick)="toggleMenu()">
+      <svg width="16" height="16">
+        <use xlink:href="/assets/icons/outline/general.svg#close" />
       </svg>
-    </button>
+    </app-button>
   </div>
   <ul class="flex flex-col text-center p-5">
       <li class="py-3 border-b"><a href="https://www.hone-solutions.com/nosotros">Nosotros</a></li>
@@ -39,54 +64,59 @@
 
 <!-- Login form -->
 
-<section class="container-form">
+<div class="flex justify-center relative lg:h-[calc(100vh-80px)]">
 
-    <section class="form-section">
+  <div class="container flex flex-col-reverse lg:flex-row pt-10 pb-20 px-4 lg:py-12 gap-9">
 
-        <div class="container-img">
-            <img src="../../../../assets/img/login/login-hone.jpg" alt="">
+    <div class="flex-1 flex items-center justify-center">
+      <form nz-form [formGroup]="loginForm" class="flex flex-col justify-center lg:py-24 lg:px-[120px] gap-3">
+
+        <h3 class="text-2xl font-black leading-[26px] text-main-blue1h">
+          ¡Bienvenido(a) a tu Portal Transaccional de Gestión de Información y Documentos!
+        </h3>
+
+        <div>
+          <app-text-input [id]="'email'" formControlName="email" [type]="'email'" label="Correo electrónico" />
+          <app-input-error [control]="loginForm.get('email')" />
         </div>
 
-        <form nz-form [formGroup]="loginForm" class="form-login">
-
-            <div class="mt-4">
-              <app-text-input [id]="'email'" formControlName="email" [type]="'email'" label="Correo electrónico" />
-              <app-input-error [control]="loginForm.get('email')" />
-            </div>
-            <div class="my-4">
-              <app-text-input [id]="'password'" formControlName="password" [type]="'password'" label="Contraseña" [togglePassword]="true" />
-              <app-input-error [control]="loginForm.get('password')" />
-            </div>
-
-            <!-- Campo re-captcha -->
-            <re-captcha (resolved)="resolved($event)" [siteKey]="siteKey"
-                (errored)="errored()" errorMode="handled"></re-captcha>
-
-            <p style="color: red;" *ngIf="showError">¡Debes validar que no eres un robot!</p>
-
-
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                style="text-align: center; margin-top: 3rem;">
-                <button nz-button nzType="primary" class="btn-primary" [disabled]="false"
-                    [nzLoading]="isSubmitData" (click)="submitRequest()" nz-popover nzPopoverTitle="" nzJustify="center"
-                    nzAlign="middle" [nzPopoverContent]="enablePopoverMessage">
-                    <ng-template #enablePopoverMessage>
-                        <span>Haga clic para iniciar sesión</span>
-                    </ng-template>
-                    Iniciar sesión
-                </button>
-            </div>
-
-        </form>
-    </section>
-
-    <div class="float-button">
-        <div class="support-container" (click)="openTicketModal()">
-            <img src="../../../../../assets/img/support.png" alt="" srcset="">
-            <span class="support-container__text">
-              Soporte
-            </span>
+        <div>
+          <app-text-input [id]="'password'" formControlName="password" [type]="'password'" label="Contraseña" [togglePassword]="true" />
+          <app-input-error [control]="loginForm.get('password')" />
         </div>
+
+        <re-captcha (resolved)="resolved($event)" [siteKey]="siteKey"
+            (errored)="errored()" errorMode="handled"></re-captcha>
+        @if (showError) {
+          <app-input-error [message]="'Debes validar que no eres un robot.'" />
+        }
+
+        <app-button
+          variant="primary"
+          styleType="solid"
+          size="lg"
+          customClass="leading-[18px] w-full flex justify-center"
+          [loading]="isSubmitData"
+          (onClick)="submitRequest()">
+          Iniciar sesión
+        </app-button>
+      </form>
     </div>
 
-</section>
+    <div class="flex-1 flex items-center justify-center">
+      <img class="object-cover rounded-3xl h-[372px] sm:h-[200px] sm:w-full lg:h-full max-h-full max-w-full" src="/assets/img/login/login.webp" alt="Imagen login">
+    </div>
+
+
+
+  </div>
+</div>
+
+<!-- <div class="float-button">
+    <div class="support-container" (click)="openTicketModal()">
+        <img src="../../../../../assets/img/support.png" alt="" srcset="">
+        <span class="support-container__text">
+          Soporte
+        </span>
+    </div>
+</div> -->

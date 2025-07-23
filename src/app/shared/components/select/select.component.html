@@ -100,7 +100,7 @@
             @if (multiple) {
               <app-checkbox
                 [checked]="isSelected(item)"
-                (click)="selectItem(item); $event.stopPropagation()"
+                (onClick)="selectItem(item); $event.stopPropagation()"
               />
             }
             <span class="block truncate max-w-full">

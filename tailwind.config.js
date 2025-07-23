@@ -1,4 +1,4 @@
-// const screens = require("tailwindcss/defaultTheme").screens;
+const screens = require("tailwindcss/defaultTheme").screens;
 const colors = require("tailwindcss/colors");
 const plugin = require("tailwindcss/plugin");
 
@@ -20,9 +20,8 @@ module.exports = {
       center: true,
       padding: "1rem",
       screens: {
-        // ...screens,
-        // "sm": "380px",
-        "2xl": "1320px",
+        ...screens,
+        // "2xl": "1320px",
       },
     },
     colors: {

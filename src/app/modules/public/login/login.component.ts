@@ -11,13 +11,14 @@ import { environment } from 'src/environments/environment';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { ProviderTicketLoginComponent } from 'src/app/shared/modals/provider-ticket-login/provider-ticket-login.component';
 import { TutorialService } from 'src/app/services/tutorial/tutorial.service';
-import { TextInputComponent } from 'src/app/shared/forms/text-input/text-input.component';
-import { InputErrorComponent } from 'src/app/shared/forms/input-error/input-error.component';
+import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
+import { InputErrorComponent } from 'src/app/shared/components/input-error/input-error.component';
+import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 
 @Component({
    selector: 'app-login',
    standalone: true,
-   imports: [ NgZorroModule, CommonModule, RecaptchaModule, TextInputComponent, InputErrorComponent ],
+   imports: [ NgZorroModule, CommonModule, RecaptchaModule, TextInputComponent, InputErrorComponent, ButtonComponent ],
 
    templateUrl: './login.component.html',
    styleUrl: './login.component.scss'
@@ -38,12 +39,12 @@ export class LoginComponent implements OnInit {
     private formBuilder: FormBuilder,
     private notificationService: NzNotificationService,
     private modalService: NzModalService,
-    private tutorialService: TutorialService
+    private tutorialService: TutorialService,
   ) {
     this.createForm();
   }
 
-  ngOnInit (): void {
+  ngOnInit(): void {
     console.log('environment prod: ', environment.production);
     localStorage.clear();
 
@@ -152,4 +153,5 @@ export class LoginComponent implements OnInit {
       }
     });
   }
+
 }

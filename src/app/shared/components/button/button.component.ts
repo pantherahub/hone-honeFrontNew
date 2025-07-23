@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-button',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './button.component.html',
   styleUrl: './button.component.scss'
 })
@@ -17,10 +18,12 @@ export class ButtonComponent {
   @Input() customClass: string = '';
   @Input() disabled: boolean = false;
   @Input() loading: boolean = false;
+  @Input() routerLink?: string | any[];
   @Input() href?: string;
-  @Input() routerLink?: string;
+  @Input() target?: string= '_self';
+  @Input() rel?: string;
 
-  @Output() click = new EventEmitter<Event>();
+  @Output() onClick = new EventEmitter<Event>();
 
   readonly variants: Record<string, Record<string, string[]>> = {
     primary: {
@@ -80,9 +83,9 @@ export class ButtonComponent {
     return classes.join(' ');
   }
 
-  onClick(event: Event) {
+  onBtnClick(event: Event) {
     if (!this.disabled && !this.href && !this.routerLink) {
-      this.click.emit(event);
+      this.onClick.emit(event);
     }
   }
 
