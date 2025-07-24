@@ -16,6 +16,7 @@ import { PipesModule } from 'src/app/pipes/pipes.module';
 import { AlertService } from 'src/app/services/alerts/alert.service';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { formatListWithY } from 'src/app/utils/string-utils';
+import { NzModalRef } from 'ng-zorro-antd/modal';
 
 @Component({
    selector: 'app-remaining-documents',
@@ -151,14 +152,35 @@ export class RemainingDocumentsComponent implements OnInit {
     }
     html += `<p class="mt-3">Por favor verifica este monto.</p>`;
 
-    this.alertService.info(
+    const modalRef = this.alertService.info(
       'Información sobre valores de póliza',
       html,
       {
         nzOkText: 'Entendido',
-        nzClosable: true,
+        nzClosable: false,
         nzWidth: 600,
         nzContent: html,
+        nzOnOk: () => {
+          this.policyCloseAlert(modalRef);
+          return false; // Avoid close modal
+        }
+      }
+    );
+  }
+
+  policyCloseAlert(firstModalRef: NzModalRef) {
+    this.alertService.confirm(
+      'IMPORTANTE',
+      'Debe leer la información anterior sobre los valores de la póliza para evitar devoluciones y retrasos en la gestión documental.',
+      {
+        nzClosable: false,
+        nzWidth: 500,
+        nzCancelText: 'Volver a revisar',
+        nzOkText: 'Ya leí la información anterior',
+        nzOkDanger: true,
+        nzOnOk: () => {
+          firstModalRef.destroy();
+        },
       }
     );
   }

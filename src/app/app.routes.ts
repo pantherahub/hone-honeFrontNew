@@ -6,7 +6,6 @@ import { PageNotFoundComponent } from './modules/public/page-not-found/page-not-
 import { ListDocumentsComponent } from './modules/private/documents/list-documents/list-documents.component';
 import { NgModule } from '@angular/core';
 import { AdminLayoutComponent } from './views/admin-layout/admin-layout.component';
-import { ComplianceDocumentationComponent } from './modules/private/documents/compliance-documentation/compliance-documentation.component';
 import { ProviderAssistancessComponent } from './modules/public/provider-assistancess/provider-assistancess.component';
 import { UpdateDataComponent } from './modules/private/update-data/update-data.component';
 import { canDeactivateGuard } from './guards/can-deactivate.guard';
@@ -56,10 +55,6 @@ export const routes: Routes = [
         path: 'cargar-documentos/:id',
         component: ListDocumentsComponent
       },
-			{
-        path: 'cumplimiento-documentos/:id',
-        component: ComplianceDocumentationComponent
-			}
 		]
   },
 

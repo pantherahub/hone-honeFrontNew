@@ -80,3 +80,13 @@ export function trimObjectStrings(obj: Record<string, any>): Record<string, any>
 export function pluralize(singularStr: string, pluralStr: string, count: number): string {
   return count === 1 ? singularStr : pluralStr;
 }
+
+/**
+ * Sanitize string values.
+ * @param string - The string to sanitize.
+ * @returns Sanitized string.
+ */
+export function sanitizeString(strValue: string): string {
+  const safeText = strValue.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return safeText;
+}
