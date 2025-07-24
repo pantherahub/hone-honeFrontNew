@@ -6,11 +6,12 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { TutorialService } from 'src/app/services/tutorial/tutorial.service';
 import { Subscription } from 'rxjs';
+import { ButtonComponent } from "../components/button/button.component";
 
 @Component({
    selector: 'app-header',
    standalone: true,
-   imports: [ NgZorroModule, CommonModule, RouterModule ],
+   imports: [NgZorroModule, CommonModule, RouterModule, ButtonComponent],
    templateUrl: './header.component.html',
    styleUrl: './header.component.scss'
 })

@@ -29,7 +29,13 @@ export class TextInputComponent implements ControlValueAccessor, OnInit {
   @Input() value: any = '';
   @Input() invalid: boolean = false;
   @Input() togglePassword: boolean = false;
-  @Output() valueChange = new EventEmitter<any>();
+  @Input() iconSize: string = '18';
+  @Output() onInput = new EventEmitter<any>();
+
+  @Input() maxlength?: string;
+  @Input() minlength?: string;
+  @Input() max?: string;
+  @Input() min?: string;
 
   onChange: any = () => {};
   onTouched: any = () => { };
@@ -57,7 +63,7 @@ export class TextInputComponent implements ControlValueAccessor, OnInit {
     this.onChange = (val: any) => {
       this.value = val;
       fn(val);
-      this.valueChange.emit(val);
+      this.onInput.emit(val);
     };
   }
 
@@ -87,7 +93,7 @@ export class TextInputComponent implements ControlValueAccessor, OnInit {
   }
 
   clearValue() {
-    this.onChange(null);
+    this.onChange('');
   }
 
 }

@@ -1,34 +1,51 @@
-<nav class="header-container h-[80px] bg-gray-0 py-4 px-5 flex justify-center border-b-[1px]">
-  <div class="w-full flex items-center justify-between max-w-screen-2xl">
+<nav class="header-container h-[80px] bg-gray-0 flex justify-center border-b">
+  <div class="w-full flex items-center justify-between max-w-screen-2xl py-3 px-4 2xl:py-4 2xl:px-5">
+    <a routerLink="/home">
+      <img class="h-[48px] cursor-pointer" src="assets/img/logo-hone.png" alt="Logo" />
+    </a>
 
-    <img class="h-[48px] cursor-pointer" src="assets/img/logo-hone.png" alt="Logo" routerLink="/home">
-
-    <div class="flex gap-1.5">
-      <div class="tutorial-option-container" [ngClass]="{ 'active-tutorial': configTutorialVisible }">
-        <button type="button" (click)="navigateToUpdateData()" class="tutorial-option user-section flex items-center gap-2 bg-gray-950/5 p-2.5 sm:py-2.5 sm:px-5 rounded-[2.5rem] font-bold text-gray-700 text-base/5 hover:bg-gray-950/10"
+    <div class="flex gap-2">
+      <div class="tutorial-option-container"
+        [ngClass]="{ 'active-tutorial': configTutorialVisible }">
+        <div
           nz-popover
           [nzPopoverContent]="popoverContent"
           [(nzPopoverVisible)]="configTutorialVisible"
           [nzPopoverTrigger]="null"
           nzPopoverPlacement="bottomRight"
-          nzPopoverOverlayClassName="tutorial-popover tutorial-popover__header-config">
-            <span class="user-section__name hidden sm:block">{{user.name ? user.name : 'No reporta nombre'}}</span>
-            <svg width="20" height="20">
-              <use xlink:href="/assets/icons/header.svg#cog" />
+          nzPopoverOverlayClassName="tutorial-popover tutorial-popover__header-config"
+        >
+          <app-button
+            (click)="navigateToUpdateData()"
+            variant="gray"
+            size="sm"
+            styleType="soft"
+            customClass="leading-4 tutorial-option"
+          >
+            <span class="truncate max-w-[150px] md:max-w-[310px] hidden sm:block">
+              {{user.name ? user.name : 'No reporta nombre'}}
+            </span>
+            <svg width="16" height="16">
+              <use xlink:href="/assets/icons/solid/general.svg#cog" />
             </svg>
-        </button>
+          </app-button>
+        </div>
       </div>
 
-      <button type="button" class="flex items-center p-2.5 rounded-full text-main-blue1h hover:bg-gray-100" (click)="logout()">
-        <svg width="20" height="20">
-          <use xlink:href="/assets/icons/header.svg#arrow-left-to-bracket" />
+      <app-button
+        (click)="logout()"
+        variant="primary"
+        size="sm"
+        styleType="ghost"
+        customClass="leading-4"
+      >
+        <svg width="16" height="16">
+          <use xlink:href="/assets/icons/outline/arrows.svg#arrow-left-to-bracket" />
         </svg>
-      </button>
+      </app-button>
     </div>
-
   </div>
 </nav>
-
 
 <!-- Tutorial popover content -->
 <ng-template #popoverContent>
@@ -37,13 +54,17 @@
       <div class="flex justify-between items-center">
         <h5 class="font-bold">Actualizar información</h5>
 
-        <button type="button" class="p-2 rounded-[2.5rem] bg-gray-0 hover:bg-gray-100" (click)="nextTutorialStep()">
+        <button
+          type="button"
+          class="p-2 rounded-[2.5rem] bg-gray-0 hover:bg-gray-100"
+          (click)="nextTutorialStep()"
+        >
           <svg width="16" height="16">
-            <use xlink:href="/assets/icons/alert.svg#close" width="16" height="16" />
+            <use xlink:href="/assets/icons/outline/general.svg#close" />
           </svg>
         </button>
       </div>
-      <div class="font-regular">
+      <div class="font-normal">
         @if (this.user.rejected) {
           Debes actualizar nuevamente los datos.
         } @else {
@@ -52,8 +73,12 @@
       </div>
     </div>
     <div class="flex justify-between items-center">
-      <span class="text-base/5 font-regular text-black">1 de 2</span>
-      <button type="button" class="py-2.5 px-5 rounded-[2.5rem] bg-blue1h-100 hover:bg-blue1h-200 text-main-blue1h text-base/5 font-bold" (click)="nextTutorialStep()">
+      <span class="text-base/5 font-normal text-black">1 de 2</span>
+      <button
+        type="button"
+        class="py-2.5 px-5 rounded-[2.5rem] bg-blue1h-100 hover:bg-blue1h-200 text-main-blue1h text-base/5 font-bold"
+        (click)="nextTutorialStep()"
+      >
         {{ this.user.withData && !this.user.rejected ? 'Siguiente' : 'Ir' }}
       </button>
     </div>
@@ -61,4 +86,8 @@
 </ng-template>
 
 <!-- Popover overlay -->
-<div *ngIf="configTutorialVisible" class="tutorial-popover-overlay" (click)="nextTutorialStep()"></div>
+<div
+  *ngIf="configTutorialVisible"
+  class="tutorial-popover-overlay"
+  (click)="nextTutorialStep()"
+></div>

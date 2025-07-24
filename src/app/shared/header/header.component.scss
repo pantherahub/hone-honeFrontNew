@@ -2,27 +2,10 @@
 //   box-shadow: 0px 0px 25.58px 0px #0000001A;
 // }
 
-.user-section {
-    &__name {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 310px;
-    }
-}
-
 .tutorial-option-container.active-tutorial::before {
-  border-radius: 3rem;
+  border-radius: 0.5rem;
 }
 
-
-@media screen and (max-width: 768px) {
-  .user-section {
-    &__name {
-      max-width: 150px;
-    }
-  }
-}
 
 @media screen and (max-width: 576px) {
   ::ng-deep .tutorial-popover__header-config {

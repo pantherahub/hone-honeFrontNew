@@ -9,11 +9,13 @@ import { CommonModule } from '@angular/common';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { TutorialService } from 'src/app/services/tutorial/tutorial.service';
 import { Subscription } from 'rxjs';
+import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
+import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [ NgZorroModule, CommonModule, RouterModule ],
+  imports: [ NgZorroModule, CommonModule, RouterModule, TextInputComponent, ButtonComponent ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -95,11 +97,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.filteredClients = this.clientList.filter(client =>
       client.clientHoneSolutions?.toLowerCase().includes(query)
     );
-  }
-
-  clearSearch() {
-    this.searchQuery = '';
-    this.applyFilter();
   }
 
   /**
