@@ -10,6 +10,7 @@ import { ComplianceDocumentationComponent } from './modules/private/documents/co
 import { ProviderAssistancessComponent } from './modules/public/provider-assistancess/provider-assistancess.component';
 import { UpdateDataComponent } from './modules/private/update-data/update-data.component';
 import { canDeactivateGuard } from './guards/can-deactivate.guard';
+import { TestsComponent } from './modules/public/tests/tests.component';
 
 export const routes: Routes = [
   //   PUBLIC ROUTES
@@ -29,6 +30,11 @@ export const routes: Routes = [
 	{
 		path: 'page-form-assistance',
 		component: ProviderAssistancessComponent
+  },
+  // Delete after tests
+	{
+		path: 'test',
+		component: TestsComponent
   },
 
 	//   PRIVATE ROUTES
