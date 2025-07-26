@@ -29,7 +29,7 @@ export class ButtonComponent {
     primary: {
       solid: ['text-blue1h-50', 'bg-main-blue1h', 'hover:bg-blue1h-800', 'active:bg-blue1h-700', 'active:ring-2', 'active:ring-blue1h-50', 'focus:ring-2', 'focus:ring-blue1h-50', 'disabled:bg-main-blue1h', 'disabled:ring-2', 'disabled:ring-blue1h-50'],
       soft: ['text-main-blue1h', 'bg-blue1h-100', 'hover:bg-blue1h-200', 'active:bg-blue1h-300', 'disabled:bg-blue1h-100'],
-      ghost: ['bg-main-blue1h', 'bg-transparent', 'hover:bg-blue1h-100', 'active:bg-blue1h-200', 'disabled:bg-transparent']
+      ghost: ['text-main-blue1h', 'bg-main-blue1h', 'bg-transparent', 'hover:bg-blue1h-100', 'active:bg-blue1h-200', 'disabled:bg-transparent']
     },
     gray: {
       solid: ['text-gray-50', 'bg-gray-700', 'hover:bg-gray-800', 'active:bg-gray-900', 'disabled:bg-gray-900'],

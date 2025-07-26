@@ -1,31 +1,3 @@
-/* Mobile menu overlay */
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 40;
-}
-
-/* Side menu in mobile */
-.sidebar {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 250px;
-  height: 100vh;
-  background: white;
-  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.1);
-  z-index: 50;
-  transform: translateX(100%);
-  transition: transform 0.3s ease-in-out;
-  &.sidebar-open {
-    transform: translateX(0);
-  }
-}
-
 .float-button {
     width: 5%;
     position: relative;

@@ -138,7 +138,7 @@ module.exports = {
     extend: {
       screens: {
         xs: "380px",
-        sm: "576px",
+        // sm: "576px",
       },
       colors: {
         main: {

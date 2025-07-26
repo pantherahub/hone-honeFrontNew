@@ -31,7 +31,6 @@ export class LoginComponent implements OnInit {
   showError: boolean = false;
   siteKey = environment.PUBLIC_PASS_KEY;
   loginForm!: FormGroup;
-  menuOpen: boolean = false;
 
   constructor (
     private authService: AuthService,
@@ -58,10 +57,6 @@ export class LoginComponent implements OnInit {
       email: [ '', [ Validators.required ] ],
       password: [ '', [ Validators.required ] ]
     });
-  }
-
-  toggleMenu() {
-    this.menuOpen = !this.menuOpen;
   }
 
   //  Envia peticion al servicio de login para obtener el token de acceso

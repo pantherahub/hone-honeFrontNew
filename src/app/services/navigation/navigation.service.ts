@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Event, NavigationEnd, Router } from '@angular/router';
-import { filter } from 'rxjs';
+import { BehaviorSubject, filter } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -9,6 +9,7 @@ export class NavigationService {
 
   private previousUrl: string | null = null;
   private currentUrl: string | null = null;
+  private currentUrl$ = new BehaviorSubject<string | null>(null);
 
   constructor(private router: Router) {
     this.router.events
@@ -18,6 +19,7 @@ export class NavigationService {
       .subscribe((event) => {
         this.previousUrl = this.currentUrl;
         this.currentUrl = event.urlAfterRedirects;
+        this.currentUrl$.next(this.currentUrl);
       });
   }
 
@@ -39,6 +41,10 @@ export class NavigationService {
     }
 
     return previous;
+  }
+
+  getCurrentUrl$() {
+    return this.currentUrl$.asObservable();
   }
 
 }

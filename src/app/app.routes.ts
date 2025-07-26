@@ -10,18 +10,30 @@ import { ProviderAssistancessComponent } from './modules/public/provider-assista
 import { UpdateDataComponent } from './modules/private/update-data/update-data.component';
 import { canDeactivateGuard } from './guards/can-deactivate.guard';
 import { TestsComponent } from './modules/public/tests/tests.component';
+import { SupportTicketComponent } from './shared/support-ticket/support-ticket.component';
+import { BasicLayoutComponent } from './views/basic-layout/basic-layout.component';
 
 export const routes: Routes = [
   //   PUBLIC ROUTES
   {
-		path: '',
-		redirectTo: 'login',
-		pathMatch: 'full'
+    path: '',
+    redirectTo: 'login',
+    pathMatch: 'full'
   },
-	{
-		path: 'login',
-		component: LoginComponent
-	},
+  {
+		path: '',
+    component: BasicLayoutComponent,
+		children: [
+      {
+        path: 'login',
+        component: LoginComponent
+      },
+      {
+        path: 'auth-support',
+        component: SupportTicketComponent
+      },
+		]
+  },
 	{
 		path: 'page-not-found',
 		component: PageNotFoundComponent
@@ -45,6 +57,10 @@ export const routes: Routes = [
       {
         path: 'home',
         component: HomeComponent
+      },
+      {
+        path: 'support',
+        component: SupportTicketComponent
       },
       {
         path: 'update-data',

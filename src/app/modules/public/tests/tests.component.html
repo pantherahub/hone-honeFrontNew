@@ -8,6 +8,9 @@
 
 <br>
 
+<textarea placeholder="Descripción"></textarea>
+
+<br>
 
 <div>
   <h3>FORM TEST</h3>
@@ -97,7 +100,7 @@
 </div>
 
 
-<app-modal #modal [size]="'xl'" [closeOnBackdrop]="true" [closeOnEscape]="true" [title]="'Formulario'">
+<app-modal #modal [customSize]="'max-w-[727px]'" [closeOnBackdrop]="true" [closeOnEscape]="true" [title]="'Formulario'">
   <div>
     <h2 class="text-xl font-bold">Hola desde otro componente</h2>
     <p class="mt-2 text-sm">Esto es contenido dinámico.</p>
@@ -127,7 +130,7 @@
 
 <div class="my-5 flex flex-col gap-3">
 
-  <div class="my-3 flex gap-3">
+  <div class="my-3 flex gap-3 flex-wrap">
     <app-button variant="primary" styleType="solid" [loading]="true" size="xs">Button text</app-button>
     <app-button variant="primary" styleType="solid" [loading]="true" size="sm">Button text</app-button>
     <app-button variant="primary" styleType="solid" [loading]="true" size="md">Button text</app-button>

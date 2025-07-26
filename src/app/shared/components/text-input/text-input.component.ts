@@ -25,6 +25,8 @@ export class TextInputComponent implements ControlValueAccessor, OnInit {
   @Input() disabled: boolean = false;
   @Input() clearable: boolean = false;
   @Input() searcher: boolean = false;
+  @Input() isTextarea: boolean = false;
+
   @Input() name: string = '';
   @Input() value: any = '';
   @Input() invalid: boolean = false;

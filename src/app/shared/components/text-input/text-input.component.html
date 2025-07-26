@@ -7,39 +7,63 @@
     </div>
   }
 
-  <input
-    [attr.id]="id"
-    [attr.name]="name"
-    [type]="actualInputType"
-    placeholder=" "
-    [disabled]="disabled"
-    [value]="value"
-    (input)="handleInput($event)"
-    (blur)="onTouched()"
-    [attr.minlength]="type === 'text' ? minlength : null"
-    [attr.maxlength]="type === 'text' ? maxlength : null"
-    [attr.min]="type === 'number' ? min : null"
-    [attr.max]="type === 'number' ? max : null"
-    class="block px-2.5 pb-2 pt-2.5 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 appearance-none dark:text-white focus:outline-none focus:ring-0 peer autofill:shadow-[inset_0_0_0_1000px_white]
-    disabled:bg-gray-100 disabled:text-gray-400 dark:disabled:bg-gray-800 dark:disabled:text-gray-500 disabled:cursor-not-allowed"
-    [ngClass]="{
-      'border-gray-300 dark:border-gray-600 focus:border-blue-600 dark:focus:border-blue-500':
-        !showError,
-      'bg-red-50 border-red-600 dark:border-red-500 focus:border-red-600 dark:focus:border-red-500':
-        showError,
-      'pe-10': !disabled && ((type === 'password' && togglePassword) || type === 'time' || (clearable && value)),
-      'ps-10': searcher,
-    }"
-  />
+  @if (isTextarea) {
+    <textarea
+      [attr.id]="id"
+      [attr.name]="name"
+      placeholder=" "
+      [disabled]="disabled"
+      [value]="value"
+      (input)="handleInput($event)"
+      (blur)="onTouched()"
+      [attr.minlength]="minlength"
+      [attr.maxlength]="maxlength"
+      class="resize-y min-h-[4rem] block px-2.5 pb-2 pt-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border-1 appearance-none dark:text-white focus:outline-none focus:ring-0 peer autofill:shadow-[inset_0_0_0_1000px_white]
+      disabled:bg-gray-100 disabled:text-gray-400 dark:disabled:bg-gray-800 dark:disabled:text-gray-500 disabled:cursor-not-allowed"
+      [ngClass]="{
+        'border-gray-300 dark:border-gray-600 focus:border-blue-600 dark:focus:border-blue-500':
+          !showError,
+        'bg-red-50 border-red-600 dark:border-red-500 focus:border-red-600 dark:focus:border-red-500':
+          showError,
+      }"
+    ></textarea>
+  } @else {
+    <input
+      [attr.id]="id"
+      [attr.name]="name"
+      [type]="actualInputType"
+      placeholder=" "
+      [disabled]="disabled"
+      [value]="value"
+      (input)="handleInput($event)"
+      (blur)="onTouched()"
+      [attr.minlength]="type === 'text' ? minlength : null"
+      [attr.maxlength]="type === 'text' ? maxlength : null"
+      [attr.min]="type === 'number' ? min : null"
+      [attr.max]="type === 'number' ? max : null"
+      class="block px-2.5 pb-2 pt-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border-1 appearance-none dark:text-white focus:outline-none focus:ring-0 peer autofill:shadow-[inset_0_0_0_1000px_white]
+      disabled:bg-gray-100 disabled:text-gray-400 dark:disabled:bg-gray-800 dark:disabled:text-gray-500 disabled:cursor-not-allowed"
+      [ngClass]="{
+        'border-gray-300 dark:border-gray-600 focus:border-blue-600 dark:focus:border-blue-500':
+          !showError,
+        'bg-red-50 border-red-600 dark:border-red-500 focus:border-red-600 dark:focus:border-red-500':
+          showError,
+        'pe-10': !disabled && ((type === 'password' && togglePassword) || type === 'time' || (clearable && value)),
+        'ps-10': searcher,
+      }"
+    />
+  }
 
   <label
     [attr.for]="id"
-    class="absolute text-sm duration-300 transform ms-2.5 -translate-y-4 scale-75 top-1.5 z-10 origin-[0] px-1.5 peer-focus:px-1.5 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:ms-2.5 peer-autofill:ms-2.5 peer-focus:top-1.5 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1 peer-autofill:scale-75 peer-autofill:-translate-y-4 peer-autofill:top-1.5"
+    class="absolute text-sm duration-300 transform ms-2.5 -translate-y-4 scale-75 top-1.5 z-10 origin-[0] px-1.5 peer-focus:px-1.5 peer-placeholder-shown:scale-100 peer-focus:ms-2.5 peer-autofill:ms-2.5 peer-focus:top-1.5 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1 peer-autofill:scale-75 peer-autofill:-translate-y-4 peer-autofill:top-1.5"
     [ngClass]="{
       'bg-white dark:bg-gray-900': !disabled,
       'bg-gray-100 dark:bg-gray-800 cursor-not-allowed': disabled,
       'text-gray-500 dark:text-gray-400 peer-focus:text-blue-600 peer-focus:dark:text-blue-500': !showError,
       'text-red-600 dark:text-red-500': showError,
+      'peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2': !isTextarea,
+      'peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-3': isTextarea,
       'peer-placeholder-shown:ms-8': searcher,
     }"
   >

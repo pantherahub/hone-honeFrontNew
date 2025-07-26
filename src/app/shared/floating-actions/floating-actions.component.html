@@ -1,0 +1,28 @@
+<div class="fixed bottom-12 right-12 z-30 flex flex-col justify-end">
+
+  @if (showSupportAction) {
+    <app-button variant="primary" size="md" styleType="ghost" customClass="ms-auto" (onClick)="onSupport()">
+      Soporte
+      <svg width="20" height="20">
+        <use xlink:href="/assets/icons/outline/e-commerce.svg#user-headset" />
+      </svg>
+    </app-button>
+  }
+  @if (showMeetingAction) {
+    <app-button variant="primary" size="md" styleType="ghost" customClass="ms-auto" (onClick)="onMeeting()">
+      Agendar reunión
+      <svg width="20" height="20">
+        <use xlink:href="/assets/icons/outline/general.svg#calendar-week" />
+      </svg>
+    </app-button>
+  }
+  @if (showTutorialAction) {
+    <app-button variant="primary" size="md" styleType="ghost" customClass="ms-auto" (onClick)="onTutorial()">
+      Visita guiada
+      <svg width="20" height="20">
+        <use xlink:href="/assets/icons/outline/media.svg#clapperboard-play" />
+      </svg>
+    </app-button>
+  }
+
+</div>

@@ -11,11 +11,13 @@ import { TutorialService } from 'src/app/services/tutorial/tutorial.service';
 import { Subscription } from 'rxjs';
 import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
+import { NavigationService } from 'src/app/services/navigation/navigation.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [ NgZorroModule, CommonModule, RouterModule, TextInputComponent, ButtonComponent ],
+  imports: [ NgZorroModule, CommonModule, RouterModule, TextInputComponent, ButtonComponent, ModalComponent ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -33,7 +35,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   clientTutorialVisible: boolean = false;
 
-  @ViewChild('videoModalTemplate', { static: false }) videoModalTemplate!: TemplateRef<any>;
+  @ViewChild('videoModal') videoModal!: ModalComponent;
+  @ViewChild('reminderModal') reminderModal!: ModalComponent;
+
+  // @ViewChild('videoModalTemplate', { static: false }) videoModalTemplate!: TemplateRef<any>;
   private tutorialSubscription!: Subscription;
 
   constructor (
@@ -42,6 +47,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     private eventManager: EventManagerService,
     private router: Router,
     private modal: NzModalService,
+    private navigationService: NavigationService,
   ) {
     localStorage.removeItem('clientSelected');
     this.eventManager.clientSelected.set({});
@@ -52,8 +58,17 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
+    if (this.user.withData) {
+      const backRoute = this.navigationService.getBackRoute();
+      // If the user has just logged in, show the reminder
+      if (backRoute === '/login' || this.user.rejected) {
+        this.tutorialService.finishTutorial();
+        this.reminderModal.open();
+      }
+    }
     this.tutorialSubscription = this.tutorialService.stepIndex$.subscribe(step => {
-      if (!this.tutorialService.isTutorialFinished()) {
+      console.log("isFinished", this.tutorialService.isTutorialFinished());
+      if (!this.tutorialService.isTutorialFinished() && !this.reminderModal.isOpen) {
         this.startTutorial(step);
       }
     });
@@ -115,18 +130,19 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   startTutorial(step: number) {
     if (step === 1) {
       this.clientTutorialVisible = false;
-      const modalRef = this.modal.create({
-        nzTitle: 'VIDEO TUTORIAL',
-        nzContent: this.videoModalTemplate,
-        nzFooter: null,
-        nzCentered: true,
-        nzWidth: '900px',
-        nzStyle: { 'max-width': '90%' },
-        nzClassName: 'video-modal'
-      });
-      modalRef.afterClose.subscribe((result: any) => {
-        this.tutorialService.nextStep();
-      });
+      this.videoModal.open();
+      // const modalRef = this.modal.create({
+      //   nzTitle: 'VIDEO TUTORIAL',
+      //   nzContent: this.videoModalTemplate,
+      //   nzFooter: null,
+      //   nzCentered: true,
+      //   nzWidth: '900px',
+      //   nzStyle: { 'max-width': '90%' },
+      //   nzClassName: 'video-modal'
+      // });
+      // modalRef.afterClose.subscribe((result: any) => {
+      //   this.tutorialService.nextStep();
+      // });
     } else if (step === 3) {
       this.clientTutorialVisible = true;
     } else {
@@ -134,13 +150,19 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  closeVideoModal() {
+    this.videoModal.close();
+  }
+
+  onCloseDataReminder() {
+    if (this.user.rejected) {
+      this.router.navigate(['/update-data']);
+    }
+  }
+
   nextTutorialStep() {
     this.clientTutorialVisible = false;
     this.tutorialService.nextStep();
-  }
-
-  resetTutorial() {
-    this.tutorialService.resetTutorial();
   }
 
 }
