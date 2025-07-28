@@ -4,10 +4,10 @@ import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-admin-layout',
+  selector: 'app-private-layout',
   standalone: true,
   imports: [HeaderPrivateComponent, CommonModule, RouterOutlet],
-  templateUrl: './admin-layout.component.html',
-  styleUrl: './admin-layout.component.scss'
+  templateUrl: './private-layout.component.html',
+  styleUrl: './private-layout.component.scss'
 })
-export class AdminLayoutComponent {}
+export class PrivateLayoutComponent {}

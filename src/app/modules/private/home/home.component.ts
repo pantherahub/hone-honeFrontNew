@@ -67,7 +67,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
     this.tutorialSubscription = this.tutorialService.stepIndex$.subscribe(step => {
-      console.log("isFinished", this.tutorialService.isTutorialFinished());
       if (!this.tutorialService.isTutorialFinished() && !this.reminderModal.isOpen) {
         this.startTutorial(step);
       }

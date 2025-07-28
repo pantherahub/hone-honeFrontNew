@@ -19,11 +19,13 @@
           <app-input-error [control]="loginForm.get('password')" />
         </div>
 
-        <re-captcha (resolved)="resolved($event)" [siteKey]="siteKey"
-            (errored)="errored()" errorMode="handled"></re-captcha>
-        @if (showError) {
-          <app-input-error [message]="'Debes validar que no eres un robot.'" />
-        }
+        <div>
+          <re-captcha (resolved)="resolved($event)" [siteKey]="siteKey"
+              (errored)="errored()" errorMode="handled"></re-captcha>
+          @if (showError) {
+            <app-input-error [message]="'Debes validar que no eres un robot.'" />
+          }
+        </div>
 
         <app-button
           variant="primary"
@@ -41,16 +43,5 @@
       <img class="object-cover rounded-3xl h-[372px] sm:h-[200px] sm:w-full lg:h-full max-h-full max-w-full" src="/assets/img/login/login.webp" alt="Imagen login">
     </div>
 
-
-
   </div>
 </div>
-
-<!-- <div class="float-button">
-    <div class="support-container" (click)="openTicketModal()">
-        <img src="../../../../../assets/img/support.png" alt="" srcset="">
-        <span class="support-container__text">
-          Soporte
-        </span>
-    </div>
-</div> -->

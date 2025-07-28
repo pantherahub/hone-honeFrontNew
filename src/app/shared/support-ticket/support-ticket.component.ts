@@ -7,6 +7,14 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { InputErrorComponent } from '../components/input-error/input-error.component';
 import { Router } from '@angular/router';
+import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
+import { NzModalService } from 'ng-zorro-antd/modal';
+import { ResponseCreateTicketComponent } from '../modals/response-create-ticket/response-create-ticket.component';
+import { sanitizeString } from 'src/app/utils/string-utils';
+import { AuthService } from 'src/app/services/auth.service';
+import { REGEX_PATTERNS } from 'src/app/constants/regex-patterns';
+import { TicketsService } from 'src/app/services/tickets/tickets.service';
+import { ToastService } from 'src/app/services/toast/toast.service';
 
 @Component({
   selector: 'app-support-ticket',
@@ -18,23 +26,34 @@ import { Router } from '@angular/router';
 export class SupportTicketComponent implements OnInit {
 
   ticketForm!: FormGroup;
+  loading: boolean = false;
+
+  user = this.eventManager.userLogged();
+  clientSelected: any = this.eventManager.clientSelected();
 
   constructor(
     private navigationService: NavigationService,
     private formBuilder: FormBuilder,
     private formUtils: FormUtilsService,
     private router: Router,
+    private eventManager: EventManagerService,
+    private modalService: NzModalService,
+    private authService: AuthService,
+    private ticketService: TicketsService,
+    private toastService: ToastService,
   ) { }
 
   ngOnInit(): void {
     this.createForm();
-
-    // Validar por ruta actual y validar por authService.isAuthenticated(), si no colocar entonces el support normal publico
   }
 
   goBack() {
     const backRoute = this.navigationService.getBackRoute();
     this.router.navigateByUrl(backRoute);
+  }
+
+  isLogged(): boolean {
+    return this.authService.isAuthenticated();
   }
 
   createForm() {
@@ -43,12 +62,130 @@ export class SupportTicketComponent implements OnInit {
       lastname: ['', [Validators.required]],
       identification: ['', [Validators.required, this.formUtils.numeric]],
       email: ['', [Validators.required, this.formUtils.email]],
-      phone: ['', [Validators.required]],
+      phone: ['', [Validators.required, Validators.pattern(REGEX_PATTERNS.telNumberWithIndicative)]],
       address: ['', [Validators.required]],
       observation: ['', [Validators.required]]
     });
   }
 
-  onSubmit() { }
+  getObservations(): string {
+    const sanitize = (value: any): string => {
+      return typeof value === 'string'
+        ? sanitizeString(value.trim())
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;")
+        : value;
+    };
+    const { name, lastname, identification, email, phone, address, observation } = this.ticketForm.value;
+
+    let observations = '';
+
+    if (this.isLogged()) {
+      observations = `<strong>Información del usuario que genera caso:</strong>
+        <br>Nombre: ${this.clientSelected.razonSocial}
+        <br>Identificacion: ${this.clientSelected.identificacion}
+        <br>Cliente: ${this.clientSelected.clientHoneSolutions}
+        <br>
+        <br><strong>Datos reportados del usuario:</strong>
+        <br>Nombre: ${sanitize(name)}
+        <br>Apellido: ${sanitize(lastname)}
+        <br>Identificación: ${sanitize(identification)}
+        <br>Teléfono: ${sanitize(phone)}
+        <br>Email: ${sanitize(email)}
+        <br>Dirección: ${sanitize(address)}
+        <br>Observaciones: ${sanitize(observation)}
+      `;
+    } else {
+      observations = `<strong>Datos reportados del usuario:</strong>
+        <br>Nombre: ${sanitize(name)}
+        <br>Apellido: ${sanitize(lastname)}
+        <br>Identificación: ${sanitize(identification)}
+        <br>Email: ${sanitize(email)}
+        <br>Teléfono: ${sanitize(phone)}
+        <br>Dirección: ${sanitize(address)}
+        <br>Observaciones: ${sanitize(observation)}
+        `;
+    }
+    return observations;
+  }
+
+  openSuccessModal() {
+    const modal = this.modalService.create<ResponseCreateTicketComponent, any>({
+      nzContent: ResponseCreateTicketComponent,
+      nzCentered: true,
+      nzClosable: false,
+      nzFooter: null,
+      nzMaskClosable: false,
+    });
+  }
+
+  openErrorModal() {
+    this.modalService.create({
+      nzContent: `<p>Lo sentimos, hubo un error en el servidor.</p>`,
+      nzFooter: null,
+    });
+  }
+
+  onSubmit() {
+    this.formUtils.markFormTouched(this.ticketForm);
+    if (this.ticketForm.invalid) return;
+
+    let idRole: number | undefined;
+    const now = new Date();
+    let data: Record<string, any> = {
+      description: this.getObservations(),
+      requestDate: now.toISOString(),
+      maxDate: new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000).toISOString(), // Two days
+    };
+
+    if (this.isLogged()) {
+      idRole = this.user?.roles?.idRoles;
+      data = {
+        ...data,
+        requestName: 'Solicitud prestador',
+        employeeCode: this.user.id,
+        typeRequest: 1,
+        userId: this.user.id,
+        email: this.user.email,
+        idClientHone: this.clientSelected.idClientHoneSolutions,
+        idRole: this.user?.roles?.idRoles,
+        userLogged: this.user.id,
+      };
+    } else {
+      idRole = 4; // Admin
+      const idUser = 4130; // Admin Hone
+      const idClientHone = 7; // Hone Solutions
+      const email = this.ticketForm.get("email")?.value;
+
+      data = {
+        ...data,
+        requestName: 'Ingreso erroneo prestador',
+        employeeCode: idUser,
+        typeRequest: 15,
+        userId: idUser,
+        email: email,
+        idClientHone: idClientHone,
+        idRole: idRole,
+        userLogged: idUser,
+      };
+    }
+
+    if (!idRole) {
+      this.toastService.error('Algo salió mal.');
+      return;
+    }
+
+    this.loading = true;
+    this.ticketService.postTicket(idRole, data).subscribe({
+        next: (res: any) => {
+          this.loading = false;
+          this.openSuccessModal();
+        },
+        error: (error: any) => {
+          this.loading = false;
+          this.openErrorModal();
+        }
+    });
+  }
 
 }

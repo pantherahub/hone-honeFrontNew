@@ -1,19 +1,18 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { CommonModule } from '@angular/common';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
 
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
-import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { RecaptchaModule } from 'ng-recaptcha';
 import { environment } from 'src/environments/environment';
-import { NzModalService } from 'ng-zorro-antd/modal';
-import { ProviderTicketLoginComponent } from 'src/app/shared/modals/provider-ticket-login/provider-ticket-login.component';
 import { TutorialService } from 'src/app/services/tutorial/tutorial.service';
 import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
 import { InputErrorComponent } from 'src/app/shared/components/input-error/input-error.component';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { ToastService } from 'src/app/services/toast/toast.service';
+import { NavigationService } from 'src/app/services/navigation/navigation.service';
 
 @Component({
    selector: 'app-login',
@@ -36,9 +35,9 @@ export class LoginComponent implements OnInit {
     private authService: AuthService,
     public router: Router,
     private formBuilder: FormBuilder,
-    private notificationService: NzNotificationService,
-    private modalService: NzModalService,
     private tutorialService: TutorialService,
+    private toastService: ToastService,
+    private navigationService: NavigationService,
   ) {
     this.createForm();
   }
@@ -47,8 +46,17 @@ export class LoginComponent implements OnInit {
     console.log('environment prod: ', environment.production);
     localStorage.clear();
 
-    const hasSupportParam = this.router.url.includes('?support=true');
-    if (hasSupportParam) this.openTicketModal();
+    const urlTree = this.router.parseUrl(this.router.url);
+    const supportParam = urlTree.queryParams['support'];
+    if (supportParam === 'true') {
+      if (!this.navigationService.getPreviousUrl()) {
+        this.router.navigateByUrl('auth-support');
+      } else {
+        // Remove support query param without reloading the page
+        delete urlTree.queryParams['support'];
+        this.router.navigateByUrl(urlTree, { replaceUrl: true });
+      }
+    }
   }
 
   //  Crea e Inicializa el formulario
@@ -94,24 +102,15 @@ export class LoginComponent implements OnInit {
         this.isSubmitData = false;
 
         if (error.status == 401) {
-          this.createNotificacion('error', 'Error', error.error.message);
+          // Pasar al otro tipo de alerta de modal
+          this.toastService.error(error.error.message);
           return;
         }
 
-        this.createNotificacion('error', 'Error', 'Lo sentimos, hubo un error en el servidor.');
+        this.toastService.error('Algo salió mal.');
       },
       complete: () => {}
     });
-  }
-
-  /**
-  * Crea una notificacion de alerta
-  * @param type - string recibe el tipo de notificacion (error, success, warning, info)
-  * @param title - string recibe el titulo de la notificacion
-  * @param message - string recibe el mensaje de la notificacion
-  */
-  createNotificacion (type: string, title: string, message: string) {
-    this.notificationService.create(type, title, message);
   }
 
   resolved (captchaResponse: any) {
@@ -123,30 +122,6 @@ export class LoginComponent implements OnInit {
     this.captchaValidation = false;
     this.showError = true;
     console.warn(`reCAPTCHA error encountered`);
-  }
-
-  /**
-  * Abre una ventana modal para solicitar ticket por inicio de sesión erroneous
-  */
-  openTicketModal(): void {
-    const modal = this.modalService.create<ProviderTicketLoginComponent, any>({
-      nzContent: ProviderTicketLoginComponent,
-      nzCentered: true,
-      nzClosable: true,
-      // nzFooter: null
-      nzMaskClosable: false, // Para evitar que se cierre al hacer clic fuera del modal
-    });
-    const instance = modal.getContentComponent();
-
-    // instance.message = message;
-
-    // Return a result when opened
-    modal.afterOpen.subscribe(() => { });
-    // Return a result when closed
-    modal.afterClose.subscribe((result: any) => {
-      if (result) {
-      }
-    });
   }
 
 }

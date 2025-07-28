@@ -9,7 +9,7 @@
     </app-button>
 
     <div class="relative px-4 py-6 xs:py-4 sm:p-8 xs:ps-44 sm:ps-56 rounded-xl bg-blue3h-100 xs:h-[190px] sm:h-[237px]">
-      <img src="assets/img/data-form/service_channels.webp"
+      <img src="assets/img/pqrs/banner.png"
         alt="Imagen decorativa"
         class="hidden xs:block absolute bottom-0 left-[23px] top-[9px] sm:left-[27px] sm:top-[17px] w-[132.987px] h-[181px] sm:w-[161.6px] sm:h-[220px]">
       <div class="h-full flex flex-col justify-center gap-2 text-main-blue1h">
@@ -52,12 +52,38 @@
         <div>
           <app-text-input [id]="'observation'" formControlName="observation" label="Observación" [isTextarea]="true" />
           <app-input-error [control]="ticketForm.get('observation')" />
+          @if (!isLogged()) {
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              Indica el cliente al que perteneces (ej. Allianz, Axa Colpatria).
+            </p>
+          }
         </div>
       </div>
 
-      <app-button [type]="'submit'" variant="primary" size="md" styleType="solid" customClass="leading-4">
-        Guardar
-      </app-button>
+      <div class="flex flex-wrap items-center justify-between">
+        <app-button
+          [type]="'submit'"
+          [loading]="loading"
+          variant="primary"
+          size="md"
+          styleType="solid"
+          customClass="leading-4">
+          Guardar
+        </app-button>
+
+        @if (!isLogged()) {
+          <a
+            [href]="'https://wa.me/+57' + 3104748360"
+            target="_blank"
+            class="flex gap-2 items-center text-sm text-gray-600 dark:text-gray-400">
+            <svg width="24" height="24">
+              <use xlink:href="/assets/icons/extras/brands.svg#whatsapp" />
+            </svg>
+            <span>3104748360</span>
+          </a>
+        }
+      </div>
+
     </form>
 
   </div>
