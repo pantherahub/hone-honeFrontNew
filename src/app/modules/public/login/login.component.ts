@@ -13,6 +13,7 @@ import { InputErrorComponent } from 'src/app/shared/components/input-error/input
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { NavigationService } from 'src/app/services/navigation/navigation.service';
+import { AlertService } from 'src/app/services/alert/alert.service';
 
 @Component({
    selector: 'app-login',
@@ -38,6 +39,7 @@ export class LoginComponent implements OnInit {
     private tutorialService: TutorialService,
     private toastService: ToastService,
     private navigationService: NavigationService,
+    private alertService: AlertService,
   ) {
     this.createForm();
   }
@@ -102,8 +104,7 @@ export class LoginComponent implements OnInit {
         this.isSubmitData = false;
 
         if (error.status == 401) {
-          // Pasar al otro tipo de alerta de modal
-          this.toastService.error(error.error.message);
+          this.alertService.error("Oops...", error.error.message);
           return;
         }
 

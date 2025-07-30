@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, TemplateRef, Type, ViewChild, ViewContainerRef } from '@angular/core';
 import { ButtonComponent } from '../button/button.component';
 
 @Component({
@@ -9,7 +9,7 @@ import { ButtonComponent } from '../button/button.component';
   templateUrl: './modal.component.html',
   styleUrl: './modal.component.scss'
 })
-export class ModalComponent implements OnInit {
+export class ModalComponent implements OnInit, AfterViewInit {
   static stack: ModalComponent[] = [];
 
   @Input() closable: boolean = true;
@@ -18,7 +18,7 @@ export class ModalComponent implements OnInit {
   @Input() showCloseButton: boolean = true;
   @Input() beforeClose?: () => boolean | Promise<boolean>;
   @Input() title?: string;
-  @Input() size: 'sm' | 'md' | 'lg' | 'xl' | '2xl' = 'md';
+  @Input() size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' = 'md';
   @Input() customSize?: string;
   @Input() position:
     | 'center'
@@ -34,12 +34,19 @@ export class ModalComponent implements OnInit {
   @Input() customModalClass: string | string[] = '';
   @Input() closingDuration: number = 0; // For animations or loaders
 
-  @Output() onClose = new EventEmitter<Event>();
+  @Output() onClose = new EventEmitter<any>();
 
   @ViewChild('modalEl') modalEl!: ElementRef<HTMLDivElement>;
+  @ViewChild('content', { read: ViewContainerRef }) contentVCR!: ViewContainerRef;
+
+  private backdropMouseDown: boolean = false;
+  private isLeftClick: boolean = false;
 
   isOpen = false;
   closing = false;
+
+  @Input() afterViewInitCallback?: (vcr: ViewContainerRef) => void;
+  hasDynamicViewLoaded = false;
 
   constructor(private cdr: ChangeDetectorRef) { }
 
@@ -48,6 +55,14 @@ export class ModalComponent implements OnInit {
       this.closeOnBackdrop = false;
       this.closeOnEscape = false;
       this.showCloseButton = false;
+    }
+  }
+
+  ngAfterViewInit(): void {
+    if (this.afterViewInitCallback) {
+      this.afterViewInitCallback(this.contentVCR);
+      this.hasDynamicViewLoaded = true;
+      this.cdr.detectChanges();
     }
   }
 
@@ -60,7 +75,7 @@ export class ModalComponent implements OnInit {
     document.body.classList.add('overflow-hidden');
   }
 
-  async close() {
+  async close(returnData?: any) {
     if (this.beforeClose) {
       const result = await this.beforeClose();
       if (!result) return;
@@ -85,9 +100,8 @@ export class ModalComponent implements OnInit {
       if (ModalComponent.stack.length === 0) {
         document.body.classList.remove('overflow-hidden');
       }
-      this.onClose.emit();
+      this.onClose.emit(returnData);
     }, this.closingDuration);
-
 
   }
 
@@ -99,15 +113,29 @@ export class ModalComponent implements OnInit {
     }
   }
 
-  handleBackdropClick(event: MouseEvent) {
-    if (this.closeOnBackdrop && event.target === this.modalEl.nativeElement) {
+  onBackdropMouseDown(event: MouseEvent) {
+    this.backdropMouseDown = (event.target === this.modalEl.nativeElement);
+    this.isLeftClick = event.button === 0;
+  }
+  onBackdropMouseUp(event: MouseEvent) {
+    const isBackdrop = event.target === this.modalEl.nativeElement;
+    if (
+      this.closeOnBackdrop &&
+      this.backdropMouseDown &&
+      isBackdrop &&
+      this.isLeftClick
+    ) {
       this.close();
     }
+    // Reset
+    this.backdropMouseDown = false;
+    this.isLeftClick = false;
   }
 
   get modalSizeClass(): string {
     if (this.customSize) return this.customSize;
     const sizes = {
+      xs: 'max-w-sm',
       sm: 'max-w-md', // 24rem 284px
       md: 'max-w-lg', // 32rem 512px
       lg: 'max-w-4xl', // 56rem 896px

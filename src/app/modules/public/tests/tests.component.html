@@ -162,3 +162,37 @@
 <br>
 <br>
 hola
+
+
+<ng-template #videoModalTemplate>
+  <div class="video-load">
+    <div class="video-container">
+      <iframe
+        src="https://www.youtube.com/embed/HNnISS31dPs"
+        frameborder="0"
+        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+      ></iframe>
+    </div>
+  </div>
+  <app-button (click)="openCustomModal()" variant="gray" [styleType]="'solid'">
+    Abrir otro
+  </app-button>
+</ng-template>
+
+<ng-template #customModal let-data>
+  <p class="text-lg">Hola desde template</p>
+</ng-template>
+
+<br>
+<button (click)="openCustomModal()">Abrir modal</button>
+
+<br>
+<button type="button" (click)="onOpenAlert()">ALERTA</button>
+
+
+
+<ng-template #customTpl>
+  <p><strong>Esto viene de un template</strong> 🎉</p>
+</ng-template>
+

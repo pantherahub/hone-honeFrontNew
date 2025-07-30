@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { AfterViewInit, Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
 import { InputErrorComponent } from 'src/app/shared/components/input-error/input-error.component';
 import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
@@ -8,6 +8,8 @@ import { ButtonComponent } from 'src/app/shared/components/button/button.compone
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ModalService } from 'src/app/services/modal/modal.service';
+import { AlertService } from 'src/app/services/alert/alert.service';
 
 @Component({
   selector: 'app-tests',
@@ -16,11 +18,76 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
   templateUrl: './tests.component.html',
   styleUrl: './tests.component.scss'
 })
-export class TestsComponent {
+export class TestsComponent implements OnInit, AfterViewInit {
+
+  @ViewChild('videoModalTemplate', { static: false }) videoModalTemplate!: TemplateRef<any>;
+  @ViewChild('customModal', { static: false }) customModal!: TemplateRef<any>;
+  @ViewChild('customTpl', { static: false }) customTpl!: TemplateRef<any>;
 
   constructor (
     private toastService: ToastService,
+    private modalService: ModalService,
+    private alertService: AlertService,
   ) { }
+
+  ngOnInit(): void {
+  }
+
+  ngAfterViewInit(): void {
+    // this.modalService.open(this.videoModalTemplate, { title: 'Hola' }, { myInput: 'value' })
+    //   .onClose.subscribe((result) => {
+    //     console.log('Modal cerrado con:', result);
+    //   });
+
+    // this.modalService.open(this.videoModalTemplate, { title: 'Hola' })
+    //   .onClose.subscribe((result) => {
+    //     console.log('Modal cerrado con:', result);
+    //   });
+
+  }
+
+  openCustomModal() {
+    this.modalService.open(this.customModal, { title: 'customModal' })
+      .onClose.subscribe((result) => {
+        console.log('Custom modal cerrado con:', result);
+      });
+  }
+
+  onOpenAlert() {
+    let html = `
+      <p>
+        Para <strong>IPS</strong>, el valor mínimo requerido de la póliza es equivalente a
+        <strong>2 SMLV</strong>
+        (<strong>2 x $1.122.312 = $1.122.312</strong>)
+      </p>
+      <p>
+        Para <strong>IPS</strong>, el valor mínimo requerido de la póliza es equivalente a
+        <strong>2 SMLV</strong>
+        (<strong>2 x $1.122.312 = $1.122.312</strong>)
+      </p>
+    `;
+    html += `<p class="mt-3">Por favor verifica este monto.</p>`;
+    this.alertService.showAlert({
+      title: 'Información sobre valores de póliza',
+      message: this.customTpl,
+      // messageHTML: html,
+      variant: 'info',
+      isConfirmation: true,
+      customSize: 'max-w-lg',
+    }).subscribe((confirmed) => {
+      console.log("confirmed", confirmed);
+    });
+    // this.alertService.showAlert({
+    //   title: '¿Estás seguro?',
+    //   message: 'Esto no se puede deshacer',
+    //   variant: 'warning',
+    //   isConfirmation: true,
+    // }).subscribe((confirmed) => {
+    //   if (confirmed) {
+    //     // Acción confirmada
+    //   }
+    // });
+  }
 
   exampleList: string[] = ['Primera opción', 'Segunda opción', 'Tercera opción', 'Cuarta opción']
   selectedCountry: any;

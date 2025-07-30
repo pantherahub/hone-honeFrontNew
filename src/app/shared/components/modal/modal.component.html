@@ -6,7 +6,8 @@
     positionClasses,
     isBackdropVisible ? 'bg-black/25' : '',
   ]"
-  (click)="handleBackdropClick($event)">
+  (mousedown)="onBackdropMouseDown($event)"
+  (mouseup)="onBackdropMouseUp($event)">
   <div class="relative w-full max-h-full bg-white rounded-xl shadow-[0px_1px_4px_0px_#2929291A] dark:bg-gray-700 p-4 flex flex-col gap-4 m-4"
     [ngClass]="combinedModalClasses">
 
@@ -31,6 +32,12 @@
     }
 
     <!-- Content -->
+    <!-- @if (hasDynamicViewLoaded) {
+      <ng-container #content></ng-container>
+    } @else {
+      <ng-content></ng-content>
+    } -->
+    <ng-container #content></ng-container>
     <ng-content></ng-content>
 
   </div>
