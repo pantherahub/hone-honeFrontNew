@@ -7,11 +7,6 @@ import { RemainingDocumentsComponent } from '../remaining-documents/remaining-do
 import { ExpiredDocumentsComponent } from '../expired-documents/expired-documents.component';
 import { UploadedDocumentsComponent } from '../uploaded-documents/uploaded-documents.component';
 import { Router } from '@angular/router';
-import { NzModalService } from 'ng-zorro-antd/modal';
-import { ContactsProviderComponent } from '../../../../shared/modals/contacts-provider/contacts-provider.component';
-import { ContactsProviderServicesService } from '../../../../services/contacts-provider/contacts-provider.services.service';
-import { AssistanceProvidersComponent } from '../../../../shared/forms/assistance-forms/assistance-providers/assistance-providers.component';
-import { ProviderAssistanceComponent } from '../../../../shared/modals/provider-assistance/provider-assistance.component';
 import { FeedbackFivestarsComponent } from 'src/app/shared/modals/feedback-fivestars/feedback-fivestars.component';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { ModalService } from 'src/app/services/modal/modal.service';
@@ -19,7 +14,7 @@ import { ModalService } from 'src/app/services/modal/modal.service';
 @Component({
   selector: 'app-list-documents',
   standalone: true,
-  imports: [NgZorroModule, RemainingDocumentsComponent, ExpiredDocumentsComponent, UploadedDocumentsComponent, AssistanceProvidersComponent],
+  imports: [NgZorroModule, RemainingDocumentsComponent, ExpiredDocumentsComponent, UploadedDocumentsComponent],
   templateUrl: './list-documents.component.html',
   styleUrl: './list-documents.component.scss'
 })
@@ -29,8 +24,6 @@ export class ListDocumentsComponent implements OnInit {
   clientSelected: any = this.eventManager.clientSelected();
   loadingData: boolean = false;
   loadManualDownload: boolean = false;
-  hiddenCard: boolean = false;
-  contactsOfProviders: any = [];
 
   percentData: PercentInterface = {};
   feedbackModalShown = false;
@@ -40,9 +33,7 @@ export class ListDocumentsComponent implements OnInit {
     private eventManager: EventManagerService,
     private documentService: DocumentsCrudService,
     private router: Router,
-    private modalService: NzModalService,
-    private modalService2: ModalService,
-    private contactProvider: ContactsProviderServicesService,
+    private modalService: ModalService,
     private alertService: AlertService,
   ) {
     effect(
@@ -55,15 +46,10 @@ export class ListDocumentsComponent implements OnInit {
         }
       }, { allowSignalWrites: true }
     );
-
-    if (this.clientSelected.idTypeProvider == 7) {
-        this.hiddenCard = true;
-    }
   }
 
   ngOnInit(): void {
     this.getDocumentPercent();
-    this.getContactsByIDProvider(this.clientSelected.idProvider);
   }
 
 
@@ -99,30 +85,9 @@ export class ListDocumentsComponent implements OnInit {
     });
   }
 
-  /**
-   * Retorna los contactos por prestador y abre el modal para actualizar y cerrar,
-   * y se hace el llamando de this.getContactsByIDProvider(this.clientSelected.idProvider); en el  ngOnInit() para que funcione
-   */
-  getContactsByIDProvider(idProvider: any) {
-    const client = this.clientSelected.idClientHoneSolutions === 4;
-    this.contactProvider.getContactById(idProvider).subscribe((data: any) => {
-      this.contactsOfProviders = data.contacts;
-      const contactWithOccupation15 = this.contactsOfProviders.find((contact: any) => contact.idOccupation === 15);
-      if (contactWithOccupation15) {
-        if (client) {
-          this.openContactsProvider();
-        }
-      } else {
-        if (client) {
-          this.openContactsProvider();
-        }
-      }
-    });
-  }
-
   open5starsFeedback(): void {
     this.feedbackModalShown = true;
-    const modal = this.modalService2.open(FeedbackFivestarsComponent, {
+    const modal = this.modalService.open(FeedbackFivestarsComponent, {
       title: 'Nos gustaría conocer tu opinión',
       closable: false,
       customSize: 'max-w-[600px] !gap-2',
@@ -161,31 +126,6 @@ export class ListDocumentsComponent implements OnInit {
 
   navigateTo(url: string): void {
     this.router.navigate([url]);
-  }
-
-  /**
-   * Valida el tipo de prestador y descarga un paquete de documentos
-   */
-  downloadDocuments() {
-    if (this.clientSelected.idTypeProvider == 3 || this.clientSelected.idTypeProvider == 6) {
-      this.saveAs(
-        `assets/documents-provider/A.Persona-Juridica.zip`,
-        `A. Documentos para diligenciar Persona Juridica.zip`
-      );
-      this.saveAs(
-        `assets/documents-provider/B.Persona-Juridica.zip`,
-        `B. Documentos solo lectura Persona Juridica.zip`
-      );
-    } else {
-      this.saveAs(
-        `assets/documents-provider/A.Persona-Natural.zip`,
-        `A. Documentos para diligenciar  Persona Natural.zip`
-      );
-      this.saveAs(
-        `assets/documents-provider/B.Persona-Natural.zip`,
-        `B. Documentos solo lectura Persona  Natural.zip`
-      );
-    }
   }
 
   /**
@@ -251,20 +191,6 @@ export class ListDocumentsComponent implements OnInit {
     this.saveAs(`assets/documents-provider/documentos-informativos-seguros-mundial.zip`, `Documentos informativos documentos-informativos-seguros-mundial.zip`);
   }
 
-
-  /**
-   * Descarga Excel de BMI
-   */
-  downloadExcelFareBmi() {
-    if (this.clientSelected.idTypeProvider == 7) {
-      this.saveAs(`assets/documents-provider/excel-bmi/Anexo_Tarifas_2024.xlsx`, `Anexo_Tarifas_2024.xlsx`);
-    }
-  }
-  /**
-   * Descarga Excel de BMI
-   */
-  downloadDocumentsBmi() { }
-
   /**
    * Descarga Documentos de Sura
    */
@@ -315,58 +241,4 @@ export class ListDocumentsComponent implements OnInit {
     if (onComplete) onComplete();
   }
 
-  /**
-   * Abre una ventana modal para actualizar el nombre del representante legal,
-   * donde se puede abrir mediante funcion del mismo modal de contacts-provider
-   * y tambien se abre por defecto o automaticamente cuando elija allianz
-   */
-  openContactsProvider() {
-    const modal = this.modalService.create<ContactsProviderComponent, any>({
-      nzContent: ContactsProviderComponent,
-      nzCentered: true,
-      nzClosable: false, //en false para ocultar la X del modal y que no pueda cerrarlo
-      // nzFooter: null
-      nzMaskClosable: false, // Para evitar que se cierre al hacer clic fuera del modal
-      nzOnOk: () => console.log('OK'),
-      nzOnCancel: () => console.log('Cancelar') // Maneja el evento de cancelación
-    });
-    const instance = modal.getContentComponent();
-
-    // instance.message = message;
-
-    // Return a result when opened
-    modal.afterOpen.subscribe(() => { });
-    // Return a result when closed
-    modal.afterClose.subscribe((result: any) => {
-      if (result) {
-      }
-    });
-  }
-  /**
-   * Abre una ventana modal para actualizar el nombre del representante legal,
-   * donde se puede abrir mediante funcion del mismo modal de contacts-provider
-   * y tambien se abre por defecto o automaticamente cuando elija allianz
-   */
-  openModalProviderAssistance() {
-    const modal = this.modalService.create<ProviderAssistanceComponent, any>({
-      nzContent: ProviderAssistanceComponent,
-      nzCentered: true,
-      nzClosable: true, //en false para ocultar la X del modal y que no pueda cerrarlo
-      // nzFooter: null
-      nzMaskClosable: false, // Para evitar que se cierre al hacer clic fuera del modal
-      nzOnOk: () => console.log('OK'),
-      nzOnCancel: () => console.log('Cancelar') // Maneja el evento de cancelación
-    });
-    const instance = modal.getContentComponent();
-
-    // instance.message = message;
-
-    // Return a result when opened
-    modal.afterOpen.subscribe(() => { });
-    // Return a result when closed
-    modal.afterClose.subscribe((result: any) => {
-      if (result) {
-      }
-    });
-  }
 }

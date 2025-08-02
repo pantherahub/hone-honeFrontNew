@@ -6,7 +6,6 @@ import { PageNotFoundComponent } from './modules/public/page-not-found/page-not-
 import { ListDocumentsComponent } from './modules/private/documents/list-documents/list-documents.component';
 import { NgModule } from '@angular/core';
 import { PrivateLayoutComponent } from './views/private-layout/private-layout.component';
-import { ProviderAssistancessComponent } from './modules/public/provider-assistancess/provider-assistancess.component';
 import { UpdateDataComponent } from './modules/private/update-data/update-data.component';
 import { canDeactivateGuard } from './guards/can-deactivate.guard';
 import { TestsComponent } from './modules/public/tests/tests.component';
@@ -39,10 +38,6 @@ export const routes: Routes = [
   {
     path: 'page-not-found',
     component: PageNotFoundComponent
-  },
-  {
-    path: 'page-form-assistance',
-    component: ProviderAssistancessComponent
   },
   // Delete after tests
   {
@@ -82,11 +77,6 @@ export const routes: Routes = [
     pathMatch: 'full',
     redirectTo: 'page-not-found'
   },
-  {
-    path: '**',
-    pathMatch: 'full',
-    redirectTo: 'page-form-assistance'
-  }
 ];
 
 @NgModule({

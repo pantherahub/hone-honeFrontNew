@@ -28,7 +28,6 @@ export class FloatingActionsComponent implements OnInit {
 
   excludedRoutes: string[] = [
     'page-not-found',
-    'page-form-assistance',
   ];
 
   clientSelected: any;
