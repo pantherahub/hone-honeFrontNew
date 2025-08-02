@@ -13,11 +13,12 @@ import { TextInputComponent } from 'src/app/shared/components/text-input/text-in
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
 import { NavigationService } from 'src/app/services/navigation/navigation.service';
+import { PopoverComponent } from 'src/app/shared/components/popover/popover.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [ NgZorroModule, CommonModule, RouterModule, TextInputComponent, ButtonComponent, ModalComponent ],
+  imports: [ NgZorroModule, CommonModule, RouterModule, TextInputComponent, ButtonComponent, ModalComponent, PopoverComponent ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -38,7 +39,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('videoModal') videoModal!: ModalComponent;
   @ViewChild('reminderModal') reminderModal!: ModalComponent;
 
-  // @ViewChild('videoModalTemplate', { static: false }) videoModalTemplate!: TemplateRef<any>;
   private tutorialSubscription!: Subscription;
 
   constructor (
@@ -46,7 +46,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     private tutorialService: TutorialService,
     private eventManager: EventManagerService,
     private router: Router,
-    private modal: NzModalService,
     private navigationService: NavigationService,
   ) {
     localStorage.removeItem('clientSelected');
@@ -130,18 +129,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (step === 1) {
       this.clientTutorialVisible = false;
       this.videoModal.open();
-      // const modalRef = this.modal.create({
-      //   nzTitle: 'VIDEO TUTORIAL',
-      //   nzContent: this.videoModalTemplate,
-      //   nzFooter: null,
-      //   nzCentered: true,
-      //   nzWidth: '900px',
-      //   nzStyle: { 'max-width': '90%' },
-      //   nzClassName: 'video-modal'
-      // });
-      // modalRef.afterClose.subscribe((result: any) => {
-      //   this.tutorialService.nextStep();
-      // });
     } else if (step === 3) {
       this.clientTutorialVisible = true;
     } else {

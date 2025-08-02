@@ -2,25 +2,25 @@ import { Component, EventEmitter, forwardRef, Input, Output } from '@angular/cor
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
-  selector: 'app-checkbox',
+  selector: 'app-radio',
   standalone: true,
   imports: [],
-  templateUrl: './checkbox.component.html',
-  styleUrl: './checkbox.component.scss',
+  templateUrl: './radio.component.html',
+  styleUrl: './radio.component.scss',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => CheckboxComponent),
+      useExisting: forwardRef(() => RadioComponent),
       multi: true
     }
   ]
 })
-export class CheckboxComponent implements ControlValueAccessor {
+export class RadioComponent implements ControlValueAccessor {
 
   @Input() id?: string;
   @Input() name?: string;
-  @Input() value?: any;
-  @Input() disabled: boolean = false;
+  @Input() disabled = false;
+  @Input() value: any;
 
   /**
    * Only use when managing state externally.
@@ -28,29 +28,29 @@ export class CheckboxComponent implements ControlValueAccessor {
    */
   @Input() checked?: boolean;
 
-  @Output() change = new EventEmitter<boolean>();
+  @Output() change = new EventEmitter<any>();
   @Output() onClick = new EventEmitter<Event>();
 
   private isNgModelUsed = false;
-  private _checkedStatus: boolean = false;
+  private modelValue: any;
 
-  get checkedValue(): boolean {
-    return this.isNgModelUsed ? this._checkedStatus : !!this.checked;
+  get isChecked(): boolean {
+    return this.isNgModelUsed ? this.modelValue === this.value : !!this.checked;
   }
 
-  // ControlValueAccessor callbacks
+  // ControlValueAccessor
   private onChange = (_: any) => {};
   private onTouched = () => {};
 
   writeValue(value: any): void {
-    this._checkedStatus = !!value;
+    this.modelValue = value;
   }
 
   registerOnChange(fn: any): void {
     this.isNgModelUsed = true;
     if (this.checked != null) {
       console.warn(
-        'app-checkbox: Using ngModel/formControl and checked prop at the same time. This can cause conflicts.'
+        'app-radio: Using ngModel/formControl and checked prop at the same time. This can cause conflicts.'
       );
     }
     this.onChange = fn;
@@ -71,10 +71,10 @@ export class CheckboxComponent implements ControlValueAccessor {
     }
 
     if (this.isNgModelUsed) {
-      this._checkedStatus = !this._checkedStatus;
-      this.onChange(this._checkedStatus);
+      this.modelValue = this.value;
+      this.onChange(this.modelValue);
       this.onTouched();
-      this.change.emit(this._checkedStatus);
+      this.change.emit(this.modelValue);
     } else {
       this.onClick.emit(event);
     }

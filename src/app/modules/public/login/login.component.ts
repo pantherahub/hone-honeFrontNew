@@ -104,7 +104,7 @@ export class LoginComponent implements OnInit {
         this.isSubmitData = false;
 
         if (error.status == 401) {
-          this.alertService.error("Oops...", error.error.message);
+          this.alertService.error("Ups...", error.error.message);
           return;
         }
 

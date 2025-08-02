@@ -5,7 +5,41 @@
     </a>
 
     <div class="flex gap-2">
-      <div class="tutorial-option-container"
+      <app-popover
+        popoverId="infoPopover"
+        triggerType="none"
+        [contentTemplate]="popoverContent"
+        placement="bottom"
+        [highlighted]="true"
+        [(visible)]="configTutorialVisible"
+        extraPopoverClass="max-w-[454px]"
+      >
+        <ng-template #triggerTemplate
+        >
+          <div
+            data-popover-target="infoPopover"
+            data-popover-placement="bottom"
+            data-popover-trigger="none"
+          >
+            <app-button
+              (click)="navigateToUpdateData()"
+              variant="gray"
+              size="sm"
+              styleType="soft"
+              customClass="leading-4 tutorial-option"
+            >
+              <span class="truncate max-w-[150px] md:max-w-[310px] hidden sm:block">
+                {{user.name ? user.name : 'No reporta nombre'}}
+              </span>
+              <svg width="16" height="16">
+                <use xlink:href="/assets/icons/solid/general.svg#cog" />
+              </svg>
+            </app-button>
+          </div>
+        </ng-template>
+      </app-popover>
+
+      <!-- <div class="tutorial-option-container"
         [ngClass]="{ 'active-tutorial': configTutorialVisible }">
         <div
           nz-popover
@@ -30,7 +64,7 @@
             </svg>
           </app-button>
         </div>
-      </div>
+      </div> -->
 
       <app-button
         (click)="logout()"
@@ -86,8 +120,8 @@
 </ng-template>
 
 <!-- Popover overlay -->
-<div
+<!-- <div
   *ngIf="configTutorialVisible"
   class="tutorial-popover-overlay"
   (click)="nextTutorialStep()"
-></div>
+></div> -->

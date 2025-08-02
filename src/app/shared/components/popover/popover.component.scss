@@ -1,0 +1,25 @@
+:host ::ng-deep .popover::before {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+:host-context(.top) ::ng-deep .popover::before {
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px 8px 0 8px;
+  border-color: white transparent transparent transparent;
+}
+
+:host-context(.bottom) ::ng-deep .popover::before {
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 0 8px 8px 8px;
+  border-color: transparent transparent white transparent;
+}
+
+/* Agrega variantes para left y right si deseas también */

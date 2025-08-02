@@ -9,12 +9,12 @@ import { InputErrorComponent } from '../components/input-error/input-error.compo
 import { Router } from '@angular/router';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 import { NzModalService } from 'ng-zorro-antd/modal';
-import { ResponseCreateTicketComponent } from '../modals/response-create-ticket/response-create-ticket.component';
 import { sanitizeString } from 'src/app/utils/string-utils';
 import { AuthService } from 'src/app/services/auth.service';
 import { REGEX_PATTERNS } from 'src/app/constants/regex-patterns';
 import { TicketsService } from 'src/app/services/tickets/tickets.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { AlertService } from 'src/app/services/alert/alert.service';
 
 @Component({
   selector: 'app-support-ticket',
@@ -41,6 +41,7 @@ export class SupportTicketComponent implements OnInit {
     private authService: AuthService,
     private ticketService: TicketsService,
     private toastService: ToastService,
+    private alertService: AlertService,
   ) { }
 
   ngOnInit(): void {
@@ -109,23 +110,6 @@ export class SupportTicketComponent implements OnInit {
     return observations;
   }
 
-  openSuccessModal() {
-    const modal = this.modalService.create<ResponseCreateTicketComponent, any>({
-      nzContent: ResponseCreateTicketComponent,
-      nzCentered: true,
-      nzClosable: false,
-      nzFooter: null,
-      nzMaskClosable: false,
-    });
-  }
-
-  openErrorModal() {
-    this.modalService.create({
-      nzContent: `<p>Lo sentimos, hubo un error en el servidor.</p>`,
-      nzFooter: null,
-    });
-  }
-
   onSubmit() {
     this.formUtils.markFormTouched(this.ticketForm);
     if (this.ticketForm.invalid) return;
@@ -179,11 +163,18 @@ export class SupportTicketComponent implements OnInit {
     this.ticketService.postTicket(idRole, data).subscribe({
         next: (res: any) => {
           this.loading = false;
-          this.openSuccessModal();
+          this.alertService.showAlert({
+            title: '¡Enviado!',
+            variant: 'success',
+            messageHTML: 'Su ticket ha sido creado con éxito, antes de 48 horas nos contactaremos formalmente con usted, para dar solución a su requerimiento.<br>¡Gracias por preferirnos!',
+          });
         },
         error: (error: any) => {
           this.loading = false;
-          this.openErrorModal();
+          this.alertService.error(
+            'Ups...',
+            'Lo sentimos, hubo un error en el servidor.'
+          );
         }
     });
   }

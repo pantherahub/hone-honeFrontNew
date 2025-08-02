@@ -22,7 +22,7 @@ export class AlertService {
     const modalReturn = this.modalService.open(AlertModalComponent, {
       customSize,
       closable,
-      customModalClass: '!rounded-lg p-0',
+      customModalClass: '!rounded-lg !p-0',
     }, {
       showClose: showClose === undefined ? closable : showClose,
       ...alertOptions
@@ -39,7 +39,7 @@ export class AlertService {
     return this.showAlert({ title, message, variant: 'success', ...options }) as Observable<void>;
   }
 
-  error(title: string = 'Oops...', message: string = 'Algo salió mal.', options: Partial<AlertOptions> = {}): Observable<void> {
+  error(title: string = 'Ups...', message: string = 'Algo salió mal.', options: Partial<AlertOptions> = {}): Observable<void> {
     return this.showAlert({ title, message, variant: 'error', ...options }) as Observable<void>;
   }
 

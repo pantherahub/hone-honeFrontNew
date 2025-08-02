@@ -7,11 +7,12 @@ import { Router, RouterModule } from '@angular/router';
 import { TutorialService } from 'src/app/services/tutorial/tutorial.service';
 import { Subscription } from 'rxjs';
 import { ButtonComponent } from '../../components/button/button.component';
+import { PopoverComponent } from '../../components/popover/popover.component';
 
 @Component({
   selector: 'app-header-private',
   standalone: true,
-  imports: [NgZorroModule, CommonModule, RouterModule, ButtonComponent],
+  imports: [NgZorroModule, CommonModule, RouterModule, ButtonComponent, PopoverComponent],
   templateUrl: './header-private.component.html',
   styleUrl: './header-private.component.scss'
 })
@@ -26,7 +27,7 @@ export class HeaderPrivateComponent implements OnInit, OnDestroy {
 
   constructor(
     private tutorialService: TutorialService,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -68,4 +69,5 @@ export class HeaderPrivateComponent implements OnInit, OnDestroy {
   logout() {
     this.authService.logout();
   }
+
 }

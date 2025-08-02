@@ -7,7 +7,6 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { CommonModule } from '@angular/common';
 
 import { NzUploadFile } from 'ng-zorro-antd/upload';
-import { ProviderAssistanceComponent } from '../../../../shared/modals/provider-assistance/provider-assistance.component';
 
 import { FetchBackend } from '@angular/common/http';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
 import { InputErrorComponent } from 'src/app/shared/components/input-error/input-error.component';
 import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
@@ -10,27 +10,62 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ModalService } from 'src/app/services/modal/modal.service';
 import { AlertService } from 'src/app/services/alert/alert.service';
+import { Router } from '@angular/router';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { PopoverComponent } from 'src/app/shared/components/popover/popover.component';
 
 @Component({
   selector: 'app-tests',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, TextInputComponent, InputErrorComponent, ModalComponent, SelectComponent, CheckboxComponent, ButtonComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    TextInputComponent,
+    InputErrorComponent,
+    ModalComponent,
+    SelectComponent,
+    CheckboxComponent,
+    ButtonComponent,
+    PopoverComponent
+  ],
   templateUrl: './tests.component.html',
   styleUrl: './tests.component.scss'
 })
 export class TestsComponent implements OnInit, AfterViewInit {
 
+  @ViewChild('modalComponentByTag', { static: false }) modalComponentByTag!: ModalComponent;
   @ViewChild('videoModalTemplate', { static: false }) videoModalTemplate!: TemplateRef<any>;
   @ViewChild('customModal', { static: false }) customModal!: TemplateRef<any>;
   @ViewChild('customTpl', { static: false }) customTpl!: TemplateRef<any>;
+
+  // @ViewChild('popover') popover!: PopoverComponent;
+  @ViewChild('triggerBtn', { static: true }) triggerBtnRef!: ElementRef;
+  popoverVisible: boolean = false;
 
   constructor (
     private toastService: ToastService,
     private modalService: ModalService,
     private alertService: AlertService,
+    private router: Router,
+    private notificationService: NzNotificationService,
   ) { }
 
+  navigateTo(url: string): void {
+    this.router.navigate([url]);
+  }
+
   ngOnInit(): void {
+    // this.alertService.showAlert({
+    //   title: '¡Atención!',
+    //   message: 'Recuerda actualizar tus datos garantizando así el cumplimiento total de tu gestión contractual.',
+    //   closable: false,
+    //   // variant: 'warning',
+    //   showConfirmBtn: true,
+    //   confirmBtnText: 'Entendido',
+    // }).subscribe(() => {
+    //   this.navigateTo('/update-data');
+    // });
   }
 
   ngAfterViewInit(): void {
@@ -44,6 +79,10 @@ export class TestsComponent implements OnInit, AfterViewInit {
     //     console.log('Modal cerrado con:', result);
     //   });
 
+  }
+
+  openModalComponentByTag() {
+    this.modalComponentByTag.open();
   }
 
   openCustomModal() {
@@ -77,6 +116,7 @@ export class TestsComponent implements OnInit, AfterViewInit {
     }).subscribe((confirmed) => {
       console.log("confirmed", confirmed);
     });
+
     // this.alertService.showAlert({
     //   title: '¿Estás seguro?',
     //   message: 'Esto no se puede deshacer',
@@ -103,9 +143,22 @@ export class TestsComponent implements OnInit, AfterViewInit {
   checkboxStatus: boolean = false;
 
   onClickTest() {
-    // this.createNotificacion('error', 'Error', 'Lo sentimos, hubo un error en el servidor.');
     // this.toastService.success('Datos guardados correctamente');
-    this.toastService.success('Documentos subidos');
+    // this.toastService.success('Documentos subidos');
+
+    // this.notificationService.create('error', 'Error', 'Lo sentimos, hubo un error en el servidor.');
+    this.toastService.error('Lo sentimos, hubo un error en el servidor.');
   }
+
+
+
+  /* Popover */
+  // handlePopoverClose() {
+  //   console.log('Popover cerrado');
+  // }
+  // accion() {
+  //   console.log('Acción confirmada');
+  //   this.popover.close();
+  // }
 
 }

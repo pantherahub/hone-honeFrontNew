@@ -34,6 +34,7 @@ export class TextInputComponent implements ControlValueAccessor, OnInit {
   @Input() iconSize: string = '18';
   @Output() onInput = new EventEmitter<any>();
 
+  @Input() rows?: string;
   @Input() maxlength?: string;
   @Input() minlength?: string;
   @Input() max?: string;

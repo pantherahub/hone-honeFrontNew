@@ -12,7 +12,7 @@ export class SurveysService {
   constructor(private http: HttpClient) { }
 
   sendFeedback(reqData: any) {
-    return this.http.post(`${this.url}makeSurveyProvider`, reqData);
+    return this.http.post(`${this.url}makeSurveyProviderr`, reqData);
   }
 
 }

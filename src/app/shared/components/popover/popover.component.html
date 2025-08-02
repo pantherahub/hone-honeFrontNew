@@ -1,0 +1,43 @@
+<!-- <div #backdropEl
+  (click)="close()"
+  (mousedown)="onBackdropMouseDown($event)"
+  (mouseup)="onBackdropMouseUp($event)"
+  class="fixed inset-0 bg-black/30 z-[60]">
+</div> -->
+@if (visible) {
+  <div #backdropEl
+    (click)="close()"
+    class="fixed inset-0 z-[60]"
+    [ngClass]="{ 'bg-black/30 pointer-events-none': visible && highlighted }">
+  </div>
+}
+
+@if (triggerTemplate) {
+  <!-- hola -->
+  <div [ngClass]="{ 'tutorial-option-container active-tutorial before:z-[60]': visible && highlighted }">
+    <div [ngClass]="{ 'relative z-[70]': visible }">
+      <ng-container *ngTemplateOutlet="triggerTemplate"></ng-container>
+    </div>
+  </div>
+}
+
+<div
+  #popoverEl
+  data-popover
+  [attr.id]="popoverId"
+  role="tooltip"
+  class="absolute z-[60] inline-block text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-xs opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800 p-4"
+  [ngClass]="classMap"
+>
+  @if (title) {
+    <h3 class="font-semibold text-gray-900 dark:text-white">{{ title }}</h3>
+  }
+
+  @if (contentTemplate) {
+    <div class="px-3 py-2">
+      <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
+    </div>
+  }
+
+  <div data-popper-arrow></div>
+</div>

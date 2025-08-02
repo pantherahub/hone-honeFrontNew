@@ -13,7 +13,8 @@ import { ContactsProviderServicesService } from '../../../../services/contacts-p
 import { AssistanceProvidersComponent } from '../../../../shared/forms/assistance-forms/assistance-providers/assistance-providers.component';
 import { ProviderAssistanceComponent } from '../../../../shared/modals/provider-assistance/provider-assistance.component';
 import { FeedbackFivestarsComponent } from 'src/app/shared/modals/feedback-fivestars/feedback-fivestars.component';
-import { AlertService } from 'src/app/services/alerts/alert.service';
+import { AlertService } from 'src/app/services/alert/alert.service';
+import { ModalService } from 'src/app/services/modal/modal.service';
 
 @Component({
   selector: 'app-list-documents',
@@ -40,6 +41,7 @@ export class ListDocumentsComponent implements OnInit {
     private documentService: DocumentsCrudService,
     private router: Router,
     private modalService: NzModalService,
+    private modalService2: ModalService,
     private contactProvider: ContactsProviderServicesService,
     private alertService: AlertService,
   ) {
@@ -120,27 +122,17 @@ export class ListDocumentsComponent implements OnInit {
 
   open5starsFeedback(): void {
     this.feedbackModalShown = true;
-    const feedbackModalRef = this.modalService.create<FeedbackFivestarsComponent, any>({
-      nzContent: FeedbackFivestarsComponent,
-      nzTitle: 'Nos gustaría conocer tu opinión',
-      nzCentered: true,
-      nzFooter: null,
-      nzClosable: false,
-      nzMaskClosable: false, // Overlay
-      nzKeyboard: false, // Esc
-      nzWidth: '600px',
-      nzStyle: { 'max-width': '90%' },
-      nzClassName: 'video-modal',
-    });
-
-    feedbackModalRef.afterClose.subscribe((result) => {
+    const modal = this.modalService2.open(FeedbackFivestarsComponent, {
+      title: 'Nos gustaría conocer tu opinión',
+      closable: false,
+      customSize: 'max-w-[600px] !gap-2',
+    })
+    modal.onClose.subscribe((result) => {
       if (result?.submitted) {
-        const alertRef = this.alertService.success(
+        this.alertService.success(
           '¡Gracias por tu feedback!',
           'Tu opinión nos ayuda a mejorar.',
-          { nzMaskClosable: true }
-        );
-        alertRef.afterClose.subscribe(() => {
+        ).subscribe(() => {
           this.showDataformAlert();
         });
       } else {
@@ -154,21 +146,16 @@ export class ListDocumentsComponent implements OnInit {
       return;
     }
     this.dataformAlertShown = true;
-    const modalRef = this.modalService.warning({
-      nzTitle: 'Atención',
-      nzContent: this.user.withData
+    this.alertService.showAlert({
+      title: '¡Atención!',
+      message: this.user.withData
         ? 'Tu información no concuerda con lo guardado en base de datos, por favor revisa nuevamente el formulario.'
         : 'Recuerda actualizar tus datos garantizando así el cumplimiento total de tu gestión contractual.',
-      nzClosable: false,
-      nzKeyboard: false,
-      nzMaskClosable: true,
-      nzOnOk: () => {
-        modalRef.close();
-        this.navigateTo('/update-data');
-      },
-      nzOnCancel: () => {
-        this.navigateTo('/update-data');
-      }
+      closable: false,
+      showConfirmBtn: true,
+      confirmBtnText: 'Entendido',
+    }).subscribe(() => {
+      this.navigateTo('/update-data');
     });
   }
 

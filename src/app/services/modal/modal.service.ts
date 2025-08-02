@@ -7,7 +7,8 @@ import {
   TemplateRef,
   createComponent,
 } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { NavigationStart, Router } from '@angular/router';
+import { filter, Observable, Subject, take } from 'rxjs';
 import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
 
 @Injectable({
@@ -17,7 +18,8 @@ export class ModalService {
 
   constructor(
     private injector: Injector,
-    private appRef: ApplicationRef
+    private appRef: ApplicationRef,
+    private router: Router,
   ) { }
 
   /**
@@ -32,9 +34,9 @@ export class ModalService {
    */
   open<T extends object>(
     content: Type<T> | TemplateRef<any>,
-    options: Partial<ModalComponent> = {},
+    options: Partial<ModalComponent> & { destroyOnRouteChange?: boolean } = {},
     inputs?: Partial<T>
-  ): { onClose: Observable<any> } {
+  ): { onClose: Observable<any>, close: (returnData?: any) => void } {
     const onClose$ = new Subject<any>();
     const isTemplate = content instanceof TemplateRef;
 
@@ -46,7 +48,11 @@ export class ModalService {
 
     const modalInstance = modalRef.instance;
 
-    Object.assign(modalInstance, options);
+    const {
+      destroyOnRouteChange = true,
+      ...modalInputs
+    } = options;
+    Object.assign(modalInstance, modalInputs);
 
     modalInstance.afterViewInitCallback = (vcr) => {
       if (isTemplate) {
@@ -69,6 +75,13 @@ export class ModalService {
     // Open modal
     modalInstance.open();
 
+    if (destroyOnRouteChange) {
+      this.router.events.pipe(
+        filter(event => event instanceof NavigationStart),
+        take(1)
+      ).subscribe(() => modalInstance.close());
+    }
+
     // Close and clean
     modalInstance.onClose.subscribe(result => {
       onClose$.next(result);
@@ -77,7 +90,10 @@ export class ModalService {
       modalRef.destroy();
     });
 
-    return { onClose: onClose$.asObservable() };
+    return {
+      onClose: onClose$.asObservable(),
+      close: (returnData?: any) => modalInstance.close(returnData),
+    };
   }
 
 }

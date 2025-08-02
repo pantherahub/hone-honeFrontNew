@@ -2,6 +2,9 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, TemplateRef, Type, ViewChild, ViewContainerRef } from '@angular/core';
 import { ButtonComponent } from '../button/button.component';
 
+/**
+ * Note for rendering methods: Do not open a template modal (by tag/selector) within one opened by service, because the second will be below.
+ */
 @Component({
   selector: 'app-modal',
   standalone: true,
@@ -70,9 +73,10 @@ export class ModalComponent implements OnInit, AfterViewInit {
     this.isOpen = true;
     this.cdr.detectChanges();
     ModalComponent.stack.push(this);
-    this.modalEl.nativeElement.classList.add('flex');
     this.modalEl.nativeElement.classList.remove('hidden');
-    document.body.classList.add('overflow-hidden');
+    if (this.isBackdropVisible) {
+      document.body.classList.add('overflow-hidden');
+    }
   }
 
   async close(returnData?: any) {
@@ -95,9 +99,8 @@ export class ModalComponent implements OnInit, AfterViewInit {
       }
 
       this.modalEl.nativeElement.classList.add('hidden');
-      this.modalEl.nativeElement.classList.remove('flex');
 
-      if (ModalComponent.stack.length === 0) {
+      if (ModalComponent.stack.length === 0 && this.isBackdropVisible) {
         document.body.classList.remove('overflow-hidden');
       }
       this.onClose.emit(returnData);
