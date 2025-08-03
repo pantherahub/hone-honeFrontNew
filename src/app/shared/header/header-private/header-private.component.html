@@ -7,35 +7,30 @@
     <div class="flex gap-2">
       <app-popover
         popoverId="infoPopover"
-        triggerType="none"
-        [contentTemplate]="popoverContent"
-        placement="bottom"
-        [highlighted]="true"
+        [content]="'Este es un popover reutilizable.'"
+        [placement]="'bottom-end'"
+        [triggerType]="'none'"
+        [highlighted]="false"
         [(visible)]="configTutorialVisible"
+        [contentTemplate]="popoverContent"
         extraPopoverClass="max-w-[454px]"
+        (onClose)="nextTutorialStep()"
       >
-        <ng-template #triggerTemplate
-        >
-          <div
-            data-popover-target="infoPopover"
-            data-popover-placement="bottom"
-            data-popover-trigger="none"
-          >
-            <app-button
+        <ng-template #triggerTemplate>
+          <app-button
               (click)="navigateToUpdateData()"
               variant="gray"
               size="sm"
               styleType="soft"
               customClass="leading-4 tutorial-option"
             >
-              <span class="truncate max-w-[150px] md:max-w-[310px] hidden sm:block">
-                {{user.name ? user.name : 'No reporta nombre'}}
-              </span>
-              <svg width="16" height="16">
-                <use xlink:href="/assets/icons/solid/general.svg#cog" />
-              </svg>
-            </app-button>
-          </div>
+            <span class="truncate max-w-[150px] md:max-w-[310px] hidden sm:block">
+              {{user.name ? user.name : 'No reporta nombre'}}
+            </span>
+            <svg width="16" height="16">
+              <use xlink:href="/assets/icons/solid/general.svg#cog" />
+            </svg>
+          </app-button>
         </ng-template>
       </app-popover>
 

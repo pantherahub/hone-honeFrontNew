@@ -4,18 +4,29 @@
   (mouseup)="onBackdropMouseUp($event)"
   class="fixed inset-0 bg-black/30 z-[60]">
 </div> -->
+
 @if (visible) {
   <div #backdropEl
     (click)="close()"
     class="fixed inset-0 z-[60]"
-    [ngClass]="{ 'bg-black/30 pointer-events-none': visible && highlighted }">
+    [ngClass]="{
+      'bg-black/30': visible && highlighted,
+      'pointer-events-none': !closable,
+    }">
   </div>
 }
 
+
 @if (triggerTemplate) {
-  <!-- hola -->
-  <div [ngClass]="{ 'tutorial-option-container active-tutorial before:z-[60]': visible && highlighted }">
-    <div [ngClass]="{ 'relative z-[70]': visible }">
+  <div #triggerEl
+    (click)="onTriggerClick()"
+    class="relative inline-block"
+    before=""
+    [ngClass]="{
+      'before:absolute before:-top-[5px] before:-left-[5px] before:-right-[5px] before:-bottom-[5px] before:content-[attr(before)] before:z-[60] before:bg-white before:rounded-lg': visible && highlighted,
+    }"
+    [class]="customPopoverClass">
+    <div [ngClass]="{ 'relative z-[70]': visible && highlighted }">
       <ng-container *ngTemplateOutlet="triggerTemplate"></ng-container>
     </div>
   </div>
@@ -23,21 +34,29 @@
 
 <div
   #popoverEl
-  data-popover
-  [attr.id]="popoverId"
-  role="tooltip"
-  class="absolute z-[60] inline-block text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-xs opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800 p-4"
+  class="absolute z-[60] inline-block text-sm text-gray-500 transition-opacity duration-300 bg-white rounded-xl shadow-xs dark:text-gray-400 dark:bg-gray-800 p-4"
+  [attr.data-popover-id]="popoverId"
+  [attr.data-popper-placement]="placement"
   [ngClass]="classMap"
 >
   @if (title) {
-    <h3 class="font-semibold text-gray-900 dark:text-white">{{ title }}</h3>
+    <h3 class="font-semibold text-gray-900 dark:text-white mb-2">
+      {{ title }}
+    </h3>
   }
-
   @if (contentTemplate) {
-    <div class="px-3 py-2">
-      <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
-    </div>
+    <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
+  } @else {
+    <p>{{ content }}</p>
   }
 
-  <div data-popper-arrow></div>
+  <div
+    class="popover-arrow"
+    [class.highlighted]="highlighted"
+    [ngClass]="{
+      'before:bg-white before:border before:border-gray-200 before:shadow': !highlighted,
+      'before:!bg-white before:dark:!bg-gray-800': true
+    }"
+    data-popper-arrow
+  ></div>
 </div>

@@ -42,36 +42,16 @@
     popoverId="infoPopover"
     [title]="'Info'"
     content="Este es un popover reutilizable."
-    triggerType="none"
+    triggerType="click"
     [contentTemplate]="popoverContent"
     placement="right"
     [highlighted]="false"
-    [(visible)]="popoverVisible"
-  >
-    <ng-template #triggerTemplate
-    >
-      <div
-        data-popover-target="infoPopover"
-        data-popover-placement="right"
-        data-popover-trigger="none"
-      >
-        <app-button (onClick)="popoverVisible = !popoverVisible">
-          CLICKME
-        </app-button>
-      </div>
-    </ng-template>
-    <!-- <div
-      trigger-container
-      data-popover-target="infoPopover"
-      data-popover-placement="right"
-      data-popover-trigger="none"
-    >
-      <app-button
-        (onClick)="popoverVisible = !popoverVisible"
-        >
+>
+    <ng-template #triggerTemplate>
+      <app-button (onClick)="popoverVisible = !popoverVisible">
         CLICKME
       </app-button>
-    </div> -->
+    </ng-template>
     <ng-template #popoverContent>
       <div class="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:bg-gray-700 dark:border-gray-600">
         <h3 class="font-semibold text-gray-900 dark:text-white">Popover Top</h3>

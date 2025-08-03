@@ -1,25 +1,24 @@
-:host ::ng-deep .popover::before {
-  content: '';
+.popover-arrow {
   position: absolute;
-  width: 0;
-  height: 0;
-  border-style: solid;
+  width: 8px;
+  height: 8px;
+  transform: rotate(45deg);
+  z-index: -1;
 }
 
-:host-context(.top) ::ng-deep .popover::before {
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-width: 8px 8px 0 8px;
-  border-color: white transparent transparent transparent;
+[data-popper-placement^='top'] > .popover-arrow {
+  bottom: -4px;
 }
-
-:host-context(.bottom) ::ng-deep .popover::before {
-  top: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-width: 0 8px 8px 8px;
-  border-color: transparent transparent white transparent;
+[data-popper-placement^='bottom'] > .popover-arrow {
+  top: -4px;
 }
-
-/* Agrega variantes para left y right si deseas también */
+[data-popper-placement^='left'] > .popover-arrow {
+  right: -4px;
+}
+[data-popper-placement^='right'] > .popover-arrow {
+  left: -4px;
+}
+[data-popper-placement$='-start'] > .popover-arrow,
+[data-popper-placement$='-end'] > .popover-arrow {
+  margin-inline-start: 0.5rem;
+}

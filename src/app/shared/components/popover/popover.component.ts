@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ContentChild, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, Renderer2, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ContentChild, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, Renderer2, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { Popover } from 'flowbite';
+import { createPopper, Instance, Placement } from '@popperjs/core';
+
 
 @Component({
   selector: 'app-popover',
@@ -11,39 +13,47 @@ import { Popover } from 'flowbite';
 })
 export class PopoverComponent implements OnInit, AfterViewInit, OnChanges {
 
-  // @Input() trigger!: ElementRef;
   @Input() contentTemplate?: TemplateRef<any>;
-
-  @Input() visible!: boolean;
+  @Input() title?: string;
+  @Input() content: string = '';
+  @Input() placement: Placement = 'top';
+  @Input() popoverId: string = 'default-popover';
   @Input() triggerType: 'click' | 'hover' | 'none' = 'click'; // none = manual
+  @Input() highlighted: boolean = false;
+
   @Input() closable: boolean = true;
   @Input() closeOnBackdrop: boolean = true;
   @Input() closeOnEscape: boolean = true;
   @Input() showCloseButton: boolean = true;
-  @Input() title?: string;
-  @Input() content: string = '';
-  @Input() placement: 'top' | 'right' | 'bottom' | 'left' = 'top';
-  @Input() popoverId: string = 'default-popover';
-  @Input() highlighted: boolean = false;
 
   @Input() extraPopoverClass: string | string[] = '';
   @Input() resetPopoverClass?: string;
+  @Input() customTriggerClass: string | string[] = '';
 
+  @Input() visible!: boolean;
   @Output() visibleChange = new EventEmitter<boolean>();
+  @Output() onClose = new EventEmitter<Event>();
 
-  @ViewChild('popoverEl') popoverEl!: ElementRef;
-  @ViewChild('backdropEl') backdropEl!: ElementRef;
-  // @ContentChild('triggerContainer', { static: false, read: ElementRef }) triggerContentSlot?: ElementRef;
   @ContentChild('triggerTemplate', { static: false }) triggerTemplate?: TemplateRef<any>;
 
+  @ViewChild('triggerEl', { read: ElementRef }) triggerEl!: ElementRef;
+  @ViewChild('popoverEl') popoverEl!: ElementRef;
+  @ViewChild('backdropEl') backdropEl!: ElementRef;
+  @ViewChild('arrowRef', { static: false }) arrowRef?: ElementRef<HTMLElement>;
+
+  private popperInstance?: Instance;
+
   manualByMethods: boolean = false;
+
+  private isHovering = false;
+  private hoverTimeout: any;
+
 
   private backdropMouseDown: boolean = false;
   private isLeftClick: boolean = false;
 
   constructor(
-    private renderer: Renderer2,
-    private el: ElementRef,
+    private cdr: ChangeDetectorRef,
   ) { }
 
   ngOnInit(): void {
@@ -53,39 +63,81 @@ export class PopoverComponent implements OnInit, AfterViewInit, OnChanges {
       this.showCloseButton = false;
     }
 
-    if (this.triggerType === 'none' && this.visible === undefined) {
+    if (this.triggerType === 'none') {
       this.manualByMethods = true;
+    }
+
+    if (this.visible === undefined) {
       this.visible = false;
     }
 
   }
 
   ngAfterViewInit(): void {
-    // if (this.trigger) {
-    //   this.renderer.listen(this.trigger.nativeElement, 'click', () => {
-    //     this.visible = !this.visible;
-    //     this.setPosition();
-    //   });
-    // }
-
-    import('flowbite').then((module) => {
-      module.initPopovers();
-    //   this.popoverInstance = new Popover(popoverEl, triggerEl, {
-    //   placement: this.placement,
-    //   triggerType: 'none',
-    // });
-    });
-
+    this.initPopper();
     if (this.triggerType === 'none') {
       this.toggleVisibility(this.visible);
+    }
+
+    if (this.triggerType === 'hover') {
+      this.triggerEl?.nativeElement?.addEventListener('mouseenter', this.onMouseEnter.bind(this));
+      this.triggerEl?.nativeElement?.addEventListener('mouseleave', this.onMouseLeave.bind(this));
+      this.popoverEl?.nativeElement?.addEventListener('mouseenter', this.onMouseEnter.bind(this));
+      this.popoverEl?.nativeElement?.addEventListener('mouseleave', this.onMouseLeave.bind(this));
     }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (this.triggerType === 'none' && changes['visible']) {
+    if (changes['visible']) {
       const isVisible = changes['visible'].currentValue;
       this.toggleVisibility(isVisible);
     }
+  }
+
+  private initPopper(): void {
+    if (!this.triggerEl || !this.popoverEl) return;
+
+    this.popperInstance = createPopper(
+      this.triggerEl.nativeElement,
+      this.popoverEl.nativeElement,
+      {
+        placement: this.placement,
+        modifiers: [
+          {
+            name: 'offset',
+            options: {
+              offset: [0, this.highlighted ? 15 : 10],
+            },
+          },
+          {
+            name: 'arrow',
+            options: {
+              element: this.arrowRef?.nativeElement,
+              padding: 5,
+            },
+          },
+          // { name: 'preventOverflow', options: { padding: 8 } },
+          {
+            name: 'preventOverflow',
+            options: { boundary: 'viewport' },
+          },
+          {
+            name: 'flip',
+            options: { fallbackPlacements: ['top', 'bottom', 'right', 'left'] }
+          },
+          {
+            name: 'updatePlacement',
+            enabled: true,
+            phase: 'write',
+            fn: ({ state }) => {
+              this.placement = state.placement as Placement;
+              this.cdr.markForCheck();
+            },
+          },
+        ],
+      }
+    );
+    this.toggleVisibility(this.visible);
   }
 
   private toggleVisibility(isVisible: boolean) {
@@ -95,15 +147,11 @@ export class PopoverComponent implements OnInit, AfterViewInit, OnChanges {
     console.log("Cambio", isVisible);
 
     if (isVisible) {
-      popover.classList.remove('invisible', 'opacity-0');
-      popover.classList.add('opacity-100');
       if (this.highlighted) {
         document.body.classList.add('overflow-hidden');
       }
+      this.popperInstance?.update();
     } else {
-      popover.classList.remove('opacity-100');
-      popover.classList.add('opacity-0');
-      // setTimeout(() => popover.classList.add('invisible'), 300);
       if (this.highlighted) {
         document.body.classList.remove('overflow-hidden');
       }
@@ -121,6 +169,7 @@ export class PopoverComponent implements OnInit, AfterViewInit, OnChanges {
 
   public close() {
     this.visible = false;
+    this.onClose.emit();
     if (this.manualByMethods) {
       this.toggleVisibility(this.visible);
       return;
@@ -128,36 +177,73 @@ export class PopoverComponent implements OnInit, AfterViewInit, OnChanges {
     this.visibleChange.emit(this.visible);
   }
 
-  @HostListener('document:keydown.escape', ['$event'])
-  handleEscape(event: KeyboardEvent) {
-    if (this.visible) this.close();
+  onTriggerClick(): void {
+    if (this.triggerType !== 'click') return;
+    if (this.visible) {
+      this.close();
+      return;
+    }
+    this.open();
   }
 
-  onBackdropMouseDown(event: MouseEvent) {
-    this.backdropMouseDown = (event.target === this.backdropEl.nativeElement);
-    this.isLeftClick = event.button === 0;
+  onMouseEnter() {
+    this.isHovering = true;
+    clearTimeout(this.hoverTimeout);
+    this.open();
   }
-  onBackdropMouseUp(event: MouseEvent) {
-    const isBackdrop = event.target === this.backdropEl.nativeElement;
-    if (
-      this.closeOnBackdrop &&
-      this.backdropMouseDown &&
-      isBackdrop &&
-      this.isLeftClick
-    ) {
-      this.close();
-    }
-    // Reset
-    this.backdropMouseDown = false;
-    this.isLeftClick = false;
+
+  onMouseLeave() {
+    this.isHovering = false;
+    this.hoverTimeout = setTimeout(() => {
+      if (!this.isHovering) {
+        this.close();
+      }
+    }, 150); // pequeño delay para evitar flickering
   }
+
+
+  // @HostListener('mouseenter')
+  // onMouseEnter(): void {
+  //   if (this.triggerType === 'hover') {
+  //     this.open();
+  //   }
+  // }
+
+  // @HostListener('mouseleave')
+  // onMouseLeave(): void {
+  //   if (this.triggerType === 'hover') {
+  //     this.close();
+  //   }
+  // }
+
+  @HostListener('document:keydown.escape', ['$event'])
+  handleEscape(event: KeyboardEvent) {
+    if (this.visible && this.closeOnEscape) this.close();
+  }
+
+  // onBackdropMouseDown(event: MouseEvent) {
+  //   this.backdropMouseDown = (event.target === this.backdropEl.nativeElement);
+  //   this.isLeftClick = event.button === 0;
+  // }
+  // onBackdropMouseUp(event: MouseEvent) {
+  //   const isBackdrop = event.target === this.backdropEl.nativeElement;
+  //   if (
+  //     this.closeOnBackdrop &&
+  //     this.backdropMouseDown &&
+  //     isBackdrop &&
+  //     this.isLeftClick
+  //   ) {
+  //     this.close();
+  //   }
+  //   // Reset
+  //   this.backdropMouseDown = false;
+  //   this.isLeftClick = false;
+  // }
 
   get popoverPlacementClasses(): string {
     const map: Record<string, string> = {
       top: '!mx-4',
       bottom: '!mx-4',
-      // left: '!my-4 !me-4',
-      // right: '!my-4 !ms-4',
       left: '!ms-4',
       right: '!me-4',
     };
@@ -166,12 +252,13 @@ export class PopoverComponent implements OnInit, AfterViewInit, OnChanges {
 
   get classMap(): string[] {
     let baseClasses: string[] = [];
+    baseClasses = [
+      this.visible
+       ? 'opacity-100'
+        : 'opacity-0 pointer-events-none',
+      !this.highlighted ? 'border border-gray-200 dark:border-gray-600' : '',
+    ];
     if (this.visible !== undefined) {
-      baseClasses = [
-        this.visible && this.triggerType === 'none'
-         ? '!opacity-100 !visible'
-         : '!opacity-0',
-      ];
     }
     if (this.resetPopoverClass) {
       const reset = Array.isArray(this.resetPopoverClass)
@@ -185,11 +272,21 @@ export class PopoverComponent implements OnInit, AfterViewInit, OnChanges {
       : [this.extraPopoverClass];
     return [
       ...baseClasses,
-      this.popoverPlacementClasses,
+      // this.popoverPlacementClasses,
       ...extra,
     ];
   }
 
+  get customPopoverClass(): string {
+    if (Array.isArray(this.customTriggerClass)) {
+      return this.customTriggerClass
+        .filter(item => typeof item === 'string')
+        .join(' ');
+    }
+    return typeof this.customTriggerClass === 'string'
+      ? this.customTriggerClass
+      : '';
+  }
 
 
 }
