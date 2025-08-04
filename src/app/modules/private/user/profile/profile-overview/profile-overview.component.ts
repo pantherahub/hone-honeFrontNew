@@ -79,6 +79,8 @@ export class ProfileOverviewComponent implements OnInit {
             fullName: `${user.names} ${user.lastNames}`,
             idTypeDocument: user.idTypeDocument,
             identification: user.identification,
+            dv: user.dv,
+            repsEnableCode: user.repsEnableCode,
             email: resp.data.email,
             avatar: user.avatar,
             birthDate: user.birthDate,

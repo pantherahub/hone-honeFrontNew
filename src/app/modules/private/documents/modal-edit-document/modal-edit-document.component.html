@@ -21,25 +21,47 @@
                                 obligatorio!
                             </p>
                         </ng-template>
-                        <input nz-input type="date" placeholder="" formControlName="nombredocumento">
+                        <input nz-input type="date" placeholder="Nombre" formControlName="nombredocumento">
                     </nz-form-control>
 
                 </nz-form-item>
             </div> -->
 
-            <!-- Campo Fecha de Expedición  idTypeDocument 4, 12, 113, 110, 111, 108 -->
+            <!-- Software -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="documentType == 4
-                  || documentType == 113
-                  || documentType == 12
-                  || documentType == 110
-                  || documentType == 111
-                  || documentType == 108">
+                *ngIf="isFieldRequiredForDocumentType('software')">
+                <nz-form-item nz-row>
+                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
+                        [nzXl]="24">
+                        Software
+                    </nz-form-label>
+
+                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
+                        [nzErrorTip]="softwareErrorTip">
+                        <ng-template #softwareErrorTip>
+                            <p *ngIf="documentForm.controls['software'].hasError('required')">
+                              ¡Este campo es obligatorio!
+                            </p>
+                        </ng-template>
+                        <nz-select
+                          id="software"
+                          formControlName="software"
+                          nzPlaceHolder="Seleccionar"
+                        >
+                          <nz-option *ngFor="let type of suraSoftwareTypes" [nzValue]="type" [nzLabel]="type"></nz-option>
+                        </nz-select>
+                    </nz-form-control>
+                </nz-form-item>
+            </div>
+
+            <!-- Campo Fecha de Expedición -->
+            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
+                *ngIf="isFieldRequiredForDocumentType('fechadedocumento')">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
                         Fecha de Expedición
-                        <div *ngIf="documentType == 4 || documentType == 108 || documentType == 113" nz-tooltip [nzTooltipTitle]="getTooltipContent()" nzPlacement="top">
+                        <div *ngIf="expeditionDateRestrictions[documentType]" nz-tooltip [nzTooltipTitle]="getExpeditionTooltipContent()" nzTooltipPlacement="top">
                           <i nz-icon nzType="info-circle" nzTheme="fill" class="info-icon"></i>
                         </div>
                     </nz-form-label>
@@ -53,16 +75,16 @@
                         </ng-template>
                         <app-date-picker-input
                           formControlName="fechadedocumento"
-                          [disableDates]="disableDates">
+                          [disableDates]="disableExpeditionDates">
                         </app-date-picker-input>
                     </nz-form-control>
                 </nz-form-item>
             </div>
 
 
-            <!-- Campo Fecha de Diligenciamiento  idTypeDocument 1 y 35 -->
+            <!-- Campo Fecha de Diligenciamiento -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="documentType == 1 || documentType == 35">
+                *ngIf="isFieldRequiredForDocumentType('dateDiligence')">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
@@ -83,9 +105,9 @@
                 </nz-form-item>
             </div>
 
-            <!-- Campo Fecha de Inicio  idTypeDocument 2 y 19 -->
+            <!-- Campo Fecha de Inicio -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="documentType == 2 || documentType == 19">
+                *ngIf="isFieldRequiredForDocumentType('dateFirm')">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
@@ -107,9 +129,9 @@
             </div>
 
 
-            <!-- Campo Fecha de Vacunación  idTypeDocument 6 y 32 -->
+            <!-- Campo Fecha de Vacunación -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="documentType == 6 || documentType == 32">
+                *ngIf="isFieldRequiredForDocumentType('dateVaccination')">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
@@ -131,9 +153,9 @@
             </div>
 
 
-            <!-- Campo Fecha de Vencimiento  idTypeDocument 8 , 22 , 37 , 21 -->
+            <!-- Campo Fecha de Vencimiento -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="documentType == 8 || documentType == 22 || documentType == 37 || documentType == 21">
+                *ngIf="isFieldRequiredForDocumentType('dueDate')">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
@@ -155,9 +177,9 @@
             </div>
 
 
-            <!-- Campo Nombre del Representante Legal  idTypeDocument 113 -->
+            <!-- Campo Nombre del Representante Legal -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="documentType == 113">
+                *ngIf="isFieldRequiredForDocumentType('legalRepresentative')">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
@@ -171,15 +193,15 @@
                                 obligatorio!
                             </p>
                         </ng-template>
-                        <input nz-input placeholder="" formControlName="legalRepresentative">
+                        <input nz-input placeholder="Nombre" formControlName="legalRepresentative">
                     </nz-form-control>
                 </nz-form-item>
             </div>
 
 
-            <!-- Campo Nombre Suplente/s  idTypeDocument 113 -->
+            <!-- Campo Nombre Suplente/s -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="documentType == 113">
+                *ngIf="isFieldRequiredForDocumentType('NameAlternate')">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
@@ -193,15 +215,15 @@
                                 obligatorio!
                             </p>
                         </ng-template>
-                        <input nz-input placeholder="" formControlName="NameAlternate">
+                        <input nz-input placeholder="Suplente/s" formControlName="NameAlternate">
                     </nz-form-control>
                 </nz-form-item>
             </div>
 
 
-            <!-- Campo Fecha de Entrega del Documento  idTypeDocument 10 y 11 -->
+            <!-- Campo Fecha de Entrega del Documento -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="documentType == 10 || documentType == 11">
+                *ngIf="isFieldRequiredForDocumentType('documentDeliveryDate')">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
@@ -223,9 +245,9 @@
             </div>
 
 
-            <!-- Campo Fecha de Nacimiento  idTypeDocument 12 -->
+            <!-- Campo Fecha de Nacimiento -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="documentType == 12">
+                *ngIf="isFieldRequiredForDocumentType('dateOfBirth')">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
@@ -247,9 +269,9 @@
             </div>
 
 
-            <!-- Campo Fecha de Consulta  idTypeDocument 16 -->
+            <!-- Campo Fecha de Consulta -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="documentType == 16">
+                *ngIf="isFieldRequiredForDocumentType('consultationDate')">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
@@ -271,9 +293,9 @@
             </div>
 
 
-            <!-- Campo Especialidad Avalada  idTypeDocument 16 -->
+            <!-- Campo Especialidad Avalada -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="documentType == 16">
+                *ngIf="isFieldRequiredForDocumentType('endorsedSpecialtyDate')">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
@@ -288,15 +310,15 @@
                                 obligatorio!
                             </p>
                         </ng-template>
-                        <input nz-input placeholder="" formControlName="endorsedSpecialtyDate">
+                        <input nz-input placeholder="Especialidad" formControlName="endorsedSpecialtyDate">
                     </nz-form-control>
                 </nz-form-item>
             </div>
 
 
-            <!-- Campo Fecha de Inicio de Vigencia  idTypeDocument 20 -->
+            <!-- Campo Fecha de Inicio de Vigencia -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="documentType == 20">
+                *ngIf="isFieldRequiredForDocumentType('validityStartDate')">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
@@ -318,9 +340,9 @@
             </div>
 
 
-            <!-- Campo Fecha de Realización  idTypeDocument 36 , 24 , 23 -->
+            <!-- Campo Fecha de Realización -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="documentType == 36 || documentType == 24 || documentType == 23">
+                *ngIf="isFieldRequiredForDocumentType('dateofRealization')">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
@@ -342,9 +364,9 @@
             </div>
 
 
-            <!-- Campo Fecha de Recepción  idTypeDocument 25 , 29 -->
+            <!-- Campo Fecha de Recepción -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="documentType == 25 || documentType == 29">
+                *ngIf="isFieldRequiredForDocumentType('receptionDate')">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
@@ -366,9 +388,9 @@
             </div>
 
 
-            <!-- Campo Fecha última dosimetria  idTypeDocument 0 -->
+            <!-- Campo Fecha última dosimetria -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="documentType == 0">
+                *ngIf="isFieldRequiredForDocumentType('lastDosimetryDate')">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
@@ -390,9 +412,9 @@
             </div>
 
 
-            <!-- Campo Nombre de la Entidad  idTypeDocument 13 y 14 -->
+            <!-- Campo Nombre de la Entidad -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="documentType == 13 || documentType == 14">
+                *ngIf="isFieldRequiredForDocumentType('epsName')">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
@@ -406,15 +428,25 @@
                                 obligatorio!
                             </p>
                         </ng-template>
-                        <input nz-input placeholder="" formControlName="epsName">
+                        <ng-container [ngSwitch]="documentType">
+                          <input *ngSwitchDefault nz-input placeholder="Nombre" formControlName="epsName">
+                          <nz-select
+                            *ngSwitchCase="135"
+                            id="epsName"
+                            formControlName="epsName"
+                            nzPlaceHolder="Seleccionar"
+                          >
+                            <nz-option *ngFor="let entity of suraArlEntities" [nzValue]="entity" [nzLabel]="entity"></nz-option>
+                          </nz-select>
+                        </ng-container>
                     </nz-form-control>
                 </nz-form-item>
             </div>
 
 
-            <!-- Campo Clasificación de Riesgo  idTypeDocument 13 -->
+            <!-- Campo Clasificación de Riesgo -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="documentType == 13">
+                *ngIf="isFieldRequiredForDocumentType('riskClassifier')">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
@@ -428,15 +460,17 @@
                                 obligatorio!
                             </p>
                         </ng-template>
-                        <input nz-input placeholder="" formControlName="riskClassifier">
+                        <nz-select formControlName="riskClassifier" nzPlaceHolder="Seleccionar">
+                          <nz-option *ngFor="let option of riskClassifierOptions" [nzValue]="option" [nzLabel]="option"></nz-option>
+                        </nz-select>
                     </nz-form-control>
                 </nz-form-item>
             </div>
 
 
-            <!-- Campo Nombre de Entidad  idTypeDocument 15 -->
+            <!-- Campo Nombre de Entidad -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="documentType == 15">
+                *ngIf="isFieldRequiredForDocumentType('resolutionOfThePension')">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
@@ -451,7 +485,41 @@
                                 obligatorio!
                             </p>
                         </ng-template>
-                        <input nz-input placeholder="" formControlName="resolutionOfThePension">
+                        <input nz-input placeholder="Nombre" formControlName="resolutionOfThePension">
+                    </nz-form-control>
+                </nz-form-item>
+            </div>
+
+            <!-- Campo Valor Póliza / Monto -->
+            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
+                *ngIf="isFieldRequiredForDocumentType('amountPolicy')">
+                <nz-form-item nz-row>
+                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
+                        [nzXl]="24">
+                        Valor Póliza
+                        <div (click)="amountPolicyInfoAlert()" class="cursor-pointer">
+                          <i nz-icon nzType="info-circle" nzTheme="fill" class="info-icon"></i>
+                        </div>
+                    </nz-form-label>
+
+                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
+                        [nzErrorTip]="amountPolicyErrorTip">
+                        <ng-template #amountPolicyErrorTip>
+                            <p *ngIf="documentForm.controls['amountPolicy'].hasError('required')">
+                              ¡Este campo es obligatorio!
+                            </p>
+                        </ng-template>
+                        <input
+                          nz-input
+                          type="text"
+                          name="amountPolicy"
+                          id="amountPolicy"
+                          formControlName="amountPolicy"
+                          (input)="onAmountPolicyChange()"
+                          (focus)="amountPolicyInfoAlert(true)"
+                          autocomplete="off"
+                          placeholder="Valor Póliza"
+                        />
                     </nz-form-control>
                 </nz-form-item>
             </div>
@@ -461,11 +529,26 @@
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24">
                 <span *ngIf="loadFile">{{loadedFile ? loadedFile.name : ''}}</span>
                 <label id="upload" class="row-doc btn rounded">
-                    <input type="file" name="file" id="upload-file" class="custom-file-input" appFileValidator (fileValidated)="loadFile($event)" hidden>
+                    <input
+                      type="file" name="file"
+                      id="upload-file"
+                      class="custom-file-input"
+                      appFileValidator
+                      [allowedExtensions]="clientSelected?.idClientHoneSolutions === 13 ? ['.pdf'] : []"
+                      [maxFileSizeMB]="7"
+                      (fileValidated)="loadFile($event)"
+                      hidden>
                     <img src="../../../../../assets/img/folder.png" alt="" srcset="">
                     Clic para cargar
                 </label>
             </div>
+
+            <nz-alert
+                *ngIf="documentType == 131"
+                class="mt-3"
+                nzType="warning"
+                nzMessage="Debes de consolidar los certificados en un solo pdf."
+            ></nz-alert>
 
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
                 style="text-align: center; margin-top: 3rem;">

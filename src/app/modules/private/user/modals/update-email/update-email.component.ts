@@ -34,7 +34,7 @@ export class UpdateEmailComponent implements OnInit {
 
   ngOnInit() {
     this.emailForm = this.fb.group({
-      email: ['', [Validators.required, this.formUtils.emailValidator]],
+      email: ['', [Validators.required, this.formUtils.email]],
     });
     this.userData = this.authService.getUserData();
   }

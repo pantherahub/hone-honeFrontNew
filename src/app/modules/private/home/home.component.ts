@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, TemplateRef, ViewChild, effect } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, TemplateRef, ViewChild, effect } from '@angular/core';
 import { ClientInterface } from '../../../models/client.interface';
 import { ClientProviderService } from '../../../services/clients/client-provider.service';
 
@@ -66,7 +66,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   /**
   * Obtiene la lista de clientes del prestador que inicia sesión
   */
-  getClientList () {
+  getClientList() {
     this.loadingData = true;
     this.clientService.getClientListByProviderId(this.user.id).subscribe({
       next: (res: any) => {
@@ -109,8 +109,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (activeTutorialStep) this.nextTutorialStep();
     localStorage.setItem('clientSelected', JSON.stringify(item));
     this.eventManager.getDataClient();
-    // this.router.navigateByUrl(`/cargar-documentos/${item.idClientHoneSolutions}`);
-    this.router.navigateByUrl(`/cumplimiento-documentos/${item.idClientHoneSolutions}`);
+    this.router.navigateByUrl(`/cargar-documentos/${item.idClientHoneSolutions}`);
   }
 
 

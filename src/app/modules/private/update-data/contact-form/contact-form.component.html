@@ -35,7 +35,6 @@
             nzShowSearch
             [nzShowArrow]="true"
             nzPlaceHolder="Seleccionar"
-            [disabled]="contact !== null"
           >
             <nz-option *ngFor="let occupation of contactOccupations" [nzValue]="occupation.idOccupation" [nzLabel]="occupation.occupation"></nz-option>
           </nz-select>
@@ -117,11 +116,11 @@
     </nz-col>
 
     <nz-col [nzSpan]="24">
-      <nz-form-label [nzRequired]="true">Correo(s)</nz-form-label>
+      <nz-form-label [nzRequired]="isEmailRequired">Correo(s)</nz-form-label>
       <div nz-row [nzGutter]="16" formArrayName="Emails">
         @for (control of emailsArray.controls; track control; let i = $index) {
           <nz-col [nzSpan]="24" [nzSm]="12">
-            <nz-form-item [formGroupName]="i" class="email-form-item">
+            <nz-form-item [formGroupName]="i" class="email-form-item pb-1">
               <nz-form-control [nzErrorTip]="emailErrorTip">
                 <ng-template #emailErrorTip>
                   @if (control.get('email')?.hasError('required')) {
@@ -142,9 +141,12 @@
               <span
                 nz-icon
                 nzType="minus-circle-o"
-                class="dynamic-delete-button"
-                *ngIf="emailsArray.length > 1"
+                class="dynamic-delete-button mt-1"
+                *ngIf="canRemoveEmail"
                 (click)="removeEmail(i)"
+                nz-tooltip
+                nzTooltipTitle="Eliminar correo"
+                nzTooltipPlacement="right"
               ></span>
             </nz-form-item>
           </nz-col>
@@ -162,7 +164,7 @@
     </nz-col>
 
     <nz-col [nzSpan]="24" [nzSm]="24">
-      <nz-form-label [nzRequired]="true">Teléfono(s)</nz-form-label>
+      <nz-form-label [nzRequired]="isPhoneRequired">Teléfono(s)</nz-form-label>
       <div nz-row [nzGutter]="4" formArrayName="Phones">
         @for (control of phonesArray.controls; track control; let i = $index) {
           <nz-col [nzSpan]="isFijoPhone(control) ? 12 : 9" [nzSm]="5">
@@ -198,7 +200,7 @@
                         <ng-template #phoneErrorTip>
                           @if (control.get('number')?.hasError('required')) {
                             El campo es requerido.
-                          } @else if (control.get('number')?.hasError('invalidNumber')) {
+                          } @else if (control.get('number')?.hasError('invalidTelNumber')) {
                             Ingresa un número válido.
                           } @else if (control.get('number')?.hasError('invalidLength')) {
                             {{ control.get('number')?.errors?.['invalidLength'] }}
@@ -215,12 +217,7 @@
                   </nz-col>
                   <nz-col [nzSpan]="11">
                     <nz-form-item class="mb-0">
-                      <nz-form-control [nzErrorTip]="extensionErrorTip">
-                        <ng-template #extensionErrorTip>
-                          @if (control.get('extension')?.hasError('invalidExtension')) {
-                            {{ control.get('extension')?.errors?.['invalidExtension'] }}
-                          }
-                        </ng-template>
+                      <nz-form-control>
                         <input
                           nz-input
                           type="text"
@@ -235,12 +232,18 @@
             </nz-form-item>
           </nz-col>
 
-          <nz-col [nzSpan]="24" class="delete-button mb-4" *ngIf="phonesArray.length > 1">
+          <nz-col
+            [nzSpan]="24" class="delete-button mt-1 mb-4"
+            *ngIf="canRemovePhone"
+          >
             <span
               nz-icon
               nzType="minus-circle-o"
               class="dynamic-delete-button"
-              (click)="removePhone(i)">
+              (click)="removePhone(i)"
+              nz-tooltip
+              nzTooltipTitle="Eliminar teléfono"
+              nzTooltipPlacement="right">
             </span>
           </nz-col>
         }
@@ -259,8 +262,8 @@
   </div>
 
   <div class="footer">
-    <button nz-button nzType="primary" type="submit">
-      {{ contact ? 'Actualizar' : 'Agregar' }}
+    <button class="btn-primary bg-green-500 hover:bg-green-500/80" type="submit">
+      {{ contact ? 'Actualizar' : 'Guardar' }}
     </button>
   </div>
 

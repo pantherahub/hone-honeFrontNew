@@ -31,6 +31,10 @@ export class ClientProviderService {
     return this.httpClient.get(this.url + "Companies/GetAll");
   }
 
+  getCompaniesByIdClients(reqBody: any): Observable<any> {
+    return this.httpClient.post(`${this.url}TemporalProvider/GetCompaniesByClients`, reqBody);
+  }
+
   getTemporalProviderData(idProvider: any): Observable<any> {
     return this.httpClient.get(`${this.url}TemporalProvider/GetOne/Provider/${idProvider}`);
   }

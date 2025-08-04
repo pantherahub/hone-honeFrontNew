@@ -64,13 +64,41 @@
 
     <nz-col [nzSpan]="12" [nzSm]="12" [nzMd]="6">
       <nz-form-item>
-        <nz-form-label>Complemento</nz-form-label>
+        <nz-form-label>
+          Complemento
+          <div
+            nz-tooltip
+            nzTooltipTitle="Si no esta el complemento de tu dirección puedes seleccionar la opción de 'Otro Valor' para digitarlo"
+            nzTooltipPlacement="top">
+            <i nz-icon nzType="info-circle" nzTheme="fill" class="info-icon"></i>
+          </div>
+        </nz-form-label>
         <nz-form-control>
           <nz-select nzSize="small" nzAllowClear formControlName="mainNumberComplement" nzPlaceHolder="Opcional">
+            <nz-option [nzValue]="otherOption" [nzLabel]="otherOption"></nz-option>
             <nz-option *ngFor="let option of lettersWithBis" [nzValue]="option" [nzLabel]="option"></nz-option>
           </nz-select>
         </nz-form-control>
+        @if (addressForm.get('mainNumberComplement')?.value === otherOption) {
+          <nz-form-control [nzErrorTip]="customMainComplementErrorTip">
+            <ng-template #customMainComplementErrorTip>
+              @if (addressForm.controls['customMainNumberCompl'].hasError('invalidAlphanumWithSpaces')) {
+                Debe ser alfanumérico
+              } @else if (addressForm.controls['customMainNumberCompl'].hasError('maxlength')) {
+                Máximo 15 carácteres
+              }
+            </ng-template>
+            <input
+              nz-input
+              nzSize="small"
+              formControlName="customMainNumberCompl"
+              placeholder="Ingrese otro valor"
+              maxlength="15"
+            />
+          </nz-form-control>
+        }
       </nz-form-item>
+
     </nz-col>
 
     <nz-col [nzSpan]="1" class="flex pt-6 sm:justify-center">-</nz-col>
@@ -86,14 +114,42 @@
 
     <nz-col [nzSpan]="12" [nzSm]="12" [nzMd]="6">
       <nz-form-item>
-        <nz-form-label>Complemento</nz-form-label>
+        <nz-form-label>
+          Complemento
+          <div
+            nz-tooltip
+            nzTooltipTitle="Si no esta el complemento de tu dirección puedes seleccionar la opción de 'Otro Valor' para digitarlo"
+            nzTooltipPlacement="top">
+            <i nz-icon nzType="info-circle" nzTheme="fill" class="info-icon"></i>
+          </div>
+        </nz-form-label>
         <nz-form-control>
           <nz-select nzSize="small" nzAllowClear formControlName="secondaryNumberComplement" nzPlaceHolder="Opcional">
+            <nz-option [nzValue]="otherOption" [nzLabel]="otherOption"></nz-option>
             <nz-option *ngFor="let option of allNumberComplementOptions" [nzValue]="option" [nzLabel]="option"></nz-option>
           </nz-select>
         </nz-form-control>
+        @if (addressForm.get('secondaryNumberComplement')?.value === otherOption) {
+          <nz-form-control [nzErrorTip]="customMainComplementErrorTip">
+            <ng-template #customMainComplementErrorTip>
+              @if (addressForm.controls['customSecNumberCompl'].hasError('invalidAlphanumWithSpaces')) {
+                Debe ser alfanumérico
+              } @else if (addressForm.controls['customSecNumberCompl'].hasError('maxlength')) {
+                Máximo 15 carácteres
+              }
+            </ng-template>
+            <input
+              nz-input
+              nzSize="small"
+              formControlName="customSecNumberCompl"
+              placeholder="Ingrese otro valor"
+              maxlength="15"
+            />
+          </nz-form-control>
+        }
       </nz-form-item>
     </nz-col>
+
   </nz-row>
 
   <nz-row [nzGutter]="16">

@@ -6,7 +6,6 @@ import { PageNotFoundComponent } from './modules/public/page-not-found/page-not-
 import { ListDocumentsComponent } from './modules/private/documents/list-documents/list-documents.component';
 import { NgModule } from '@angular/core';
 import { AdminLayoutComponent } from './views/admin-layout/admin-layout.component';
-import { ComplianceDocumentationComponent } from './modules/private/documents/compliance-documentation/compliance-documentation.component';
 import { ProviderAssistancessComponent } from './modules/public/provider-assistancess/provider-assistancess.component';
 import { UpdateDataComponent } from './modules/private/update-data/update-data.component';
 import { UserManagementComponent } from './modules/private/user/user-management/user-management.component';
@@ -22,6 +21,7 @@ import { ValidatePasswordComponent } from './modules/private/user/validate-passw
 import { ProfileComponent } from './modules/private/user/profile/profile.component';
 import { ProfileOverviewComponent } from './modules/private/user/profile/profile-overview/profile-overview.component';
 import { ProfileSecurityComponent } from './modules/private/user/profile/profile-security/profile-security.component';
+import { canDeactivateGuard } from './guards/can-deactivate.guard';
 
 export const routes: Routes = [
   //   PUBLIC ROUTES
@@ -80,7 +80,8 @@ export const routes: Routes = [
       },
       {
         path: 'update-data',
-        component: UpdateDataComponent
+        component: UpdateDataComponent,
+        canDeactivate: [canDeactivateGuard]
       },
       {
         path: 'profile',
@@ -104,10 +105,6 @@ export const routes: Routes = [
         path: 'cargar-documentos/:id',
         component: ListDocumentsComponent
       },
-			{
-        path: 'cumplimiento-documentos/:id',
-        component: ComplianceDocumentationComponent
-			}
 		]
   },
 

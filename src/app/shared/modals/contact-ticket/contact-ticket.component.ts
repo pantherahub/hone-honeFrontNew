@@ -7,10 +7,11 @@ import { CommonModule } from '@angular/common';
 import { EventManagerService } from '../../../services/events-manager/event-manager.service';
 import { TicketsService } from '../../../services/tickets/tickets.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
-import { mailRegexpValidation } from '../../../utils/constant';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { ResponseCreateTicketComponent } from '../response-create-ticket/response-create-ticket.component';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
+import { REGEX_PATTERNS } from 'src/app/constants/regex-patterns';
+import { sanitizeString } from 'src/app/utils/string-utils';
 
 @Component({
    selector: 'app-contact-ticket',
@@ -61,7 +62,7 @@ export class ContactTicketComponent implements AfterContentChecked, OnInit {
          name: ['', [Validators.required]],
          lastname: ['', [Validators.required]],
          identification: ['', [Validators.required, this.formUtils.numeric]],
-         email: ['', [Validators.required, Validators.pattern(mailRegexpValidation)]],
+         email: ['', [Validators.required, Validators.pattern(REGEX_PATTERNS.email)]],
          phone: ['', [Validators.required]],
          address: ['', [Validators.required]],
          observation: ['', [Validators.required]]
@@ -127,16 +128,27 @@ export class ContactTicketComponent implements AfterContentChecked, OnInit {
     */
   getObservations(): string {
       const removeQuotes = (value: any): string => {
-        return typeof value === 'string' ? value.replace(/["']/g, '').trim() : value;
+        return typeof value === 'string'
+          ? sanitizeString(value.trim())
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;")
+          : value;
       };
       const { name, lastname, identification, email, phone, address, observation } = this.requestForm.value;
 
-      const observaciones = `
-      Información del usuario que genera caso:  Nombre: ${this.clientSelected.razonSocial} ,   identificacion: ${this.clientSelected.identificacion} ,   cliente: ${this.clientSelected.clientHoneSolutions}
+    const observaciones = `<strong>Información del usuario que genera caso:</strong>
+      <br>Nombre: ${this.clientSelected.razonSocial}
+      <br>Identificacion: ${this.clientSelected.identificacion}
+      <br>Cliente: ${this.clientSelected.clientHoneSolutions}
       <br>
-      Datos reportados del usuario:
-      <br> Nombre: ${removeQuotes(name)},  <br> Apellido: ${removeQuotes(lastname)},  <br> Identificación: ${removeQuotes(identification)},  <br> Teléfono: ${removeQuotes(phone)},
-      <br> Email: ${removeQuotes(email)}, <br> Dirección: ${removeQuotes(address)},  <br> Observaciones: ${removeQuotes(observation)}, <br>
+      <br><strong>Datos reportados del usuario:</strong>
+      <br>Nombre: ${removeQuotes(name)}
+      <br>Apellido: ${removeQuotes(lastname)}
+      <br>Identificación: ${removeQuotes(identification)}
+      <br>Teléfono: ${removeQuotes(phone)}
+      <br>Email: ${removeQuotes(email)}
+      <br>Dirección: ${removeQuotes(address)}
+      <br>Observaciones: ${removeQuotes(observation)}
       `;
       return observaciones;
    }

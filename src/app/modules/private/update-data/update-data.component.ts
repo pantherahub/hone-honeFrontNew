@@ -1,12 +1,12 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 import { OfficeModalComponent } from './office-modal/office-modal.component';
 import { ClientProviderService } from 'src/app/services/clients/client-provider.service';
-import { LANGUAGES } from 'src/app/utils/languages';
+import { LANGUAGES } from 'src/app/constants/languages';
 import { ContactFormComponent } from './contact-form/contact-form.component';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -15,6 +15,10 @@ import { format } from 'date-fns';
 import { BackendErrorsComponent } from 'src/app/shared/forms/backend-errors/backend-errors.component';
 import { debounceTime, firstValueFrom } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
+import { CanComponentDeactivate } from 'src/app/guards/can-deactivate.interface';
+import { Router } from '@angular/router';
+import { NavigationService } from 'src/app/services/navigation/navigation.service';
+import { isEmail } from 'src/app/utils/validation-utils';
 
 @Component({
   selector: 'app-update-data',
@@ -23,7 +27,7 @@ import { AuthService } from 'src/app/services/auth.service';
   templateUrl: './update-data.component.html',
   styleUrl: './update-data.component.scss'
 })
-export class UpdateDataComponent implements OnInit, OnDestroy {
+export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeactivate {
 
   user = this.eventManager.userLogged();
   providerForm!: FormGroup;
@@ -31,6 +35,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
 
   languages: any[] = LANGUAGES;
   identificationTypes: any[] = [];
+  providerCompanies: any[] = [];
 
   existingOffices: any[] = [];
   existingContacts: any[] = [];
@@ -44,8 +49,15 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
   loading: boolean = false;
   backendError: any = null;
 
-  autoSaveInterval: any;
   private formSubscription: any;
+
+  showFloatingButton = true;
+  @ViewChild('footerButton') footerButton!: ElementRef;
+
+  emailInfoMessage: string[] = [
+    "Correo único corporativo o personal del prestador.",
+    "En caso de que administres o gestiones mas de un prestador, asegúrate de que el correo electrónico registrado sea el personal o corporativo correspondiente a cada uno de ellos."
+  ];
 
   constructor (
     private eventManager: EventManagerService,
@@ -56,7 +68,9 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     private modalService: NzModalService,
     private clientProviderService: ClientProviderService,
     private location: Location,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router,
+    private navigationService: NavigationService,
   ) { }
 
   ngOnInit(): void {
@@ -65,12 +79,29 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     this.getIdentificationTypes();
     this.initializeForm();
 
+    this.getCompanies();
+
     this.loadFormData();
 
   }
 
   ngOnDestroy(): void {
     this.unsubscribeForm();
+  }
+
+  async canDeactivate(): Promise<boolean> {
+    return !this.hasSavedState() || await this.alertService.confirm(
+      'Aviso', 'Tienes cambios pendientes. ¿Deseas salir?', {
+        nzOkText: 'Salir',
+        nzCancelText: 'Cancelar',
+    });
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  handleUnload($event: BeforeUnloadEvent): void {
+    if (this.hasSavedState()) {
+      $event.preventDefault();
+    }
   }
 
   subscribeOnChange() {
@@ -83,6 +114,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
           'idTypeDocument',
           'identification',
           'dv',
+          'repsEnableCode',
           'website'
         ];
         // Check if any of these specific controls have changed
@@ -103,17 +135,80 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     }
   }
 
+  @HostListener('window:scroll', [])
+  onWindowScroll() {
+    if (!this.footerButton) return;
+
+    const rect = this.footerButton.nativeElement.getBoundingClientRect();
+    const isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
+
+    this.showFloatingButton = !isVisible;
+  }
+
+  scrollToFooter(): void {
+    this.footerButton?.nativeElement?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    this.highlightSubmitBtn();
+  }
+
+  highlightSubmitBtn() {
+    const element = this.footerButton?.nativeElement;
+    if (element) {
+      setTimeout(() => {
+        element.classList.add(
+          'ring-2',
+          'ring-green-400',
+          'ring-offset-2',
+          'scale-105',
+          'transition',
+          'duration-500'
+        );
+      }, 280);
+
+      setTimeout(() => {
+        element.classList.remove('ring-2', 'ring-green-400', 'ring-offset-2', 'scale-105');
+      }, 2000);
+    }
+  }
+
   initializeForm() {
+    const dvValue = this.user.dv != null && this.user.dv !== '' && !isNaN(Number(this.user.dv))
+      ? Number(this.user.dv)
+      : null;
+
+    const isValidEmail = this.isValidEmail(this.user.email);
+
     this.providerForm = this.fb.group({
       idProvider: [this.user.id],
       startTime: [this.formatDate(new Date())],
       endTime: [''],
-      email: [this.user.email || '', [Validators.required, this.formUtils.emailValidator]],
-      name: [this.user.name || '', [Validators.required]],
+      email: [
+        {
+          value: isValidEmail ? this.user.email : '',
+          disabled: isValidEmail
+        },
+        [Validators.required, this.formUtils.email]
+      ],
+      name: [
+        { value: this.user.name || '', disabled: true },
+        [Validators.required]
+      ],
       languages: [[], [Validators.required]],
-      idTypeDocument: ['', [Validators.required]],
-      identification: ['', [Validators.required, this.formUtils.numeric]],
-      dv: [null, [this.dvValidator]],
+      idTypeDocument: [
+        { value: this.user.idTypeDocument || '', disabled: true },
+        [Validators.required]
+      ],
+      identification: [
+        { value: this.user.identificacion || '', disabled: true },
+        [Validators.required, this.formUtils.numeric]
+      ],
+      dv: [
+        { value: dvValue, disabled: dvValue != null },
+        [this.dvValidator]
+      ],
+      repsEnableCode: [
+        { value: this.user.repsEnableCode || '', disabled: !!this.user.repsEnableCode },
+        [Validators.required]
+      ],
       website: ['', this.formUtils.url],
 
       updatedBasicData: [false],
@@ -140,8 +235,18 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  goBack(): void {
-    this.location.back();
+  async goBack(): Promise<void> {
+    const backRoute = this.navigationService.getBackRoute();
+    this.router.navigateByUrl(backRoute);
+  }
+
+  enableFormControls() {
+    Object.values(this.providerForm.controls).forEach(control => control.enable());
+  }
+
+  isValidEmail(email: string | undefined): boolean {
+    if (!email || typeof email != 'string') return false;
+    return isEmail(email || '');
   }
 
   getIdentificationTypes() {
@@ -151,6 +256,34 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => {
         console.error(err);
+      }
+    });
+  }
+
+  getCompanies() {
+    this.loading = true;
+    this.clientProviderService.getClientListByProviderId(this.user.id).subscribe({
+      next: (res: any) => {
+        const clientList = res;
+        const clientsIds = clientList.map((client: any) => client.idClientHoneSolutions);
+        this.getProviderCompanies(clientsIds);
+      },
+      error: (err: any) => {
+        console.error(err);
+        this.loading = false;
+      },
+    });
+  }
+
+  getProviderCompanies(clientsIds: number[]) {
+    this.clientProviderService.getCompaniesByIdClients({ clientsIds }).subscribe({
+      next: (res: any) => {
+        this.providerCompanies = res.data;
+        this.loading = false;
+      },
+      error: (err: any) => {
+        console.error(err);
+        this.loading = false;
       }
     });
   }
@@ -179,7 +312,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
 
   saveFormToLocalStorage(): void {
     const newState = {
-      formValue: this.providerForm.value,
+      formValue: this.providerForm.getRawValue(),
       existingOffices: this.existingOffices,
       existingContacts: this.existingContacts,
       isFirstForm: this.isFirstForm
@@ -203,6 +336,10 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     const formState = state.formValue;
 
     this.isFirstForm = state.isFirstForm;
+    if (this.isFirstForm === false) {
+      this.enableFormControls();
+    }
+
     this.providerForm.patchValue({
       startTime: formState.startTime,
       email: formState.email,
@@ -211,6 +348,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       idTypeDocument: formState.idTypeDocument,
       identification: formState.identification,
       dv: formState.dv,
+      repsEnableCode: formState.repsEnableCode,
       website: formState.website,
       updatedBasicData: formState.updatedBasicData,
     });
@@ -257,6 +395,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
         };
 
         this.isFirstForm = false;
+        this.enableFormControls();
 
         // Convert to an array
         let languages = [];
@@ -281,6 +420,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
           idTypeDocument: data.idTypeDocument,
           identification: data.identification,
           dv: data.dv,
+          repsEnableCode: data.repsEnableCode,
           website: data.website
         });
 
@@ -298,6 +438,13 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
         this.existingContacts = data.TemporalContactsForProvider;
 
         this.subscribeOnChange();
+
+        // If repsEnableCode is not saved, add it automatically
+        if (!this.providerForm.get('repsEnableCode')?.value && this.user.repsEnableCode) {
+          this.providerForm.patchValue({
+            repsEnableCode: this.user.repsEnableCode,
+          });
+        }
 
         const user = this.user;
         user.rejected = res.rejected;
@@ -349,13 +496,33 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       nzContent: OfficeModalComponent,
       nzCentered: true,
       nzClosable: true,
+      nzMaskClosable: false,
       nzWidth: '900px',
-      nzStyle: { 'max-width': '90%', 'margin': '22px 0' }
+      nzStyle: { 'max-width': '90%', 'margin': '22px 0' },
+      nzOnCancel: () => {
+        const componentInstance = modalRef.getContentComponent();
+        if (componentInstance.hasChanges) {
+          this.alertService.confirm(
+            'Cambios sin guardar',
+            'Tienes cambios en la sede. Si sales sin guardar, se perderán.',
+            {
+              nzOkText: 'Salir',
+              nzCancelText: 'Cancelar',
+              nzOnOk: () => {
+                modalRef.destroy();
+              },
+            }
+          );
+          return false;
+        }
+        return true; // Close modal
+      }
     });
     const instanceModal = modalRef.getContentComponent();
     if (office) {
       instanceModal.office = office;
     }
+    instanceModal.providerCompanies = this.providerCompanies;
 
     modalRef.afterClose.subscribe((result: any) => {
       if (result && result.office) {
@@ -404,8 +571,27 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       nzContent: ContactFormComponent,
       nzCentered: true,
       nzClosable: true,
+      nzMaskClosable: false,
       nzWidth: '650px',
-      nzStyle: { 'max-width': '90%', 'margin': '22px 0' }
+      nzStyle: { 'max-width': '90%', 'margin': '22px 0' },
+      nzOnCancel: () => {
+        const componentInstance = modalRef.getContentComponent();
+        if (componentInstance.hasChanges) {
+          this.alertService.confirm(
+            'Cambios sin guardar',
+            'Tienes cambios en el contacto. Si sales sin guardar, se perderán.',
+            {
+              nzOkText: 'Salir',
+              nzCancelText: 'Cancelar',
+              nzOnOk: () => {
+                modalRef.destroy();
+              },
+            }
+          );
+          return false;
+        }
+        return true; // Close modal
+      }
     });
     const instanceModal = modalRef.getContentComponent();
     instanceModal.contactModelType = 'Prestador';
@@ -526,16 +712,22 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     this.unsubscribeForm();
     this.removeFormState();
 
+    const dvValue = this.user.dv != null && this.user.dv !== '' && !isNaN(Number(this.user.dv))
+      ? Number(this.user.dv)
+      : null;
+    const isValidEmail = this.isValidEmail(this.user.email);
+
     this.providerForm.reset({
       idProvider: this.user.id,
       startTime: this.formatDate(new Date()),
       endTime: '',
-      email: this.user.email || '',
+      email: isValidEmail ? this.user.email : '',
       name: this.user.name || '',
       languages: [],
-      idTypeDocument: '',
-      identification: '',
-      dv: null,
+      idTypeDocument: this.user.idTypeDocument || '',
+      identification: this.user.identificacion || '',
+      dv: dvValue,
+      repsEnableCode: this.user.repsEnableCode || '',
       website: ''
     }, { emitEvent: false });
     this.formUtils.clearFormArray(this.updatedOffices);
@@ -560,6 +752,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     this.messageService.remove();
     this.backendError = null;
 
+    // Validate the existence of offices and contacts
     if (!this.existingOffices?.length) {
       this.alertService.warning('Aviso', 'Debe agregar al menos una sede de prestación de servicio.');
       return;
@@ -569,6 +762,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Validate incomplete information
     const hasInvalidOffice = this.existingOffices.some(office =>
       (!office.TemporalAddress && !office.address) ||
       (!office.TemporalSchedules?.length && !office.createdSchedules?.length)
@@ -577,6 +771,37 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
       this.alertService.warning('Aviso', 'Algunas sedes tienen información incompleta.');
       return;
     }
+
+    // Validate that the offices are associated with the provider companies
+    const companiesIds = this.providerCompanies.map((c: any) => c.idCompany);
+    const companiesNotLinked: number[] = [];
+    companiesIds.forEach(companyId => {
+      const isLinked = this.existingOffices.some(office => {
+        if (office.idsCompanies) {
+          return office.idsCompanies.includes(companyId);
+        } else if (office.Companies) {
+          return office.Companies.some((company: any) => company.idCompany === companyId);
+        }
+        return false;
+      });
+      if (!isLinked) {
+        companiesNotLinked.push(companyId);
+      }
+    });
+
+    if (companiesNotLinked.length > 0) {
+      const names = this.providerCompanies
+        .filter(c => companiesNotLinked.includes(c.idCompany))
+        .map(c => c.name)
+        .join(', ');
+
+      this.alertService.warning(
+        'Aviso',
+        `Debes agregar las siguientes compañías asociadas a alguna sede: ${names}`
+      );
+      return;
+    }
+
 
     const website = this.providerForm.get('website')?.value?.toLowerCase() || null;
     const email = this.providerForm.get('email')?.value?.toLowerCase() || null;
@@ -594,7 +819,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy {
     this.loading = true;
 
     setTimeout(() => {
-      serviceMethod(this.providerForm.value).subscribe({
+      serviceMethod(this.providerForm.getRawValue()).subscribe({
         next: (res: any) => {
           const user = this.user;
           user.rejected = false;

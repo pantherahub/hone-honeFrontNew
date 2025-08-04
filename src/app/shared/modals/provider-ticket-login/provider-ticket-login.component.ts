@@ -7,9 +7,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { EventManagerService } from '../../../services/events-manager/event-manager.service';
 import { TicketsService } from '../../../services/tickets/tickets.service';
-import { mailRegexpValidation } from '../../../utils/constant';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
-
+import { REGEX_PATTERNS } from 'src/app/constants/regex-patterns';
+import { sanitizeString } from 'src/app/utils/string-utils';
 
 @Component({
   selector: 'app-provider-ticket-login',
@@ -62,7 +62,7 @@ export class ProviderTicketLoginComponent implements AfterContentChecked, OnInit
       name: ['', [Validators.required]],
       lastname: ['', [Validators.required]],
       identification: ['', [Validators.required, this.formUtils.numeric]],
-      email: ['', [Validators.required, Validators.pattern(mailRegexpValidation)]],
+      email: ['', [Validators.required, Validators.pattern(REGEX_PATTERNS.email)]],
       phone: ['', [Validators.required]],
       address: ['', [Validators.required]],
       observation: ['', [Validators.required]]
@@ -128,15 +128,23 @@ export class ProviderTicketLoginComponent implements AfterContentChecked, OnInit
    * Mapea y retorna el formulario en una sola cadena de string
    */
   getObservations(): string {
-    const removeQuotes = (value: any): string => {
-      return typeof value === 'string' ? value.replace(/["']/g, '').trim() : value;
+    const sanitize = (value: any): string => {
+      return typeof value === 'string'
+        ? sanitizeString(value.trim())
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;")
+        : value;
     };
     const { name, lastname, identification, email, phone, address, observation } = this.requestForm.value;
 
-    const observaciones = `
-      Datos reportados del usuario:
-      <br> Nombre: ${removeQuotes(name)},  <br> Apellido: ${removeQuotes(lastname)},  <br> Identificación: ${removeQuotes(identification)},  <br> Teléfono: ${removeQuotes(phone)},
-      <br> Email: ${removeQuotes(email)}, <br> Dirección: ${removeQuotes(address)},  <br> Observaciones: ${removeQuotes(observation)}, <br>
+    const observaciones = `<strong>Datos reportados del usuario:</strong>
+      <br>Nombre: ${sanitize(name)}
+      <br>Apellido: ${sanitize(lastname)}
+      <br>Identificación: ${sanitize(identification)}
+      <br>Email: ${sanitize(email)}
+      <br>Teléfono: ${sanitize(phone)}
+      <br>Dirección: ${sanitize(address)}
+      <br>Observaciones: ${sanitize(observation)}
       `;
     return observaciones;
   }

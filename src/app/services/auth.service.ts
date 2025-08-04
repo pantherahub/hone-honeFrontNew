@@ -131,7 +131,9 @@ export class AuthService {
           id: provider?.idProvider || null,
           email: provider?.email || null,
           name: provider?.razonSocial || null,
+          withData: res.withData ?? false,
           rejected: res.rejected ?? false,
+          doesNeedSurvey: res.doesNeedSurvey ?? false,
           roles: {
             description: role?.description,
             fullaccess: role?.fullaccess,
@@ -140,7 +142,6 @@ export class AuthService {
             nameRol: role?.nameRol,
             slug: role?.slug,
           },
-          withData: res.withData ?? false,
 
           user: {
             idUser: user.idUser,
@@ -149,6 +150,8 @@ export class AuthService {
             fullName: `${user.names} ${user.lastNames}`,
             idTypeDocument: user.idTypeDocument,
             identification: user.identification,
+            dv: user.dv,
+            repsEnableCode: user.repsEnableCode,
             email: userEmail,
             avatar: user.avatar,
 

@@ -27,6 +27,8 @@ export interface UserState {
   fullName: string;
   idTypeDocument: number;
   identification: string;
+  dv?: string | number;
+  repsEnableCode?: string;
   email: string;
   avatar: string;
   Roles?: any[];
@@ -47,6 +49,7 @@ export interface AuthUserState {
   name?: string;
   withData?: boolean;
   rejected?: boolean;
+  doesNeedSurvey?: boolean;
   roles?: RoleState;
   user?: UserState;
 }

@@ -9,6 +9,9 @@ import { EventManagerService } from '../../../../services/events-manager/event-m
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { FileValidatorDirective } from 'src/app/directives/file-validator.directive';
 import { DatePickerInputComponent } from 'src/app/shared/forms/date-picker-input/date-picker-input.component';
+import { AlertService } from 'src/app/services/alerts/alert.service';
+import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
+import { formatListWithY } from 'src/app/utils/string-utils';
 
 @Component({
    selector: 'app-modal-edit-document',
@@ -32,14 +35,49 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
    readonly #modal = inject(NzModalRef);
    readonly nzModalData: any = inject(NZ_MODAL_DATA);
 
+  suraSoftwareTypes: string[] = [
+    'Evolve Hc', 'KloudSolutions', 'Medicarte', 'Simedica', 'Sunube',
+    'HIMED', 'Netmedik', 'Ekisa', 'Medsys', 'Luku', 'Ipsa', 'Otro'
+  ];
+  suraArlEntities: string[] = [
+    'ARL COLSANITAS', 'ALFATEP', 'ARL SURA', 'ARP AURORA', 'ARP BOLIVAR',
+    'ARP COLMENA', 'ARP COLPATRIA', 'LA EQUIDAD SEGUROS DE VIDA S.A',
+    'LIBERTY SEGUROS DE VIDA S.A', 'MAPFRE', 'POSITIVA ARP', 'AXA ARL', 'OTRAS',
+  ];
+  riskClassifierOptions = ['1', '2', '3', '4', '5'];
+
+  readonly SMLV: number = 1423500;
+  readonly typePolicyProviderConfig: { [key: string]: number } = {
+    'Psicólogo': 200,
+    'Nutricionista': 200,
+    'Terapeuta': 200,
+    'Fonoaudiólogo': 200,
+    'Profesional médico': 420,
+    'IPS': 420,
+  };
+  hasShownAmountMessage: boolean = false;
+
+  expeditionDateRestrictions: { [key: number]: 'lastMonth' | 'currentYear' | 'last3Years' | 'last2Months' } = {
+    108: 'lastMonth',
+    113: 'lastMonth',
+    139: 'last2Months',
+    140: 'last2Months',
+    4: 'currentYear',
+    110: 'currentYear',
+    111: 'currentYear',
+    134: 'currentYear',
+    135: 'currentYear',
+    137: 'last3Years',
+  };
+
    constructor (
       private formBuilder: FormBuilder,
       private notificationService: NzNotificationService,
       private documentService: DocumentsCrudService,
-      private eventManager: EventManagerService
-   ) {
-      // this.createForm();
-   }
+      private eventManager: EventManagerService,
+      private alertService: AlertService,
+      private formUtils: FormUtilsService,
+   ) { }
 
    ngAfterContentChecked (): void {}
 
@@ -59,6 +97,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
    createForm() {
       this.documentForm = this.formBuilder.nonNullable.group({
          nombredocumento: [ '' ],
+         software: [ '', [Validators.required] ],
          fechadedocumento: [ '', [Validators.required] ],
          dateDiligence: [ '', [Validators.required] ],
          dateFirm: [ '', [Validators.required] ],
@@ -76,7 +115,9 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
          lastDosimetryDate: [ '', [Validators.required] ],
          epsName: [ '', [Validators.required] ],
          riskClassifier: [ '', [Validators.required] ],
-         resolutionOfThePension: [ '', [Validators.required] ]
+         resolutionOfThePension: ['', [Validators.required]],
+         amountPolicy: ['', [Validators.required]],
+         tipodocumento: [ '' ],
       });
 
       // Clear validations of fields that do not apply
@@ -96,32 +137,45 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
     */
    isFieldRequiredForDocumentType(controlName: string): boolean {
       const documentValidationMap: any = {
-         'fechadedocumento': [4, 113, 12, 110, 111, 108],
+         'software': [138],
+         'fechadedocumento': [
+            4, 113, 12, 110, 111, 108, 137,
+            130, 131, 132, 133, 134, 135, 136, 138, 139, 140, 141, 142
+         ],
          'dateDiligence': [1, 35],
          'dateFirm': [2, 19],
          'dateVaccination': [6, 32],
-         'dueDate': [8, 22, 37, 21],
+         'dueDate': [
+           8, 22, 37, 21, 133, 137,
+           132, 139, 140, 142
+         ],
          'legalRepresentative': [113],
          'NameAlternate': [113],
          'documentDeliveryDate': [10, 11],
-         'dateOfBirth': [12],
+         'dateOfBirth': [12, 130],
          'consultationDate': [16],
          'endorsedSpecialtyDate': [16],
          'validityStartDate': [20],
          'dateofRealization': [36, 24, 23],
          'receptionDate': [25, 29],
          'lastDosimetryDate': [0],
-         'epsName': [13, 14],
-         'riskClassifier': [13],
-         'resolutionOfThePension': [15]
+         'epsName': [13, 14, 135],
+         'riskClassifier': [13, 135],
+         'resolutionOfThePension': [15],
+         'amountPolicy': [133],
       };
       return documentValidationMap[controlName]?.includes(this.documentType);
    }
+
+  sanitizeWithOptions(value: any, validValues: any[]): any | null {
+    return validValues.includes(value) ? value : null;
+  }
 
    patchForm () {
       const item = this.currentDoc;
 
       this.documentForm.patchValue({
+         software: this.sanitizeWithOptions(item.software, this.suraSoftwareTypes),
          consultationDate: this.convertDate(item.consultationDate),
          dateDiligence: this.convertDate(item.dateDiligence),
          dateFirm: this.convertDate(item.dateFirm),
@@ -131,7 +185,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
          documentDeliveryDate: this.convertDate(item.documentDeliveryDate),
          dueDate: this.convertDate(item.dueDate),
          endorsedSpecialtyDate: this.convertDate(item.endorsedSpecialtyDate),
-         epsName: item.epsName,
+         epsName: this.sanitizeWithOptions(item.epsName, this.suraArlEntities),
          fechadedocumento: this.convertDate(item.fechadedocumento),
          lastDosimetryDate: this.convertDate(item.lastDosimetryDate),
          legalRepresentative: item.legalRepresentative,
@@ -139,8 +193,10 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
          nombredocumento: item.nombredocumento,
          receptionDate: this.convertDate(item.receptionDate),
          resolutionOfThePension: item.resolutionOfThePension,
-         riskClassifier: item.riskClassifier,
-         validityStartDate: this.convertDate(item.validityStartDate)
+         riskClassifier: this.sanitizeWithOptions(item.riskClassifier, this.riskClassifierOptions),
+         validityStartDate: this.convertDate(item.validityStartDate),
+         amountPolicy: this.formUtils.formatCurrency(item.amountPolicy),
+         tipodocumento: item.idTypeDocuments,
       });
    }
 
@@ -149,39 +205,126 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
     */
    validateDocumentType() { }
 
-   getTooltipContent() {
-      if (this.documentType === 4) {
-        return 'Debe ser del año inmediatamente presente.';
-      } else if (this.documentType === 108 || this.documentType === 113) {
-        return 'Debe ser no mayor a un mes.';
+   getExpeditionTooltipContent(): string {
+      const restriction = this.expeditionDateRestrictions[this.documentType];
+      switch (restriction) {
+        case 'lastMonth':
+          return 'Debe ser no mayor a un mes.';
+        case 'currentYear':
+          return 'Debe ser del año inmediatamente presente.';
+        case 'last3Years':
+          return 'Debe ser no mayor a tres años.';
+        case 'last2Months':
+          return 'Debe ser no mayor a dos meses.';
+        default:
+          return '';
       }
-      return '';
-   }
+    }
 
-    /**
-     *
-     * @param current Bloquea las fechas antes de la fecha actual, habilita por un año y bloquea fechas posterior (para fecha de expedición)
-     * @returns
-     */
-   disableDates = (current: Date): boolean => {
-      current.setHours(0, 0, 0, 0);
-      const withRestriction = [4, 113, 108, 110, 111];
-      if (!withRestriction.includes(this.documentType)) {
+   /**
+    *
+    * @param current Bloquea las fechas antes de la fecha actual, habilita por un año y bloquea fechas posterior (para fecha de expedición)
+    * @returns
+    */
+  disableExpeditionDates = (current: Date): boolean => {
+    current.setHours(0, 0, 0, 0);
+    const restriction = this.expeditionDateRestrictions[this.documentType];
+    if (!restriction) return false;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    switch (restriction) {
+      case 'lastMonth':
+        const lastMonth = new Date(today);
+        lastMonth.setMonth(today.getMonth() - 1);
+        return current < lastMonth || current > today;
+
+      case 'last2Months':
+        const twoMonthsAgo = new Date(today);
+        twoMonthsAgo.setMonth(today.getMonth() - 2);
+        return current < twoMonthsAgo || current > today;
+
+      case 'currentYear':
+        const startOfYear = new Date(today.getFullYear(), 0, 1);
+        return current < startOfYear || current > today;
+
+      case 'last3Years':
+        const threeYearsAgo = new Date(today);
+        threeYearsAgo.setFullYear(today.getFullYear() - 3);
+        return current < threeYearsAgo || current > today;
+
+      default:
         return false;
-      }
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+    }
+  };
 
-      if (this.documentType === 108 || this.documentType === 113) {
-         // Restriction by last month
-         const lastMonth = new Date(today);
-         lastMonth.setMonth(today.getMonth() - 1);
-         return current < lastMonth || current > today;
+  onAmountPolicyChange(): void {
+    const control = this.documentForm.get('amountPolicy');
+    let value = control?.value;
+    const formatted = this.formUtils.formatCurrency(value);
+    control?.setValue(formatted, { emitEvent: false });
+  }
+
+  amountPolicyInfoAlert(onFocus: boolean = false): void {
+    if (onFocus && this.hasShownAmountMessage) return;
+    this.hasShownAmountMessage = true;
+
+    // Group by SMLVs num min
+    const groups: { [smlvNum: number]: string[] } = {};
+    for (let type in this.typePolicyProviderConfig) {
+      let smlvNum = this.typePolicyProviderConfig[type];
+      if (!groups[smlvNum]) groups[smlvNum] = [];
+      groups[smlvNum].push(type);
+    }
+
+    // Generate dinamic message
+    let html = '';
+    for (let smlvNum in groups) {
+      let provTypes = groups[smlvNum];
+      let value = this.SMLV * parseInt(smlvNum);
+      html += `
+        <p>
+          Para <strong>${formatListWithY(provTypes)}</strong>, el valor mínimo requerido de la póliza es equivalente a
+          <strong>${smlvNum} SMLV</strong>
+          (<strong>${smlvNum} x $${this.SMLV.toLocaleString('es-CO')} = $${value.toLocaleString('es-CO')}</strong>)
+        </p>
+      `;
+    }
+    html += `<p class="mt-3">Por favor verifica este monto.</p>`;
+
+    const modalRef = this.alertService.info(
+      'Información sobre valores de póliza',
+      html,
+      {
+        nzOkText: 'Entendido',
+        nzClosable: false,
+        nzWidth: 600,
+        nzContent: html,
+        nzOnOk: () => {
+          this.policyCloseAlert(modalRef);
+          return false; // Avoid close modal
+        }
       }
-      // Restriction by current year
-      const startOfYear = new Date(today.getFullYear(), 0, 1);
-      return current < startOfYear || current > today;
-    };
+    );
+  }
+
+  policyCloseAlert(firstModalRef: NzModalRef) {
+    this.alertService.confirm(
+      'IMPORTANTE',
+      'Debe leer la información anterior sobre los valores de la póliza para evitar devoluciones y retrasos en la gestión documental.',
+      {
+        nzClosable: false,
+        nzWidth: 500,
+        nzCancelText: 'Volver a revisar',
+        nzOkText: 'Ya leí la información anterior',
+        nzOkDanger: true,
+        nzOnOk: () => {
+          firstModalRef.destroy();
+        },
+      }
+    );
+  }
 
    /**
     * Carga un archivo y lo envia al api de carga de documentos
@@ -213,14 +356,18 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
 
       const docForm: Object = { ...this.documentForm.value };
 
-    for (const [key, value] of Object.entries(docForm)) {
-         if (value && value instanceof Date) {
-            fileToUpload.append(key, value.toString().split('T')[0]);
-         } else if (value != null && value.toString().trim() != '') {
-            fileToUpload.append(key, value);
-         } else {
-            fileToUpload.append(key, '');
-         }
+      for (const [key, value] of Object.entries(docForm)) {
+        if (value && value instanceof Date) {
+          fileToUpload.append(key, value.toString().split('T')[0]);
+        } else if (value != null && value.toString().trim() != '') {
+          let appendValue = value;
+          if (key === 'amountPolicy') {
+            appendValue = this.formUtils.sanitizeToNumeric(value, true);
+          }
+          fileToUpload.append(key, appendValue);
+        } else {
+          fileToUpload.append(key, '');
+        }
       }
 
       this.documentService.updateDocuments(this.documentId, fileToUpload).subscribe({
@@ -229,9 +376,14 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
             this.createNotificacion('success', 'Documento actualizado', 'El documento se actualizó correctamente.');
             this.destroyModal(true);
          },
-         error: (error: any) => {
-            this.createNotificacion('error', 'Error', 'Lo sentimos, hubo un error en el servidor.');
-            this.loader = false;
+        error: (err: any) => {
+          this.loader = false;
+          const msg = err.error && err.error.message;
+          if (err.status == 400 && msg) {
+            this.alertService.error('Oops...', msg);
+            return;
+          }
+          this.createNotificacion('error', 'Error', 'Lo sentimos, hubo un error en el servidor.');
          },
          complete: () => {}
       });
