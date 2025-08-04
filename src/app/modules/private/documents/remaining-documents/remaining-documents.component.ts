@@ -5,7 +5,6 @@ import { EventManagerService } from '../../../../services/events-manager/event-m
 import { NgZorroModule } from '../../../../ng-zorro.module';
 import { CommonModule } from '@angular/common';
 import { NzUploadFile } from 'ng-zorro-antd/upload';
-import { ProviderAssistanceComponent } from '../../../../shared/modals/provider-assistance/provider-assistance.component';
 import { FetchBackend } from '@angular/common/http';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { ModalEditDocumentComponent } from '../modal-edit-document/modal-edit-document.component';

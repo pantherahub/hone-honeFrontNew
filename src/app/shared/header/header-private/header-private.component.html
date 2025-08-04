@@ -1,0 +1,92 @@
+<nav class="header-container h-[80px] bg-gray-0 flex justify-center border-b">
+  <div class="w-full flex items-center justify-between max-w-screen-2xl py-3 px-4 2xl:py-4 2xl:px-5">
+    <a routerLink="/home">
+      <img class="h-[48px] cursor-pointer" src="assets/img/logo-hone.png" alt="Logo" />
+    </a>
+
+    <div class="flex gap-2">
+      <app-popover
+        [title]="'Tu perfil'"
+        [text]="'Mantén tus datos actualizados para asegurar la correcta publicación de tus sedes en los directorios médicos.'"
+        [placement]="'bottom-end'"
+        [triggerType]="'manual'"
+        [highlighted]="true"
+        [(visible)]="configTutorialVisible"
+        [contentTemplate]="popoverContent"
+        extraPopoverClass="max-w-[330px] md:max-w-[486px]"
+        [autoScrollOnOpen]="true"
+        (onClose)="nextTutorialStep()"
+      >
+        <ng-template #triggerTemplate>
+          <app-button
+              (click)="navigateToUpdateData()"
+              variant="gray"
+              size="sm"
+              styleType="soft"
+              customClass="leading-4 tutorial-option"
+            >
+            <span class="truncate max-w-[150px] md:max-w-[310px] hidden sm:block">
+              {{user.name ? user.name : 'No reporta nombre'}}
+            </span>
+            <svg width="16" height="16">
+              <use xlink:href="/assets/icons/solid/general.svg#cog" />
+            </svg>
+          </app-button>
+        </ng-template>
+      </app-popover>
+
+      <app-button
+        (click)="logout()"
+        variant="primary"
+        size="sm"
+        styleType="ghost"
+        customClass="leading-4"
+      >
+        <svg width="16" height="16">
+          <use xlink:href="/assets/icons/outline/arrows.svg#arrow-left-to-bracket" />
+        </svg>
+      </app-button>
+    </div>
+  </div>
+</nav>
+
+
+<!-- Tutorial popover content -->
+<ng-template #popoverContent>
+  <img src="assets/img/home/guide1.webp"
+    alt="Imagen previsualización"
+    class="hidden md:block rounded-md"
+  />
+  <div class="flex justify-between items-center">
+    <span class="text-base leading-5 md:leading-[18px] font-normal text-main-blue1h">1 de 2</span>
+    <div class="flex gap-2">
+      <app-button
+        (click)="backTutorialStep()"
+        variant="primary"
+        styleType="ghost"
+        size="md"
+        class="hidden md:block"
+        customClass="leading-4">
+        Atrás
+      </app-button>
+      <app-button
+        (click)="nextTutorialStep()"
+        variant="primary"
+        styleType="soft"
+        size="md"
+        class="hidden md:block"
+        customClass="leading-4">
+        {{ this.user.withData && !this.user.rejected ? 'Siguiente' : 'Ir' }}
+      </app-button>
+      <app-button
+        (click)="nextTutorialStep()"
+        variant="primary"
+        styleType="soft"
+        size="sm"
+        class="block md:hidden"
+        customClass="leading-4">
+        {{ this.user.withData && !this.user.rejected ? 'Siguiente' : 'Ir' }}
+      </app-button>
+    </div>
+  </div>
+</ng-template>

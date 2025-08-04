@@ -1,0 +1,291 @@
+<h1>COMPONENTE DE PRUEBAS</h1>
+
+<hr>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<!-- <app-popover
+  placement="bottom"
+  [title]="'Info'"
+  content="Este es un popover reutilizable."
+  buttonText="Haz clic"
+  [isBackdropVisible]="true"
+  triggerType="manual"
+  [(visible)]="popoverVisible"
+  [contentTemplate]="popoverContent"
+  [trigger]="triggerBtnRef"
+> -->
+
+<!-- <app-button styleType="ghost" (onClick)="popoverVisible = !popoverVisible">
+  CLICKME
+</app-button> -->
+
+
+<div class="flex">
+  <!-- <div
+    data-popover-target="infoPopover"
+    data-popover-placement="right"
+    data-popover-trigger="none"
+  >
+    <app-button (onClick)="popoverVisible = !popoverVisible">
+      CLICKME
+    </app-button>
+  </div> -->
+
+  <!-- [(visible)]="popoverVisible" -->
+  <app-popover
+    #popover
+    [title]="'Info'"
+    text="Este es un popover reutilizable."
+    triggerType="manual"
+    [contentTemplate]="popoverContent"
+    placement="right"
+    [highlighted]="false"
+    [(visible)]="popoverVisible"
+>
+    <ng-template #triggerTemplate>
+      <app-button (onClick)="popoverVisible = !popoverVisible">
+        CLICKME
+      </app-button>
+      <!-- <app-button (onClick)="popover.open()">
+        CLICKME
+      </app-button> -->
+    </ng-template>
+    <ng-template #popoverContent>
+      <div class="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:bg-gray-700 dark:border-gray-600">
+        <h3 class="font-semibold text-gray-900 dark:text-white">Popover Top</h3>
+      </div>
+      <div class="px-3 py-2">
+        <p>Here’s some amazing content. Very engaging, right?</p>
+      </div>
+    </ng-template>
+  </app-popover>
+</div>
+
+
+<div class="flex justify-center">
+  <button
+    #triggerBtn
+    type="button"
+    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5"
+  >
+    Click me
+  </button>
+
+  <!-- <app-popover [trigger]="triggerBtnRef" [contentTemplate]="popoverContent" placement="top" /> -->
+
+</div>
+
+
+
+<br>
+<br>
+<br>
+
+<input type="text" />
+
+<br>
+
+<div>
+  <h3>FORM TEST</h3>
+
+  <div class="my-3">
+    <!-- <div class="mt-4">
+      <app-text-input [id]="'search'" label="Buscar" [clearable]="true" formControlName="email" [searcher]="true" />
+    </div> -->
+
+    <div class="mt-4">
+      <app-text-input [id]="'calendar'" label="Buscar"  [type]="'time'" />
+    </div>
+
+    <div class="mt-4">
+      <app-select
+        [items]="[
+          { label: 'Colombia', value: 'co' },
+          { label: 'México', value: 'mx' },
+          { label: 'Perú', value: 'pe' },
+          { label: 'Perú2', value: 'pe2' },
+          { label: 'Perú3', value: 'pe3' },
+          { label: 'Perú4', value: 'pe4' },
+          { label: 'Perú5', value: 'pe5' },
+          { label: 'Perú6', value: 'pe6' },
+          { label: 'Perú7', value: 'pe7' },
+          { label: 'Perú8', value: 'pe8' },
+          { label: 'Perú9', value: 'pe9' },
+          { label: 'Perú10', value: 'pe10' },
+          { label: 'Perú11', value: 'pe11' },
+          { label: 'Perú12', value: 'pe12' },
+          { label: 'Perú13', value: 'pe13' },
+          { label: 'Perú14', value: 'pe14' },
+          { label: 'Perú15', value: 'pe15' },
+          { label: 'Perú16', value: 'pe16' },
+        ]"
+        [(selected)]="selectedCountry"
+        placeholder="Seleccione un país"
+        [searchable]="true"
+        [clearable]="true"
+        bindLabel="label" bindValue="value">
+      </app-select>
+    </div>
+
+    <div class="mt-4">
+      <app-select
+        [items]="exampleList"
+        [(selected)]="selectedCountry2"
+        placeholder="Seleccione un país"
+        [searchable]="true"
+        [clearable]="true">
+      </app-select>
+    </div>
+
+    <div class="mt-4">
+      <app-select
+        [items]="exampleList"
+        [(selected)]="selectedCountry2"
+        placeholder="Seleccione un país">
+      </app-select>
+    </div>
+
+    <div class="mt-4">
+      <app-select
+        [multiple]="true"
+        [items]="exampleList"
+        [(selected)]="selectedCountry2"
+        [searchable]="true"
+        [maxVisibleSelected]="3">
+      </app-select>
+    </div>
+
+    <!-- <app-checkbox [(ngModel)]="checked" (change)="onChange($event)" />
+ -->
+
+  </div>
+
+</div>
+
+
+<div class="m-4">
+  <label>
+    <app-checkbox
+      [(ngModel)]="checkboxStatus"
+      [checked]="checkboxStatus"
+      [disabled]="false">
+    </app-checkbox>
+    Campo checkbox
+  </label>
+</div>
+
+
+<app-modal #modal [customSize]="'max-w-[727px]'" [closeOnBackdrop]="true" [closeOnEscape]="true" [title]="'Formulario'">
+  <div>
+    <h2 class="text-xl font-bold">Hola desde otro componente</h2>
+    <p class="mt-2 text-sm">Esto es contenido dinámico.</p>
+    <button (click)="modal2.open()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Abrir otro encima</button>
+    <button (click)="modal.close()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Cerrar</button>
+  </div>
+</app-modal>
+<app-modal #modal2>
+  <div>
+    <h2 class="text-xl font-bold">Modal superior</h2>
+    <p class="mt-2 text-sm">Contenido dinámico.</p>
+    <button (click)="modal3.open()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Abrir otro encima</button>
+    <button (click)="modal2.close()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Cerrar</button>
+  </div>
+</app-modal>
+<app-modal #modal3 [size]="'sm'">
+  <div>
+    <h2 class="text-xl font-bold">Modal pequeño</h2>
+    <p class="mt-2 text-sm">Contenido.</p>
+    <button (click)="modal3.close()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Cerrar</button>
+  </div>
+</app-modal>
+
+
+<button (click)="modal.open()" class="mt-4 px-4 py-2 bg-green-600 text-white rounded">Abrir Modal</button>
+<button (click)="onClickTest()" class="mt-4 px-4 py-2 bg-green-600 text-white rounded">TOAST</button>
+
+<div class="my-5 flex flex-col gap-3">
+
+  <div class="my-3 flex gap-3 flex-wrap">
+    <app-button variant="primary" styleType="solid" [loading]="true" size="xs">Button text</app-button>
+    <app-button variant="primary" styleType="solid" [loading]="true" size="sm">Button text</app-button>
+    <app-button variant="primary" styleType="solid" [loading]="true" size="md">Button text</app-button>
+    <app-button variant="primary" styleType="solid" [loading]="true" size="lg">Button text</app-button>
+    <app-button variant="primary" styleType="solid" [loading]="true" size="xl">Button text</app-button>
+
+  </div>
+
+  <app-button variant="primary" [styleType]="'solid'">Guardar</app-button>
+
+  <app-button variant="red" [styleType]="'solid'" [disabled]="false" [loading]="true">
+    <svg class="w-[1em] h-[1em]">
+      <use xlink:href="/assets/icons/outline/general.svg#search" />
+    </svg>
+    Eliminar
+  </app-button>
+
+  <!-- <app-button [customClass]="'bg-black text-white hover:bg-zinc-900'">
+    Clase personalizada
+  </app-button> -->
+
+  <app-button variant="gray" [styleType]="'solid'" [disabled]="true">
+    Deshabilitado
+  </app-button>
+
+</div>
+
+<br>
+<br>
+<br>
+hola
+
+
+<ng-template #videoModalTemplate>
+  <div class="video-load">
+    <div class="video-container">
+      <iframe
+        src="https://www.youtube.com/embed/HNnISS31dPs"
+        frameborder="0"
+        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+      ></iframe>
+    </div>
+  </div>
+  <app-button (click)="openCustomModal()" variant="gray" [styleType]="'solid'">
+    Abrir otro
+  </app-button>
+</ng-template>
+
+<app-modal #modalComponentByTag
+  [customSize]="'max-w-[454px]'"
+  [title]="'Modal de prueba'">
+  Contenido del modal de prueba
+  <button type="button" (click)="onClickTest()">toast</button>
+</app-modal>
+
+<ng-template #customModal>
+  <p class="text-lg">Hola desde template</p>
+  <button (click)="openModalComponentByTag()">Abrir modal por etiqueta</button>
+  <button type="button" (click)="onOpenAlert()">modal alerta</button>
+  <button type="button" (click)="onClickTest()">toast</button>
+</ng-template>
+
+<br>
+<button (click)="openCustomModal()">Abrir modal</button>
+
+<br>
+<button (click)="openModalComponentByTag()">Abrir modal por etiqueta</button>
+
+<br>
+<button type="button" (click)="onOpenAlert()">ALERTA</button>
+
+
+
+<ng-template #customTpl>
+  <p><strong>Esto viene de un template</strong> 🎉</p>
+</ng-template>
+

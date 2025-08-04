@@ -1,39 +1,44 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, Input } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { NzModalRef } from 'ng-zorro-antd/modal';
-import { NzNotificationService } from 'ng-zorro-antd/notification';
-import { NgZorroModule } from 'src/app/ng-zorro.module';
-import { AlertService } from 'src/app/services/alerts/alert.service';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { SurveysService } from 'src/app/services/surveys/surveys.service';
+import { ModalComponent } from '../../components/modal/modal.component';
+import { ButtonComponent } from '../../components/button/button.component';
+import { ToastService } from 'src/app/services/toast/toast.service';
+import { TooltipComponent } from '../../components/tooltip/tooltip.component';
+import { TextInputComponent } from '../../components/text-input/text-input.component';
+import { InputErrorComponent } from '../../components/input-error/input-error.component';
+import { RadioComponent } from '../../components/radio/radio.component';
 
 @Component({
   selector: 'app-feedback-fivestars',
   standalone: true,
-  imports: [CommonModule, NgZorroModule],
+  imports: [CommonModule, ReactiveFormsModule, ButtonComponent, TooltipComponent, TextInputComponent, InputErrorComponent, RadioComponent],
   templateUrl: './feedback-fivestars.component.html',
   styleUrl: './feedback-fivestars.component.scss'
 })
 export class FeedbackFivestarsComponent {
 
-  tooltips = ['Muy mala', 'Mala', 'Regular', 'Buena', 'Excelente'];
   form: FormGroup;
   user = this.eventManager.userLogged();
   enableCloseModal: boolean = false;
 
+  hoverRating = 0;
+  // stars = Array(5);
+  stars = ['Muy mala', 'Mala', 'Regular', 'Buena', 'Excelente'];
+
   private fb = inject(FormBuilder);
-  private modal = inject(NzModalRef);
 
   constructor(
+    private modalRef: ModalComponent,
     private formUtils: FormUtilsService,
     private eventManager: EventManagerService,
     private surveysService: SurveysService,
-    private notificationService: NzNotificationService,
     private authService: AuthService,
-    private alertService: AlertService,
+    private toastService: ToastService,
   ) {
     this.form = this.fb.group({
       rating: [null, [Validators.required]],
@@ -54,8 +59,16 @@ export class FeedbackFivestarsComponent {
     });
   }
 
+  get selectedRating() {
+    return this.form.get('rating')?.value;
+  }
+
+  setRating(value: number) {
+    this.form.get('rating')?.setValue(value);
+  }
+
   closeModal(): void {
-    this.modal.destroy();
+    this.modalRef.close();
   }
 
   onSubmit(): void {
@@ -72,11 +85,11 @@ export class FeedbackFivestarsComponent {
         const user = this.user;
         user.doesNeedSurvey = false;
         this.authService.saveUserLogged(user);
-        this.modal.close({ submitted: true });
+        this.modalRef.close({ submitted: true });
       },
       error: (error: any) => {
         this.enableCloseModal = true;
-        this.notificationService.create('error', 'Error', 'Lo sentimos, hubo un error en el servidor.');
+        this.toastService.error('Algo salió mal.');
       },
     });
   }

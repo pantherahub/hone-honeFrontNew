@@ -23,3 +23,7 @@ export function isUrl(value: string): boolean {
 export function isTelephoneNumber(value: string): boolean {
   return REGEX_PATTERNS.telephoneNumber.test(value);
 }
+
+export function isNonEmptyObject(obj: any): boolean {
+  return obj && typeof obj === 'object' && Object.keys(obj).length > 0;
+}

@@ -8,17 +8,17 @@ import { DocumentsCrudService } from '../../../../services/documents/documents-c
 import { EventManagerService } from '../../../../services/events-manager/event-manager.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { FileValidatorDirective } from 'src/app/directives/file-validator.directive';
-import { DatePickerInputComponent } from 'src/app/shared/forms/date-picker-input/date-picker-input.component';
+import { DatePickerInputComponent } from 'src/app/shared/components/date-picker-input/date-picker-input.component';
 import { AlertService } from 'src/app/services/alerts/alert.service';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { formatListWithY } from 'src/app/utils/string-utils';
 
 @Component({
-   selector: 'app-modal-edit-document',
-   standalone: true,
-   imports: [ NgZorroModule, CommonModule, FileValidatorDirective, DatePickerInputComponent ],
-   templateUrl: './modal-edit-document.component.html',
-   styleUrl: './modal-edit-document.component.scss'
+  selector: 'app-modal-edit-document',
+  standalone: true,
+  imports: [NgZorroModule, CommonModule, FileValidatorDirective, DatePickerInputComponent],
+  templateUrl: './modal-edit-document.component.html',
+  styleUrl: './modal-edit-document.component.scss'
 })
 export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
   loader: boolean = false;

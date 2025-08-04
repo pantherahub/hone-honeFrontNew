@@ -1,0 +1,67 @@
+<div class="p-4" [ngClass]="{ 'pb-8': !isConfirmation && !showConfirmBtn }">
+
+  @if (showClose) {
+    <div class="flex justify-end">
+      <button class="text-gray-400" type="button" (click)="close(false)">
+        <svg width="20" height="20">
+          <use xlink:href="/assets/icons/outline/general.svg#close" />
+        </svg>
+      </button>
+    </div>
+  }
+
+  <div class="flex flex-col gap-2">
+
+    <div class="mx-auto p-[7.5px] rounded-[10px]"
+      [ngClass]="[
+        iconClasses,
+        loading ? '!bg-transparent' : '',
+      ]">
+      <svg width="25" height="25" [ngClass]="{ 'text-current animate-spin fill-gray-200': loading }">
+        <use [attr.xlink:href]="iconPath" />
+      </svg>
+    </div>
+
+    <div class="flex flex-col items-center justify-center gap-0.5 text-sm leading-4 text-center">
+      <h5 class="text-gray-500 font-semibold">
+        {{ title }}
+      </h5>
+      @if (isTemplateRef(message)) {
+        <div class="text-gray-500 font-normal">
+          <ng-container *ngTemplateOutlet="message"></ng-container>
+        </div>
+      } @else if (messageHTML) {
+        <p class="text-gray-500 font-normal" [innerHTML]="messageHTML"></p>
+      } @else if (message) {
+        <p class="text-gray-500 font-normal">
+          {{ message }}
+        </p>
+      }
+    </div>
+
+    @if (isConfirmation || showConfirmBtn) {
+      <div class="flex flex-wrap justify-center gap-3">
+        <app-button
+          [variant]="resolvedConfirmBtnVariant"
+          [styleType]="resolvedConfirmBtnStyle"
+          class="flex-1"
+          customClass="leading-4 w-full flex justify-center"
+          (click)="close(true)">
+          {{ confirmBtnText }}
+        </app-button>
+        @if (isConfirmation) {
+          <app-button
+            variant="gray"
+            styleType="soft"
+            class="flex-1"
+            customClass="leading-4 w-full flex justify-center"
+            (click)="close(false)">
+            {{ cancelBtnText }}
+          </app-button>
+          }
+      </div>
+    }
+
+  </div>
+
+</div>
