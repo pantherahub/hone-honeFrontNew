@@ -65,9 +65,9 @@ export class RemainingDocumentsComponent implements OnInit {
    }
 
   /**
-    * Abre una ventana modal para la carga de documentos
-    * @param item - recibe el tipo de documento que desea cargar
-    */
+   * Abre una ventana modal para la carga de documentos
+   * @param item - recibe el tipo de documento que desea cargar
+   */
   uploadDocumentModal(item: any): void {
     const fileToUpload = new FormData();
     const body: any = {

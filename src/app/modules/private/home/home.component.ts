@@ -109,8 +109,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (activeTutorialStep) this.nextTutorialStep();
     localStorage.setItem('clientSelected', JSON.stringify(item));
     this.eventManager.getDataClient();
-    // this.router.navigateByUrl(`/cargar-documentos/${item.idClientHoneSolutions}`);
-    this.router.navigateByUrl(`/cumplimiento-documentos/${item.idClientHoneSolutions}`);
+    this.router.navigateByUrl(`/cargar-documentos/${item.idClientHoneSolutions}`);
   }
 
 
