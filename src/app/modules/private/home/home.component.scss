@@ -46,17 +46,3 @@
     }
   }
 }
-
-.tutorial-option-container.active-tutorial::before {
-  border-radius: 0.5rem;
-}
-
-::ng-deep .tutorial-popover__home-client .ant-popover-inner-content {
-  width: 368px;
-}
-
-@media (max-width: 380px) {
-  ::ng-deep .tutorial-popover__home-client .ant-popover-arrow {
-    left: 50%;
-  }
-}

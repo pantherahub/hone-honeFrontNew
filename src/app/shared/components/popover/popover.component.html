@@ -25,8 +25,11 @@
     [ngClass]="{
       'before:absolute before:-top-[5px] before:-left-[5px] before:-right-[5px] before:-bottom-[5px] before:content-[attr(before)] before:z-[60] before:bg-white before:rounded-lg': visible && highlighted,
     }"
-    [class]="customPopoverClass">
-    <div [ngClass]="{ 'relative z-[70]': visible && highlighted }">
+    [class]="customTriggerClasses">
+    <div class="relative"
+      [ngClass]="{
+        'z-[70]': visible,
+      }">
       <ng-container *ngTemplateOutlet="triggerTemplate"></ng-container>
     </div>
   </div>
@@ -34,29 +37,39 @@
 
 <div
   #popoverEl
-  class="absolute z-[60] inline-block text-sm text-gray-500 transition-opacity duration-300 bg-white rounded-xl shadow-xs dark:text-gray-400 dark:bg-gray-800 p-4"
-  [attr.data-popover-id]="popoverId"
+  class="absolute z-[60] flex flex-col text-sm text-gray-500 transform transition duration-200 ease-out bg-white rounded-xl shadow-xs dark:text-gray-400 dark:bg-gray-800 p-4 gap-4"
   [attr.data-popper-placement]="placement"
   [ngClass]="classMap"
 >
   @if (title) {
-    <h3 class="font-semibold text-gray-900 dark:text-white mb-2">
-      {{ title }}
-    </h3>
+    <div class="flex flex-col gap-1 text-base leading-[18px] text-main-blue1h">
+      <div class="flex items-center justify-between">
+        <h3 class="font-semibold dark:text-white">
+          {{ title }}
+        </h3>
+        @if (showCloseButton) {
+          <app-button (click)="close()" variant="primary" size="sm" styleType="ghost">
+            <svg width="16" height="16">
+              <use xlink:href="/assets/icons/outline/general.svg#close" />
+            </svg>
+          </app-button>
+        }
+      </div>
+
+      @if (text) {
+        <p class="font-normal">{{ text }}</p>
+      }
+    </div>
   }
+
   @if (contentTemplate) {
     <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
-  } @else {
-    <p>{{ content }}</p>
   }
 
   <div
-    class="popover-arrow"
-    [class.highlighted]="highlighted"
-    [ngClass]="{
-      'before:bg-white before:border before:border-gray-200 before:shadow': !highlighted,
-      'before:!bg-white before:dark:!bg-gray-800': true
-    }"
     data-popper-arrow
-  ></div>
+    class="popover-arrow"
+    [class.highlighted]="highlighted">
+  </div>
+
 </div>

@@ -28,6 +28,14 @@ export class TutorialService {
     this.saveStep(step);
   }
 
+  backStep() {
+    if (this.isTutorialFinished() || this.stepIndex.value <= this.INITIAL_STEP) {
+      return;
+    }
+    const newStep = this.stepIndex.value - 1;
+    this.setStep(newStep);
+  }
+
   nextStep() {
     if (this.isTutorialFinished()) return;
     const newStep = this.stepIndex.value + 1;

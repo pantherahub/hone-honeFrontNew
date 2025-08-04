@@ -6,14 +6,15 @@
 
     <div class="flex gap-2">
       <app-popover
-        popoverId="infoPopover"
-        [content]="'Este es un popover reutilizable.'"
+        [title]="'Tu perfil'"
+        [text]="'Mantén tus datos actualizados para asegurar la correcta publicación de tus sedes en los directorios médicos.'"
         [placement]="'bottom-end'"
-        [triggerType]="'none'"
-        [highlighted]="false"
+        [triggerType]="'manual'"
+        [highlighted]="true"
         [(visible)]="configTutorialVisible"
         [contentTemplate]="popoverContent"
-        extraPopoverClass="max-w-[454px]"
+        extraPopoverClass="max-w-[330px] md:max-w-[486px]"
+        [autoScrollOnOpen]="true"
         (onClose)="nextTutorialStep()"
       >
         <ng-template #triggerTemplate>
@@ -34,33 +35,6 @@
         </ng-template>
       </app-popover>
 
-      <!-- <div class="tutorial-option-container"
-        [ngClass]="{ 'active-tutorial': configTutorialVisible }">
-        <div
-          nz-popover
-          [nzPopoverContent]="popoverContent"
-          [(nzPopoverVisible)]="configTutorialVisible"
-          [nzPopoverTrigger]="null"
-          nzPopoverPlacement="bottomRight"
-          nzPopoverOverlayClassName="tutorial-popover tutorial-popover__header-config"
-        >
-          <app-button
-            (click)="navigateToUpdateData()"
-            variant="gray"
-            size="sm"
-            styleType="soft"
-            customClass="leading-4 tutorial-option"
-          >
-            <span class="truncate max-w-[150px] md:max-w-[310px] hidden sm:block">
-              {{user.name ? user.name : 'No reporta nombre'}}
-            </span>
-            <svg width="16" height="16">
-              <use xlink:href="/assets/icons/solid/general.svg#cog" />
-            </svg>
-          </app-button>
-        </div>
-      </div> -->
-
       <app-button
         (click)="logout()"
         variant="primary"
@@ -76,47 +50,43 @@
   </div>
 </nav>
 
+
 <!-- Tutorial popover content -->
 <ng-template #popoverContent>
-  <div class="tutorial-popover__content flex flex-col gap-6">
-    <div class="flex flex-col gap-2.5 text-base/5 text-black">
-      <div class="flex justify-between items-center">
-        <h5 class="font-bold">Actualizar información</h5>
-
-        <button
-          type="button"
-          class="p-2 rounded-[2.5rem] bg-gray-0 hover:bg-gray-100"
-          (click)="nextTutorialStep()"
-        >
-          <svg width="16" height="16">
-            <use xlink:href="/assets/icons/outline/general.svg#close" />
-          </svg>
-        </button>
-      </div>
-      <div class="font-normal">
-        @if (this.user.rejected) {
-          Debes actualizar nuevamente los datos.
-        } @else {
-          Aquí puedes actualizar la información asociada a tu sede o sedes de prestación de servicios, lo cual permitirá mantener la información correcta en nuestros directorios médicos, así como de contactos asociados al convenio.
-        }
-      </div>
-    </div>
-    <div class="flex justify-between items-center">
-      <span class="text-base/5 font-normal text-black">1 de 2</span>
-      <button
-        type="button"
-        class="py-2.5 px-5 rounded-[2.5rem] bg-blue1h-100 hover:bg-blue1h-200 text-main-blue1h text-base/5 font-bold"
+  <img src="assets/img/home/guide1.webp"
+    alt="Imagen previsualización"
+    class="hidden md:block rounded-md"
+  />
+  <div class="flex justify-between items-center">
+    <span class="text-base leading-5 md:leading-[18px] font-normal text-main-blue1h">1 de 2</span>
+    <div class="flex gap-2">
+      <app-button
+        (click)="backTutorialStep()"
+        variant="primary"
+        styleType="ghost"
+        size="md"
+        class="hidden md:block"
+        customClass="leading-4">
+        Atrás
+      </app-button>
+      <app-button
         (click)="nextTutorialStep()"
-      >
+        variant="primary"
+        styleType="soft"
+        size="md"
+        class="hidden md:block"
+        customClass="leading-4">
         {{ this.user.withData && !this.user.rejected ? 'Siguiente' : 'Ir' }}
-      </button>
+      </app-button>
+      <app-button
+        (click)="nextTutorialStep()"
+        variant="primary"
+        styleType="soft"
+        size="sm"
+        class="block md:hidden"
+        customClass="leading-4">
+        {{ this.user.withData && !this.user.rejected ? 'Siguiente' : 'Ir' }}
+      </app-button>
     </div>
   </div>
 </ng-template>
-
-<!-- Popover overlay -->
-<!-- <div
-  *ngIf="configTutorialVisible"
-  class="tutorial-popover-overlay"
-  (click)="nextTutorialStep()"
-></div> -->

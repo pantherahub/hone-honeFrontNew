@@ -75,6 +75,37 @@
         alguna para cargar o actualizar tu información.
       </p>
 
+      <ng-template #clientCardTemplate let-item>
+        <div
+          (click)="changeOptionClient(item, clientTutorialVisible)"
+          class="flex p-4 rounded-lg cursor-pointer bg-gray-50 text-main-blue1h hover:bg-gray-100 hover:ring-[1px] hover:ring-inset hover:ring-blue1h-600 hover:shadow-[0px_16px_44px_0px_#0D0F1C1A] transition-shadow"
+          [ngClass]="{
+            'flex-col gap-3': viewMode === 'grid',
+            'h-[98.95px] items-center gap-4': viewMode === 'list',
+          }">
+          <div
+            class="overflow-hidden bg-gray-0 rounded-lg"
+            [ngClass]="{
+              'p-3.5 h-[346px] xs:h-[149.13px] sm:h-[185.264px]': viewMode === 'grid',
+              'p-2 w-[67.3px] h-[67.3px] flex justify-center items-center': viewMode === 'list',
+            }">
+            <img
+              [src]="item.url ? item.url : defaultImageUrl"
+              alt="Logo cliente"
+              [ngClass]="{
+                'w-full h-full object-contain': viewMode === 'grid',
+                'w-full object-cover': viewMode === 'list',
+              }" />
+          </div>
+          <div class="text-base leading-[18px] font-semibold"
+            [ngClass]="{
+              'text-center': viewMode === 'grid'
+            }">
+            {{ item.clientHoneSolutions }}
+          </div>
+        </div>
+      </ng-template>
+
       @if (loadingData) {
         <div class="flex items-center gap-3 text-main-blue1h text-base">
           <svg class="w-5 h-5 text-current animate-spin fill-gray-200">
@@ -82,67 +113,33 @@
           </svg>
           Cargando datos...
         </div>
-      } @else if (viewMode === 'grid') {
-        <div class="grid gap-4 grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+      } @else {
+        <div class="gap-4" [ngClass]="{
+          'grid  grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6': viewMode === 'grid',
+          'flex flex-col': viewMode === 'list',
+        }">
           @for (item of filteredClients; track item.idClientHoneSolutions; let i = $index) {
-            <div
-              [ngClass]="{ 'tutorial-option-container': i === 0, 'active-tutorial': i === 0 && clientTutorialVisible }">
-              <div
-                (click)="changeOptionClient(item, i === 0 ? clientTutorialVisible : false)"
-                class=" flex flex-col gap-3 p-4 rounded-lg cursor-pointer bg-gray-50 text-main-blue1h hover:bg-gray-100 hover:ring-[1px] hover:ring-inset hover:ring-blue1h-600 hover:shadow-[0px_16px_44px_0px_#0D0F1C1A] transition-shadow"
-                [ngClass]="{ 'tutorial-option': i === 0 }"
-                nz-popover
-                [nzPopoverContent]="i === 0 ? popoverContent : undefined"
-                [nzPopoverVisible]="i === 0 ? clientTutorialVisible : false"
-                [nzPopoverTrigger]="null"
-                [nzPopoverPlacement]="['bottomLeft', 'topLeft']"
-                nzPopoverOverlayClassName="tutorial-popover tutorial-popover__home-client"
+            @if (i === 0) {
+              <app-popover
+                [title]="'Aseguradoras asociadas'"
+                [text]="'Cada una solicita información y documentos específicos.'"
+                [placement]="'right'"
+                [triggerType]="'manual'"
+                [highlighted]="true"
+                [(visible)]="clientTutorialVisible"
+                [contentTemplate]="popoverContent"
+                customTriggerClass="w-full"
+                extraPopoverClass="max-w-[330px] md:max-w-[487px]"
+                [autoScrollOnOpen]="true"
+                (onClose)="nextTutorialStep()"
               >
-                <div
-                  class="p-3.5 h-[346px] xs:h-[149.13px] sm:h-[185.264px] overflow-hidden bg-gray-0 rounded-lg"
-                >
-                  <img
-                    class="w-full h-full object-contain"
-                    [src]="item.url ? item.url : defaultImageUrl"
-                    alt=""
-                  />
-                </div>
-                <div class="text-base leading-[18px] font-semibold text-center">
-                  {{ item.clientHoneSolutions }}
-                </div>
-              </div>
-            </div>
-          }
-        </div>
-      } @else if (viewMode === 'list') {
-        <div class="flex flex-col gap-4">
-          @for (item of filteredClients; track item.idClientHoneSolutions; let i = $index) {
-            <div class="tutorial-option-container"
-              [ngClass]="{ 'active-tutorial': i === 0 && clientTutorialVisible }">
-              <div
-                (click)="changeOptionClient(item, i === 0 ? clientTutorialVisible : false)"
-                class="h-[98.95px] flex items-center gap-4 p-4 rounded-lg cursor-pointer bg-gray-50 text-main-blue1h hover:bg-gray-100 hover:ring-[1px] hover:ring-inset hover:ring-blue1h-600 hover:shadow-[0px_16px_44px_0px_#0D0F1C1A] transition-shadow"
-                [ngClass]="{ 'tutorial-option': i === 0 }"
-                nz-popover
-                [nzPopoverContent]="i === 0 ? popoverContent : undefined"
-                [nzPopoverVisible]="i === 0 ? clientTutorialVisible : false"
-                [nzPopoverTrigger]="null"
-                nzPopoverPlacement="bottomLeft"
-                [nzPopoverPlacement]="['bottomLeft', 'topLeft']"
-                nzPopoverOverlayClassName="tutorial-popover tutorial-popover__home-client"
-              >
-                <div class="p-2 w-[67.3px] h-[67.3px] flex justify-center items-center overflow-hidden bg-gray-0 rounded-lg">
-                  <img
-                    class="w-full object-cover"
-                    [src]="item.url ? item.url : defaultImageUrl"
-                    alt=""
-                  />
-                </div>
-                <div class="text-base leading-[18px] font-semibold">
-                  {{ item.clientHoneSolutions }}
-                </div>
-              </div>
-            </div>
+                <ng-template #triggerTemplate>
+                  <ng-container *ngTemplateOutlet="clientCardTemplate; context: { $implicit: item }"></ng-container>
+                </ng-template>
+              </app-popover>
+            } @else {
+              <ng-container *ngTemplateOutlet="clientCardTemplate; context: { $implicit: item }"></ng-container>
+            }
           }
         </div>
       }
@@ -167,6 +164,54 @@
     </svg>
   </app-button>
 </app-modal>
+
+
+<!-- Tutorial popover content -->
+<ng-template #popoverContent>
+  <img src="assets/img/home/guide2.webp"
+    alt="Imagen previsualización"
+    class="hidden md:block rounded-md"
+  />
+  <div class="flex justify-between items-center">
+    <span class="text-base leading-5 md:leading-[18px] font-normal text-main-blue1h">2 de 2</span>
+    <div class="flex gap-2 md:hidden">
+      <app-button
+        (click)="backTutorialStep()"
+        variant="primary"
+        styleType="ghost"
+        size="sm"
+        customClass="leading-4">
+        Atrás
+      </app-button>
+      <app-button
+        (click)="nextTutorialStep()"
+        variant="primary"
+        styleType="solid"
+        size="sm"
+        customClass="leading-4">
+        Entendido
+      </app-button>
+    </div>
+    <div class="hidden md:flex gap-2">
+      <app-button
+        (click)="backTutorialStep()"
+        variant="primary"
+        styleType="ghost"
+        size="md"
+        customClass="leading-4">
+        Atrás
+      </app-button>
+      <app-button
+        (click)="nextTutorialStep()"
+        variant="primary"
+        styleType="solid"
+        size="md"
+        customClass="leading-4">
+        Entendido
+      </app-button>
+    </div>
+  </div>
+</ng-template>
 
 
 <app-modal #reminderModal
@@ -214,42 +259,3 @@
     Entendido
   </app-button>
 </app-modal>
-
-<!-- Tutorial popover content -->
-<ng-template #popoverContent>
-  <div class="tutorial-popover__content flex flex-col gap-6">
-    <div class="flex flex-col gap-2.5 text-base/5 text-black">
-      <div class="flex justify-between items-center">
-        <h5 class="font-bold">Completa la documentación</h5>
-
-        <button
-          type="button"
-          class="p-2 rounded-[2.5rem] bg-gray-0 hover:bg-gray-100"
-          (click)="nextTutorialStep()"
-        >
-          <svg width="16" height="16">
-            <use xlink:href="/assets/icons/outline/general.svg#close" />
-          </svg>
-        </button>
-      </div>
-      <div class="font-normal">
-        Cada aseguradora exige la documentación actualizada para completar el
-        proceso, para ello se debe hacer clic en el logo.
-      </div>
-    </div>
-    <div class="flex justify-between items-center">
-      <span class="text-base/5 font-normal text-black">2 de 2</span>
-      <button
-        type="button"
-        class="py-2.5 px-5 rounded-[2.5rem] bg-main-blue1h hover:bg-blue1h-800 text-gray-0 text-base/5 font-bold"
-        (click)="nextTutorialStep()">
-        Entendido
-      </button>
-    </div>
-  </div>
-</ng-template>
-
-<!-- Popover overlay -->
-@if (clientTutorialVisible && filteredClients.length) {
-  <div class="tutorial-popover-overlay" (click)="nextTutorialStep()"></div>
-}

@@ -9,7 +9,6 @@
 <br>
 
 <!-- <app-popover
-  popoverId="infoPopover"
   placement="bottom"
   [title]="'Info'"
   content="Este es un popover reutilizable."
@@ -39,18 +38,22 @@
 
   <!-- [(visible)]="popoverVisible" -->
   <app-popover
-    popoverId="infoPopover"
+    #popover
     [title]="'Info'"
-    content="Este es un popover reutilizable."
-    triggerType="click"
+    text="Este es un popover reutilizable."
+    triggerType="manual"
     [contentTemplate]="popoverContent"
     placement="right"
     [highlighted]="false"
+    [(visible)]="popoverVisible"
 >
     <ng-template #triggerTemplate>
       <app-button (onClick)="popoverVisible = !popoverVisible">
         CLICKME
       </app-button>
+      <!-- <app-button (onClick)="popover.open()">
+        CLICKME
+      </app-button> -->
     </ng-template>
     <ng-template #popoverContent>
       <div class="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:bg-gray-700 dark:border-gray-600">

@@ -50,6 +50,11 @@ export class HeaderPrivateComponent implements OnInit, OnDestroy {
     this.configTutorialVisible = true;
   }
 
+  backTutorialStep() {
+    this.configTutorialVisible = false;
+    this.tutorialService.backStep();
+  }
+
   nextTutorialStep() {
     this.configTutorialVisible = false;
     this.tutorialService.nextStep();

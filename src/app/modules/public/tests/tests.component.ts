@@ -39,7 +39,7 @@ export class TestsComponent implements OnInit, AfterViewInit {
   @ViewChild('customModal', { static: false }) customModal!: TemplateRef<any>;
   @ViewChild('customTpl', { static: false }) customTpl!: TemplateRef<any>;
 
-  // @ViewChild('popover') popover!: PopoverComponent;
+  @ViewChild('popover') popover!: PopoverComponent;
   @ViewChild('triggerBtn', { static: true }) triggerBtnRef!: ElementRef;
   popoverVisible: boolean = false;
 
@@ -57,18 +57,19 @@ export class TestsComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     // this.alertService.showAlert({
-    //   title: '¡Atención!',
-    //   message: 'Recuerda actualizar tus datos garantizando así el cumplimiento total de tu gestión contractual.',
-    //   closable: false,
-    //   // variant: 'warning',
-    //   showConfirmBtn: true,
-    //   confirmBtnText: 'Entendido',
-    // }).subscribe(() => {
-    //   this.navigateTo('/update-data');
-    // });
-  }
+      //   title: '¡Atención!',
+      //   message: 'Recuerda actualizar tus datos garantizando así el cumplimiento total de tu gestión contractual.',
+      //   closable: false,
+      //   // variant: 'warning',
+      //   showConfirmBtn: true,
+      //   confirmBtnText: 'Entendido',
+      // }).subscribe(() => {
+        //   this.navigateTo('/update-data');
+        // });
+      }
 
   ngAfterViewInit(): void {
+    // this.popover.open();
     // this.modalService.open(this.videoModalTemplate, { title: 'Hola' }, { myInput: 'value' })
     //   .onClose.subscribe((result) => {
     //     console.log('Modal cerrado con:', result);

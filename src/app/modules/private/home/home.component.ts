@@ -146,6 +146,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  backTutorialStep() {
+    this.clientTutorialVisible = false;
+    this.tutorialService.backStep();
+  }
+
   nextTutorialStep() {
     this.clientTutorialVisible = false;
     this.tutorialService.nextStep();

@@ -1,34 +1,35 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectorRef, Component, ContentChild, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, Renderer2, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
-import { Popover } from 'flowbite';
+import { AfterViewInit, ChangeDetectorRef, Component, ContentChild, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { createPopper, Instance, Placement } from '@popperjs/core';
+import { ButtonComponent } from '../button/button.component';
+import { PopoverStateService } from 'src/app/services/popover-state/popover-state.service';
 
 
 @Component({
   selector: 'app-popover',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ButtonComponent],
   templateUrl: './popover.component.html',
   styleUrl: './popover.component.scss'
 })
-export class PopoverComponent implements OnInit, AfterViewInit, OnChanges {
+export class PopoverComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
 
   @Input() contentTemplate?: TemplateRef<any>;
   @Input() title?: string;
-  @Input() content: string = '';
+  @Input() text?: string;
   @Input() placement: Placement = 'top';
-  @Input() popoverId: string = 'default-popover';
-  @Input() triggerType: 'click' | 'hover' | 'none' = 'click'; // none = manual
+  @Input() triggerType: 'click' | 'hover' | 'manual' = 'click';
   @Input() highlighted: boolean = false;
 
   @Input() closable: boolean = true;
   @Input() closeOnBackdrop: boolean = true;
   @Input() closeOnEscape: boolean = true;
-  @Input() showCloseButton: boolean = true;
+  @Input() showCloseButton: boolean = false;
 
   @Input() extraPopoverClass: string | string[] = '';
   @Input() resetPopoverClass?: string;
   @Input() customTriggerClass: string | string[] = '';
+  @Input() autoScrollOnOpen: boolean = false;
 
   @Input() visible!: boolean;
   @Output() visibleChange = new EventEmitter<boolean>();
@@ -54,6 +55,7 @@ export class PopoverComponent implements OnInit, AfterViewInit, OnChanges {
 
   constructor(
     private cdr: ChangeDetectorRef,
+    private popoverState: PopoverStateService,
   ) { }
 
   ngOnInit(): void {
@@ -63,7 +65,7 @@ export class PopoverComponent implements OnInit, AfterViewInit, OnChanges {
       this.showCloseButton = false;
     }
 
-    if (this.triggerType === 'none') {
+    if (this.triggerType === 'manual' && this.visible === undefined) {
       this.manualByMethods = true;
     }
 
@@ -75,9 +77,6 @@ export class PopoverComponent implements OnInit, AfterViewInit, OnChanges {
 
   ngAfterViewInit(): void {
     this.initPopper();
-    if (this.triggerType === 'none') {
-      this.toggleVisibility(this.visible);
-    }
 
     if (this.triggerType === 'hover') {
       this.triggerEl?.nativeElement?.addEventListener('mouseenter', this.onMouseEnter.bind(this));
@@ -92,6 +91,14 @@ export class PopoverComponent implements OnInit, AfterViewInit, OnChanges {
       const isVisible = changes['visible'].currentValue;
       this.toggleVisibility(isVisible);
     }
+  }
+
+  ngOnDestroy(): void {
+    if (this.visible) {
+      this.visible = false;
+      this.toggleVisibility(this.visible);
+    }
+    this.popperInstance?.destroy();
   }
 
   private initPopper(): void {
@@ -144,23 +151,34 @@ export class PopoverComponent implements OnInit, AfterViewInit, OnChanges {
     const popover = this.popoverEl?.nativeElement;
     if (!popover) return;
 
-    console.log("Cambio", isVisible);
-
     if (isVisible) {
       if (this.highlighted) {
-        document.body.classList.add('overflow-hidden');
+        this.popoverState.addHighlight();
+      }
+      this.popperInstance?.update();
+      if (this.autoScrollOnOpen) {
+        // Slight delay to ensure proper positioning
+        setTimeout(() => {
+          popover.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+            inline: 'center',
+          });
+        }, 50);
       }
       this.popperInstance?.update();
     } else {
       if (this.highlighted) {
-        document.body.classList.remove('overflow-hidden');
+        this.popoverState.removeHighlight();
       }
+      this.popperInstance?.update();
     }
   }
 
   public open() {
     this.visible = true;
-    if (this.manualByMethods) {
+    this.cdr.detectChanges();
+    if (this.manualByMethods || this.triggerType !== 'manual') {
       this.toggleVisibility(this.visible);
       return;
     }
@@ -170,7 +188,7 @@ export class PopoverComponent implements OnInit, AfterViewInit, OnChanges {
   public close() {
     this.visible = false;
     this.onClose.emit();
-    if (this.manualByMethods) {
+    if (this.manualByMethods || this.triggerType !== 'manual') {
       this.toggleVisibility(this.visible);
       return;
     }
@@ -198,23 +216,8 @@ export class PopoverComponent implements OnInit, AfterViewInit, OnChanges {
       if (!this.isHovering) {
         this.close();
       }
-    }, 150); // pequeño delay para evitar flickering
+    }, 150); // Small delay to avoid flickering
   }
-
-
-  // @HostListener('mouseenter')
-  // onMouseEnter(): void {
-  //   if (this.triggerType === 'hover') {
-  //     this.open();
-  //   }
-  // }
-
-  // @HostListener('mouseleave')
-  // onMouseLeave(): void {
-  //   if (this.triggerType === 'hover') {
-  //     this.close();
-  //   }
-  // }
 
   @HostListener('document:keydown.escape', ['$event'])
   handleEscape(event: KeyboardEvent) {
@@ -251,11 +254,11 @@ export class PopoverComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   get classMap(): string[] {
-    let baseClasses: string[] = [];
+    let baseClasses: string[] = []; // scale-95
     baseClasses = [
       this.visible
-       ? 'opacity-100'
-        : 'opacity-0 pointer-events-none',
+        ? 'scale-100 opacity-100'
+        : 'scale-0 opacity-0 pointer-events-none',
       !this.highlighted ? 'border border-gray-200 dark:border-gray-600' : '',
     ];
     if (this.visible !== undefined) {
@@ -277,7 +280,7 @@ export class PopoverComponent implements OnInit, AfterViewInit, OnChanges {
     ];
   }
 
-  get customPopoverClass(): string {
+  get customTriggerClasses(): string {
     if (Array.isArray(this.customTriggerClass)) {
       return this.customTriggerClass
         .filter(item => typeof item === 'string')

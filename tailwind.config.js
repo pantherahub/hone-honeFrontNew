@@ -14,6 +14,14 @@ module.exports = {
     "./src/**/*.{html,ts}",
     "./node_modules/flowbite/**/*.js"
   ],
+  // safelist: [
+  //   'scale-0',
+  //   'scale-100',
+  //   'opacity-0',
+  //   'opacity-100',
+  //   'pointer-events-none',
+  //   'pointer-events-auto',
+  // ],
   darkMode: 'class',
   theme: {
     container: {
