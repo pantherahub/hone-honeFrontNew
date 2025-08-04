@@ -34,10 +34,10 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      img {
-          width: 50px;
-          align-self: center;
-      }
+    }
+    &__img {
+        width: 50px;
+        align-self: center;
     }
 
 }

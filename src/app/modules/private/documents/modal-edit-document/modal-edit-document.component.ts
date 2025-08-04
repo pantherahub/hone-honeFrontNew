@@ -27,8 +27,9 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
   loadedFile: any;
 
   @Input() currentDoc?: any;
-  @Input() documentId?: any;
-  @Input() documentType?: any;
+  @Input() idDocumentType?: any;
+  @Input() isNew: boolean = false;
+  @Input() bodyData?: any = null;
 
   clientSelected: any = this.eventManager.clientSelected();
 
@@ -57,69 +58,64 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
   };
   hasShownAmountMessage: boolean = false;
 
-  expeditionDateRestrictions: {
-    [key: number]: 'lastMonth' | 'currentYear' | 'last3Years' | 'last2Months';
-  } = {
-      108: 'lastMonth',
-      113: 'lastMonth',
-      139: 'last2Months',
-      140: 'last2Months',
-      4: 'currentYear',
-      110: 'currentYear',
-      111: 'currentYear',
-      134: 'currentYear',
-      135: 'currentYear',
-      137: 'last3Years'
-    };
+  expeditionDateRestrictions: { [key: number]: 'lastMonth' | 'currentYear' | 'last3Years' | 'last2Months' } = {
+    108: 'lastMonth',
+    113: 'lastMonth',
+    139: 'last2Months',
+    140: 'last2Months',
+    4: 'currentYear',
+    110: 'currentYear',
+    111: 'currentYear',
+    134: 'currentYear',
+    135: 'currentYear',
+    137: 'last3Years',
+  };
 
-  constructor(
-    private formBuilder: FormBuilder,
-    private notificationService: NzNotificationService,
-    private documentService: DocumentsCrudService,
-    private eventManager: EventManagerService,
-    private alertService: AlertService,
-    private formUtils: FormUtilsService
-  ) { }
+   constructor (
+      private formBuilder: FormBuilder,
+      private notificationService: NzNotificationService,
+      private documentService: DocumentsCrudService,
+      private eventManager: EventManagerService,
+      private alertService: AlertService,
+      private formUtils: FormUtilsService,
+   ) { }
 
-  ngAfterContentChecked(): void { }
+  ngAfterContentChecked (): void {}
 
   ngOnInit(): void {
     this.createForm();
-    this.validateDocumentType();
-    // this.patchForm();
   }
 
-  destroyModal(response: boolean = false): void {
+  destroyModal (response: boolean = false): void {
     this.#modal.destroy({ response });
   }
 
   /**
-   * Crea e Inicializa el formulario
-   */
+  * Crea e Inicializa el formulario
+  */
   createForm() {
     this.documentForm = this.formBuilder.nonNullable.group({
-      nombredocumento: [''],
-      software: ['', [Validators.required]],
-      fechadedocumento: ['', [Validators.required]],
-      dateDiligence: ['', [Validators.required]],
-      dateFirm: ['', [Validators.required]],
-      dateVaccination: ['', [Validators.required]],
-      dueDate: ['', [Validators.required]],
-      legalRepresentative: ['', [Validators.required]],
-      NameAlternate: ['', [Validators.required]],
-      documentDeliveryDate: ['', [Validators.required]],
-      dateOfBirth: ['', [Validators.required]],
-      consultationDate: ['', [Validators.required]],
-      endorsedSpecialtyDate: ['', [Validators.required]],
-      validityStartDate: ['', [Validators.required]],
-      dateofRealization: ['', [Validators.required]],
-      receptionDate: ['', [Validators.required]],
-      lastDosimetryDate: ['', [Validators.required]],
-      epsName: ['', [Validators.required]],
-      riskClassifier: ['', [Validators.required]],
+      software: [ '', [Validators.required] ],
+      dateExpedition: [ '', [Validators.required] ],
+      dateDiligence: [ '', [Validators.required] ],
+      dateFirm: [ '', [Validators.required] ],
+      dateVaccination: [ '', [Validators.required] ],
+      dueDate: [ '', [Validators.required] ],
+      legalRepresentative: [ '', [Validators.required] ],
+      NameAlternate: [ '', [Validators.required] ],
+      documentDeliveryDate: [ '', [Validators.required] ],
+      dateOfBirth: [ '', [Validators.required] ],
+      consultationDate: [ '', [Validators.required] ],
+      endorsedSpecialtyDate: [ '', [Validators.required] ],
+      validityStartDate: [ '', [Validators.required] ],
+      dateofRealization: [ '', [Validators.required] ],
+      receptionDate: [ '', [Validators.required] ],
+      lastDosimetryDate: [ '', [Validators.required] ],
+      epsName: [ '', [Validators.required] ],
+      riskClassifier: [ '', [Validators.required] ],
       resolutionOfThePension: ['', [Validators.required]],
       amountPolicy: ['', [Validators.required]],
-      tipodocumento: ['']
+      idDocumentType: [ '', [Validators.required] ],
     });
 
     // Clear validations of fields that do not apply
@@ -131,7 +127,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
     // Update validity statuses
     this.documentForm.updateValueAndValidity();
 
-    this.patchForm();
+    if (this.currentDoc) this.patchForm();
   }
 
   /**
@@ -140,7 +136,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
   isFieldRequiredForDocumentType(controlName: string): boolean {
     const documentValidationMap: any = {
       'software': [138],
-      'fechadedocumento': [
+      'dateExpedition': [
         4, 113, 12, 110, 111, 108, 137,
         130, 131, 132, 133, 134, 135, 136, 138, 139, 140, 141, 142
       ],
@@ -166,65 +162,33 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
       'resolutionOfThePension': [15],
       'amountPolicy': [133],
     };
-    return documentValidationMap[controlName]?.includes(this.documentType);
+    return documentValidationMap[controlName]?.includes(this.idDocumentType);
   }
 
   sanitizeWithOptions(value: any, validValues: any[]): any | null {
     return validValues.includes(value) ? value : null;
   }
 
-  patchForm() {
-    const item = this.currentDoc;
+   /**
+    * Valida el tipo de documento que se va a editar
+    */
+   validateDocumentType() { }
 
-    this.documentForm.patchValue({
-      software: this.sanitizeWithOptions(item.software, this.suraSoftwareTypes),
-      consultationDate: this.convertDate(item.consultationDate),
-      dateDiligence: this.convertDate(item.dateDiligence),
-      dateFirm: this.convertDate(item.dateFirm),
-      dateOfBirth: this.convertDate(item.dateOfBirth),
-      dateofRealization: this.convertDate(item.dateofRealization),
-      dateVaccination: this.convertDate(item.dateVaccination),
-      documentDeliveryDate: this.convertDate(item.documentDeliveryDate),
-      dueDate: this.convertDate(item.dueDate),
-      endorsedSpecialtyDate: this.convertDate(item.endorsedSpecialtyDate),
-      epsName: this.sanitizeWithOptions(item.epsName, this.suraArlEntities),
-      fechadedocumento: this.convertDate(item.fechadedocumento),
-      lastDosimetryDate: this.convertDate(item.lastDosimetryDate),
-      legalRepresentative: item.legalRepresentative,
-      NameAlternate: item.NameAlternate,
-      nombredocumento: item.nombredocumento,
-      receptionDate: this.convertDate(item.receptionDate),
-      resolutionOfThePension: item.resolutionOfThePension,
-      riskClassifier: this.sanitizeWithOptions(
-        item.riskClassifier,
-        this.riskClassifierOptions
-      ),
-      validityStartDate: this.convertDate(item.validityStartDate),
-      amountPolicy: this.formUtils.formatCurrency(item.amountPolicy),
-      tipodocumento: item.idTypeDocuments
-    });
-  }
-
-  /**
-   * Valida el tipo de documento que se va a editar
-   */
-  validateDocumentType() { }
-
-  getExpeditionTooltipContent(): string {
-    const restriction = this.expeditionDateRestrictions[this.documentType];
-    switch (restriction) {
-      case 'lastMonth':
-        return 'Debe ser no mayor a un mes.';
-      case 'currentYear':
-        return 'Debe ser del año inmediatamente presente.';
-      case 'last3Years':
-        return 'Debe ser no mayor a tres años.';
-      case 'last2Months':
-        return 'Debe ser no mayor a dos meses.';
-      default:
-        return '';
+   getExpeditionTooltipContent(): string {
+      const restriction = this.expeditionDateRestrictions[this.idDocumentType];
+      switch (restriction) {
+        case 'lastMonth':
+          return 'Debe ser no mayor a un mes.';
+        case 'currentYear':
+          return 'Debe ser del año inmediatamente presente.';
+        case 'last3Years':
+          return 'Debe ser no mayor a tres años.';
+        case 'last2Months':
+          return 'Debe ser no mayor a dos meses.';
+        default:
+          return '';
+      }
     }
-  }
 
   /**
    *
@@ -233,7 +197,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
    */
   disableExpeditionDates = (current: Date): boolean => {
     current.setHours(0, 0, 0, 0);
-    const restriction = this.expeditionDateRestrictions[this.documentType];
+    const restriction = this.expeditionDateRestrictions[this.idDocumentType];
     if (!restriction) return false;
 
     const today = new Date();
@@ -331,18 +295,103 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
     );
   }
 
-  /**
-   * Carga un archivo y lo envia al api de carga de documentos
-   * @param event - evento del input que contiene el archivo para cargar
-   * @param item - elemento de la lista para saber cual documento de carga ej (cedula, nit, rethus)
-   */
-  loadFile(file: any) {
-    if (file) this.loadedFile = file;
+  patchForm() {
+    const item = this.currentDoc;
+
+    let riskClassifier = item.riskClassifier;
+    if (!this.riskClassifierOptions.includes(riskClassifier)) {
+      riskClassifier = null;
+    }
+
+    const amountPolicy = this.formUtils.formatCurrency(item.amountPolicy);
+
+    this.documentForm.patchValue({
+      software: this.sanitizeWithOptions(item.software, this.suraSoftwareTypes),
+      consultationDate: this.convertDate(item.consultationDate),
+      dateDiligence: this.convertDate(item.dateDiligence),
+      dateFirm: this.convertDate(item.dateFirm),
+      dateOfBirth: this.convertDate(item.dateOfBirth),
+      dateofRealization: this.convertDate(item.dateofRealization),
+      dateVaccination: this.convertDate(item.dateVaccination),
+      documentDeliveryDate: this.convertDate(item.documentDeliveryDate),
+      dueDate: this.convertDate(item.dueDate),
+      endorsedSpecialtyDate: this.convertDate(item.endorsedSpecialtyDate),
+      epsName: this.sanitizeWithOptions(item.epsName, this.suraArlEntities),
+      dateExpedition: this.convertDate(item.dateExpedition),
+      lastDosimetryDate: this.convertDate(item.lastDosimetryDate),
+      legalRepresentative: item.legalRepresentative,
+      NameAlternate: item.NameAlternate,
+      receptionDate: this.convertDate(item.receptionDate),
+      resolutionOfThePension: item.resolutionOfThePension,
+      riskClassifier: this.sanitizeWithOptions(item.riskClassifier, this.riskClassifierOptions),
+      validityStartDate: this.convertDate(item.validityStartDate),
+      amountPolicy: amountPolicy,
+      idDocumentType: item.idDocumentType,
+    });
   }
 
   /**
-   * Envia peticion al servicio de login para obtener el token de acceso
-   */
+  * Carga un archivo y lo envia al api de carga de documentos
+  * @param event - evento del input que contiene el archivo para cargar
+  * @param item - elemento de la lista para saber cual documento de carga ej (cedula, nit, rethus)
+  */
+  loadFile (file: any) {
+    if (file) this.loadedFile = file;
+  }
+
+createFormData(): FormData {
+  const dataToUpload = new FormData();
+  const unifiedData: any = {};
+
+  // Add body data
+  if (this.isNew && this.bodyData) {
+    Object.assign(unifiedData, this.bodyData);
+  }
+
+  if (this.loadedFile) {
+    unifiedData['nameDocument'] = this.loadedFile.name;
+  }
+
+  const idProvider = this.clientSelected.idProvider;
+  unifiedData['idUser'] = idProvider;
+
+  // Add form data
+  const docForm = { ...this.documentForm.value };
+  for (const [key, value] of Object.entries(docForm)) {
+    if (value && value instanceof Date) {
+      unifiedData[key] = value.toString().split('T')[0];
+    } else if (value != null && value.toString().trim() != '') {
+      let appendValue: any = value;
+      if (key === 'amountPolicy') {
+        appendValue = this.formUtils.sanitizeToNumeric(value.toString(), true);
+      }
+      unifiedData[key] = appendValue;
+    } else {
+      // unifiedData[key] = '';
+    }
+  }
+
+  // If not new, add all data directly into the FormData
+  if (!this.isNew) {
+    for (const [key, value] of Object.entries(unifiedData)) {
+      dataToUpload.append(key, String(value));
+    }
+  } else {
+    // If new, add the data as a single JSON
+    dataToUpload.append('datos', JSON.stringify(unifiedData));
+  }
+
+  // Add the separate file (binary only)
+  if (this.loadedFile) {
+    dataToUpload.append('archivo', this.loadedFile);
+  }
+
+  return dataToUpload;
+}
+
+  /**
+  * Envia peticion al servicio de login para obtener el token de acceso
+  */
   submitRequest() {
     if (this.documentForm.invalid) {
       Object.values(this.documentForm.controls).forEach(control => {
@@ -352,57 +401,55 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
         }
       });
       return;
+    } else if (this.isNew && !this.loadedFile) {
+      this.createNotificacion("warning", "Aviso", "Debe seleccionar un documento.");
+      return;
     }
     this.loader = true;
 
-    const fileToUpload = new FormData();
-    if (this.loadedFile) {
-        fileToUpload.append('archivo', this.loadedFile);
-    }
-    const { idProvider } = this.clientSelected;
-    fileToUpload.append('idUser', idProvider);
+    const fileToUpload = this.createFormData();
 
-    const docForm: Object = { ...this.documentForm.value };
-
-    for (const [key, value] of Object.entries(docForm)) {
-      if (value && value instanceof Date) {
-        fileToUpload.append(key, value.toString().split('T')[0]);
-      } else if (value != null && value.toString().trim() != '') {
-        let appendValue = value;
-        if (key === 'amountPolicy') {
-          appendValue = this.formUtils.sanitizeToNumeric(value, true);
-        }
-        fileToUpload.append(key, appendValue);
-      } else {
-        fileToUpload.append(key, '');
-      }
+    if (this.isNew) {
+      this.saveDocument(fileToUpload);
+      return;
     }
 
-    this.documentService.updateDocuments(this.documentId, fileToUpload).subscribe({
+    this.documentService.updateDocuments(this.currentDoc.idDocumentsProvider, fileToUpload).subscribe({
       next: (res: any) => {
         this.loader = false;
         this.createNotificacion('success', 'Documento actualizado', 'El documento se actualizó correctamente.');
         this.destroyModal(true);
       },
-      error: (err: any) => {
-        this.loader = false;
-        const msg = err.error && err.error.message;
-        if (err.status == 400 && msg) {
-          this.alertService.error('Oops...', msg);
-          return;
-        }
+      error: (error: any) => {
         this.createNotificacion('error', 'Error', 'Lo sentimos, hubo un error en el servidor.');
+        this.loader = false;
       },
       complete: () => {}
     });
   }
 
+  saveDocument(fileToUpload: FormData) {
+    const { idProvider } = this.clientSelected;
+    this.documentService.uploadDocuments(idProvider, fileToUpload).subscribe({
+      next: (res: any) => {
+        this.loader = false;
+        this.createNotificacion('success', 'Carga exitosa', 'El documento se subió de manera satisfactoria');
+        this.destroyModal(true);
+      },
+      error: (error: any) => {
+        this.loader = false;
+        this.createNotificacion('error', 'Error', 'Lo sentimos, hubo un error en el servidor.');
+      },
+      complete: () => { }
+    });
+  }
+
   /**
-   * Crea una notificacion de alerta
-   * @param type - string recibe el tipo de notificacion (error, success, warning, info)
-   * @param title - string recibe el titulo de la notificacion
-   * @param message - string recibe el mensaje de la notificacion
-   */
+  * Crea una notificacion de alerta
+  * @param type - string recibe el tipo de notificacion (error, success, warning, info)
+  * @param title - string recibe el titulo de la notificacion
+  * @param message - string recibe el mensaje de la notificacion
+  */
   createNotificacion(type: string, title: string, message: string) {
     this.notificationService.create(type, title, message);
   }
