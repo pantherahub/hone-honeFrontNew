@@ -47,10 +47,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     private eventManager: EventManagerService,
     private router: Router,
     private navigationService: NavigationService,
-  ) {
-    localStorage.removeItem('clientSelected');
-    this.eventManager.clientSelected.set({});
-  }
+  ) { }
 
   ngOnInit(): void {
     this.getClientList();
@@ -84,8 +81,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   getClientList() {
     this.loadingData = true;
     this.clientService.getClientListByProviderId(this.user.id).subscribe({
-      next: (res: any) => {
-        this.clientList = res.filter((client: any) => client.idClientHoneSolutions !== 10);
+      next: (res: ClientInterface[]) => {
+        this.clientList = [...res];
         this.applyFilter();
         this.loadingData = false;
       },
@@ -119,7 +116,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (activeTutorialStep) this.nextTutorialStep();
     localStorage.setItem('clientSelected', JSON.stringify(item));
     this.eventManager.getDataClient();
-    this.router.navigateByUrl(`/cargar-documentos/${item.idClientHoneSolutions}`);
+    this.router.navigateByUrl(`/documentation`);
   }
 
 

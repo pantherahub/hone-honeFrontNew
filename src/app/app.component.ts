@@ -5,13 +5,12 @@ import { NgZorroModule } from './ng-zorro.module';
 import { IconsProviderModule } from './icons-provider.module';
 import { EventManagerService } from './services/events-manager/event-manager.service';
 import { initFlowbite } from 'flowbite';
-import { ToastContainerComponent } from './shared/alerts/toast-container/toast-container.component';
 import { FloatingActionsComponent } from './shared/floating-actions/floating-actions.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [ CommonModule, RouterOutlet, NgZorroModule, IconsProviderModule, ToastContainerComponent, FloatingActionsComponent ],
+  imports: [ CommonModule, RouterOutlet, NgZorroModule, IconsProviderModule, FloatingActionsComponent ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

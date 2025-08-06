@@ -56,3 +56,21 @@
     }
   }
 }
+
+.apexcharts-canvas {
+
+  .apexcharts-datalabels-group {
+    .apexcharts-text.apexcharts-datalabel-value {
+      font-size: 1rem !important;
+    }
+  }
+
+  .apexcharts-tooltip {
+    .apexcharts-tooltip-text-y-label,
+    .apexcharts-tooltip-text-y-value {
+      font-size: 0.875rem !important;
+    }
+  }
+
+}
+

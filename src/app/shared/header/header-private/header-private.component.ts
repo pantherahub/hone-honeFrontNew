@@ -1,5 +1,4 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { NgZorroModule } from '../../../ng-zorro.module';
 import { EventManagerService } from '../../../services/events-manager/event-manager.service';
 import { AuthService } from '../../../services/auth.service';
 import { CommonModule } from '@angular/common';
@@ -12,7 +11,7 @@ import { PopoverComponent } from '../../components/popover/popover.component';
 @Component({
   selector: 'app-header-private',
   standalone: true,
-  imports: [NgZorroModule, CommonModule, RouterModule, ButtonComponent, PopoverComponent],
+  imports: [CommonModule, RouterModule, ButtonComponent, PopoverComponent],
   templateUrl: './header-private.component.html',
   styleUrl: './header-private.component.scss'
 })

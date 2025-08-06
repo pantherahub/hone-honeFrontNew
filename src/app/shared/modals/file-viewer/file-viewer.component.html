@@ -1,31 +1,54 @@
-<nz-modal
-  [nzVisible]="visible"
-  [nzTitle]="(currentItem?.NameDocument | formatNameDoc:currentItem?.idTypeDocuments) || 'No especifica'"
-  [nzFooter]="null"
-  [nzWidth]="'800px'"
-  [nzClassName]="'custom-modal'"
-  [nzContent]="modalContent"
-  (nzOnCancel)="closeModal()"
->
-  <ng-template #modalContent>
-    <div class="modal-content">
-      <div class="loading-pdf">
-        <nz-spin *ngIf="loadingPdf" nzSimple [nzSize]="'large'" nzTip="Cargando documento..."></nz-spin>
-      </div>
+<div class="flex flex-col gap-4">
+  <div class="flex items-center justify-between">
+    <h3 class="text-base font-semibold leading-[18px] text-main-blue1h dark:text-white">
+      {{ (currentItem?.typeDocument | formatNameDoc:currentItem?.idTypeDocuments) || 'No especifica' }}
+    </h3>
+    <app-button (click)="closeModal()" variant="primary" size="sm" styleType="ghost">
+      <svg width="16" height="16">
+        <use xlink:href="/assets/icons/outline/general.svg#close" />
+      </svg>
+    </app-button>
+  </div>
 
-      <img *ngIf="isImage" [src]="previewFile" [ngStyle]="{ width: '100%' }" />
+  <!-- min-h-72 -->
+  <div class="relative min-h-[60vh]">
+    @if (loadingPdf) {
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+        <svg class="w-7 h-7 text-main-blue1h animate-spin fill-gray-200">
+          <use xlink:href="/assets/icons/extras/animations.svg#spin" />
+        </svg>
+      </div>
+    }
+
+    @if (isImage) {
+      <img [src]="previewFile" class="w-full" />
+    } @else {
       <ngx-doc-viewer
-        *ngIf="!isImage"
         [url]="previewFile"
-        class="doc-viewer"
+        class="w-full h-[60vh]"
         (loaded)="onDocumentLoaded()"
         [googleCheckInterval]="1500"
         [googleMaxChecks]="15"
       ></ngx-doc-viewer>
+    }
+  </div>
 
-      <div class="footer">
-        <button type="button" nz-button nzType="primary" (click)="openDoc()">Abrir documento</button>
-      </div>
-    </div>
-  </ng-template>
-</nz-modal>
+  <div class="flex justify-end gap-2">
+    <app-button
+      (click)="closeModal()"
+      variant="gray"
+      styleType="soft"
+      size="md"
+      customClass="leading-4">
+      Cerrar
+    </app-button>
+    <app-button
+      (onClick)="openDoc()"
+      variant="primary"
+      styleType="solid"
+      size="md"
+      customClass="leading-4">
+      Abrir documento
+    </app-button>
+  </div>
+</div>

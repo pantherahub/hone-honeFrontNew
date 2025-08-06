@@ -20,7 +20,7 @@ export interface PercentInterface {
 
 export interface DocumentInterface {
    idProvider?: string;
-   NameDocument?: string;
+   typeDocument?: string;
    UrlDocument?: string;
    nameDocument?: string;
    idTypeProvider?: number;

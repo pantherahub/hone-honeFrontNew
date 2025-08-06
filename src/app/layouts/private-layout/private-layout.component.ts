@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-private-layout',
   standalone: true,
-  imports: [HeaderPrivateComponent, CommonModule, RouterOutlet],
+  imports: [CommonModule, RouterOutlet, HeaderPrivateComponent],
   templateUrl: './private-layout.component.html',
   styleUrl: './private-layout.component.scss'
 })

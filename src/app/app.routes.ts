@@ -5,13 +5,15 @@ import { authGuard } from './guards/auth.guard';
 import { PageNotFoundComponent } from './modules/public/page-not-found/page-not-found.component';
 import { ListDocumentsComponent } from './modules/private/documents/list-documents/list-documents.component';
 import { NgModule } from '@angular/core';
-import { PrivateLayoutComponent } from './views/private-layout/private-layout.component';
+import { PrivateLayoutComponent } from './layouts/private-layout/private-layout.component';
 import { UpdateDataComponent } from './modules/private/update-data/update-data.component';
 import { canDeactivateGuard } from './guards/can-deactivate.guard';
 import { TestsComponent } from './modules/public/tests/tests.component';
 import { SupportTicketComponent } from './shared/support-ticket/support-ticket.component';
-import { PublicLayoutComponent } from './views/public-layout/public-layout.component';
+import { PublicLayoutComponent } from './layouts/public-layout/public-layout.component';
 import { noauthGuard } from './guards/noauth.guard';
+import { ServiceLayoutComponent } from './layouts/service-layout/service-layout.component';
+import { clientSelectedGuard } from './guards/client-selected.guard';
 
 export const routes: Routes = [
   //   PUBLIC ROUTES
@@ -65,8 +67,15 @@ export const routes: Routes = [
         canDeactivate: [canDeactivateGuard]
       },
       {
-        path: 'cargar-documentos/:id',
-        component: ListDocumentsComponent
+        path: '',
+        component: ServiceLayoutComponent,
+        canActivate: [clientSelectedGuard],
+        children: [
+          {
+            path: 'documentation',
+            component: ListDocumentsComponent
+          },
+        ],
       }
     ]
   },

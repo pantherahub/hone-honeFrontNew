@@ -2,25 +2,6 @@
     padding-bottom: 2rem;
 }
 
-.list-document-container {
-    margin: 0 auto;
-    padding: 15px 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #fff;
-    -webkit-box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.45);
-    -moz-box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.45);
-    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.45);
-}
-
-.user-data {
-    display: flex;
-    flex-direction: column;
-    font-size: 16px;
-    font-weight: 500;
-}
-
 .title-tabs {
     margin: 0 !important;
 }
@@ -66,18 +47,6 @@
     -moz-box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.45);
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.45);
     min-height: 60px;
-}
-
-.custom-btn {
-    background-color: #1890FF;
-    border-color: #1890FF;
-    border-radius: 5px;
-}
-
-.logo {
-    img {
-        max-width: 120px;
-    }
 }
 
 ::ng-deep {

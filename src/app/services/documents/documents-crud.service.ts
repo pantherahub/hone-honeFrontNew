@@ -8,12 +8,17 @@ import { environment } from '../../../environments/environment';
 })
 export class DocumentsCrudService {
   public url = environment.url;
+  private urlPrefix = 'Documents/Providers';
 
   constructor(private httpClient: HttpClient) { }
 
-  // Llama al api para obtener porcentaje de los documentos del prestador
   public getPercentDocuments(idProvider: number, idTypeProvider: number, idClient: number): Observable<any> {
-    return this.httpClient.get(`${this.url}getPercentageDocuments/${idProvider}/${idTypeProvider}/${idClient}`);
+    // return this.httpClient.get(`${this.url}${this.urlPrefix}/GetPorcentages/${idProvider}/${idTypeProvider}/${idClient}`);
+    return this.httpClient.get(`${this.url}${this.urlPrefix}/GetPorcentages/${idProvider}/${idClient}`);
+  }
+
+  public getDocuments(idProvider: number, idClient: number): Observable<any> {
+    return this.httpClient.get(`${this.url}${this.urlPrefix}/GetDocuments/${idProvider}/${idClient}`);
   }
 
   // Llama al api para obtener lista documentos por cargar del prestador

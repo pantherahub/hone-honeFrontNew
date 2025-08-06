@@ -19,6 +19,7 @@ import { CanComponentDeactivate } from 'src/app/guards/can-deactivate.interface'
 import { Router } from '@angular/router';
 import { NavigationService } from 'src/app/services/navigation/navigation.service';
 import { isEmail } from 'src/app/utils/validation-utils';
+import { ClientInterface } from 'src/app/models/client.interface';
 
 @Component({
   selector: 'app-update-data',
@@ -263,7 +264,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
   getCompanies() {
     this.loading = true;
     this.clientProviderService.getClientListByProviderId(this.user.id).subscribe({
-      next: (res: any) => {
+      next: (res: ClientInterface[]) => {
         const clientList = res;
         const clientsIds = clientList.map((client: any) => client.idClientHoneSolutions);
         this.getProviderCompanies(clientsIds);

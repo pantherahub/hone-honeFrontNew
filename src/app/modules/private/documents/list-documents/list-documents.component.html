@@ -1,27 +1,311 @@
-<div class="layout">
+<div class="flex flex-col gap-9">
 
-    <header>
-        <div class="list-document-container">
-            <div class="user-data">
-                <span>{{clientSelected.razonSocial ? clientSelected.razonSocial : ''}}</span>
-                <span>{{clientSelected.typeProvider ? clientSelected.typeProvider : ''}}</span>
-                <!-- <span>Cedula: {{clientSelected.identificacion ? clientSelected.identificacion : ''}}</span> -->
-                <span>{{clientSelected.identificacion ? clientSelected.identificacion : ''}}</span>
-            </div>
-            <div class="logo">
-                <img [src]="clientSelected ? clientSelected.urlHeader : 'assets/img/logo-hone.png' "
-                    alt="Logo">
-            </div>
+  <div class="flex flex-col gap-2">
+    <h2 class="text-xl font-black leading-[22px] text-main-blue1h">
+      Documentación – {{ clientSelected.typeProvider ?? '' }}
+    </h2>
+    <p class="text-gray-600 text-base font-normal leading-[18px]">
+      Asegúrate de que estén completos, actualizados y legibles. Súbelos aquí para validación.
+    </p>
+  </div>
+
+  <div class="flex flex-col gap-4">
+
+    <div class="flex gap-4">
+      <div class="flex-1 bg-gray-100 rounded-xl p-4 flex items-center gap-6">
+        <div class="flex-1 bg-white p-4 rounded-lg">
+          <img
+            [src]="clientSelected ? clientSelected.urlHeader : 'assets/img/logo-hone.png'"
+            alt="Logo cliente" class="w-full h-full object-contain" />
+             <!-- [ngClass]="{
+              'w-full h-full object-contain': viewMode === 'grid',
+              'w-full object-cover': viewMode === 'list',
+            }" -->
         </div>
-    </header>
+        <div class="flex-1 flex flex-col gap-4">
+          <div class="flex flex-col gap-2.5 text-main-blue1h">
+            <h3 class="text-lg font-black leading-5 uppercase">
+              {{ clientSelected.clientHoneSolutions ?? '' }}
+            </h3>
+            <p class="text-sm font-normal leading-4">
+              Para avanzar correctamente, descarga y revisa los siguientes documentos.
+            </p>
+          </div>
+          <div>
+            <app-button variant="primary" styleType="soft" size="md">
+              <svg width="20" height="20">
+                <use xlink:href="/assets/icons/outline/general.svg#download" />
+              </svg>
+              Descargar ahora
+            </app-button>
+          </div>
+        </div>
+      </div>
 
-    @if (clientSelected.idClientHoneSolutions == 4) {
-    <!-- Nothing por Allianz -->
-    <section id="download-documents">
-    </section>
-    }
+      <div class="flex-1 flex flex-col sm:flex-row items-center bg-gray-100 rounded-xl p-4 gap-6">
+        <div #donutChart class=" min-w-[162px] h-[162px]"></div>
+
+        <div class="w-full">
+          <div class="flex items-center gap-2 py-1.5 text-sm font-semibold leading-4">
+            <h5 class="text-main-blue1h">Estado de tus documentos</h5>
+            <span class="text-main-blue1h ml-auto">%</span>
+          </div>
+          <hr class="h-px bg-gray-300 border-0 dark:bg-gray-700">
+          <div class="flex items-center gap-3 py-1.5"
+            (mouseenter)="highlightSeries('Cargados')"
+            (mouseleave)="clearHighlight()">
+            <span class="w-3 h-3 rounded-full bg-green-500"></span>
+            <span class="text-sm font-semibold leading-4 text-main-blue1h dark:text-gray-300">Cargados</span>
+            <span class="ml-auto text-sm font-semibold leading-4 text-main-blue1h dark:text-gray-300">
+              @if (loadingPercent) {
+                <ng-container *ngTemplateOutlet="loadingPercentTemplate"></ng-container>
+              } @else {
+                {{ percentData.uploaded }}%
+              }
+            </span>
+          </div>
+          <div class="flex items-center gap-3 py-1.5"
+            (mouseenter)="highlightSeries('Pendientes')"
+            (mouseleave)="clearHighlight()">
+            <span class="w-3 h-3 rounded-full bg-yellow-400"></span>
+            <span class="text-sm font-semibold leading-4 text-main-blue1h dark:text-gray-300">Pendientes</span>
+            <span class="ml-auto text-sm font-semibold leading-4 text-main-blue1h dark:text-gray-300">
+              @if (loadingPercent) {
+                <ng-container *ngTemplateOutlet="loadingPercentTemplate"></ng-container>
+              } @else {
+                {{ percentData.remaining }}%
+              }
+            </span>
+          </div>
+          <div class="flex items-center gap-3 py-1.5"
+            (mouseenter)="highlightSeries('Vencidos')"
+            (mouseleave)="clearHighlight()">
+            <span class="w-3 h-3 rounded-full bg-red-500"></span>
+            <span class="text-sm font-semibold leading-4 text-main-blue1h dark:text-gray-300">Vencidos</span>
+            <span class="ml-auto text-sm font-semibold leading-4 text-main-blue1h dark:text-gray-300">
+              @if (loadingPercent) {
+                <ng-container *ngTemplateOutlet="loadingPercentTemplate"></ng-container>
+              } @else {
+                {{ percentData.expired }}%
+              }
+            </span>
+          </div>
+
+          <ng-template #loadingPercentTemplate>
+            <svg class="w-4 h-4 text-main-blue1h animate-spin fill-gray-200">
+              <use xlink:href="/assets/icons/extras/animations.svg#spin" />
+            </svg>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-4 p-4 rounded-xl bg-gray-100">
+      <div class="flex gap-2 text-main-blue1h">
+        <h4 class="text-lg font-semibold leading-5">Documentos</h4>
+        <app-tooltip
+          [id]="'doc-container'"
+          [text]="'Carga los siguientes documentos obligatorios. Asegúrate de que cada archivo esté completo, sea legible y no esté protegido por contraseña antes de subirlo.'"
+          position="top"
+          styleType="light">
+          <svg width="20" height="20">
+            <use xlink:href="/assets/icons/outline/general.svg#info-circle" />
+          </svg>
+        </app-tooltip>
+      </div>
+
+
+      <div class="relative overflow-x-auto rounded-xl">
+        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+          <thead class="text-sm font-semibold leading-4 text-blue1h-950 bg-gray-50 dark:bg-gray-700 dark:text-gray-400 whitespace-nowrap">
+            <tr>
+              <th scope="col" class="px-4 py-3">
+                Nombre
+              </th>
+              <th scope="col" class="px-4 py-3">
+                Estado de carga
+              </th>
+              <th scope="col" class="px-4 py-3">
+                Fecha de carga
+              </th>
+              <th scope="col" class="px-4 py-3">
+                Requerido
+              </th>
+              <th scope="col" class="px-4 py-3">
+                Aprobación
+              </th>
+              <th scope="col" class="px-4 py-3">
+                Acciones
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (loadingDocs) {
+              <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+                <td colspan="6" class="px-4 h-[54px] text-left">
+                  <div class="text-md text-main-blue1h leading-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-current animate-spin fill-gray-200">
+                      <use xlink:href="/assets/icons/extras/animations.svg#spin" />
+                    </svg>
+                    Cargando documentos...
+                  </div>
+                </td>
+              </tr>
+            } @else {
+              @for (doc of docList; track $index) {
+                <!-- min-h-[54px] px-4 -->
+                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+                  <td class="px-4 py-[10.5px] text-sm font-normal text-main-blue1h leading-4 dark:text-white min-w-[320px]">
+                    {{ doc.typeDocument | formatNameDoc:doc.idTypeDocuments }}
+                  </td>
+                  <td class="px-4 py-[10.5px]">
+                    @switch (doc.documentStatus) {
+                      @case ('PENDIENTE') {
+                        <div class="inline-flex gap-1 py-1.5 px-3 rounded-full bg-yellow-100 text-yellow-800 text-sm font-semibold leading-4">
+                          <svg width="16" height="16">
+                            <use xlink:href="/assets/icons/outline/general.svg#clock" />
+                          </svg>
+                          Pendiente
+                        </div>
+                      }
+                      @case ('AL DIA') {
+                        <div class="inline-flex gap-1 py-1.5 px-3 rounded-full bg-green-100 text-green-800 text-sm font-semibold leading-4">
+                          <svg width="16" height="16">
+                            <use xlink:href="/assets/icons/outline/general.svg#check" />
+                          </svg>
+                          Cargado
+                        </div>
+                      }
+                      @case ('VENCIDO') {
+                        <div class="inline-flex gap-1 py-1.5 px-3 rounded-full bg-red-100 text-red-800 text-sm font-semibold leading-4">
+                          <svg width="16" height="16">
+                            <use xlink:href="/assets/icons/outline/general.svg#close" />
+                          </svg>
+                          Vencido
+                        </div>
+                      }
+                    }
+                  </td>
+                  <td class="px-4 py-[10.5px] text-sm font-normal text-main-blue1h leading-4 dark:text-white">
+                    {{ doc.documentStatus === 'PENDIENTE' ? 'N/A' : doc.dateAdd | date: 'mediumDate' }}
+                  </td>
+                  <td class="px-4 py-[10.5px] text-sm font-normal text-main-blue1h leading-4 dark:text-white">
+                    {{ doc.required ? 'Sí' : 'No' }}
+                  </td>
+                  <td class="px-4 py-[10.5px]">
+                    @if (doc.documentStatus !== 'AL DIA') {
+                      N/A
+                    } @else {
+                      @if (doc.isDocApproved) {
+                        <!-- bg-green-100 text-green-800 -->
+                        <div class="inline-flex gap-1 py-1.5 rounded-full text-green-600 text-sm font-semibold leading-4">
+                          <svg width="16" height="16">
+                            <use xlink:href="/assets/icons/outline/general.svg#check" />
+                          </svg>
+                          Aprobado
+                        </div>
+                      } @else {
+                        <!-- bg-yellow-100 text-yellow-800 -->
+                        <div class="inline-flex gap-1 py-1.5 rounded-full text-yellow-600 text-sm font-semibold leading-4">
+                          <svg width="16" height="16">
+                            <use xlink:href="/assets/icons/outline/general.svg#clock" />
+                          </svg>
+                          Pendiente
+                        </div>
+                      }
+                    }
+                  </td>
+                  <td class="px-4 py-[10.5px] text-left">
+                    <div class="my-auto flex gap-2">
+                      @switch (doc.documentStatus) {
+                        @case ('PENDIENTE') {
+                          <app-button variant="primary" styleType="solid" size="xs">
+                            <svg width="16" height="16">
+                              <use xlink:href="/assets/icons/outline/general.svg#upload" />
+                            </svg>
+                            Cargar
+                          </app-button>
+                        }
+                        @case ('AL DIA') {
+                          <app-button
+                            (click)="viewFile(doc)"
+                            variant="gray"
+                            styleType="soft"
+                            size="xs">
+                            <svg width="16" height="16">
+                              <use xlink:href="/assets/icons/outline/general.svg#eye" />
+                            </svg>
+                          </app-button>
+                          <app-button variant="gray" styleType="soft" size="xs">
+                            <svg width="16" height="16">
+                              <use xlink:href="/assets/icons/outline/arrows.svg#refresh" />
+                            </svg>
+                          </app-button>
+                          <app-button
+                            (click)="deleteDocument(doc)"
+                            variant="gray"
+                            styleType="soft"
+                            size="xs">
+                            <svg width="16" height="16">
+                              <use xlink:href="/assets/icons/outline/general.svg#trash-bin" />
+                            </svg>
+                          </app-button>
+                        }
+                        @case ('VENCIDO') {
+                          <app-button variant="primary" styleType="solid" size="xs">
+                            <svg width="16" height="16">
+                              <use xlink:href="/assets/icons/outline/arrows.svg#refresh" />
+                            </svg>
+                            Actualizar
+                          </app-button>
+                          <app-button
+                            (click)="viewFile(doc)"
+                            variant="gray"
+                            styleType="soft"
+                            size="xs">
+                            <svg width="16" height="16">
+                              <use xlink:href="/assets/icons/outline/general.svg#eye" />
+                            </svg>
+                          </app-button>
+                          <app-button
+                            (click)="deleteDocument(doc)"
+                            variant="gray"
+                            styleType="soft"
+                            size="xs">
+                            <svg width="16" height="16">
+                              <use xlink:href="/assets/icons/outline/general.svg#trash-bin" />
+                            </svg>
+                          </app-button>
+                        }
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<div class="layout mt-4">
+
     @if (clientSelected.idClientHoneSolutions == 8) {
-
     <section id="download-documents">
         <div class="container-documents" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
 
@@ -52,46 +336,8 @@
         </div>
     </section>
     }
-    @if (clientSelected.idClientHoneSolutions == 10) {
 
-    <section id="download-documents">
-        <div class="container-documents" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-
-            <div class="item-container-documents" nz-col [nzXs]="24" [nzSm]="24" [nzMd]="18" [nzLg]="8" [nzXl]="8" [nzXXl]="8">
-                <div class="cursor-pointer" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]" (click)="downloadDocumentsMundialSeguros()">
-                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="14" [nzXXl]="14" class="text-lg">
-                        Documentos obligatorios a diligenciar (descargar)
-                    </h2>
-
-                    <div nz-col>
-                        <img src="../../../../../assets/img/carbon_download.png" alt="Logo" style="width: 50px;">
-                    </div>
-                </div>
-            </div>
-
-            <div class="item-container-documents" nz-col [nzXs]="24" [nzSm]="24" [nzMd]="18" [nzLg]="8" [nzXl]="8" [nzXXl]="8" >
-                <div class="cursor-pointer" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]" (click)="downloadDocumentsMundialSegurosInformative()">
-                    <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18" class="text-lg">
-                        Documentos informativos
-                    </h2>
-
-                    <div nz-col>
-                        <img src="../../../../../assets/img/carbon_download.png" alt="Logo" style="width: 50px;">
-                    </div>
-
-                </div>
-            </div>
-
-        </div>
-    </section>
-    }
-    @if (clientSelected.idClientHoneSolutions == 12) {
-    <!-- Empty, no documents for bmi -->
-    <section id="download-documents">
-    </section>
-    }
     @if (clientSelected.idClientHoneSolutions == 13 && clientSelected.idTypeProvider == 7) {
-
     <section id="download-documents">
         <div class="container-documents" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
 
@@ -113,14 +359,9 @@
 
 
 
-    @if (loadingData) {
-    <div class="centerContent">
-        <nz-spin nzSimple [nzSize]="'large'" nzTip="Cargando datos..."></nz-spin>
-    </div>
-    }
-    @if (!loadingData) {
+    @if (!loadingDocs) {
     <section class="custom-tabs">
-        <nz-tabset nzCentered (nzSelectChange)="tabChange([$event])">
+        <nz-tabset nzCentered>
             <nz-tab [nzTitle]="templateWarning">
                 <ng-template #templateWarning>
                     <section class="title-tabs" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[24,32]">
@@ -177,22 +418,5 @@
         </nz-tabset>
     </section>
     }
-
-    <section id="download-documents">
-        <div class="download-documents" nz-row nzJustify="center" nzAlign="middle" [nzGutter]="[12,12]">
-
-            <h2 nz-col [nzXs]="24" [nzSm]="18" [nzMd]="18" [nzLg]="18" [nzXl]="18" [nzXXl]="18" class="text-lg">
-                Deseas agregar documentos a otra empresa afiliada
-            </h2>
-
-            <div nz-col>
-                <button nz-button nzType="primary" class="btn-primary custom-btn" [disabled]="false"
-                    nzJustify="center" nzAlign="middle" (click)="navigateTo('/home')">
-                    Agregar
-                </button>
-            </div>
-
-        </div>
-    </section>
 
 </div>

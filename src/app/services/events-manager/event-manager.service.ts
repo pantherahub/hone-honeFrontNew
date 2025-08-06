@@ -1,5 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { UserInterface } from '../../models/user.interface';
+import { ClientInterface } from 'src/app/models/client.interface';
 
 @Injectable({
    providedIn: 'root'
@@ -7,7 +8,7 @@ import { UserInterface } from '../../models/user.interface';
 export class EventManagerService {
 
   userLogged = signal<UserInterface>({});
-  clientSelected = signal({});
+  clientSelected = signal<ClientInterface>({});
   getPercentApi = signal<number>(0);
 
   constructor() { }
