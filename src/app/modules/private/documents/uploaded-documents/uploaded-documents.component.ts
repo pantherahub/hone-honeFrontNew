@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { EventManagerService } from '../../../../services/events-manager/event-manager.service';
 import { DocumentsCrudService } from '../../../../services/documents/documents-crud.service';
 import { DocumentInterface } from '../../../../models/client.interface';
@@ -19,6 +19,8 @@ import { FileViewerComponent } from 'src/app/shared/modals/file-viewer/file-view
    styleUrl: './uploaded-documents.component.scss'
 })
 export class UploadedDocumentsComponent implements OnInit {
+   @Input() citiesList: any[] = [];
+
    loadingData: boolean = false;
    clientSelected: any = this.eventManager.clientSelected();
    counterApi: any = this.eventManager.getPercentApi();
@@ -126,7 +128,7 @@ export class UploadedDocumentsComponent implements OnInit {
     * @param message - recibe el mensaje que se mostrará en pantalla
     * @param documentType - recibe el tipo de documento que desea editar
     */
-   editDocumentModal (item: any): void {
+  editDocumentModal(item: any): void {
       const modal = this.modalService.create<ModalEditDocumentComponent, any>({
          nzContent: ModalEditDocumentComponent,
          nzCentered: true,
@@ -140,6 +142,7 @@ export class UploadedDocumentsComponent implements OnInit {
       instance.currentDoc = item;
       instance.documentId = item.idDocumentsProvider;
       instance.documentType = item.idTypeDocuments;
+      instance.citiesList = this.citiesList;
 
       // Return a result when opened
       modal.afterOpen.subscribe(() => {});

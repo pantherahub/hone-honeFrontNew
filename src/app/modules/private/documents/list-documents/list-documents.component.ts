@@ -15,6 +15,7 @@ import { AssistanceProvidersComponent } from '../../../../shared/forms/assistanc
 import { ProviderAssistanceComponent } from '../../../../shared/modals/provider-assistance/provider-assistance.component';
 import { FeedbackFivestarsComponent } from 'src/app/shared/modals/feedback-fivestars/feedback-fivestars.component';
 import { AlertService } from 'src/app/services/alerts/alert.service';
+import { CitiesService } from 'src/app/services/cities/cities.service';
 
 @Component({
   selector: 'app-list-documents',
@@ -31,6 +32,7 @@ export class ListDocumentsComponent implements OnInit {
   loadManualDownload: boolean = false;
   hiddenCard: boolean = false;
   contactsOfProviders: any = [];
+  citiesList: any[] = [];
 
   percentData: PercentInterface = {};
   feedbackModalShown = false;
@@ -43,6 +45,7 @@ export class ListDocumentsComponent implements OnInit {
     private modalService: NzModalService,
     private contactProvider: ContactsProviderServicesService,
     private alertService: AlertService,
+    private citiesService: CitiesService,
   ) {
     effect(
       () => {
@@ -61,6 +64,7 @@ export class ListDocumentsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.getCities();
     this.getDocumentPercent();
     this.getContactsByIDProvider(this.clientSelected.idProvider);
   }
@@ -73,6 +77,17 @@ export class ListDocumentsComponent implements OnInit {
   * @params event: any
   */
   tabChange(event: any) { }
+
+  getCities() {
+    this.citiesService.getCities().subscribe({
+      next: (resp: any[]) => {
+        this.citiesList = resp;
+      },
+      error: (err: any) => {
+        console.error(err);
+      }
+    });
+  }
 
   /**
    * Obtiene desde un api el porcentaje de documentos cargado, sin cargas y vencidos
