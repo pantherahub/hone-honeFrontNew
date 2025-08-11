@@ -1,4 +1,4 @@
-<nav class="header-container h-[80px] bg-gray-0 flex justify-center border-b">
+<nav class="header-container h-[80px] bg-gray-50 flex justify-center border-b">
   <div class="w-full flex items-center justify-between max-w-screen-2xl py-3 px-4 2xl:py-4 2xl:px-5">
     <a routerLink="/home">
       <img class="h-[48px] cursor-pointer" src="assets/img/logo-hone.png" alt="Logo" />
@@ -13,10 +13,11 @@
         [highlighted]="true"
         [(visible)]="configTutorialVisible"
         [contentTemplate]="popoverContent"
-        extraPopoverClass="max-w-[330px] md:max-w-[486px]"
+        extraPopoverClass="max-w-[380px]"
         [autoScrollOnOpen]="true"
         (onClose)="nextTutorialStep()"
       >
+        <!-- extraPopoverClass="max-w-[330px] md:max-w-[486px]" -->
         <ng-template #triggerTemplate>
           <app-button
               (click)="navigateToUpdateData()"
@@ -25,7 +26,10 @@
               styleType="soft"
               customClass="leading-4 tutorial-option"
             >
-            <span class="truncate max-w-[150px] md:max-w-[310px] hidden sm:block">
+            <span class="truncate max-w-[50px] sm:hidden">
+              {{ getProviderNameInitials(user.name) }}
+            </span>
+            <span class="truncate max-w-[310px] hidden sm:block">
               {{user.name ? user.name : 'No reporta nombre'}}
             </span>
             <svg width="16" height="16">
@@ -53,10 +57,10 @@
 
 <!-- Tutorial popover content -->
 <ng-template #popoverContent>
-  <img src="assets/img/home/guide1.webp"
+  <!-- <img src="assets/img/home/guide1.webp"
     alt="Imagen previsualización"
     class="hidden md:block rounded-md"
-  />
+  /> -->
   <div class="flex justify-between items-center">
     <span class="text-base leading-5 md:leading-[18px] font-normal text-main-blue1h">1 de 2</span>
     <div class="flex gap-2">

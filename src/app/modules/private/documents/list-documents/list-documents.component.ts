@@ -1,11 +1,8 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild, effect } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { NgZorroModule } from '../../../../ng-zorro.module';
 import { EventManagerService } from '../../../../services/events-manager/event-manager.service';
 import { DocumentsCrudService } from '../../../../services/documents/documents-crud.service';
 import { DocumentInterface, PercentInterface } from '../../../../models/client.interface';
-import { RemainingDocumentsComponent } from '../remaining-documents/remaining-documents.component';
-import { ExpiredDocumentsComponent } from '../expired-documents/expired-documents.component';
-import { UploadedDocumentsComponent } from '../uploaded-documents/uploaded-documents.component';
 import { Router } from '@angular/router';
 import { FeedbackFivestarsComponent } from 'src/app/shared/modals/feedback-fivestars/feedback-fivestars.component';
 import { AlertService } from 'src/app/services/alert/alert.service';
@@ -16,16 +13,14 @@ import { PipesModule } from 'src/app/pipes/pipes.module';
 import { FileViewerComponent } from 'src/app/shared/modals/file-viewer/file-viewer.component';
 import { CommonModule } from '@angular/common';
 import { TooltipComponent } from 'src/app/shared/components/tooltip/tooltip.component';
-
-interface DocumentConfig {
-  files: { url: string; name: string }[]; // pueden ser .pdf o .zip
-  displayName: string; // nombre para el botón o mensaje
-}
+import { ModalEditDocumentComponent } from '../modal-edit-document/modal-edit-document.component';
+import { DocumentConfig, DownloadService } from 'src/app/services/download/download.service';
+import { ToastService } from 'src/app/services/toast/toast.service';
 
 @Component({
   selector: 'app-list-documents',
   standalone: true,
-  imports: [NgZorroModule, CommonModule, PipesModule, FileViewerComponent, RemainingDocumentsComponent, ExpiredDocumentsComponent, UploadedDocumentsComponent, ButtonComponent, TooltipComponent],
+  imports: [NgZorroModule, CommonModule, PipesModule, ButtonComponent, TooltipComponent],
   templateUrl: './list-documents.component.html',
   styleUrl: './list-documents.component.scss'
 })
@@ -38,14 +33,33 @@ export class ListDocumentsComponent implements OnInit {
   loadManualDownload: boolean = false;
 
   percentData: PercentInterface = {};
+  docList: any[] = [];
   feedbackModalShown = false;
   dataformAlertShown = false;
 
-  docList: any[] = [];
-
-  testItems: any[] = Array(4);
-  @ViewChild('donutChart', { static: false }) chartElement!: ElementRef;
   chart!: ApexCharts;
+  @ViewChild('donutChart', { static: false }) chartElement!: ElementRef;
+
+  private downloadConfigs: Record<string, DocumentConfig> = {
+    '8-9': {
+      files: [
+        { url: 'https://honesolutions.blob.core.windows.net/documents/docs-prestadores-axa-gestion-preventiva.zip', name: 'Documentos para diligenciar axa gestión preventiva.zip' }
+      ],
+      displayName: 'Documentos obligatorios a diligenciar',
+    },
+    '8-*': {
+      files: [
+        { url: 'https://honesolutions.blob.core.windows.net/documents/docs-prestadores-axa.zip', name: 'Documentos para diligenciar axa.zip' },
+      ],
+      displayName: 'Documentos obligatorios a diligenciar',
+    },
+    '13-7': {
+      files: [
+        { url: 'https://honesolutions.blob.core.windows.net/documents/carta_mipres.pdf', name: 'Carta_Mipres.pdf' }
+      ],
+      displayName: 'Carta Mipres a diligenciar',
+    }
+  };
 
   constructor(
     private eventManager: EventManagerService,
@@ -53,18 +67,9 @@ export class ListDocumentsComponent implements OnInit {
     private router: Router,
     private modalService: ModalService,
     private alertService: AlertService,
-  ) {
-    // effect(
-    //   () => {
-    //     const shouldCallApi = this.eventManager.getPercentApi();
-    //     if (shouldCallApi) {
-    //       this.getDocumentPercent();
-    //       // Reset to avoid double querying with ngOnInit when re-rendering the component
-    //       this.eventManager.getPercentApi.set(0);
-    //     }
-    //   }, { allowSignalWrites: true }
-    // );
-  }
+    private downloadService: DownloadService,
+    private toastService: ToastService,
+  ) { }
 
   ngOnInit(): void {
     this.getDocumentPercent();
@@ -165,6 +170,7 @@ export class ListDocumentsComponent implements OnInit {
     this.chart.highlightSeries(label);
   }
   clearHighlight(): void {
+    if (!this.chart) return;
     this.chart.resetSeries();
   }
 
@@ -220,7 +226,7 @@ export class ListDocumentsComponent implements OnInit {
       title: 'Nos gustaría conocer tu opinión',
       closable: false,
       customSize: 'max-w-[600px] !gap-2',
-    })
+    });
     modal.onClose.subscribe((result) => {
       if (result?.submitted) {
         this.alertService.success(
@@ -270,15 +276,18 @@ export class ListDocumentsComponent implements OnInit {
 
   deleteDocument(doc: any) {
     const { idDocumentsProvider } = doc;
+    if (!this.clientSelected?.idProvider || !idDocumentsProvider) {
+      this.toastService.error('Algo salió mal.');
+      return;
+    }
 
     this.alertService.confirmDelete(
       '¿Estas seguro de eliminar el documento?',
       'En caso de eliminar el documento se perderá y no podrá recuperarse'
     ).subscribe((confirmed: boolean) => {
-      console.log("confirmed", confirmed);
       if (!confirmed) return;
       this.loadingDocs = true;
-      this.documentService.deleteDocument(idDocumentsProvider).subscribe({
+      this.documentService.deleteDocument(this.clientSelected.idProvider, idDocumentsProvider).subscribe({
         next: (res: any) => {
           this.loadingDocs = false;
           this.getDocumentPercent();
@@ -299,202 +308,51 @@ export class ListDocumentsComponent implements OnInit {
     });
   }
 
+  editDocumentModal(item: any, isNew: boolean = true): void {
+    let docModalInputs: any = {
+      currentDoc: item,
+    };
+    if (isNew) docModalInputs["isNew"] = true;
 
+    const modal = this.modalService.open(ModalEditDocumentComponent, {
+      title: isNew ? 'Agregar documento' : 'Actualizar información',
+      customSize: 'max-w-[600px]',
+    }, {
+      ...docModalInputs,
+    })
+    modal.onClose.subscribe((result) => {
+      if (result?.response) {
+        this.getDocumentPercent();
+        this.getDocuments();
+      }
+    });
+  }
 
+  getCurrentDownloadConfig(): DocumentConfig | null {
+    const clientId = this.clientSelected?.idClientHoneSolutions;
+    const providerType = this.clientSelected?.idTypeProvider;
+    if (!clientId || !providerType) return null;
 
+    const keyExact = `${clientId}-${providerType}`;
+    const keyWildcard = `${clientId}-*`;
 
-
-  private downloadConfigs: Record<string, DocumentConfig> = {
-    '8-9': {
-      files: [
-        { url: 'assets/documents-provider/documentos-axa-gestion-preventiva.zip', name: 'Documentos para diligenciar axa gestión preventiva.zip' }
-      ],
-      displayName: 'Documentos obligatorios a diligenciar',
-    },
-    '8-*': {
-      files: [
-        { url: 'assets/documents-provider/documentos-axa.zip', name: 'Documentos para diligenciar axa.zip' },
-        {
-          url: 'https://honesolutions.blob.core.windows.net/documents/PresentacionInduccionSostenibilidad2025.pdf',
-          name: 'Presentación inducción y sostenibilidad 2025.pdf'
-        },
-        {
-          url: 'https://honesolutions.blob.core.windows.net/documents/Manual_Portal_de_Prestadores_Salud_VF_2.pdf',
-          name: 'Manual Portal de Prestadores Salud VF 2.pdf'
-        },
-        {
-          url: 'https://honesolutions.blob.core.windows.net/documents/AXA_Manual_Radicacion_Digital_Salud_1.30.25_(2275+2284).pdf',
-          name: 'AXA Manual Radicacion Digital Salud 1.30.25 (2275+2284).pdf'
-        },
-      ],
-      displayName: 'Documentos obligatorios a diligenciar y manuales',
-    },
-    '13-7': {
-      files: [
-        { url: 'assets/documents-provider/CartaMipres.pdf', name: 'Carta_Mipres.pdf' }
-      ],
-      displayName: 'Carta Mipres a diligenciar',
-    }
-  };
-
-
-
-
-
+    return this.downloadConfigs[keyExact] || this.downloadConfigs[keyWildcard] || null;
+  }
 
   downloadClientDocs() {
-    switch (this.clientSelected.idClientHoneSolutions) {
-      case (8): // axa
-        if (this.clientSelected.idTypeProvider == 9) {
-          // Este zip:
-          this.saveAs(
-            `assets/documents-provider/documentos-axa-gestion-preventiva.zip`,
-            `Documentos para diligenciar axa gestión preventiva.zip`
-          );
-          const documents = [
-            {
-              url: 'https://honesolutions.blob.core.windows.net/documents/PresentacionInduccionSostenibilidad2025.pdf',
-              name: 'Presentación inducción y sostenibilidad 2025.pdf'
-            },
-            {
-              url: 'https://honesolutions.blob.core.windows.net/documents/Manual_Portal_de_Prestadores_Salud_VF_2.pdf',
-              name: 'Manual Portal de Prestadores Salud VF 2.pdf'
-            },
-            {
-              url: 'https://honesolutions.blob.core.windows.net/documents/AXA_Manual_Radicacion_Digital_Salud_1.30.25_(2275+2284).pdf',
-              name: 'AXA Manual Radicacion Digital Salud 1.30.25 (2275+2284).pdf'
-            },
-          ];
-          break;
-        } else {
-          // Un solo zip con todo esto: (tanto el zip del saveAs como los documentos pdf, todo eso en un zip)
-          this.saveAs(
-            `assets/documents-provider/documentos-axa.zip`,
-            `Documentos para diligenciar axa.zip`
-          );
-          const documents = [
-            {
-              url: 'https://honesolutions.blob.core.windows.net/documents/PresentacionInduccionSostenibilidad2025.pdf',
-              name: 'Presentación inducción y sostenibilidad 2025.pdf'
-            },
-            {
-              url: 'https://honesolutions.blob.core.windows.net/documents/Manual_Portal_de_Prestadores_Salud_VF_2.pdf',
-              name: 'Manual Portal de Prestadores Salud VF 2.pdf'
-            },
-            {
-              url: 'https://honesolutions.blob.core.windows.net/documents/AXA_Manual_Radicacion_Digital_Salud_1.30.25_(2275+2284).pdf',
-              name: 'AXA Manual Radicacion Digital Salud 1.30.25 (2275+2284).pdf'
-            },
-          ];
-        }
-        break;
-      case (13):
-        if (this.clientSelected.idTypeProvider == 7) {
-          // Solo este documento (no zip)
-          this.saveAs(`assets/documents-provider/CartaMipres.pdf`, `Carta_Mipres.pdf`);
-          break;
-        }
+    const config = this.getCurrentDownloadConfig();
+    if (!config) return;
 
-    }
-  }
-
-  /**
-   * Valida el tipo de prestador y descarga un paquete de documentos
-   */
-  downloadDocumentsAxa() { // YA
-    if (this.clientSelected.idTypeProvider == 9) {
-      this.saveAs(
-        `assets/documents-provider/documentos-axa-gestion-preventiva.zip`,
-        `Documentos para diligenciar axa gestión preventiva.zip`
-      );
-      return;
-    }
-    this.saveAs(
-      `assets/documents-provider/documentos-axa.zip`,
-      `Documentos para diligenciar axa.zip`
-    );
-  }
-
-  /**
-   * Descargar para Axa manuales de prestadores de Servicios de Salud
-   */
-  downloadAxaProviderManual() {
-    if (this.loadManualDownload) return;
-    const documents = [
-      {
-        url: 'https://honesolutions.blob.core.windows.net/documents/PresentacionInduccionSostenibilidad2025.pdf',
-        name: 'Presentación inducción y sostenibilidad 2025.pdf'
-      },
-      {
-        url: 'https://honesolutions.blob.core.windows.net/documents/Manual_Portal_de_Prestadores_Salud_VF_2.pdf',
-        name: 'Manual Portal de Prestadores Salud VF 2.pdf'
-      },
-      {
-        url: 'https://honesolutions.blob.core.windows.net/documents/AXA_Manual_Radicacion_Digital_Salud_1.30.25_(2275+2284).pdf',
-        name: 'AXA Manual Radicacion Digital Salud 1.30.25 (2275+2284).pdf'
-      },
-    ];
-
-    let downloadsInProgress = documents.length;
+    let downloadsInProgress = config.files.length;
     this.loadManualDownload = true;
-    documents.forEach(doc => {
-      this.saveAs(doc.url, doc.name, () => {
+    config.files.forEach(doc => {
+      this.downloadService.saveFile(doc.url, doc.name, () => {
         downloadsInProgress--;
         if (downloadsInProgress === 0) {
           this.loadManualDownload = false;
         }
       });
     });
-  }
-
-  /**
-   * Descarga Documentos de Sura
-   */
-  downloadDocumentsSura() {
-    // Natural person
-    if (this.clientSelected.idTypeProvider == 7) {
-      this.saveAs(`assets/documents-provider/CartaMipres.pdf`, `Carta_Mipres.pdf`);
-    }
-  }
-
-  /**
-   * Recibe la url de donde se toman los documentos locales y los descarga
-   * @param url - ruta de los assets/container a descargar
-   * @param name - nombre del archivo que se muestra en la descarga
-   * @param onComplete - callback opcional para cuando se complete la descarga
-   */
-  saveAs(url: any, name: any, onComplete?: () => void) {
-    if (url.startsWith('http')) {
-      fetch(url)
-        .then(response => {
-          if (!response.ok) throw new Error('Error al descargar el archivo');
-          return response.blob();
-        })
-        .then(blob => {
-          const blobUrl = window.URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = blobUrl;
-          link.download = name;
-          document.body.appendChild(link);
-          link.click();
-          link.remove();
-          window.URL.revokeObjectURL(blobUrl);
-        })
-        .catch(error => console.error('Error descargando el archivo:', error))
-        .finally(() => {
-          if (onComplete) onComplete();
-        });
-      return;
-    }
-
-    const link = document.createElement('a');
-    link.setAttribute('type', 'hidden');
-    link.href = url;
-    link.download = name;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    if (onComplete) onComplete();
   }
 
 }

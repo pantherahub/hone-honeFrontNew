@@ -16,12 +16,14 @@ export class AlertService {
       customSize = 'max-w-xs',
       closable = true,
       showClose,
+      beforeClose,
       ...alertOptions
     } = opts;
 
     const modalReturn = this.modalService.open(AlertModalComponent, {
       customSize,
       closable,
+      beforeClose,
       customModalClass: '!rounded-lg !p-0',
     }, {
       showClose: showClose === undefined ? closable : showClose,

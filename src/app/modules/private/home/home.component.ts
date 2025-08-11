@@ -50,6 +50,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    localStorage.removeItem('clientSelected');
+    this.eventManager.clientSelected.set({});
+
     this.getClientList();
   }
 
@@ -116,7 +119,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (activeTutorialStep) this.nextTutorialStep();
     localStorage.setItem('clientSelected', JSON.stringify(item));
     this.eventManager.getDataClient();
-    this.router.navigateByUrl(`/documentation`);
+    this.router.navigateByUrl(`/service/documentation`);
   }
 
 

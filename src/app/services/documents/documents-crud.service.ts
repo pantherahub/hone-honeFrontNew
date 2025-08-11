@@ -13,7 +13,6 @@ export class DocumentsCrudService {
   constructor(private httpClient: HttpClient) { }
 
   public getPercentDocuments(idProvider: number, idTypeProvider: number, idClient: number): Observable<any> {
-    // return this.httpClient.get(`${this.url}${this.urlPrefix}/GetPorcentages/${idProvider}/${idTypeProvider}/${idClient}`);
     return this.httpClient.get(`${this.url}${this.urlPrefix}/GetPorcentages/${idProvider}/${idClient}`);
   }
 
@@ -21,38 +20,17 @@ export class DocumentsCrudService {
     return this.httpClient.get(`${this.url}${this.urlPrefix}/GetDocuments/${idProvider}/${idClient}`);
   }
 
-  // Llama al api para obtener lista documentos por cargar del prestador
-  public getDocumentsToUpload(idProvider: number, idTypeProvider: number, idClient: number): Observable<any> {
-    return this.httpClient.get(`${this.url}getDocumentsToUpload/${idProvider}/${idTypeProvider}/${idClient}`);
+  public uploadDocuments(payload: any): Observable<any> {
+    return this.httpClient.post(`${this.url}${this.urlPrefix}/Upload/One`, payload);
   }
 
-  // Llama al api para obtener lista documentos cargados del prestador
-  public getUploadedDocuments(idProvider: number, idTypeProvider: number, idClient: number): Observable<any> {
-    return this.httpClient.get(`${this.url}getUploadedDocuments/${idProvider}/${idTypeProvider}/${idClient}`);
+  public updateDocuments(idDocument: number, payload: any): Observable<any> {
+    return this.httpClient.put(`${this.url}${this.urlPrefix}/Update/${idDocument}`, payload);
   }
 
-  // Llama al api para obtener lista documentos vencidos del prestador
-  public getExpiredDocuments (idProvider: number, idTypeProvider: number, idClient: number): Observable<any> {
-    return this.httpClient.get(`${this.url}getExpiredDocuments/${idProvider}/${idTypeProvider}/${idClient}`);
-  }
-
-  // Sube los documentos al servidor
-  public uploadDocuments (idProvider: number, payload: any): Observable<any> {
-    const headers = {
-        'Content-Type': 'multipart/form-data',
-        accept: 'application/json'
-    };
-    return this.httpClient.post(`${this.url}uploadsDocuments/${idProvider}`, payload);
-  }
-
-  // actualiza los documentos
-  public updateDocuments (idDocument: number, payload: any): Observable<any> {
-    return this.httpClient.put(`${this.url}updateDocuments/${idDocument}`, payload);
-  }
-
-  // actualiza los documentos
-  public deleteDocument (idDocument: any): Observable<any> {
-    return this.httpClient.delete(`${this.url}deleteDocument/${idDocument}`);
+  public deleteDocument(idProvider: number, idDocument: any): Observable<any> {
+    const url = `${this.url}${this.urlPrefix}/Delete/${idProvider}/${idDocument}`;
+    return this.httpClient.delete(url);
   }
 
   downloadFile(filename: string) {
@@ -60,4 +38,5 @@ export class DocumentsCrudService {
       responseType: 'arraybuffer'
     });
   }
+
 }

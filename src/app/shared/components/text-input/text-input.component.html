@@ -9,6 +9,7 @@
 
   @if (isTextarea) {
     <textarea
+      #inputRef
       [attr.id]="id"
       [attr.name]="name"
       placeholder=" "
@@ -16,6 +17,7 @@
       [value]="value"
       (input)="handleInput($event)"
       (blur)="onTouched()"
+      (focus)="handleFocus($event)"
       [attr.rows]="rows"
       [attr.minlength]="minlength"
       [attr.maxlength]="maxlength"
@@ -30,18 +32,22 @@
     ></textarea>
   } @else {
     <input
+      #inputRef
       [attr.id]="id"
       [attr.name]="name"
-      [type]="actualInputType"
+      [type]="type === 'date' ? 'text' : actualInputType"
       placeholder=" "
       [disabled]="disabled"
       [value]="value"
       (input)="handleInput($event)"
       (blur)="onTouched()"
+      (focus)="handleFocus($event)"
       [attr.minlength]="type === 'text' ? minlength : null"
       [attr.maxlength]="type === 'text' ? maxlength : null"
       [attr.min]="type === 'number' ? min : null"
       [attr.max]="type === 'number' ? max : null"
+      [attr.autocomplete]="type === 'date' ? 'off' : autocomplete"
+      [readonly]="type === 'date'"
       class="block px-2.5 pb-2 pt-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border-1 appearance-none dark:text-white focus:outline-none focus:ring-0 peer autofill:shadow-[inset_0_0_0_1000px_white]
       disabled:bg-gray-100 disabled:text-gray-400 dark:disabled:bg-gray-800 dark:disabled:text-gray-500 disabled:cursor-not-allowed"
       [ngClass]="{
@@ -88,6 +94,12 @@
         </svg>
       }
     </button>
+  } @else if (type === 'date') {
+    <div class="absolute inset-y-0 end-0 flex items-center px-3 top-0.5 text-sm text-gray-500 dark:text-gray-300 pointer-events-none">
+      <svg [attr.width]="iconSize" [attr.height]="iconSize">
+        <use xlink:href="/assets/icons/outline/general.svg#calendar-week" />
+      </svg>
+    </div>
   } @else if (type === 'time') {
     <div class="absolute inset-y-0 end-0 flex items-center px-3 top-0.5 text-sm text-gray-500 dark:text-gray-300 pointer-events-none">
       <svg [attr.width]="iconSize" [attr.height]="iconSize">

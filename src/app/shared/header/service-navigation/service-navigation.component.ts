@@ -18,20 +18,20 @@ export class ServiceNavigationComponent implements OnInit, OnDestroy {
 
   serviceRoutes = [
     {
-      path: '/documentation',
+      path: '/service/documentation',
       label: 'Documentación',
       tab: 'Documentos',
     },
-    {
-      path: '/billling',
-      label: 'Facturación',
-      tab: 'Facturación',
-    },
-    {
-      path: '/rips',
-      label: 'Rips',
-      tab: 'RIPS',
-    }
+    // {
+    //   path: '/service/billling',
+    //   label: 'Facturación',
+    //   tab: 'Facturación',
+    // },
+    // {
+    //   path: '/service/rips',
+    //   label: 'Rips',
+    //   tab: 'RIPS',
+    // }
   ];
 
   currentLabel: string = '';

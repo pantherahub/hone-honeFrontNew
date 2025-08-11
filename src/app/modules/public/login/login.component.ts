@@ -45,7 +45,7 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('environment prod: ', environment.production);
+    // console.log('environment prod: ', environment.production);
     localStorage.clear();
 
     const urlTree = this.router.parseUrl(this.router.url);
@@ -61,16 +61,14 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  //  Crea e Inicializa el formulario
-  createForm () {
+  createForm() {
     this.loginForm = this.formBuilder.nonNullable.group({
       email: [ '', [ Validators.required ] ],
       password: [ '', [ Validators.required ] ]
     });
   }
 
-  //  Envia peticion al servicio de login para obtener el token de acceso
-  submitRequest () {
+  submitRequest() {
     if (this.loginForm.invalid) {
       Object.values(this.loginForm.controls).forEach(control => {
         if (control.invalid) {
@@ -109,17 +107,16 @@ export class LoginComponent implements OnInit {
         }
 
         this.toastService.error('Algo salió mal.');
-      },
-      complete: () => {}
+      }
     });
   }
 
-  resolved (captchaResponse: any) {
+  resolved(captchaResponse: any) {
     this.captchaValidation = true;
     this.showError = false;
   }
 
-  errored () {
+  errored() {
     this.captchaValidation = false;
     this.showError = true;
     console.warn(`reCAPTCHA error encountered`);

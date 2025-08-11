@@ -74,4 +74,14 @@ export class HeaderPrivateComponent implements OnInit, OnDestroy {
     this.authService.logout();
   }
 
+  getProviderNameInitials(name?: string): string {
+    if (!name) return '';
+    const trimmed = name.trim();
+    const parts = trimmed.split(/\s+/);
+    if (parts.length > 1) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return trimmed.slice(0, 2).toUpperCase();
+  }
+
 }

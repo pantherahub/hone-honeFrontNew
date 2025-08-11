@@ -67,7 +67,7 @@ export const routes: Routes = [
         canDeactivate: [canDeactivateGuard]
       },
       {
-        path: '',
+        path: 'service',
         component: ServiceLayoutComponent,
         canActivate: [clientSelectedGuard],
         children: [
@@ -84,8 +84,13 @@ export const routes: Routes = [
   {
     path: '**',
     pathMatch: 'full',
-    redirectTo: 'page-not-found'
+    redirectTo: 'home'
   },
+  // {
+  //   path: '**',
+  //   pathMatch: 'full',
+  //   redirectTo: 'page-not-found'
+  // },
 ];
 
 @NgModule({

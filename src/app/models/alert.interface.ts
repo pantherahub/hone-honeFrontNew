@@ -12,6 +12,7 @@ export interface AlertOptions {
   showClose?: boolean;
   loading?: boolean;
 
+  iconVariant?: AlertVariant;
   cancelBtnText?: string;
   confirmBtnText?: string;
   confirmBtnVariant?: 'primary' | 'gray' | 'red' | 'green';
@@ -20,4 +21,5 @@ export interface AlertOptions {
 
   customSize?: string;
   closable?: boolean;
+  beforeClose?: () => boolean | Promise<boolean>;
 }

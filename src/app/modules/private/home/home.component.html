@@ -1,5 +1,5 @@
-<div class="flex justify-center">
-  <div class="max-w-screen-xl w-full mx-4 pt-10 pb-20 md:py-6 flex flex-col gap-9">
+<div class="flex justify-center mx-4">
+  <div class="max-w-screen-xl w-full pt-10 pb-20 md:pt-6 flex flex-col gap-9">
     <div class="rounded-xl bg-blue2h-100">
       <div class="w-full max-w-[821px] mx-auto flex">
         <div class="hidden md:block px-4 pt-4 flex-shrink-0">
@@ -78,7 +78,7 @@
       <ng-template #clientCardTemplate let-item>
         <div
           (click)="changeOptionClient(item, clientTutorialVisible)"
-          class="flex p-4 rounded-lg cursor-pointer bg-gray-50 text-main-blue1h hover:bg-gray-100 hover:ring-[1px] hover:ring-inset hover:ring-blue1h-600 hover:shadow-[0px_16px_44px_0px_#0D0F1C1A] transition-shadow"
+          class="flex p-4 rounded-lg cursor-pointer bg-gray-100 text-main-blue1h hover:bg-gray-100 hover:ring-[1px] hover:ring-inset hover:ring-blue1h-600 hover:shadow-[0px_16px_44px_0px_#0D0F1C1A] transition-shadow"
           [ngClass]="{
             'flex-col gap-3': viewMode === 'grid',
             'h-[98.95px] items-center gap-4': viewMode === 'list',
@@ -86,7 +86,7 @@
           <div
             class="overflow-hidden bg-gray-0 rounded-lg"
             [ngClass]="{
-              'p-3.5 h-[346px] xs:h-[149.13px] sm:h-[185.264px]': viewMode === 'grid',
+              'p-3.5 h-[300px] xs:h-[149.13px] sm:h-[167.03px]': viewMode === 'grid',
               'p-2 w-[67.3px] h-[67.3px] flex justify-center items-center': viewMode === 'list',
             }">
             <img

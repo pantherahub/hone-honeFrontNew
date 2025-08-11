@@ -69,7 +69,7 @@ export class FloatingActionsComponent implements OnInit {
 
     this.showSupportAction = !['/auth-support', '/support'].includes(currentUrl);
     this.showTutorialAction = currentUrl === '/home';
-    this.showMeetingAction = currentUrl ===  '/documentation'
+    this.showMeetingAction = currentUrl.startsWith('/service')
       && isNonEmptyObject(this.clientSelected)
       && !!this.customerScheduling.get(this.clientSelected.idClientHoneSolutions);
   }

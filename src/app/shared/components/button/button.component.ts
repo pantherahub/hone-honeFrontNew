@@ -12,7 +12,7 @@ import { RouterModule } from '@angular/router';
 export class ButtonComponent {
 
   @Input() type: 'button' | 'submit' = 'button';
-  @Input() variant: 'primary' | 'gray' | 'red' | 'green' = 'primary';
+  @Input() variant: 'primary' | 'white' | 'gray' | 'red' | 'green' = 'primary';
   @Input() styleType: 'solid' | 'soft' | 'ghost' = 'solid';
   @Input() size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' = 'md';
   @Input() customClass: string = '';
@@ -30,6 +30,11 @@ export class ButtonComponent {
       solid: ['text-blue1h-50', 'bg-main-blue1h', 'hover:bg-blue1h-800', 'active:bg-blue1h-700', 'active:ring-2', 'active:ring-blue1h-50', 'focus:ring-2', 'focus:ring-blue1h-50', 'disabled:bg-main-blue1h', 'disabled:ring-2', 'disabled:ring-blue1h-50'],
       soft: ['text-main-blue1h', 'bg-blue1h-100', 'hover:bg-blue1h-200', 'active:bg-blue1h-300', 'disabled:bg-blue1h-100'],
       ghost: ['text-main-blue1h', 'bg-main-blue1h', 'bg-transparent', 'hover:bg-blue1h-100', 'active:bg-blue1h-200', 'disabled:bg-transparent']
+    },
+    white: {
+      solid: ['text-gray-900', 'bg-white', 'hover:bg-gray-50', 'active:bg-gray-100', 'disabled:bg-white'],
+      soft: ['text-white', 'bg-white/15', 'hover:bg-white/25', 'active:bg-gray-50/35', 'disabled:bg-white/15'],
+      ghost: ['text-white', 'bg-transparent', 'hover:bg-white/15', 'active:bg-white/25', 'disabled:text-white', 'disabled:bg-transparent']
     },
     gray: {
       solid: ['text-gray-50', 'bg-gray-700', 'hover:bg-gray-800', 'active:bg-gray-900', 'disabled:bg-gray-900'],

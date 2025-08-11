@@ -1,577 +1,363 @@
-<section class="container-form">
-
-
-    <section class="form-section">
-
-        <form nz-form [formGroup]="documentForm" (ngSubmit)="submitRequest()" class="form-login">
-
-            <!-- Campo Nombre de Documento -->
-            <!-- <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="idDocumentType == 4 || idDocumentType == 12">
-                <nz-form-item nz-row>
-                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
-                        [nzXl]="24">
-                        Nombre documento
-                    </nz-form-label>
-
-                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="nombreDocErrorTip">
-                        <ng-template #nombreDocErrorTip>
-                            <p *ngIf="documentForm.controls['nombredocumento'].hasError('required')">¡Este campo es
-                                obligatorio!
-                            </p>
-                        </ng-template>
-                        <input nz-input type="date" placeholder="Nombre" formControlName="nombredocumento">
-                    </nz-form-control>
-
-                </nz-form-item>
-            </div> -->
-
-            <!-- Software -->
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="isFieldRequiredForDocumentType('software')">
-                <nz-form-item nz-row>
-                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
-                        [nzXl]="24">
-                        Software
-                    </nz-form-label>
-
-                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="softwareErrorTip">
-                        <ng-template #softwareErrorTip>
-                            <p *ngIf="documentForm.controls['software'].hasError('required')">
-                              ¡Este campo es obligatorio!
-                            </p>
-                        </ng-template>
-                        <nz-select
-                          id="software"
-                          formControlName="software"
-                          nzPlaceHolder="Seleccionar"
-                        >
-                          <nz-option *ngFor="let type of suraSoftwareTypes" [nzValue]="type" [nzLabel]="type"></nz-option>
-                        </nz-select>
-                    </nz-form-control>
-                </nz-form-item>
-            </div>
-
-            <!-- Campo Fecha de Expedición -->
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="isFieldRequiredForDocumentType('dateExpedition')">
-                <nz-form-item nz-row>
-                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
-                        [nzXl]="24" nzFor="dateExpedition">
-                        Fecha de Expedición
-                        <div *ngIf="expeditionDateRestrictions[idDocumentType]" nz-tooltip [nzTooltipTitle]="getExpeditionTooltipContent()" nzTooltipPlacement="top">
-                          <i nz-icon nzType="info-circle" nzTheme="fill" class="info-icon"></i>
-                        </div>
-                    </nz-form-label>
-
-                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="dateExpeditionErrorTip">
-                        <ng-template #dateExpeditionErrorTip>
-                            <p *ngIf="documentForm.controls['dateExpedition'].hasError('required')">
-                                ¡Este campo es obligatorio!
-                            </p>
-                        </ng-template>
-                        <app-date-picker-input
-                          formControlName="dateExpedition"
-                          inputId="dateExpedition"
-                          [disableDates]="disableExpeditionDates">
-                        </app-date-picker-input>
-                    </nz-form-control>
-                </nz-form-item>
-            </div>
-
-
-            <!-- Campo Fecha de Diligenciamiento -->
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="isFieldRequiredForDocumentType('dateDiligence')">
-                <nz-form-item nz-row>
-                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
-                        [nzXl]="24" nzFor="dateDiligence">
-                        Fecha de Diligenciamiento
-                    </nz-form-label>
-
-                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="dateDiligenceErrorTip">
-                        <ng-template #dateDiligenceErrorTip>
-                            <p *ngIf="documentForm.controls['dateDiligence'].hasError('required')">
-                                ¡Este campo es obligatorio!
-                            </p>
-                        </ng-template>
-                        <app-date-picker-input
-                          formControlName="dateDiligence"
-                          inputId="dateDiligence">
-                        </app-date-picker-input>
-                    </nz-form-control>
-                </nz-form-item>
-            </div>
-
-            <!-- Campo Fecha de Inicio -->
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="isFieldRequiredForDocumentType('dateFirm')">
-                <nz-form-item nz-row>
-                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
-                        [nzXl]="24" nzFor="dateFirm">
-                        Fecha de Inicio
-                    </nz-form-label>
-
-                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="dateFirmErrorTip">
-                        <ng-template #dateFirmErrorTip>
-                            <p *ngIf="documentForm.controls['dateFirm'].hasError('required')">
-                                ¡Este campo es obligatorio!
-                            </p>
-                        </ng-template>
-                        <app-date-picker-input
-                          formControlName="dateFirm"
-                          inputId="dateFirm">
-                        </app-date-picker-input>
-                    </nz-form-control>
-                </nz-form-item>
-            </div>
-
-
-            <!-- Campo Fecha de Vacunación -->
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="isFieldRequiredForDocumentType('dateVaccination')">
-                <nz-form-item nz-row>
-                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
-                        [nzXl]="24" nzFor="dateVaccination">
-                        Fecha de Vacunación
-                    </nz-form-label>
-
-                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="dateVaccinationErrorTip">
-                        <ng-template #dateVaccinationErrorTip>
-                            <p *ngIf="documentForm.controls['dateVaccination'].hasError('required')">
-                                ¡Este campo es obligatorio!
-                            </p>
-                        </ng-template>
-                        <app-date-picker-input
-                          formControlName="dateVaccination"
-                          inputId="dateVaccination">
-                        </app-date-picker-input>
-                    </nz-form-control>
-                </nz-form-item>
-            </div>
-
-
-            <!-- Campo Fecha de Vencimiento -->
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="isFieldRequiredForDocumentType('dueDate')">
-                <nz-form-item nz-row>
-                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
-                        [nzXl]="24" nzFor="dueDate">
-                        Fecha de Vencimiento
-                    </nz-form-label>
-
-                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="dueDateErrorTip">
-                        <ng-template #dueDateErrorTip>
-                            <p *ngIf="documentForm.controls['dueDate'].hasError('required')">
-                                ¡Este campo es obligatorio!
-                            </p>
-                        </ng-template>
-                        <app-date-picker-input
-                          formControlName="dueDate"
-                          inputId="dueDate">
-                        </app-date-picker-input>
-                    </nz-form-control>
-                </nz-form-item>
-            </div>
-
-
-            <!-- Campo Nombre del Representante Legal -->
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="isFieldRequiredForDocumentType('legalRepresentative')">
-                <nz-form-item nz-row>
-                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
-                        [nzXl]="24" nzFor="legalRepresentative">
-                        Nombre del Representante Legal
-                    </nz-form-label>
-
-                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="legalRepresentativeErrorTip">
-                        <ng-template #legalRepresentativeErrorTip>
-                            <p *ngIf="documentForm.controls['legalRepresentative'].hasError('required')">
-                                ¡Este campo es obligatorio!
-                            </p>
-                        </ng-template>
-                        <input nz-input placeholder="Nombre" id="legalRepresentative" formControlName="legalRepresentative">
-                    </nz-form-control>
-                </nz-form-item>
-            </div>
-
-
-            <!-- Campo Nombre Suplente/s -->
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="isFieldRequiredForDocumentType('NameAlternate')">
-                <nz-form-item nz-row>
-                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
-                        [nzXl]="24" nzFor="NameAlternate">
-                        Suplente/s
-                    </nz-form-label>
-
-                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="NameAlternateErrorTip">
-                        <ng-template #NameAlternateErrorTip>
-                            <p *ngIf="documentForm.controls['NameAlternate'].hasError('required')">
-                                ¡Este campo es obligatorio!
-                            </p>
-                        </ng-template>
-                        <input nz-input placeholder="Suplente/s" id="NameAlternate" formControlName="NameAlternate">
-                    </nz-form-control>
-                </nz-form-item>
-            </div>
-
-
-            <!-- Campo Fecha de Entrega del Documento -->
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="isFieldRequiredForDocumentType('documentDeliveryDate')">
-                <nz-form-item nz-row>
-                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
-                        [nzXl]="24" nzFor="documentDeliveryDate">
-                        Fecha de Entrega del Documento
-                    </nz-form-label>
-
-                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="documentDeliveryDateErrorTip">
-                        <ng-template #documentDeliveryDateErrorTip>
-                            <p *ngIf="documentForm.controls['documentDeliveryDate'].hasError('required')">
-                                ¡Este campo es obligatorio!
-                            </p>
-                        </ng-template>
-                        <app-date-picker-input
-                          formControlName="documentDeliveryDate"
-                          inputId="documentDeliveryDate">
-                        </app-date-picker-input>
-                    </nz-form-control>
-                </nz-form-item>
-            </div>
-
-
-            <!-- Campo Fecha de Nacimiento -->
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="isFieldRequiredForDocumentType('dateOfBirth')">
-                <nz-form-item nz-row>
-                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
-                        [nzXl]="24" nzFor="dateOfBirth">
-                        Fecha de Nacimiento
-                    </nz-form-label>
-
-                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="dateOfBirthErrorTip">
-                        <ng-template #dateOfBirthErrorTip>
-                            <p *ngIf="documentForm.controls['dateOfBirth'].hasError('required')">
-                                ¡Este campo es obligatorio!
-                            </p>
-                        </ng-template>
-                        <app-date-picker-input
-                          formControlName="dateOfBirth"
-                          inputId="dateOfBirth">
-                        </app-date-picker-input>
-                    </nz-form-control>
-                </nz-form-item>
-            </div>
-
-
-            <!-- Campo Fecha de Consulta -->
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="isFieldRequiredForDocumentType('consultationDate')">
-                <nz-form-item nz-row>
-                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
-                        [nzXl]="24" nzFor="consultationDate">
-                        Fecha de Consulta
-                    </nz-form-label>
-
-                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="consultationDateErrorTip">
-                        <ng-template #consultationDateErrorTip>
-                            <p *ngIf="documentForm.controls['consultationDate'].hasError('required')">
-                                ¡Este campo es obligatorio!
-                            </p>
-                        </ng-template>
-                        <app-date-picker-input
-                          formControlName="consultationDate"
-                          inputId="consultationDate">
-                        </app-date-picker-input>
-                    </nz-form-control>
-                </nz-form-item>
-            </div>
-
-
-            <!-- Campo Especialidad Avalada -->
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="isFieldRequiredForDocumentType('endorsedSpecialtyDate')">
-                <nz-form-item nz-row>
-                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
-                        [nzXl]="24" nzFor="endorsedSpecialtyDate">
-                        Especialidad Avalada
-                    </nz-form-label>
-
-                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="endorsedSpecialtyDateErrorTip">
-                        <ng-template #endorsedSpecialtyDateErrorTip>
-                            <p *ngIf="documentForm.controls['endorsedSpecialtyDate'].hasError('required')">
-                                ¡Este campo es obligatorio!
-                            </p>
-                        </ng-template>
-                        <input nz-input placeholder="Especialidad Avalada" id="endorsedSpecialtyDate" formControlName="endorsedSpecialtyDate">
-                    </nz-form-control>
-                </nz-form-item>
-            </div>
-
-
-            <!-- Campo Fecha de Inicio de Vigencia -->
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="isFieldRequiredForDocumentType('validityStartDate')">
-                <nz-form-item nz-row>
-                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
-                        [nzXl]="24" nzFor="validityStartDate">
-                        Fecha de Inicio de Vigencia
-                    </nz-form-label>
-
-                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="validityStartDateErrorTip">
-                        <ng-template #validityStartDateErrorTip>
-                            <p *ngIf="documentForm.controls['validityStartDate'].hasError('required')">
-                                ¡Este campo es obligatorio!
-                            </p>
-                        </ng-template>
-                        <app-date-picker-input
-                          formControlName="validityStartDate"
-                          inputId="validityStartDate">
-                        </app-date-picker-input>
-                    </nz-form-control>
-                </nz-form-item>
-            </div>
-
-
-            <!-- Campo Fecha de Realización -->
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="isFieldRequiredForDocumentType('dateofRealization')">
-                <nz-form-item nz-row>
-                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
-                        [nzXl]="24" nzFor="dateofRealization">
-                        Fecha de Realización
-                    </nz-form-label>
-
-                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="dateofRealizationErrorTip">
-                        <ng-template #dateofRealizationErrorTip>
-                            <p *ngIf="documentForm.controls['dateofRealization'].hasError('required')">
-                                ¡Este campo es obligatorio!
-                            </p>
-                        </ng-template>
-                        <app-date-picker-input
-                          formControlName="dateofRealization"
-                          inputId="dateofRealization">
-                        </app-date-picker-input>
-                    </nz-form-control>
-                </nz-form-item>
-            </div>
-
-
-            <!-- Campo Fecha de Recepción -->
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="isFieldRequiredForDocumentType('receptionDate')">
-                <nz-form-item nz-row>
-                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
-                        [nzXl]="24" nzFor="receptionDate">
-                        Fecha de Recepción
-                    </nz-form-label>
-
-                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="receptionDateErrorTip">
-                        <ng-template #receptionDateErrorTip>
-                            <p *ngIf="documentForm.controls['receptionDate'].hasError('required')">
-                                ¡Este campo es obligatorio!
-                            </p>
-                        </ng-template>
-                        <app-date-picker-input
-                          formControlName="receptionDate"
-                          inputId="receptionDate">
-                        </app-date-picker-input>
-                    </nz-form-control>
-                </nz-form-item>
-            </div>
-
-
-            <!-- Campo Fecha última dosimetria -->
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="isFieldRequiredForDocumentType('lastDosimetryDate')">
-                <nz-form-item nz-row>
-                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
-                        [nzXl]="24" nzFor="lastDosimetryDate">
-                        Fecha última dosimetria
-                    </nz-form-label>
-
-                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="lastDosimetryDateErrorTip">
-                        <ng-template #lastDosimetryDateErrorTip>
-                            <p *ngIf="documentForm.controls['lastDosimetryDate'].hasError('required')">
-                                ¡Este campo es obligatorio!
-                            </p>
-                        </ng-template>
-                        <app-date-picker-input
-                          formControlName="lastDosimetryDate"
-                          inputId="lastDosimetryDate">
-                        </app-date-picker-input>
-                    </nz-form-control>
-                </nz-form-item>
-            </div>
-
-
-            <!-- Campo Nombre de la Entidad -->
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="isFieldRequiredForDocumentType('epsName')">
-                <nz-form-item nz-row>
-                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
-                        [nzXl]="24" nzFor="epsName">
-                        Nombre de la Entidad
-                    </nz-form-label>
-
-                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="epsNameErrorTip">
-                        <ng-template #epsNameErrorTip>
-                            <p *ngIf="documentForm.controls['epsName'].hasError('required')">
-                                ¡Este campo es obligatorio!
-                            </p>
-                        </ng-template>
-                        <ng-container [ngSwitch]="idDocumentType">
-                          <input *ngSwitchDefault nz-input id="epsName" placeholder="Nombre" formControlName="epsName">
-                          <nz-select
-                            *ngSwitchCase="135"
-                            id="epsName"
-                            formControlName="epsName"
-                            nzPlaceHolder="Seleccionar"
-                          >
-                            <nz-option *ngFor="let entity of suraArlEntities" [nzValue]="entity" [nzLabel]="entity"></nz-option>
-                          </nz-select>
-                        </ng-container>
-                    </nz-form-control>
-                </nz-form-item>
-            </div>
-
-
-            <!-- Campo Clasificación de Riesgo -->
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="isFieldRequiredForDocumentType('riskClassifier')">
-                <nz-form-item nz-row>
-                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
-                        [nzXl]="24" nzFor="riskClassifier">
-                        Clasificación de Riesgo
-                    </nz-form-label>
-
-                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="riskClassifierErrorTip">
-                        <ng-template #riskClassifierErrorTip>
-                            <p *ngIf="documentForm.controls['riskClassifier'].hasError('required')">
-                                ¡Este campo es obligatorio!
-                            </p>
-                        </ng-template>
-                        <nz-select id="riskClassifier" formControlName="riskClassifier" nzPlaceHolder="Seleccionar">
-                          <nz-option *ngFor="let option of riskClassifierOptions" [nzValue]="option" [nzLabel]="option"></nz-option>
-                        </nz-select>
-                    </nz-form-control>
-                </nz-form-item>
-            </div>
-
-
-            <!-- Campo Nombre de Entidad -->
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="isFieldRequiredForDocumentType('resolutionOfThePension')">
-                <nz-form-item nz-row>
-                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
-                        [nzXl]="24" nzFor="resolutionOfThePension">
-                        Nombre de la Entidad
-                    </nz-form-label>
-
-                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="resolutionOfThePensionErrorTip">
-                        <ng-template #resolutionOfThePensionErrorTip>
-                            <p *ngIf="documentForm.controls['resolutionOfThePension'].hasError('required')">
-                                ¡Este campo es obligatorio!
-                            </p>
-                        </ng-template>
-                        <input nz-input placeholder="Nombre" id="resolutionOfThePension" formControlName="resolutionOfThePension">
-                    </nz-form-control>
-                </nz-form-item>
-            </div>
-
-            <!-- Campo Valor Póliza / Monto -->
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="isFieldRequiredForDocumentType('amountPolicy')">
-                <nz-form-item nz-row>
-                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
-                        [nzXl]="24">
-                        Valor Póliza
-                        <div (click)="amountPolicyInfoAlert()" class="cursor-pointer">
-                          <i nz-icon nzType="info-circle" nzTheme="fill" class="info-icon"></i>
-                        </div>
-                    </nz-form-label>
-
-                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="amountPolicyErrorTip">
-                        <ng-template #amountPolicyErrorTip>
-                            <p *ngIf="documentForm.controls['amountPolicy'].hasError('required')">
-                              ¡Este campo es obligatorio!
-                            </p>
-                        </ng-template>
-                        <input
-                          nz-input
-                          type="text"
-                          name="amountPolicy"
-                          id="amountPolicy"
-                          formControlName="amountPolicy"
-                          (input)="onAmountPolicyChange()"
-                          (focus)="amountPolicyInfoAlert(true)"
-                          autocomplete="off"
-                          placeholder="Valor Póliza"
-                        />
-                    </nz-form-control>
-                </nz-form-item>
-            </div>
-
-
-            <!-- Campo documento -->
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24">
-                <span *ngIf="loadFile">{{ loadedFile ? loadedFile.name : '' }}</span>
-                <label id="upload" class="row-doc btn rounded">
-                    <input
-                      type="file" name="file"
-                      id="upload-file"
-                      class="custom-file-input"
-                      appFileValidator
-                      [allowedExtensions]="clientSelected?.idClientHoneSolutions === 13 ? ['.pdf'] : []"
-                      [maxFileSizeMB]="7"
-                      (fileValidated)="loadFile($event)"
-                      hidden>
-                    <img src="../../../../../assets/img/folder.png" alt="" srcset="">
-                    Clic para cargar
-                </label>
-            </div>
-
-            <nz-alert
-                *ngIf="idDocumentType == 131"
-                class="mt-3"
-                nzType="warning"
-                nzMessage="Debes de consolidar los certificados en un solo pdf."
-            ></nz-alert>
-
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                style="text-align: center; margin-top: 3rem;">
-                <button type="submit" nz-button nzType="primary" class="btn-primary custom-btn" [disabled]="false"
-                    [nzLoading]="loader" nz-popover nzPopoverTitle="" nzJustify="center"
-                    nzAlign="middle" [nzPopoverContent]="enablePopoverMessage">
-                    <ng-template #enablePopoverMessage>
-                        <span>Haga clic para guardar los datos</span>
-                    </ng-template>
-                    Actualizar
-                </button>
-            </div>
-
-        </form>
-    </section>
-</section>
+<form [formGroup]="documentForm" (ngSubmit)="submitRequest()" class="flex flex-col gap-5">
+
+  <p class="text-sm font-normal leading-4 text-gray-600">
+    Formulario para la {{ isNew ? 'carga' : 'actualización' }} del documento:
+    <b>{{ (currentDoc?.typeDocument | formatNameDoc:currentDoc?.idDocumentType)
+      || 'No especifica' }}</b>.
+  </p>
+
+  <div class="flex flex-col gap-4">
+
+    <!-- Campo Software -->
+    @if (isFieldRequiredForDocumentType('software')) {
+      <div>
+        <app-select
+          [items]="suraSoftwareTypes"
+          formControlName="software"
+          placeholder="Software"
+        >
+        </app-select>
+        <app-input-error [control]="documentForm.get('software')" />
+      </div>
+    }
+
+    <!-- Campo Fecha de Expedición -->
+    @if (isFieldRequiredForDocumentType('dateExpedition')) {
+      <div>
+        <app-text-input
+          [id]="'dateExpedition'"
+          label="Fecha de Expedición"
+          [type]="'date'"
+          formControlName="dateExpedition"
+        />
+        <app-input-error
+          [control]="documentForm.get('dateExpedition')"
+          [customMessages]="customMessagesExpeditionMap"
+        />
+        @if (getExpeditionTooltipContent() && !documentForm.get('dateExpedition')?.hasError('dateExpeditionInvalid')) {
+          <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            {{ getExpeditionTooltipContent() }}
+          </p>
+        }
+      </div>
+    }
+
+    <!-- Campo Fecha de Diligenciamiento -->
+    @if (isFieldRequiredForDocumentType('dateDiligence')) {
+      <div>
+        <app-text-input
+          [id]="'dateDiligence'"
+          label="Fecha de Diligenciamiento"
+          [type]="'date'"
+          formControlName="dateDiligence"
+        />
+        <app-input-error [control]="documentForm.get('dateDiligence')" />
+      </div>
+    }
+
+    <!-- Campo Fecha de Inicio -->
+    @if (isFieldRequiredForDocumentType('dateSignature')) {
+      <div>
+        <app-text-input
+          [id]="'dateSignature'"
+          label="Fecha de Inicio"
+          [type]="'date'"
+          formControlName="dateSignature"
+        />
+        <app-input-error [control]="documentForm.get('dateSignature')" />
+      </div>
+    }
+
+    <!-- Campo Fecha de Vacunación -->
+    @if (isFieldRequiredForDocumentType('dateVaccination')) {
+      <div>
+        <app-text-input
+          [id]="'dateVaccination'"
+          label="Fecha de Vacunación"
+          [type]="'date'"
+          formControlName="dateVaccination"
+        />
+        <app-input-error [control]="documentForm.get('dateVaccination')" />
+      </div>
+    }
+
+    <!-- Campo Fecha de Vencimiento -->
+    @if (isFieldRequiredForDocumentType('expirationDate')) {
+      <div>
+        <app-text-input
+          [id]="'expirationDate'"
+          label="Fecha de Vencimiento"
+          [type]="'date'"
+          formControlName="expirationDate"
+        />
+        <app-input-error [control]="documentForm.get('expirationDate')" />
+      </div>
+    }
+
+    <!-- Campo Nombre del Representante Legal -->
+    @if (isFieldRequiredForDocumentType('legalRepresentative')) {
+      <div>
+        <app-text-input
+          [id]="'legalRepresentative'"
+          formControlName="legalRepresentative"
+          label="Nombre del Representante Legal"
+        />
+        <app-input-error [control]="documentForm.get('legalRepresentative')" />
+      </div>
+    }
+
+    <!-- Campo Nombre Suplente/s -->
+    @if (isFieldRequiredForDocumentType('NameAlternate')) {
+      <div>
+        <app-text-input
+          [id]="'NameAlternate'"
+          formControlName="NameAlternate"
+          label="Suplente/s"
+        />
+        <app-input-error [control]="documentForm.get('NameAlternate')" />
+      </div>
+    }
+
+    <!-- Campo Fecha de Entrega del Documento -->
+    @if (isFieldRequiredForDocumentType('documentDeliveryDate')) {
+      <div>
+        <app-text-input
+          [id]="'documentDeliveryDate'"
+          label="Fecha de Entrega del Documento"
+          [type]="'date'"
+          formControlName="documentDeliveryDate"
+        />
+        <app-input-error [control]="documentForm.get('documentDeliveryDate')" />
+      </div>
+    }
+
+    <!-- Campo Fecha de Nacimiento -->
+    @if (isFieldRequiredForDocumentType('dateOfBirth')) {
+      <div>
+        <app-text-input
+          [id]="'dateOfBirth'"
+          label="Fecha de Nacimiento"
+          [type]="'date'"
+          formControlName="dateOfBirth"
+        />
+        <app-input-error [control]="documentForm.get('dateOfBirth')" />
+      </div>
+    }
+
+    <!-- Campo Fecha de Consulta -->
+    @if (isFieldRequiredForDocumentType('consultationDate')) {
+      <div>
+        <app-text-input
+          [id]="'consultationDate'"
+          label="Fecha de Consulta"
+          [type]="'date'"
+          formControlName="consultationDate"
+        />
+        <app-input-error [control]="documentForm.get('consultationDate')" />
+      </div>
+    }
+
+    <!-- Campo Especialidad Avalada -->
+    @if (isFieldRequiredForDocumentType('endorsedSpecialtyDate')) {
+      <div>
+        <app-text-input
+          [id]="'endorsedSpecialtyDate'"
+          formControlName="endorsedSpecialtyDate"
+          label="Especialidad Avalada"
+        />
+        <app-input-error [control]="documentForm.get('endorsedSpecialtyDate')" />
+      </div>
+    }
+
+    <!-- Campo Fecha de Inicio de Vigencia -->
+    @if (isFieldRequiredForDocumentType('validityStartDate')) {
+      <div>
+        <app-text-input
+          [id]="'validityStartDate'"
+          label="Fecha de Inicio de Vigencia"
+          [type]="'date'"
+          formControlName="validityStartDate"
+        />
+        <app-input-error [control]="documentForm.get('validityStartDate')" />
+      </div>
+    }
+
+    <!-- Campo Fecha de Realización -->
+    @if (isFieldRequiredForDocumentType('dateofRealization')) {
+      <div>
+        <app-text-input
+          [id]="'dateofRealization'"
+          label="Fecha de Realización"
+          [type]="'date'"
+          formControlName="dateofRealization"
+        />
+        <app-input-error [control]="documentForm.get('dateofRealization')" />
+      </div>
+    }
+
+    <!-- Campo Fecha de Recepción -->
+    @if (isFieldRequiredForDocumentType('receptionDate')) {
+      <div>
+        <app-text-input
+          [id]="'receptionDate'"
+          label="Fecha de Recepción"
+          [type]="'date'"
+          formControlName="receptionDate"
+        />
+        <app-input-error [control]="documentForm.get('receptionDate')" />
+      </div>
+    }
+
+    <!-- Campo Fecha última dosimetria -->
+    @if (isFieldRequiredForDocumentType('lastDosimetryDate')) {
+      <div>
+        <app-text-input
+          [id]="'lastDosimetryDate'"
+          label="Fecha última dosimetria"
+          [type]="'date'"
+          formControlName="lastDosimetryDate"
+        />
+        <app-input-error [control]="documentForm.get('lastDosimetryDate')" />
+      </div>
+    }
+
+    <!-- Campo Nombre de la Entidad -->
+    @if (isFieldRequiredForDocumentType('epsName')) {
+      <div>
+        @if (currentDoc.idDocumentType == 135) {
+          <app-select
+            [items]="suraArlEntities"
+            formControlName="epsName"
+            placeholder="Nombre de la Entidad"
+          >
+          </app-select>
+        } @else {
+          <app-text-input
+            [id]="'epsName'"
+            formControlName="epsName"
+            label="Nombre de la Entidad"
+          />
+        }
+        <app-input-error [control]="documentForm.get('epsName')" />
+      </div>
+    }
+
+    <!-- Campo Clasificación de Riesgo -->
+    @if (isFieldRequiredForDocumentType('riskClassifier')) {
+      <div>
+        <app-select
+          [items]="riskClassifierOptions"
+          formControlName="riskClassifier"
+          placeholder="Clasificación de Riesgo"
+        >
+        </app-select>
+        <app-input-error [control]="documentForm.get('riskClassifier')" />
+      </div>
+    }
+
+    <!-- Campo Nombre de Entidad -->
+    @if (isFieldRequiredForDocumentType('resolutionOfThePension')) {
+      <div>
+        <app-text-input
+          [id]="'resolutionOfThePension'"
+          formControlName="resolutionOfThePension"
+          label="Nombre de la Entidad"
+        />
+        <app-input-error [control]="documentForm.get('resolutionOfThePension')" />
+      </div>
+    }
+
+    <!-- Campo Valor Póliza / Monto -->
+    @if (isFieldRequiredForDocumentType('amountPolicy')) {
+      <div>
+        <app-text-input
+          [id]="'amountPolicy'"
+          formControlName="amountPolicy"
+          label="Valor Póliza"
+          (onInput)="onAmountPolicyChange()"
+          (onFocus)="amountPolicyInfoAlert(true)"
+          [autocomplete]="'off'"
+        />
+        <app-input-error [control]="documentForm.get('amountPolicy')" />
+        <a
+          (click)="amountPolicyInfoAlert()"
+          class="mt-1 inline-flex gap-1 items-center text-xs text-blue-600 dark:text-blue-500 hover:underline"
+        >
+          <svg width="16" height="16">
+            <use xlink:href="/assets/icons/outline/general.svg#info-circle" />
+          </svg>
+          <span>Información importante</span>
+        </a>
+      </div>
+    }
+
+    <!-- Campo documento -->
+    <div class="flex flex-col gap-1.5 w-full">
+      @if (loadedFile) {
+        <span class="text-sm font-normal leading-4 text-gray-600">
+          {{ loadedFile.name }}
+        </span>
+      }
+
+      <label
+        for="dropzone-file"
+        class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer border-gray-300 bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+      >
+        <div
+          class="flex flex-col items-center justify-center pt-5 pb-6 text-gray-500 dark:text-gray-400 gap-[7px]"
+        >
+          <svg class="w-8 h-8 text-gray-400">
+            <use xlink:href="/assets/icons/outline/general.svg#upload" />
+          </svg>
+          <p class="text-sm leading-4">
+            <span class="font-semibold">Haz clic para cargar</span> o arrastra y
+            suelta
+          </p>
+          <p class="text-xs leading-[14px]">
+            {{ clientSelected?.idClientHoneSolutions === 13 ? 'Solo PDF' : ''}}
+            (Máx. 7 MB)
+          </p>
+        </div>
+
+        <input
+          id="dropzone-file"
+          type="file"
+          name="file"
+          class="hidden"
+          appFileValidator
+          [allowedExtensions]="clientSelected?.idClientHoneSolutions === 13 ? ['.pdf'] : []"
+          [maxFileSizeMB]="7"
+          (fileValidated)="loadFile($event)"
+        />
+      </label>
+
+      @if (currentDoc.idDocumentType == 131) {
+        <p class="text-xs text-gray-500 dark:text-gray-400">
+          Debes de consolidar los certificados en un solo pdf.
+        </p>
+      }
+    </div>
+  </div>
+
+  <div class="flex justify-end gap-2">
+    <app-button
+      (click)="closeModal()"
+      variant="gray"
+      styleType="soft"
+      size="md"
+      customClass="leading-4"
+    >
+      Cerrar
+    </app-button>
+    <app-button
+      [type]="'submit'"
+      [loading]="loader"
+      variant="primary"
+      size="md"
+      styleType="solid"
+      customClass="leading-4"
+    >
+      {{ isNew ? 'Guardar' : 'Actualizar' }}
+    </app-button>
+  </div>
+</form>

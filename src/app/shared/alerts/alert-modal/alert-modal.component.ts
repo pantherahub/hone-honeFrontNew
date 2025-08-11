@@ -23,6 +23,7 @@ export class AlertModalComponent {
   @Input() showConfirmBtn: boolean = false;
   @Input() confirmBtnText: string = 'Aceptar';
   @Input() cancelBtnText: string = 'Cancelar';
+  @Input() iconVariant?: AlertVariant;
   @Input() confirmBtnVariant?: 'primary' | 'gray' | 'red' | 'green';
   @Input() confirmBtnStyle?: 'solid' | 'soft' | 'ghost';
   @Input() customIconPath?: string;
@@ -34,12 +35,14 @@ export class AlertModalComponent {
   }
 
   get iconClasses(): string {
-    return {
+    const variants = {
       error: 'bg-red-100 text-main-red',
       success: 'bg-green-100 text-blue2h-500',
       warning: 'bg-yellow-100 text-yellow-600',
       info: 'bg-blue-100 text-main-blue1h',
-    }[this.variant];
+    };
+    if (this.iconVariant) return variants[this.iconVariant];
+    return variants[this.variant];
   }
 
   get iconPath(): string {

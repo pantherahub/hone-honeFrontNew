@@ -9,7 +9,6 @@ export class EventManagerService {
 
   userLogged = signal<UserInterface>({});
   clientSelected = signal<ClientInterface>({});
-  getPercentApi = signal<number>(0);
 
   constructor() { }
 

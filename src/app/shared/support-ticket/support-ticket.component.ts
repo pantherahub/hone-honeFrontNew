@@ -61,10 +61,16 @@ export class SupportTicketComponent implements OnInit {
     this.ticketForm = this.formBuilder.nonNullable.group({
       name: ['', [Validators.required]],
       lastname: ['', [Validators.required]],
-      identification: ['', [Validators.required, this.formUtils.numeric]],
-      email: ['', [Validators.required, this.formUtils.email]],
+      identification: [
+        this.isLogged() ? this.user.identificacion || '' : '',
+        [Validators.required, this.formUtils.numeric]
+      ],
+      email: [
+        this.isLogged() ? this.user.email || '' : '',
+        [Validators.required, this.formUtils.email]
+      ],
       phone: ['', [Validators.required, Validators.pattern(REGEX_PATTERNS.telNumberWithIndicative)]],
-      address: ['', [Validators.required]],
+      address: ['', this.isLogged() ? [] : [Validators.required]],
       observation: ['', [Validators.required]]
     });
   }
@@ -79,33 +85,43 @@ export class SupportTicketComponent implements OnInit {
     };
     const { name, lastname, identification, email, phone, address, observation } = this.ticketForm.value;
 
+    const joinWithBr = (lines: string[]): string => lines.map(
+      (line, i) => (i === 0 ? line : `<br>${line}`)
+    ).join('');
     let observations = '';
 
     if (this.isLogged()) {
-      observations = `<strong>Información del usuario que genera caso:</strong>
-        <br>Nombre: ${this.clientSelected.razonSocial}
-        <br>Identificacion: ${this.clientSelected.identificacion}
-        <br>Cliente: ${this.clientSelected.clientHoneSolutions}
-        <br>
-        <br><strong>Datos reportados del usuario:</strong>
-        <br>Nombre: ${sanitize(name)}
-        <br>Apellido: ${sanitize(lastname)}
-        <br>Identificación: ${sanitize(identification)}
-        <br>Teléfono: ${sanitize(phone)}
-        <br>Email: ${sanitize(email)}
-        <br>Dirección: ${sanitize(address)}
-        <br>Observaciones: ${sanitize(observation)}
-      `;
+      const userInfo = [
+        '<strong>Información del usuario que genera caso:</strong>',
+        `Nombre: ${this.user.name}`,
+        `Identificacion: ${this.user.identificacion}`,
+      ];
+      if (this.clientSelected?.clientHoneSolutions) {
+        userInfo.push(`Cliente: ${this.clientSelected.clientHoneSolutions}`);
+      }
+
+      const reportedData = [
+        '<strong>Datos reportados del usuario:</strong>',
+        `Nombre: ${sanitize(name)}`,
+        `Apellido: ${sanitize(lastname)}`,
+        `Identificación: ${sanitize(identification)}`,
+        `Teléfono: ${sanitize(phone)}`,
+        `Email: ${sanitize(email)}`,
+        `Observaciones: ${sanitize(observation)}`,
+      ];
+      observations = joinWithBr(userInfo) + '<br><br>' + joinWithBr(reportedData);
     } else {
-      observations = `<strong>Datos reportados del usuario:</strong>
-        <br>Nombre: ${sanitize(name)}
-        <br>Apellido: ${sanitize(lastname)}
-        <br>Identificación: ${sanitize(identification)}
-        <br>Email: ${sanitize(email)}
-        <br>Teléfono: ${sanitize(phone)}
-        <br>Dirección: ${sanitize(address)}
-        <br>Observaciones: ${sanitize(observation)}
-        `;
+      const reportedData = [
+        '<strong>Datos reportados del usuario:</strong>',
+        `Nombre: ${sanitize(name)}`,
+        `Apellido: ${sanitize(lastname)}`,
+        `Identificación: ${sanitize(identification)}`,
+        `Teléfono: ${sanitize(phone)}`,
+        `Email: ${sanitize(email)}`,
+        `Dirección: ${sanitize(address)}`,
+        `Observaciones: ${sanitize(observation)}`,
+      ];
+      observations = joinWithBr(reportedData);
     }
     return observations;
   }
@@ -114,6 +130,7 @@ export class SupportTicketComponent implements OnInit {
     this.formUtils.markFormTouched(this.ticketForm);
     if (this.ticketForm.invalid) return;
 
+    const idClientHone = 7; // Hone Solutions
     let idRole: number | undefined;
     const now = new Date();
     let data: Record<string, any> = {
@@ -131,14 +148,13 @@ export class SupportTicketComponent implements OnInit {
         typeRequest: 1,
         userId: this.user.id,
         email: this.user.email,
-        idClientHone: this.clientSelected.idClientHoneSolutions,
+        idClientHone: this.clientSelected?.idClientHoneSolutions ?? idClientHone,
         idRole: this.user?.roles?.idRoles,
         userLogged: this.user.id,
       };
     } else {
       idRole = 4; // Admin
       const idUser = 4130; // Admin Hone
-      const idClientHone = 7; // Hone Solutions
       const email = this.ticketForm.get("email")?.value;
 
       data = {

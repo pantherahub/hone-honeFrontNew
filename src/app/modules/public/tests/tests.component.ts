@@ -109,8 +109,8 @@ export class TestsComponent implements OnInit, AfterViewInit {
     html += `<p class="mt-3">Por favor verifica este monto.</p>`;
     this.alertService.showAlert({
       title: 'Información sobre valores de póliza',
-      message: this.customTpl,
-      // messageHTML: html,
+      // message: this.customTpl,
+      messageHTML: html,
       variant: 'info',
       isConfirmation: true,
       customSize: 'max-w-lg',

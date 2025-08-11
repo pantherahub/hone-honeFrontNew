@@ -238,6 +238,10 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
 
   async goBack(): Promise<void> {
     const backRoute = this.navigationService.getBackRoute();
+    if (!this.user.withData && backRoute === '/service/documentation') {
+      this.router.navigateByUrl('/home');
+      return;
+    }
     this.router.navigateByUrl(backRoute);
   }
 

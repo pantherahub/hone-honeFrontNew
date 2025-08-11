@@ -30,10 +30,15 @@ export class TooltipComponent implements AfterViewInit {
         {
           placement: this.position,
           triggerType: this.trigger,
+          // triggerType: this.isTouchDevice() ? 'click' : this.trigger,
           // style: this.styleType,
         }
       );
     });
   }
+
+  // private isTouchDevice(): boolean {
+  //   return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  // }
 
 }

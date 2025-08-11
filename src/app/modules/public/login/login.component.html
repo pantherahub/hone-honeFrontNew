@@ -3,7 +3,7 @@
   <div class="container flex flex-col-reverse lg:flex-row pt-10 pb-20 px-0 lg:py-12 gap-9">
 
     <div class="flex-1 flex items-center justify-center">
-      <form nz-form [formGroup]="loginForm" class="flex flex-col justify-center lg:py-24 lg:px-[120px] gap-3">
+      <form nz-form [formGroup]="loginForm" class="flex flex-col justify-center lg:py-24 lg:px-[120px] gap-3 text-center">
 
         <h3 class="text-2xl font-black leading-[26px] text-main-blue1h">
           ¡Bienvenido(a) a tu Portal Transaccional de Gestión de Información y Documentos!
@@ -19,7 +19,7 @@
           <app-input-error [control]="loginForm.get('password')" />
         </div>
 
-        <div>
+        <div class="mx-auto">
           <re-captcha (resolved)="resolved($event)" [siteKey]="siteKey"
               (errored)="errored()" errorMode="handled"></re-captcha>
           @if (showError) {
