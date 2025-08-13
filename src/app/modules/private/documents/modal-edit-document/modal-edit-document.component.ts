@@ -42,12 +42,17 @@ export class ModalEditDocumentComponent implements OnInit {
 
   @Input() currentDoc?: any;
   @Input() isNew: boolean = false;
-  @Input() citiesList?: any[] = [];
+  @Input() citiesList: any[] = [];
 
   clientSelected: any = this.eventManager.clientSelected();
 
-  customMessagesExpeditionMap = {
-    dateExpeditionInvalid: (error: any) => error
+  customErrorMessagesMap: { [key: string]: any } = {
+    dateExpedition: {
+      dateExpeditionInvalid: (error: string) => error
+    },
+    amountPolicy: {
+      minPolicy: (error: string) => error
+    },
   };
 
   suraSoftwareTypes: string[] = [
@@ -139,6 +144,10 @@ export class ModalEditDocumentComponent implements OnInit {
       smlvOtherCities: 100,
     },
   };
+  typePolicyProviderOptions: string[] = Object.keys(
+    this.typePolicyProviderConfig
+  );
+
   hasShownAmountMessage: boolean = false;
 
   @ViewChild('dateInput', { static: true }) dateInputRef!: ElementRef;
@@ -185,7 +194,12 @@ export class ModalEditDocumentComponent implements OnInit {
       epsName: ['', [Validators.required]],
       riskClassifier: ['', [Validators.required]],
       resolutionOfThePension: ['', [Validators.required]],
-      amountPolicy: ['', [Validators.required]],
+      idCity: ['', [Validators.required]],
+      typePolicyProvider: ['', [Validators.required]],
+      amountPolicy: ['', [
+        Validators.required,
+        this.minPolicyDynamicValidator.bind(this)
+      ]],
       idDocumentType: [this.currentDoc?.idDocumentType || '', [Validators.required]]
     });
 
@@ -198,6 +212,13 @@ export class ModalEditDocumentComponent implements OnInit {
     // Update validity statuses
     this.documentForm.updateValueAndValidity();
 
+    this.documentForm.get('idCity')?.valueChanges.subscribe(() => {
+      this.documentForm.get('amountPolicy')?.updateValueAndValidity();
+    });
+    this.documentForm.get('typePolicyProvider')?.valueChanges.subscribe(() => {
+      this.documentForm.get('amountPolicy')?.updateValueAndValidity();
+    });
+
     if (this.currentDoc && !this.isNew) this.patchForm();
   }
 
@@ -205,27 +226,30 @@ export class ModalEditDocumentComponent implements OnInit {
    * Checks if the field is required for the document type
    */
   isFieldRequiredForDocumentType(controlName: string): boolean {
-    if (!this.currentDoc.showInProviderSystem) return false;
+    const item = this.currentDoc;
+    if (!item.showInProviderSystem) return false;
     const documentValidationMap: any = {
-      software: this.currentDoc.withSoftwareMedicalRecord,
-      dateExpedition: this.currentDoc.withExpedition,
-      dateDiligence: this.currentDoc.withDateDiligence,
-      dateSignature: this.currentDoc.withDateSignature,
-      dateVaccination: this.currentDoc.withDateVaccination,
-      expirationDate: this.currentDoc.withExpiration,
-      legalRepresentative: this.currentDoc.withLegalRepresentative,
-      NameAlternate: this.currentDoc.withLegalRepresentative,
-      documentDeliveryDate: this.currentDoc.withDeliveryDate,
-      dateOfBirth: this.currentDoc.withDateOfBirth,
-      consultationDate: this.currentDoc.withConsultationDate,
-      endorsedSpecialtyDate: this.currentDoc.withEndorsedSpecialtyDate,
-      validityStartDate: this.currentDoc.withValidityStartDate,
-      dateofRealization: this.currentDoc.withDateofRealization,
-      receptionDate: this.currentDoc.withReceptionDate,
-      epsName: this.currentDoc.withEpsName,
-      riskClassifier: this.currentDoc.withRiskClassifier,
-      resolutionOfThePension: this.currentDoc.withResolutionOfThePension,
-      amountPolicy: this.currentDoc.withAmountPolicy
+      software: item.withSoftwareMedicalRecord,
+      dateExpedition: item.withExpedition,
+      dateDiligence: item.withDateDiligence,
+      dateSignature: item.withDateSignature,
+      dateVaccination: item.withDateVaccination,
+      expirationDate: item.withExpiration,
+      legalRepresentative: item.withLegalRepresentative,
+      NameAlternate: item.withLegalRepresentative,
+      documentDeliveryDate: item.withDeliveryDate,
+      dateOfBirth: item.withDateOfBirth,
+      consultationDate: item.withConsultationDate,
+      endorsedSpecialtyDate: item.withEndorsedSpecialtyDate,
+      validityStartDate: item.withValidityStartDate,
+      dateofRealization: item.withDateofRealization,
+      receptionDate: item.withReceptionDate,
+      epsName: item.withEpsName,
+      riskClassifier: item.withRiskClassifier,
+      resolutionOfThePension: item.withResolutionOfThePension,
+      idCity: item.withAmountPolicy,
+      typePolicyProvider: item.withAmountPolicy,
+      amountPolicy: item.withAmountPolicy
     };
     return documentValidationMap[controlName];
   }
@@ -292,12 +316,67 @@ export class ModalEditDocumentComponent implements OnInit {
     return null;
   }
 
-  getMainCities() {
-    if (this.citiesList?.length) {
-      this.mainCities = this.citiesList.filter(city =>
-        this.idMainCities.includes(city.idCity)
-      );
-    }
+  minPolicyDynamicValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control || !control.parent) return null;
+
+    const form = control.parent as FormGroup;
+    const type = form.get('typePolicyProvider')?.value;
+    const idCity = form.get('idCity')?.value;
+
+    if (!type || !idCity) return null;
+
+    const config = this.typePolicyProviderConfig[type];
+    if (!config) return null;
+
+    const isMainCity = this.idMainCities.includes(Number(idCity));
+    const smlvNum = isMainCity ? config.smlvMainCities : config.smlvOtherCities;
+
+    const value = Number(
+      this.formUtils.sanitizeToNumeric(String(control.value), true)
+    );
+    if (value == null || isNaN(value)) return null;
+
+    const min = this.SMLV * smlvNum;
+    const minFormatted = this.formUtils.formatCurrency(min);
+    return value < min
+      ? { minPolicy: `Mínimo permitido: $ ${minFormatted}` }
+      : null;
+  }
+
+  patchForm() {
+    const item = this.currentDoc;
+
+    this.documentForm.patchValue({
+      software: this.sanitizeWithOptions(item.software, this.suraSoftwareTypes),
+      consultationDate: this.convertDate(item.consultationDate),
+      dateDiligence: this.convertDate(item.dateDiligence),
+      dateSignature: this.convertDate(item.dateSignature),
+      dateOfBirth: this.convertDate(item.dateOfBirth),
+      dateofRealization: this.convertDate(item.dateofRealization),
+      dateVaccination: this.convertDate(item.dateVaccination),
+      documentDeliveryDate: this.convertDate(item.documentDeliveryDate),
+      expirationDate: this.convertDate(item.expirationDate),
+      endorsedSpecialtyDate: this.convertDate(item.endorsedSpecialtyDate),
+      epsName: this.sanitizeWithOptions(item.epsName, this.suraArlEntities),
+      dateExpedition: this.convertDate(item.dateExpedition),
+      lastDosimetryDate: this.convertDate(item.lastDosimetryDate),
+      legalRepresentative: item.legalRepresentative,
+      NameAlternate: item.NameAlternate,
+      receptionDate: this.convertDate(item.receptionDate),
+      resolutionOfThePension: item.resolutionOfThePension,
+      riskClassifier: this.sanitizeWithOptions(
+        item.riskClassifier,
+        this.riskClassifierOptions
+      ),
+      validityStartDate: this.convertDate(item.validityStartDate),
+      idCity: item.idCity,
+      typePolicyProvider: this.sanitizeWithOptions(
+        item.typePolicyProvider,
+        this.typePolicyProviderOptions
+      ),
+      amountPolicy: this.formUtils.formatCurrency(item.amountPolicy),
+      idDocumentType: item.idDocumentType
+    });
   }
 
   onAmountPolicyChange(): void {
@@ -312,7 +391,15 @@ export class ModalEditDocumentComponent implements OnInit {
     return Object.values(this.typePolicyProviderConfig).some(
       (config: any) => config.idTypeProvider === this.clientSelected.idTypeProvider
     );
-  };
+  }
+
+  getMainCities() {
+    if (this.citiesList?.length) {
+      this.mainCities = this.citiesList.filter(city =>
+        this.idMainCities.includes(city.idCity)
+      );
+    }
+  }
 
   amountPolicyInfoAlert(onFocus: boolean = false): void {
     if (!this.hasAmountPolicyValidation()
@@ -388,44 +475,6 @@ export class ModalEditDocumentComponent implements OnInit {
         .subscribe(confirmed => {
           resolve(confirmed);
         });
-    });
-  }
-
-  patchForm() {
-    const item = this.currentDoc;
-
-    let riskClassifier = item.riskClassifier;
-    if (!this.riskClassifierOptions.includes(riskClassifier)) {
-      riskClassifier = null;
-    }
-
-    const amountPolicy = this.formUtils.formatCurrency(item.amountPolicy);
-
-    this.documentForm.patchValue({
-      software: this.sanitizeWithOptions(item.software, this.suraSoftwareTypes),
-      consultationDate: this.convertDate(item.consultationDate),
-      dateDiligence: this.convertDate(item.dateDiligence),
-      dateSignature: this.convertDate(item.dateSignature),
-      dateOfBirth: this.convertDate(item.dateOfBirth),
-      dateofRealization: this.convertDate(item.dateofRealization),
-      dateVaccination: this.convertDate(item.dateVaccination),
-      documentDeliveryDate: this.convertDate(item.documentDeliveryDate),
-      expirationDate: this.convertDate(item.expirationDate),
-      endorsedSpecialtyDate: this.convertDate(item.endorsedSpecialtyDate),
-      epsName: this.sanitizeWithOptions(item.epsName, this.suraArlEntities),
-      dateExpedition: this.convertDate(item.dateExpedition),
-      lastDosimetryDate: this.convertDate(item.lastDosimetryDate),
-      legalRepresentative: item.legalRepresentative,
-      NameAlternate: item.NameAlternate,
-      receptionDate: this.convertDate(item.receptionDate),
-      resolutionOfThePension: item.resolutionOfThePension,
-      riskClassifier: this.sanitizeWithOptions(
-        item.riskClassifier,
-        this.riskClassifierOptions
-      ),
-      validityStartDate: this.convertDate(item.validityStartDate),
-      amountPolicy: amountPolicy,
-      idDocumentType: item.idDocumentType
     });
   }
 

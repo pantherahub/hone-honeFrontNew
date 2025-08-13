@@ -32,7 +32,7 @@
         />
         <app-input-error
           [control]="documentForm.get('dateExpedition')"
-          [customMessages]="customMessagesExpeditionMap"
+          [customMessages]="customErrorMessagesMap['dateExpedition']"
         />
         @if (getExpeditionTooltipContent() && !documentForm.get('dateExpedition')?.hasError('dateExpeditionInvalid')) {
           <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
@@ -267,6 +267,35 @@
       </div>
     }
 
+    <!-- Campo Ciudad -->
+    @if (isFieldRequiredForDocumentType('idCity')) {
+      <div>
+        <app-select
+          [items]="citiesList"
+          bindLabel="city"
+          bindValue="idCity"
+          [searchable]="true"
+          formControlName="idCity"
+          placeholder="Ciudad"
+        >
+        </app-select>
+        <app-input-error [control]="documentForm.get('idCity')" />
+      </div>
+    }
+
+    <!-- Campo Tipo de Prestador -->
+    @if (isFieldRequiredForDocumentType('typePolicyProvider')) {
+      <div>
+        <app-select
+          [items]="typePolicyProviderOptions"
+          formControlName="typePolicyProvider"
+          placeholder="Tipo de Prestador"
+        >
+        </app-select>
+        <app-input-error [control]="documentForm.get('typePolicyProvider')" />
+      </div>
+    }
+
     <!-- Campo Valor Póliza / Monto -->
     @if (isFieldRequiredForDocumentType('amountPolicy')) {
       <div>
@@ -278,7 +307,9 @@
           (onFocus)="amountPolicyInfoAlert(true)"
           [autocomplete]="'off'"
         />
-        <app-input-error [control]="documentForm.get('amountPolicy')" />
+        <app-input-error
+          [control]="documentForm.get('amountPolicy')"
+          [customMessages]="customErrorMessagesMap['amountPolicy']" />
         @if (hasAmountPolicyValidation()) {
           <a
             (click)="amountPolicyInfoAlert()"
