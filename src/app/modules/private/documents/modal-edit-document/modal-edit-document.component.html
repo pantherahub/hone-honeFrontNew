@@ -446,7 +446,8 @@
 
             <!-- Campo Clasificación de Riesgo -->
             <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                *ngIf="isFieldRequiredForDocumentType('riskClassifier')">
+                *ngIf="isFieldRequiredForDocumentType('riskClassifier')
+                    && this.currentDoc?.riskClassifier !== '9'">
                 <nz-form-item nz-row>
                     <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
                         [nzXl]="24">
