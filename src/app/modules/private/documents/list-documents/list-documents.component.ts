@@ -16,6 +16,7 @@ import { TooltipComponent } from 'src/app/shared/components/tooltip/tooltip.comp
 import { ModalEditDocumentComponent } from '../modal-edit-document/modal-edit-document.component';
 import { DocumentConfig, DownloadService } from 'src/app/services/download/download.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { CitiesService } from 'src/app/services/cities/cities.service';
 
 @Component({
   selector: 'app-list-documents',
@@ -34,6 +35,7 @@ export class ListDocumentsComponent implements OnInit {
 
   percentData: PercentInterface = {};
   docList: any[] = [];
+  citiesList: any[] = [];
   feedbackModalShown = false;
   dataformAlertShown = false;
 
@@ -69,9 +71,11 @@ export class ListDocumentsComponent implements OnInit {
     private alertService: AlertService,
     private downloadService: DownloadService,
     private toastService: ToastService,
+    private citiesService: CitiesService,
   ) { }
 
   ngOnInit(): void {
+    this.getCities();
     this.getDocumentPercent();
     this.getDocuments();
   }
@@ -172,6 +176,17 @@ export class ListDocumentsComponent implements OnInit {
   clearHighlight(): void {
     if (!this.chart) return;
     this.chart.resetSeries();
+  }
+
+  getCities() {
+    this.citiesService.getCities().subscribe({
+      next: (resp: any[]) => {
+        this.citiesList = resp;
+      },
+      error: (err: any) => {
+        console.error(err);
+      }
+    });
   }
 
   /**
