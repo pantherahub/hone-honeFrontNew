@@ -249,7 +249,10 @@ export class ModalEditDocumentComponent implements OnInit {
          nombredocumento: item.nombredocumento,
          receptionDate: this.convertDate(item.receptionDate),
          resolutionOfThePension: item.resolutionOfThePension,
-         riskClassifier: this.sanitizeWithOptions(item.riskClassifier, this.riskClassifierOptions),
+         riskClassifier: this.sanitizeWithOptions(
+           item.riskClassifier,
+           [...this.riskClassifierOptions, '9']
+         ),
          validityStartDate: this.convertDate(item.validityStartDate),
          amountPolicy: this.formUtils.formatCurrency(item.amountPolicy),
          tipodocumento: item.idTypeDocuments,
