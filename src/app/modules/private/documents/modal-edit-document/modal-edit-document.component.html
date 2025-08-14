@@ -90,7 +90,9 @@
           [type]="'date'"
           formControlName="expirationDate"
         />
-        <app-input-error [control]="documentForm.get('expirationDate')" />
+        <app-input-error
+        [control]="documentForm.get('expirationDate')"
+        [customMessages]="customErrorMessagesMap['expirationDate']" />
       </div>
     }
 

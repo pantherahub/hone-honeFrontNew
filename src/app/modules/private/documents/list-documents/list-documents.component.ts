@@ -326,6 +326,7 @@ export class ListDocumentsComponent implements OnInit {
   editDocumentModal(item: any, isNew: boolean = true): void {
     let docModalInputs: any = {
       currentDoc: item,
+      citiesList: this.citiesList,
     };
     if (isNew) docModalInputs["isNew"] = true;
 

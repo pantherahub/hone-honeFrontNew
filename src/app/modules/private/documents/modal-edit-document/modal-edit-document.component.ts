@@ -50,6 +50,9 @@ export class ModalEditDocumentComponent implements OnInit {
     dateExpedition: {
       dateExpeditionInvalid: (error: string) => error
     },
+    expirationDate: {
+      minDate: (error: string) => error
+    },
     amountPolicy: {
       minPolicy: (error: string) => error
     },
@@ -180,7 +183,10 @@ export class ModalEditDocumentComponent implements OnInit {
       dateDiligence: ['', [Validators.required]],
       dateSignature: ['', [Validators.required]],
       dateVaccination: ['', [Validators.required]],
-      expirationDate: ['', [Validators.required]],
+      expirationDate: ['', [
+        Validators.required,
+        this.expirationDateValidator
+      ]],
       legalRepresentative: ['', [Validators.required]],
       NameAlternate: ['', [Validators.required]],
       documentDeliveryDate: ['', [Validators.required]],
@@ -245,7 +251,7 @@ export class ModalEditDocumentComponent implements OnInit {
       dateofRealization: item.withDateofRealization,
       receptionDate: item.withReceptionDate,
       epsName: item.withEpsName,
-      riskClassifier: item.withRiskClassifier,
+      riskClassifier: item.withRiskClassifier && item.riskClassifier !== '9',
       resolutionOfThePension: item.withResolutionOfThePension,
       idCity: item.withAmountPolicy,
       typePolicyProvider: item.withAmountPolicy,
@@ -314,6 +320,22 @@ export class ModalEditDocumentComponent implements OnInit {
     }
 
     return null;
+  }
+
+  expirationDateValidator(control: AbstractControl) {
+    if (!control.value) return null;
+
+    const selectedDate = new Date(control.value + 'T00:00:00');
+    const today = new Date();
+    selectedDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+
+    const tomorrow = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+
+    // expirationDate must be greater than today
+    return selectedDate < tomorrow
+      ? { minDate: 'Debe ser posterior al día de hoy' }
+      : null;
   }
 
   minPolicyDynamicValidator(control: AbstractControl): ValidationErrors | null {
@@ -536,7 +558,7 @@ export class ModalEditDocumentComponent implements OnInit {
   submitRequest() {
     this.formUtils.markFormTouched(this.documentForm);
     if (this.documentForm.invalid) return;
-    else if (this.isNew && !this.loadedFile) {
+    else if (!this.loadedFile && (this.isNew || this.currentDoc.documentStatus === 'VENCIDO')) {
       this.alertService.warning(
         '¡Aviso!',
         'Debe seleccionar un documento.',
@@ -552,8 +574,7 @@ export class ModalEditDocumentComponent implements OnInit {
       return;
     }
 
-    this.documentService
-      .updateDocuments(this.currentDoc.idDocumentsProvider, fileToUpload)
+    this.documentService.updateDocuments(this.currentDoc.idDocumentsProvider, fileToUpload)
       .subscribe({
         next: (res: any) => {
           this.loader = false;
