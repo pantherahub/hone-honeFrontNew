@@ -476,6 +476,7 @@ export class ModalEditDocumentComponent implements OnInit {
         isConfirmation: true,
         customSize: 'max-w-lg',
         beforeClose: async () => {
+          console.log("beforeClose");
           return await this.policyCloseAlert();
         }
       });

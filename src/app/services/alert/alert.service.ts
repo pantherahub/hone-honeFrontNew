@@ -1,4 +1,4 @@
-import { Injectable, TemplateRef, Type } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { AlertModalComponent } from 'src/app/shared/alerts/alert-modal/alert-modal.component';
 import { ModalService } from '../modal/modal.service';
 import { Observable } from 'rxjs';

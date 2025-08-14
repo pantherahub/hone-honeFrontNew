@@ -8,7 +8,7 @@ import {
   createComponent,
 } from '@angular/core';
 import { NavigationStart, Router } from '@angular/router';
-import { filter, Observable, Subject, take } from 'rxjs';
+import { filter, Observable, Subject, Subscription, take } from 'rxjs';
 import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
 
 @Injectable({
@@ -75,15 +75,19 @@ export class ModalService {
     // Open modal
     modalInstance.open();
 
+    let navSub: Subscription | undefined;
     if (destroyOnRouteChange) {
-      this.router.events.pipe(
+      navSub = this.router.events.pipe(
         filter(event => event instanceof NavigationStart),
         take(1)
-      ).subscribe(() => modalInstance.close());
+      ).subscribe(() => {
+        if (modalInstance.isOpen) modalInstance.close();
+      });
     }
 
     // Close and clean
     modalInstance.onClose.subscribe(result => {
+      if (navSub) navSub.unsubscribe();
       onClose$.next(result);
       onClose$.complete();
       this.appRef.detachView(modalRef.hostView);
