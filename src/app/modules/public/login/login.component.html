@@ -1,132 +1,47 @@
-<header class="login-header-container h-[97px] bg-gray-0 flex items-center justify-between py-4 px-5">
-  <img class="h-[65px]" src="assets/img/logo-hone.png" alt="Logo">
+<div class="flex justify-center relative lg:h-[calc(100vh-80px)] mx-4">
 
-  <nav class="hidden lg:block">
-    <ul class="flex space-x-6">
-        <li><a href="https://www.hone-solutions.com/nosotros">Nosotros</a></li>
-        <li><a href="https://www.hone-solutions.com/services">Nuestros servicios</a></li>
-        <li><a href="#">Lissom</a></li>
-    </ul>
-  </nav>
+  <div class="container flex flex-col-reverse lg:flex-row pt-10 pb-20 px-0 lg:py-12 gap-9">
 
-  <!-- Menu button on mobile -->
-  <button class="lg:hidden p-1.5 text-gray-700 rounded-full hover:bg-gray-100" (click)="toggleMenu()">
-      <svg width="28" height="28">
-        <use xlink:href="/assets/icons/layout.svg#bars" width="28" height="28" />
-      </svg>
-  </button>
-</header>
+    <div class="flex-1 flex items-center justify-center">
+      <form nz-form [formGroup]="loginForm" class="flex flex-col justify-center lg:py-24 lg:px-[120px] gap-3 text-center">
 
-<!-- Side menu in mobile -->
-@if (menuOpen) {
-  <div class="overlay" (click)="toggleMenu()"></div>
-}
-<nav class="sidebar" [ngClass]="{'sidebar-open': menuOpen}" [attr.aria-hidden]="!menuOpen">
-  <div class="px-5 py-4">
-    <button class="lg:hidden p-1.5 text-gray-700 rounded-full hover:bg-gray-100" (click)="toggleMenu()">
-      <svg width="28" height="28">
-        <use xlink:href="/assets/icons/alert.svg#close" width="28" height="28" />
-      </svg>
-    </button>
-  </div>
-  <ul class="flex flex-col text-center p-5">
-      <li class="py-3 border-b"><a href="https://www.hone-solutions.com/nosotros">Nosotros</a></li>
-      <li class="py-3 border-b"><a href="https://www.hone-solutions.com/services">Nuestros servicios</a></li>
-      <li class="py-3"><a href="#">Lissom</a></li>
-  </ul>
-</nav>
+        <h3 class="text-2xl font-black leading-[26px] text-main-blue1h">
+          ¡Bienvenido(a) a tu Portal Transaccional de Gestión de Información y Documentos!
+        </h3>
 
-
-<!-- Login form -->
-
-<section class="container-form">
-
-    <section class="form-section">
-
-        <div class="container-img">
-            <img src="../../../../assets/img/login/login-hone.jpg" alt="">
+        <div>
+          <app-text-input [id]="'email'" formControlName="email" [type]="'email'" label="Correo electrónico" />
+          <app-input-error [control]="loginForm.get('email')" />
         </div>
 
-        <form nz-form [formGroup]="loginForm" class="form-login">
-
-            <!-- Campo Usuario / email -->
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24">
-                <nz-form-item nz-row>
-                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
-                        [nzXl]="24">
-                        Usuario
-                    </nz-form-label>
-
-                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="emailErrorTip">
-                        <ng-template #emailErrorTip>
-                            <p *ngIf="loginForm.controls['email'].hasError('required')">¡El usuario es
-                                obligatorio!
-                            </p>
-                        </ng-template>
-                        <input nz-input placeholder="" formControlName="email">
-                    </nz-form-control>
-
-                </nz-form-item>
-            </div>
-
-            <!-- Campo contraseña -->
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24">
-                <nz-form-item nz-row>
-                    <nz-form-label class="form-label" nzRequired [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24"
-                        [nzXl]="24">
-                        Contraseña
-                    </nz-form-label>
-
-                    <nz-form-control [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24"
-                        [nzErrorTip]="passwordErrorTip">
-                        <ng-template #passwordErrorTip>
-                            <p *ngIf="loginForm.controls['password'].hasError('required')">¡La contraseña es
-                                obligatoria!
-                            </p>
-                        </ng-template>
-                        <nz-input-group [nzSuffix]="suffixTemplate">
-                            <input [type]="passwordVisible ? 'text' : 'password'" nz-input placeholder=""
-                                formControlName="password" />
-                        </nz-input-group>
-                        <ng-template #suffixTemplate>
-                            <span style="cursor: pointer" nz-icon [nzType]="passwordVisible ? 'eye-invisible' : 'eye'"
-                                (click)="passwordVisible = !passwordVisible"></span>
-                        </ng-template>
-                    </nz-form-control>
-
-                </nz-form-item>
-            </div>
-
-            <!-- Campo re-captcha -->
-            <re-captcha (resolved)="resolved($event)" [siteKey]="siteKey"
-                (errored)="errored()" errorMode="handled"></re-captcha>
-
-            <p style="color: red;" *ngIf="showError">¡Debes validar que no eres un robot!</p>
-
-
-            <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="24" [nzLg]="24" [nzXl]="24" [nzXXl]="24"
-                style="text-align: center; margin-top: 3rem;">
-                <button nz-button nzType="primary" class="btn-primary" [disabled]="false"
-                    [nzLoading]="isSubmitData" (click)="submitRequest()" nz-popover nzPopoverTitle="" nzJustify="center"
-                    nzAlign="middle" [nzPopoverContent]="enablePopoverMessage">
-                    <ng-template #enablePopoverMessage>
-                        <span>Haga clic para iniciar sesión</span>
-                    </ng-template>
-                    Iniciar sesión
-                </button>
-            </div>
-
-        </form>
-    </section>
-
-    <div class="float-button">
-        <div class="support-container" (click)="openTicketModal()">
-            <img src="../../../../../assets/img/support.png" alt="" srcset="">
-            <span class="support-container__text">
-              Soporte
-            </span>
+        <div>
+          <app-text-input [id]="'password'" formControlName="password" [type]="'password'" label="Contraseña" [togglePassword]="true" />
+          <app-input-error [control]="loginForm.get('password')" />
         </div>
+
+        <div class="mx-auto">
+          <re-captcha (resolved)="resolved($event)" [siteKey]="siteKey"
+              (errored)="errored()" errorMode="handled"></re-captcha>
+          @if (showError) {
+            <app-input-error [message]="'Debes validar que no eres un robot.'" />
+          }
+        </div>
+
+        <app-button
+          variant="primary"
+          styleType="solid"
+          size="lg"
+          customClass="leading-[18px] w-full flex justify-center"
+          [loading]="isSubmitData"
+          (onClick)="submitRequest()">
+          Iniciar sesión
+        </app-button>
+      </form>
     </div>
 
-</section>
+    <div class="flex-1 flex items-center justify-center">
+      <img class="object-cover rounded-3xl h-[372px] sm:h-[200px] sm:w-full lg:h-full max-h-full max-w-full" src="/assets/img/login/login.webp" alt="Imagen login">
+    </div>
+
+  </div>
+</div>

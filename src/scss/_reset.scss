@@ -56,3 +56,63 @@
     }
   }
 }
+
+.apexcharts-canvas {
+
+  .apexcharts-datalabels-group {
+    .apexcharts-text.apexcharts-datalabel-value {
+      font-size: 1rem !important;
+    }
+  }
+
+  .apexcharts-tooltip {
+    .apexcharts-tooltip-text-y-label,
+    .apexcharts-tooltip-text-y-value {
+      font-size: 0.875rem !important;
+    }
+  }
+
+}
+
+.ant-input {
+  // border-box: 0;
+  margin: 0;
+  padding: 0;
+  font-variant: tabular-nums;
+  list-style: none;
+  font-feature-settings: "tnum";
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  min-width: 0;
+  padding: 9px 11px;
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 14px;
+  line-height: 1.5715;
+  background-color: #fff;
+  background-image: none;
+  border: 2px solid #d9d9d9;
+  border-radius: 2px;
+  transition: all 0.3s;
+
+  &:focus {
+    border-color: #40a9ff;
+        box-shadow: 0 0 0 2px rgba
+    #1890ff33
+    (24, 144, 255, 0.2);
+        border-right-width: 2px;
+        outline: 0;
+  }
+}
+
+.datepicker.datepicker-orient-top {
+  padding-top: 0;
+  padding-bottom: 0.5rem;
+  .datepicker-picker {
+    box-shadow: 0 0 15px -3px rgba(0,0,0,0.1);
+  }
+}
+.datepicker.datepicker-orient-bottom {
+  padding-top: 0.5rem;
+  padding-bottom: 0;
+}

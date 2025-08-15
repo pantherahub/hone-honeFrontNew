@@ -1,15 +1,15 @@
 @layer utilities {
+
+  /* Moving edge animation */
   @property --border-angle {
     syntax: "<angle>";
     initial-value: 0deg;
     inherits: false;
   }
-
   @keyframes border-angle-rotate {
     from { --border-angle: 0deg; }
     to { --border-angle: 360deg; }
   }
-
   .animated-border {
     --border-angle: 0deg;
     border-radius: 2.5rem;
@@ -18,4 +18,35 @@
       conic-gradient(from var(--border-angle), var(--color-blue1h-500) 10%, white) border-box;
     animation: border-angle-rotate 2s infinite linear;
   }
+
+
+  /* Horizontal motion object animation */
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  @keyframes toast-out {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+  }
+  .animate-toast-in {
+    animation: toast-in 0.3s ease-out forwards;
+  }
+  .animate-toast-out {
+    animation: toast-out 0.3s ease-in forwards;
+  }
+
+
 }

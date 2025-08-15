@@ -9,11 +9,16 @@ import { CommonModule } from '@angular/common';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { TutorialService } from 'src/app/services/tutorial/tutorial.service';
 import { Subscription } from 'rxjs';
+import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
+import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
+import { NavigationService } from 'src/app/services/navigation/navigation.service';
+import { PopoverComponent } from 'src/app/shared/components/popover/popover.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [ NgZorroModule, CommonModule, RouterModule ],
+  imports: [ NgZorroModule, CommonModule, RouterModule, TextInputComponent, ButtonComponent, ModalComponent, PopoverComponent ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -31,7 +36,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   clientTutorialVisible: boolean = false;
 
-  @ViewChild('videoModalTemplate', { static: false }) videoModalTemplate!: TemplateRef<any>;
+  @ViewChild('videoModal') videoModal!: ModalComponent;
+  @ViewChild('reminderModal') reminderModal!: ModalComponent;
+
   private tutorialSubscription!: Subscription;
 
   constructor (
@@ -39,19 +46,27 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     private tutorialService: TutorialService,
     private eventManager: EventManagerService,
     private router: Router,
-    private modal: NzModalService,
-  ) {
-    localStorage.removeItem('clientSelected');
-    this.eventManager.clientSelected.set({});
-  }
+    private navigationService: NavigationService,
+  ) { }
 
   ngOnInit(): void {
+    localStorage.removeItem('clientSelected');
+    this.eventManager.clientSelected.set({});
+
     this.getClientList();
   }
 
   ngAfterViewInit(): void {
+    if (this.user.withData) {
+      const backRoute = this.navigationService.getBackRoute();
+      // If the user has just logged in, show the reminder
+      if (backRoute === '/login' || this.user.rejected) {
+        this.tutorialService.finishTutorial();
+        this.reminderModal.open();
+      }
+    }
     this.tutorialSubscription = this.tutorialService.stepIndex$.subscribe(step => {
-      if (!this.tutorialService.isTutorialFinished()) {
+      if (!this.tutorialService.isTutorialFinished() && !this.reminderModal.isOpen) {
         this.startTutorial(step);
       }
     });
@@ -69,8 +84,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   getClientList() {
     this.loadingData = true;
     this.clientService.getClientListByProviderId(this.user.id).subscribe({
-      next: (res: any) => {
-        this.clientList = res.filter((client: any) => client.idClientHoneSolutions !== 10);
+      next: (res: ClientInterface[]) => {
+        this.clientList = [...res];
         this.applyFilter();
         this.loadingData = false;
       },
@@ -97,11 +112,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
-  clearSearch() {
-    this.searchQuery = '';
-    this.applyFilter();
-  }
-
   /**
   * Redirecciona a la lista de documentos por cargar del cliente seleccionado
   */
@@ -109,7 +119,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (activeTutorialStep) this.nextTutorialStep();
     localStorage.setItem('clientSelected', JSON.stringify(item));
     this.eventManager.getDataClient();
-    this.router.navigateByUrl(`/cargar-documentos/${item.idClientHoneSolutions}`);
+    this.router.navigateByUrl(`/service/documentation`);
   }
 
 
@@ -118,18 +128,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   startTutorial(step: number) {
     if (step === 1) {
       this.clientTutorialVisible = false;
-      const modalRef = this.modal.create({
-        nzTitle: 'VIDEO TUTORIAL',
-        nzContent: this.videoModalTemplate,
-        nzFooter: null,
-        nzCentered: true,
-        nzWidth: '900px',
-        nzStyle: { 'max-width': '90%' },
-        nzClassName: 'video-modal'
-      });
-      modalRef.afterClose.subscribe((result: any) => {
-        this.tutorialService.nextStep();
-      });
+      this.videoModal.open();
     } else if (step === 3) {
       this.clientTutorialVisible = true;
     } else {
@@ -137,12 +136,24 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  closeVideoModal() {
+    this.videoModal.close();
+  }
+
+  onCloseDataReminder() {
+    if (this.user.rejected) {
+      this.router.navigate(['/update-data']);
+    }
+  }
+
+  backTutorialStep() {
+    this.clientTutorialVisible = false;
+    this.tutorialService.backStep();
+  }
+
   nextTutorialStep() {
     this.clientTutorialVisible = false;
     this.tutorialService.nextStep();
   }
 
-  resetTutorial() {
-    this.tutorialService.resetTutorial();
-  }
 }

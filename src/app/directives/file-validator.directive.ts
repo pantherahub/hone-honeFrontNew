@@ -1,5 +1,5 @@
 import { Directive, HostListener, ElementRef, Input, OnInit, Output, EventEmitter } from '@angular/core';
-import { AlertService } from '../services/alerts/alert.service';
+import { AlertService } from '../services/alert/alert.service';
 
 @Directive({
   selector: '[appFileValidator]',
@@ -50,21 +50,23 @@ export class FileValidatorDirective implements OnInit {
     if (!file) return;
 
     if (!this.isFileTypeValid(file)) {
-      this.alertService.error(
-        'Oops...',
-        `Archivo no permitido: "${file.name}".<br>
-        Formatos permitidos: ${this.allowedExtensions.join(', ')}`
-      );
+      this.alertService.showAlert({
+        title: '¡Error!',
+        messageHTML: `Archivo no permitido.<br>
+          Formatos permitidos: ${this.allowedExtensions.join(', ')}`,
+        variant: 'error',
+      });
       // Reset input if file is invalid
       input.value = '';
       return;
     } else if (!this.isFileSizeValid(file)) {
-      this.alertService.error(
-        'Archivo demasiado grande',
-        `El archivo excede el tamaño máximo de ${this.maxFileSizeMB}MB.<br>
-        Puedes usar este compresor para reducir su tamaño: <a href="https://www.wecompress.com/es/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">
-        ir al compresor</a>.`
-      );
+      this.alertService.showAlert({
+        title: '¡Archivo muy pesado!',
+        messageHTML: `El archivo excede el tamaño máximo de ${this.maxFileSizeMB}MB.<br>
+          Puedes usar este compresor para reducir su tamaño: <a href="https://www.wecompress.com/es/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">
+          ir al compresor</a>.`,
+        variant: 'error',
+      });
       input.value = '';
       return;
     }
