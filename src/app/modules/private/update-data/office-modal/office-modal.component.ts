@@ -17,7 +17,7 @@ import { ClientProviderService } from 'src/app/services/clients/client-provider.
 import { CompanyInterface } from 'src/app/models/client.interface';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { AlertService } from 'src/app/services/alerts/alert.service';
+import { AlertNzService } from 'src/app/services/alert-nz/alert-nz.service';
 import { ScheduleFormComponent } from './schedule-form/schedule-form.component';
 import { AddressFormComponent } from './address-form/address-form.component';
 import { DatePickerInputComponent } from 'src/app/shared/components/date-picker-input/date-picker-input.component';
@@ -72,7 +72,7 @@ export class OfficeModalComponent implements OnInit {
     private fb: FormBuilder,
     private formUtils: FormUtilsService,
     private messageService: NzMessageService,
-    private alertService: AlertService,
+    private alertNzService: AlertNzService,
     private modalService: NzModalService,
     private citiesService: CitiesService,
     private clientService: ClientProviderService,
@@ -295,7 +295,7 @@ export class OfficeModalComponent implements OnInit {
 
       const hasContacts = this.existingContacts && this.existingContacts.length;
       if (hasContacts) {
-        const confirmed = await this.alertService.confirmDelete(
+        const confirmed = await this.alertNzService.confirmDelete(
           '¿Está seguro?',
           'Si actualiza la ciudad todos los indicativos de teléfonos fijos de los contactos serán actualizados a la ciudad seleccionada.'
         );
@@ -555,7 +555,7 @@ export class OfficeModalComponent implements OnInit {
   }
 
   async deleteSchedule(index: number) {
-    const confirmed = await this.alertService.confirmDelete(
+    const confirmed = await this.alertNzService.confirmDelete(
       '¿Eliminar horario?',
       'Eliminar horario de atención del listado'
     );
@@ -601,7 +601,7 @@ export class OfficeModalComponent implements OnInit {
     this.formUtils.trimFormStrControls(this.officeForm);
     if (this.officeForm.invalid) {
       this.formUtils.markFormTouched(this.officeForm);
-      this.alertService.warning(
+      this.alertNzService.warning(
         'Aviso',
         'Para actualizar contactos primero debe diligenciar la información de la sede.'
       );
@@ -622,7 +622,7 @@ export class OfficeModalComponent implements OnInit {
       nzOnCancel: () => {
         const componentInstance = modalRef.getContentComponent();
         if (componentInstance.hasChanges) {
-          this.alertService.confirm(
+          this.alertNzService.confirm(
             'Cambios sin guardar',
             'Tienes cambios en el contacto. Si sales sin guardar, se perderán.',
             {
@@ -670,7 +670,7 @@ export class OfficeModalComponent implements OnInit {
             `Contacto por ${contactIndex != null ? 'actualizar' : 'agregar'}.`
           );
           if (contactShortcut) {
-            this.alertService.success(
+            this.alertNzService.success(
               'Agregado',
               `Contacto de ${contactShortcut.label} agregado para crear`
             );
@@ -698,7 +698,7 @@ export class OfficeModalComponent implements OnInit {
   }
 
   async deleteContact(index: number) {
-    const confirmed = await this.alertService.confirmDelete(
+    const confirmed = await this.alertNzService.confirmDelete(
       '¿Eliminar contacto?',
       'Eliminar contacto del listado'
     );
@@ -742,18 +742,18 @@ export class OfficeModalComponent implements OnInit {
     if (this.officeForm.invalid) return;
 
     if (!this.existingSchedules?.length) {
-      this.alertService.warning(
+      this.alertNzService.warning(
         'Aviso',
         'Debe agregar al menos un horario de atención.'
       );
       return;
     }
     if (!this.existingContacts?.length) {
-      this.alertService.warning('Aviso', 'Debe agregar al menos un contacto.');
+      this.alertNzService.warning('Aviso', 'Debe agregar al menos un contacto.');
       return;
     }
     if (this.getMissingContacts(true).length > 0) {
-      this.alertService.warning(
+      this.alertNzService.warning(
         'Aviso',
         'Faltan algunos contactos requeridos. Por favor diligéncialos.'
       );

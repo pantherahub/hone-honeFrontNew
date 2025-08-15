@@ -468,18 +468,16 @@ export class ModalEditDocumentComponent implements OnInit {
     }
     html += `<p class="mt-3">Por favor verifica este monto según el tipo de prestador y la ciudad correspondiente.</p>`;
 
-    this.alertService
-      .showAlert({
-        title: 'Información sobre valores de póliza',
-        messageHTML: html,
-        variant: 'info',
-        isConfirmation: true,
-        customSize: 'max-w-lg',
-        beforeClose: async () => {
-          console.log("beforeClose");
-          return await this.policyCloseAlert();
-        }
-      });
+    this.alertService.showAlert({
+      title: 'Información sobre valores de póliza',
+      messageHTML: html,
+      variant: 'info',
+      isConfirmation: true,
+      customSize: 'max-w-lg',
+      beforeClose: async () => {
+        return await this.policyCloseAlert();
+      }
+    });
   }
 
   policyCloseAlert(): Promise<boolean> {

@@ -11,13 +11,6 @@ export interface ClientInterface {
    email?: string;
 }
 
-export interface PercentInterface {
-   uploaded?: number;
-   expired?: number;
-   remaining?: number;
-   total?: number;
-}
-
 export interface DocumentInterface {
    idProvider?: string;
    typeDocument?: string;

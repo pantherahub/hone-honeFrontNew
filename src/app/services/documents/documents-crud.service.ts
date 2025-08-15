@@ -12,7 +12,7 @@ export class DocumentsCrudService {
 
   constructor(private httpClient: HttpClient) { }
 
-  public getPercentDocuments(idProvider: number, idTypeProvider: number, idClient: number): Observable<any> {
+  public getPercentDocuments(idProvider: number, idClient: number): Observable<any> {
     return this.httpClient.get(`${this.url}${this.urlPrefix}/GetPorcentages/${idProvider}/${idClient}`);
   }
 

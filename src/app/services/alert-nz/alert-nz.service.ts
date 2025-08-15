@@ -4,7 +4,7 @@ import { NzModalRef, NzModalService, ModalOptions } from 'ng-zorro-antd/modal';
 @Injectable({
   providedIn: 'root'
 })
-export class AlertService {
+export class AlertNzService {
 
   constructor(private modalService: NzModalService) { }
 

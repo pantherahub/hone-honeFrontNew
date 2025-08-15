@@ -2,7 +2,7 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { NgZorroModule } from '../../../../ng-zorro.module';
 import { EventManagerService } from '../../../../services/events-manager/event-manager.service';
 import { DocumentsCrudService } from '../../../../services/documents/documents-crud.service';
-import { DocumentInterface, PercentInterface } from '../../../../models/client.interface';
+import { DocumentInterface } from '../../../../models/client.interface';
 import { Router } from '@angular/router';
 import { FeedbackFivestarsComponent } from 'src/app/shared/modals/feedback-fivestars/feedback-fivestars.component';
 import { AlertService } from 'src/app/services/alert/alert.service';
@@ -17,6 +17,7 @@ import { ModalEditDocumentComponent } from '../modal-edit-document/modal-edit-do
 import { DocumentConfig, DownloadService } from 'src/app/services/download/download.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CitiesService } from 'src/app/services/cities/cities.service';
+import { CompliancePercentInterface, PercentInterface } from 'src/app/models/doc-percent.interface';
 
 @Component({
   selector: 'app-list-documents',
@@ -33,7 +34,7 @@ export class ListDocumentsComponent implements OnInit {
   loadingDocs: boolean = false;
   loadManualDownload: boolean = false;
 
-  percentData: PercentInterface = {};
+  percentData: CompliancePercentInterface | undefined;
   docList: any[] = [];
   citiesList: any[] = [];
   feedbackModalShown = false;
@@ -41,6 +42,12 @@ export class ListDocumentsComponent implements OnInit {
 
   chart!: ApexCharts;
   @ViewChild('donutChart', { static: false }) chartElement!: ElementRef;
+
+  statusConfig: Record<string, { bg: string; text: string; icon: string; label: string }> = {
+    'PENDIENTE': { bg: 'bg-yellow-100', text: 'text-yellow-800', icon: 'clock', label: 'Pendiente' },
+    'AL DIA': { bg: 'bg-green-100', text: 'text-green-800', icon: 'check', label: 'Cargado' },
+    'VENCIDO': { bg: 'bg-red-100', text: 'text-red-800', icon: 'close', label: 'Vencido' }
+  };
 
   private downloadConfigs: Record<string, DocumentConfig> = {
     '8-9': {
@@ -98,7 +105,7 @@ export class ListDocumentsComponent implements OnInit {
       remaining = 100,
       uploaded = 0,
       expired = 0,
-    } = this.percentData;
+    } = this.percentData ?? {};
 
     return {
       series: [uploaded, remaining, expired],
@@ -194,22 +201,23 @@ export class ListDocumentsComponent implements OnInit {
    */
   getDocumentPercent() {
     this.loadingPercent = true;
-    const { idProvider, idTypeProvider, idClientHoneSolutions } = this.clientSelected;
-    this.documentService.getPercentDocuments(idProvider, idTypeProvider, idClientHoneSolutions).subscribe({
+    const { idProvider, idClientHoneSolutions } = this.clientSelected;
+    this.documentService.getPercentDocuments(idProvider, idClientHoneSolutions).subscribe({
       next: (res: any) => {
-        this.percentData = res.data;
+        const percentDataTypes = res.data as PercentInterface;
+        this.percentData = percentDataTypes?.compliance;
         this.loadingPercent = false;
         if (this.chart) {
           this.chart.updateSeries([
-            this.percentData.uploaded ?? 0,
-            this.percentData.remaining ?? 0,
-            this.percentData.expired ?? 0
+            this.percentData?.uploaded ?? 0,
+            this.percentData?.remaining ?? 0,
+            this.percentData?.expired ?? 0
           ]);
         } else {
           this.setupChart();
         }
 
-        if (this.percentData.uploaded && this.user.doesNeedSurvey && !this.feedbackModalShown) {
+        if (this.percentData?.uploaded && this.user.doesNeedSurvey && !this.feedbackModalShown) {
           this.open5starsFeedback();
         } else {
           this.showDataformAlert();
