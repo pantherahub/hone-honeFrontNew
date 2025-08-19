@@ -1,4 +1,4 @@
-import { Component, inject, AfterContentChecked, Input, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { NZ_MODAL_DATA, NzModalRef } from 'ng-zorro-antd/modal';
 import { NgZorroModule } from '../../../../ng-zorro.module';
 import { CommonModule } from '@angular/common';
@@ -20,7 +20,7 @@ import { formatListWithY } from 'src/app/utils/string-utils';
    templateUrl: './modal-edit-document.component.html',
    styleUrl: './modal-edit-document.component.scss'
 })
-export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
+export class ModalEditDocumentComponent implements OnInit {
    loader: boolean = false;
    documentForm!: FormGroup;
 
@@ -29,6 +29,7 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
    @Input() currentDoc?: any;
    @Input() documentId?: any;
    @Input() documentType?: any;
+   @Input() citiesList?: any[] = [];
 
    clientSelected: any = this.eventManager.clientSelected();
 
@@ -47,13 +48,62 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
   riskClassifierOptions = ['1', '2', '3', '4', '5'];
 
   readonly SMLV: number = 1423500;
-  readonly typePolicyProviderConfig: { [key: string]: number } = {
-    'Psicólogo': 200,
-    'Nutricionista': 200,
-    'Terapeuta': 200,
-    'Fonoaudiólogo': 200,
-    'Profesional médico': 420,
-    'IPS': 420,
+  readonly idMainCities: number[] = [
+    88, // Barranquilla
+    107, // Bogota
+    150, // Cali
+    547, // Medellin
+  ];
+  mainCities: any[] = [];
+  readonly typePolicyProviderConfig: { [key: string]: any } = {
+    // Juridica
+    'Clinica': {
+      idTypeProvider: 3,
+      smlvMainCities: 420,
+      smlvOtherCities: 370,
+    },
+    'Hospital': {
+      idTypeProvider: 3,
+      smlvMainCities: 420,
+      smlvOtherCities: 370,
+    },
+    'IPS Ambulatoria': {
+      idTypeProvider: 3,
+      smlvMainCities: 370,
+      smlvOtherCities: 230,
+    },
+
+    // Natural
+    'Profesional médico': {
+      idTypeProvider: 7,
+      smlvMainCities: 230,
+      smlvOtherCities: 200,
+    },
+    'Odontologo': {
+      idTypeProvider: 7,
+      smlvMainCities: 230,
+      smlvOtherCities: 200,
+    },
+    'Terapeuta': {
+      idTypeProvider: 7,
+      smlvMainCities: 200,
+      smlvOtherCities: 100,
+    },
+    'Psicólogo': {
+      idTypeProvider: 7,
+      smlvMainCities: 200,
+      smlvOtherCities: 100,
+    },
+    'Fonoaudiólogo': {
+      idTypeProvider: 7,
+      smlvMainCities: 200,
+      smlvOtherCities: 100,
+    },
+    'Nutricionista': {
+      idTypeProvider: 7,
+      smlvMainCities: 200,
+      smlvOtherCities: 100,
+    },
   };
   hasShownAmountMessage: boolean = false;
 
@@ -79,8 +129,6 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
       private formUtils: FormUtilsService,
    ) { }
 
-   ngAfterContentChecked (): void {}
-
    ngOnInit(): void {
       this.createForm();
       this.validateDocumentType();
@@ -90,6 +138,14 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
    destroyModal (response: boolean = false): void {
       this.#modal.destroy({ response });
    }
+
+  getMainCities() {
+    if (this.citiesList?.length) {
+      this.mainCities = this.citiesList.filter(city =>
+        this.idMainCities.includes(city.idCity)
+      );
+    }
+  }
 
    /**
     * Crea e Inicializa el formulario
@@ -193,7 +249,10 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
          nombredocumento: item.nombredocumento,
          receptionDate: this.convertDate(item.receptionDate),
          resolutionOfThePension: item.resolutionOfThePension,
-         riskClassifier: this.sanitizeWithOptions(item.riskClassifier, this.riskClassifierOptions),
+         riskClassifier: this.sanitizeWithOptions(
+           item.riskClassifier,
+           [...this.riskClassifierOptions, '9']
+         ),
          validityStartDate: this.convertDate(item.validityStartDate),
          amountPolicy: this.formUtils.formatCurrency(item.amountPolicy),
          tipodocumento: item.idTypeDocuments,
@@ -266,41 +325,87 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
     control?.setValue(formatted, { emitEvent: false });
   }
 
+  hasAmountPolicyValidation(): boolean {
+    if (!this.clientSelected?.idTypeProvider) return false;
+    return Object.values(this.typePolicyProviderConfig).some(
+      (config: any) => config.idTypeProvider === this.clientSelected.idTypeProvider
+    );
+  };
+
   amountPolicyInfoAlert(onFocus: boolean = false): void {
-    if (onFocus && this.hasShownAmountMessage) return;
+    if (!this.hasAmountPolicyValidation()
+      || (onFocus && this.hasShownAmountMessage)) return;
     this.hasShownAmountMessage = true;
 
+    this.getMainCities();
+
     // Group by SMLVs num min
-    const groups: { [smlvNum: number]: string[] } = {};
-    for (let type in this.typePolicyProviderConfig) {
-      let smlvNum = this.typePolicyProviderConfig[type];
-      if (!groups[smlvNum]) groups[smlvNum] = [];
-      groups[smlvNum].push(type);
+    const grouped: Record<string, { smlvMain: number, smlvOther: number, types: string[] }> = {};
+    for (let [type, config] of Object.entries(this.typePolicyProviderConfig)) {
+      if (config.idTypeProvider !== this.clientSelected.idTypeProvider) continue;
+
+      const key = `${config.smlvMainCities}-${config.smlvOtherCities}`;
+      if (!grouped[key]) {
+        grouped[key] = {
+          smlvMain: config.smlvMainCities,
+          smlvOther: config.smlvOtherCities,
+          types: []
+        };
+      }
+      grouped[key].types.push(type);
     }
 
+    const mainCitiesNames = this.mainCities
+      .map(city => city.city)
+      .sort();
+
     // Generate dinamic message
-    let html = '';
-    for (let smlvNum in groups) {
-      let provTypes = groups[smlvNum];
-      let value = this.SMLV * parseInt(smlvNum);
+    let html = `<p class="font-bold">Valores mínimos requeridos</p>`;
+    html += `<p><span class="font-semibold">Ciudades principales:</span> ${mainCitiesNames.join(', ')}.</p>`;
+    for (let group of Object.values(grouped)) {
+      const valueMain = group.smlvMain * this.SMLV;
+      const valueOther = group.smlvOther * this.SMLV;
       html += `
-        <p>
-          Para <strong>${formatListWithY(provTypes)}</strong>, el valor mínimo requerido de la póliza es equivalente a
-          <strong>${smlvNum} SMLV</strong>
-          (<strong>${smlvNum} x $${this.SMLV.toLocaleString('es-CO')} = $${value.toLocaleString('es-CO')}</strong>)
+        <p class="mt-2">
+          Para <strong>${formatListWithY(group.types)}</strong>:
+          <ul class="list-disc list-inside mt-1">
+            <li><strong>${group.smlvMain} SMLV</strong> en ciudades principales (<strong>$${valueMain.toLocaleString('es-CO')}</strong>)</li>
+            <li><strong>${group.smlvOther} SMLV</strong> en otras ciudades (<strong>$${valueOther.toLocaleString('es-CO')}</strong>)</li>
+          </ul>
         </p>
       `;
     }
-    html += `<p class="mt-3">Por favor verifica este monto.</p>`;
+    html += `<p class="mt-3">Por favor verifica este monto según el tipo de prestador y la ciudad correspondiente.</p>`;
 
-    this.alertService.info(
+    const modalRef = this.alertService.info(
       'Información sobre valores de póliza',
       html,
       {
         nzOkText: 'Entendido',
-        nzClosable: true,
+        nzClosable: false,
         nzWidth: 600,
         nzContent: html,
+        nzOnOk: () => {
+          this.policyCloseAlert(modalRef);
+          return false; // Avoid close modal
+        }
+      }
+    );
+  }
+
+  policyCloseAlert(firstModalRef: NzModalRef) {
+    this.alertService.confirm(
+      'IMPORTANTE',
+      'Debe leer la información anterior sobre los valores de la póliza para evitar devoluciones y retrasos en la gestión documental.',
+      {
+        nzClosable: false,
+        nzWidth: 500,
+        nzCancelText: 'Volver a revisar',
+        nzOkText: 'Ya leí la información anterior',
+        nzOkDanger: true,
+        nzOnOk: () => {
+          firstModalRef.destroy();
+        },
       }
     );
   }

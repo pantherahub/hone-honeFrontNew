@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { DocumentsCrudService } from '../../../../services/documents/documents-crud.service';
 import { DocumentInterface, PercentInterface } from '../../../../models/client.interface';
 import { EventManagerService } from '../../../../services/events-manager/event-manager.service';
@@ -16,6 +16,7 @@ import { PipesModule } from 'src/app/pipes/pipes.module';
 import { AlertService } from 'src/app/services/alerts/alert.service';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { formatListWithY } from 'src/app/utils/string-utils';
+import { NzModalRef } from 'ng-zorro-antd/modal';
 
 @Component({
    selector: 'app-remaining-documents',
@@ -25,6 +26,8 @@ import { formatListWithY } from 'src/app/utils/string-utils';
    styleUrl: './remaining-documents.component.scss'
 })
 export class RemainingDocumentsComponent implements OnInit {
+
+   @Input() citiesList: any[] = [];
 
    loading: boolean = false;
    clientSelected: any = this.eventManager.clientSelected();
@@ -45,13 +48,63 @@ export class RemainingDocumentsComponent implements OnInit {
   ];
 
   readonly SMLV: number = 1423500;
-  readonly typePolicyProviderConfig: { [key: string]: number } = {
-    'Psicólogo': 200,
-    'Nutricionista': 200,
-    'Terapeuta': 200,
-    'Fonoaudiólogo': 200,
-    'Profesional médico': 420,
-    'IPS': 420,
+  readonly idMainCities: number[] = [
+    88, // Barranquilla
+    107, // Bogota
+    150, // Cali
+    547, // Medellin
+  ];
+  mainCities: any[] = [];
+
+  readonly typePolicyProviderConfig: { [key: string]: any } = {
+    // Juridica
+    'Clinica': {
+      idTypeProvider: 3,
+      smlvMainCities: 420,
+      smlvOtherCities: 370,
+    },
+    'Hospital': {
+      idTypeProvider: 3,
+      smlvMainCities: 420,
+      smlvOtherCities: 370,
+    },
+    'IPS Ambulatoria': {
+      idTypeProvider: 3,
+      smlvMainCities: 370,
+      smlvOtherCities: 230,
+    },
+
+    // Natural
+    'Profesional médico': {
+      idTypeProvider: 7,
+      smlvMainCities: 230,
+      smlvOtherCities: 200,
+    },
+    'Odontologo': {
+      idTypeProvider: 7,
+      smlvMainCities: 230,
+      smlvOtherCities: 200,
+    },
+    'Terapeuta': {
+      idTypeProvider: 7,
+      smlvMainCities: 200,
+      smlvOtherCities: 100,
+    },
+    'Psicólogo': {
+      idTypeProvider: 7,
+      smlvMainCities: 200,
+      smlvOtherCities: 100,
+    },
+    'Fonoaudiólogo': {
+      idTypeProvider: 7,
+      smlvMainCities: 200,
+      smlvOtherCities: 100,
+    },
+    'Nutricionista': {
+      idTypeProvider: 7,
+      smlvMainCities: 200,
+      smlvOtherCities: 100,
+    },
   };
 
   hasShownAmountMessage: boolean = false;
@@ -66,11 +119,20 @@ export class RemainingDocumentsComponent implements OnInit {
    ) { }
 
    ngOnInit(): void {
+     this.getMainCities();
      this.getDocumentsToUpload();
    }
 
   hasExpirationField(idDoc: number | undefined): boolean {
     return idDoc !== undefined && this.documentIdsWithExpiration.includes(idDoc)
+  }
+
+  getMainCities() {
+    if (this.citiesList?.length) {
+      this.mainCities = this.citiesList.filter(city =>
+        this.idMainCities.includes(city.idCity)
+      );
+    }
   }
 
    getDocumentsToUpload() {
@@ -124,41 +186,85 @@ export class RemainingDocumentsComponent implements OnInit {
     control?.setValue(formatted, { emitEvent: false });
   }
 
+  hasAmountPolicyValidation(): boolean {
+    if (!this.clientSelected?.idTypeProvider) return false;
+    return Object.values(this.typePolicyProviderConfig).some(
+      (config: any) => config.idTypeProvider === this.clientSelected.idTypeProvider
+    );
+  };
+
   amountPolicyInfoAlert(onFocus: boolean = false): void {
-    if (onFocus && this.hasShownAmountMessage) return;
+    if (!this.hasAmountPolicyValidation()
+      || (onFocus && this.hasShownAmountMessage)) return;
     this.hasShownAmountMessage = true;
 
     // Group by SMLVs num min
-    const groups: { [smlvNum: number]: string[] } = {};
-    for (let type in this.typePolicyProviderConfig) {
-      let smlvNum = this.typePolicyProviderConfig[type];
-      if (!groups[smlvNum]) groups[smlvNum] = [];
-      groups[smlvNum].push(type);
+    const grouped: Record<string, { smlvMain: number, smlvOther: number, types: string[] }> = {};
+    for (let [type, config] of Object.entries(this.typePolicyProviderConfig)) {
+      if (config.idTypeProvider !== this.clientSelected.idTypeProvider) continue;
+
+      const key = `${config.smlvMainCities}-${config.smlvOtherCities}`;
+      if (!grouped[key]) {
+        grouped[key] = {
+          smlvMain: config.smlvMainCities,
+          smlvOther: config.smlvOtherCities,
+          types: []
+        };
+      }
+      grouped[key].types.push(type);
     }
 
+    const mainCitiesNames = this.mainCities
+      .map(city => city.city)
+      .sort();
+
     // Generate dinamic message
-    let html = '';
-    for (let smlvNum in groups) {
-      let provTypes = groups[smlvNum];
-      let value = this.SMLV * parseInt(smlvNum);
+    let html = `<p class="font-bold">Valores mínimos requeridos</p>`;
+    html += `<p><span class="font-semibold">Ciudades principales:</span> ${mainCitiesNames.join(', ')}.</p>`;
+    for (let group of Object.values(grouped)) {
+      const valueMain = group.smlvMain * this.SMLV;
+      const valueOther = group.smlvOther * this.SMLV;
       html += `
-        <p>
-          Para <strong>${formatListWithY(provTypes)}</strong>, el valor mínimo requerido de la póliza es equivalente a
-          <strong>${smlvNum} SMLV</strong>
-          (<strong>${smlvNum} x $${this.SMLV.toLocaleString('es-CO')} = $${value.toLocaleString('es-CO')}</strong>)
+        <p class="mt-2">
+          Para <strong>${formatListWithY(group.types)}</strong>:
+          <ul class="list-disc list-inside mt-1">
+            <li><strong>${group.smlvMain} SMLV</strong> en ciudades principales (<strong>$${valueMain.toLocaleString('es-CO')}</strong>)</li>
+            <li><strong>${group.smlvOther} SMLV</strong> en otras ciudades (<strong>$${valueOther.toLocaleString('es-CO')}</strong>)</li>
+          </ul>
         </p>
       `;
     }
-    html += `<p class="mt-3">Por favor verifica este monto.</p>`;
+    html += `<p class="mt-3">Por favor verifica este monto según el tipo de prestador y la ciudad correspondiente.</p>`;
 
-    this.alertService.info(
+    const modalRef = this.alertService.info(
       'Información sobre valores de póliza',
       html,
       {
         nzOkText: 'Entendido',
-        nzClosable: true,
+        nzClosable: false,
         nzWidth: 600,
         nzContent: html,
+        nzOnOk: () => {
+          this.policyCloseAlert(modalRef);
+          return false; // Avoid close modal
+        }
+      }
+    );
+  }
+
+  policyCloseAlert(firstModalRef: NzModalRef) {
+    this.alertService.confirm(
+      'IMPORTANTE',
+      'Debe leer la información anterior sobre los valores de la póliza para evitar devoluciones y retrasos en la gestión documental.',
+      {
+        nzClosable: false,
+        nzWidth: 500,
+        nzCancelText: 'Volver a revisar',
+        nzOkText: 'Ya leí la información anterior',
+        nzOkDanger: true,
+        nzOnOk: () => {
+          firstModalRef.destroy();
+        },
       }
     );
   }

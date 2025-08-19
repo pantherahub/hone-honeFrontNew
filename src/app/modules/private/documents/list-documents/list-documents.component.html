@@ -248,7 +248,7 @@
                     </section>
                 </ng-template>
                 <ng-template nz-tab>
-                    <app-remaining-documents></app-remaining-documents>
+                    <app-remaining-documents [citiesList]="citiesList"></app-remaining-documents>
                 </ng-template>
             </nz-tab>
 
@@ -267,7 +267,7 @@
                     </section>
                 </ng-template>
                 <ng-template nz-tab>
-                    <app-uploaded-documents></app-uploaded-documents>
+                    <app-uploaded-documents [citiesList]="citiesList"></app-uploaded-documents>
                 </ng-template>
             </nz-tab>
 
@@ -285,7 +285,7 @@
                     </section>
                 </ng-template>
                 <ng-template nz-tab>
-                    <app-expired-documents></app-expired-documents>
+                    <app-expired-documents [citiesList]="citiesList"></app-expired-documents>
                 </ng-template>
             </nz-tab>
         </nz-tabset>
