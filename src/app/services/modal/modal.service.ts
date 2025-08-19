@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { NavigationStart, Router } from '@angular/router';
 import { filter, Observable, Subject, Subscription, take } from 'rxjs';
+import { ModalRef } from 'src/app/models/modal.interface';
 import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
 
 @Injectable({
@@ -36,7 +37,7 @@ export class ModalService {
     content: Type<T> | TemplateRef<any>,
     options: Partial<ModalComponent> & { destroyOnRouteChange?: boolean } = {},
     inputs?: Partial<T>
-  ): { onClose: Observable<any>, close: (returnData?: any) => void } {
+  ): ModalRef {
     const onClose$ = new Subject<any>();
     const isTemplate = content instanceof TemplateRef;
 

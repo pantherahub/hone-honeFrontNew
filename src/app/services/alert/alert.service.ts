@@ -3,6 +3,7 @@ import { AlertModalComponent } from 'src/app/shared/alerts/alert-modal/alert-mod
 import { ModalService } from '../modal/modal.service';
 import { Observable } from 'rxjs';
 import { AlertOptions } from 'src/app/models/alert.interface';
+import { ModalRef } from 'src/app/models/modal.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +21,7 @@ export class AlertService {
       ...alertOptions
     } = opts;
 
-    const modalReturn = this.modalService.open(AlertModalComponent, {
+    const modalReturn: ModalRef = this.modalService.open(AlertModalComponent, {
       customSize,
       closable,
       beforeClose,

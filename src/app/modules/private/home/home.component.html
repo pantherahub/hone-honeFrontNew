@@ -149,7 +149,7 @@
 
 
 <!-- Tutorial video modal -->
-<app-modal #videoModal [customSize]="'max-w-[727px]'" [showCloseButton]="false" [title]="'Video presentación'" (onClose)="nextTutorialStep()">
+<ng-template #videoModal>
   <iframe
     src="https://www.youtube.com/embed/HNnISS31dPs"
     frameborder="0"
@@ -163,7 +163,7 @@
       <use xlink:href="/assets/icons/outline/arrows.svg#arrow-right" />
     </svg>
   </app-button>
-</app-modal>
+</ng-template>
 
 
 <!-- Tutorial popover content -->

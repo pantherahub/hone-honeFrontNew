@@ -14,6 +14,8 @@ import { ButtonComponent } from 'src/app/shared/components/button/button.compone
 import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
 import { NavigationService } from 'src/app/services/navigation/navigation.service';
 import { PopoverComponent } from 'src/app/shared/components/popover/popover.component';
+import { ModalService } from 'src/app/services/modal/modal.service';
+import { ModalRef } from 'src/app/models/modal.interface';
 
 @Component({
   selector: 'app-home',
@@ -36,7 +38,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   clientTutorialVisible: boolean = false;
 
-  @ViewChild('videoModal') videoModal!: ModalComponent;
+  videoModalRef: ModalRef | null = null;
+
+  @ViewChild('videoModal') videoModal!: TemplateRef<any>;
   @ViewChild('reminderModal') reminderModal!: ModalComponent;
 
   private tutorialSubscription!: Subscription;
@@ -47,6 +51,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     private eventManager: EventManagerService,
     private router: Router,
     private navigationService: NavigationService,
+    private modalService: ModalService,
   ) { }
 
   ngOnInit(): void {
@@ -128,7 +133,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   startTutorial(step: number) {
     if (step === 1) {
       this.clientTutorialVisible = false;
-      this.videoModal.open();
+      this.openVideoModal();
     } else if (step === 3) {
       this.clientTutorialVisible = true;
     } else {
@@ -136,8 +141,19 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  openVideoModal() {
+    this.videoModalRef = this.modalService.open(this.videoModal, {
+      title: 'Video presentación',
+      showCloseButton: false,
+      customSize: 'max-w-[727px]',
+    });
+    this.videoModalRef.onClose.subscribe(() => {
+      this.nextTutorialStep();
+    });
+  }
+
   closeVideoModal() {
-    this.videoModal.close();
+    this.videoModalRef?.close();
   }
 
   onCloseDataReminder() {

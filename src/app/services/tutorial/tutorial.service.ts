@@ -5,7 +5,8 @@ import { BehaviorSubject, distinctUntilChanged } from 'rxjs';
   providedIn: 'root'
 })
 export class TutorialService {
-  private readonly INITIAL_STEP = 1;
+  // private readonly INITIAL_STEP = 1;
+  private readonly INITIAL_STEP = 2;
   private readonly LAST_STEP = 3;
   private stepIndex = new BehaviorSubject<number>(this.getStoredStep());
   stepIndex$ = this.stepIndex.asObservable();
