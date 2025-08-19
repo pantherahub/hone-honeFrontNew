@@ -42,10 +42,10 @@ export const routes: Routes = [
     component: PageNotFoundComponent
   },
   // Delete after tests
-  {
-    path: 'test',
-    component: TestsComponent
-  },
+  // {
+  //   path: 'test',
+  //   component: TestsComponent
+  // },
 
   //   PRIVATE ROUTES
   {

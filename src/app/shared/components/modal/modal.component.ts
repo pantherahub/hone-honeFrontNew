@@ -70,7 +70,6 @@ export class ModalComponent implements OnInit, AfterViewInit {
   }
 
   open() {
-    console.log("OPEN.STACK:", ModalComponent.stack);
     this.isOpen = true;
     this.cdr.detectChanges();
     ModalComponent.stack.push(this);
@@ -81,12 +80,10 @@ export class ModalComponent implements OnInit, AfterViewInit {
   }
 
   async close(returnData?: any) {
-    console.log("CLOSE");
     if (this.beforeClose) {
       const result = await this.beforeClose();
       if (!result) return;
     }
-    console.log("PASA");
 
     this.closing = true;
     setTimeout(() => {
@@ -107,7 +104,6 @@ export class ModalComponent implements OnInit, AfterViewInit {
         document.body.classList.remove('overflow-hidden');
       }
       this.onClose.emit(returnData);
-      console.log("STACK:", ModalComponent.stack);
     }, this.closingDuration);
 
   }

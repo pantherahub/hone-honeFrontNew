@@ -98,11 +98,12 @@ export class LoginComponent implements OnInit {
         this.tutorialService.resetTutorial();
         this.router.navigateByUrl('home');
       },
-      error: (error: any) => {
+      error: (err: any) => {
         this.isSubmitData = false;
 
-        if (error.status == 401) {
-          this.alertService.error("Ups...", error.error.message);
+        if (err.status == 401 || err.status == 403) {
+          const msg = err.error?.message;
+          this.alertService.error("Ups...", msg || 'Algo salió mal.');
           return;
         }
 

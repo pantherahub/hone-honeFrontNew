@@ -19,11 +19,17 @@ export class AuthService {
    // Llama al api para iniciar sesión y solo se debe usar en el LoginComponent
    public login (user: any): Observable<any> {
       return this.httpClient.post(`${this.url}login`, user).pipe(
-         map((resp: any) => {
-            this.saveToken(resp.token, resp.expir);
-            this.saveUserLogged(resp.usuario);
-            return resp;
-         })
+        map((resp: any) => {
+          if (!resp.usuario || !resp.usuario.roles) {
+            throw {
+              status: 403,
+              error: { message: 'El usuario no tiene roles asignados. Contacte con soporte.' }
+            };
+          }
+          this.saveToken(resp.token, resp.expir);
+          this.saveUserLogged(resp.usuario);
+          return resp;
+        })
       );
    }
 

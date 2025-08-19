@@ -67,7 +67,7 @@ export class SupportTicketComponent implements OnInit {
       ],
       email: [
         this.isLogged() ? this.user.email || '' : '',
-        [Validators.required, this.formUtils.email]
+        [Validators.required]
       ],
       phone: ['', [Validators.required, Validators.pattern(REGEX_PATTERNS.telNumberWithIndicative)]],
       address: ['', this.isLogged() ? [] : [Validators.required]],
