@@ -70,7 +70,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.reminderModal.open();
       }
     }
-    this.tutorialService.INITIAL_STEP = 2;
+
     this.tutorialSubscription = this.tutorialService.stepIndex$.subscribe(step => {
       if (!this.tutorialService.isTutorialFinished() && !this.reminderModal.isOpen) {
         this.startTutorial(step);
@@ -133,8 +133,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   startTutorial(step: number) {
     if (step === 1) {
-      this.clientTutorialVisible = false;
-      this.openVideoModal();
+      this.nextTutorialStep();
+      // this.clientTutorialVisible = false;
+      // this.openVideoModal();
     } else if (step === 3) {
       this.clientTutorialVisible = true;
     } else {
