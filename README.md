@@ -1,7 +1,7 @@
 
 # HoneSolutions Providers
 
-Esta es una nueva version de HoneSolutions, destinada al inicio de sesión de prestadores medicos. 
+Esta es una nueva version de HoneSolutions, destinada al inicio de sesión de prestadores medicos.
 
 
 ## Run Locally
@@ -9,13 +9,13 @@ Esta es una nueva version de HoneSolutions, destinada al inicio de sesión de pr
 Clone the project
 
 ```bash
-  git clone https://github.com/joseMetNet/honeFrontNew.git
+  git clone https://github.com/pantherahub/hone-honeFrontNew.git
 ```
 
 Go to the project directory
 
 ```bash
-  cd my-project
+  cd hone-honeFrontNew
 ```
 
 Install dependencies
@@ -46,7 +46,9 @@ or prod mode
 ```
 
 
+## Notes
 
+- The icons from `assets/icons/` -> `outline/*, solid/*, brands/*` were extracted from the `flowbite-icons v1.5.0` library and merged with the library from: `svgstore-cli v2.0.1`.
 
 
 ## Authors
@@ -56,7 +58,7 @@ or prod mode
 
 ## Tech Stack
 
-**Client:** Angular (version 17), NgZorro, Typescript
+**Client:** Angular (version 17), NgZorro, Typescript, Tailwindcss
 
 **Server:** Node, Express
 

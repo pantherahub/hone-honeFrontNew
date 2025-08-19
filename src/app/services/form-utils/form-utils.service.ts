@@ -15,7 +15,12 @@ export class FormUtilsService {
   minArrayLength(min: number): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
       if (control && control.value && control.value.length < min) {
-        return { 'minArrayLength': { valid: false } };
+        return {
+          minArrayLength: {
+            requiredLength: min,
+            actualLength: control.value.length
+          }
+        };
       }
       return null;
     };
@@ -27,7 +32,12 @@ export class FormUtilsService {
   maxArrayLength(max: number): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
       if (control && control.value && control.value.length > max) {
-        return { 'maxArrayLength': { valid: false } };
+        return {
+          maxArrayLength: {
+            requiredLength: max,
+            actualLength: control.value.length
+          }
+        };
       }
       return null;
     };

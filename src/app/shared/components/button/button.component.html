@@ -1,0 +1,36 @@
+@if (routerLink != null) {
+  <a
+    [routerLink]="routerLink"
+    [ngClass]="computedClasses"
+    [attr.aria-disabled]="disabled || loading"
+  >
+    <ng-container [ngTemplateOutlet]="buttonContent" />
+  </a>
+} @else if (href != null) {
+  <a
+    [attr.href]="href"
+    [attr.target]="target"
+    [attr.rel]="rel ?? null"
+    [ngClass]="computedClasses"
+    [attr.aria-disabled]="disabled || loading"
+  >
+    <ng-container [ngTemplateOutlet]="buttonContent" />
+  </a>
+} @else {
+  <button
+    [attr.type]="type"
+    [disabled]="disabled || loading"
+    [ngClass]="computedClasses"
+    (click)="onBtnClick($event)">
+    <ng-container [ngTemplateOutlet]="buttonContent" />
+  </button>
+}
+
+<ng-template #buttonContent>
+  @if (loading) {
+    <svg class="w-[1em] h-[1em] text-current animate-spin fill-gray-200">
+      <use xlink:href="/assets/icons/extras/animations.svg#spin" />
+    </svg>
+  }
+  <ng-content></ng-content>
+</ng-template>

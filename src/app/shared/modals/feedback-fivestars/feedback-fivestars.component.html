@@ -1,58 +1,86 @@
-<form [formGroup]="form" (ngSubmit)="onSubmit()" class="feedback-container space-y-4">
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="feedback-container space-y-6">
 
-  <div class="flex flex-col">
-    <label class="block text-sm font-medium">* Califica la experiencia</label>
+  <p class="text-sm font-normal leading-4 text-gray-600">
+    Queremos conocer tu opinión para seguir mejorando. Cuéntanos cómo te has sentido usando la plataforma. ¡Tu feedback es muy valioso para nosotros!
+  </p>
+
+  <div class="flex flex-col gap-2.5">
+    <label class="text-sm font-semibold leading-4">* Califica la experiencia</label>
     <div>
-      <nz-rate formControlName="rating" [nzTooltips]="tooltips" [nzAllowClear]="false"></nz-rate>
-      @if (form.value.rating) {
-        <span class="ant-rate-text text-sm text-gray-600">{{ tooltips[form.value.rating - 1] }}</span>
-      }
+      <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1">
+          @for (star of stars; track star; let i = $index) {
+            <app-tooltip [id]="'star-' + i" [text]="stars[i]" position="top" styleType="dark">
+              <button
+                type="button"
+                (click)="setRating(i + 1)"
+                (mouseover)="hoverRating = i + 1"
+                (mouseleave)="hoverRating = 0"
+                class="focus:outline-none transform transition duration-150 ease-in-out hover:scale-110"
+                [ngClass]="{
+                  'text-yellow-400': (hoverRating || selectedRating) > i,
+                  'text-gray-200': (hoverRating || selectedRating) <= i
+                }"
+              >
+                <svg width="20" height="20">
+                  <use xlink:href="/assets/icons/solid/general.svg#star" />
+                </svg>
+              </button>
+            </app-tooltip>
+          }
+        </div>
+        @if (selectedRating) {
+          <span class="text-sm text-gray-600">{{ stars[selectedRating - 1] }}</span>
+        }
+      </div>
+      <app-input-error [control]="form.get('rating')" />
     </div>
-    <small class="text-red-500" *ngIf="form.get('rating')?.invalid && form.get('rating')?.touched">
-      El campo es requerido.
-    </small>
   </div>
 
-  <div>
-    <label for="comments" class="block text-sm font-medium mb-1">Cuentános sobre tu experiencia en Lissom</label>
-    <textarea id="comments" formControlName="comments" maxlength="500" rows="4"
-      class="w-full border rounded p-2 text-sm focus:outline-none focus:ring resize-y min-h-24 max-h-48"
-      placeholder="Escribe tus comentarios..."></textarea>
+  <div class="flex flex-col gap-2.5">
+    <label class="text-sm font-semibold leading-4">Cuentános sobre tu experiencia en Lissom</label>
+    <app-text-input [id]="'comments'" formControlName="comments" label="Comentarios" [isTextarea]="true" maxlength="500" />
   </div>
 
-  <div>
-    <label class="block text-sm font-medium">¿Podemos ponernos en contacto contigo?</label>
-    <div class="flex space-x-4 mt-1">
-      <label class="flex items-center gap-2 cursor-pointer">
-        <input type="radio" formControlName="canContact" [value]="true" class="cursor-pointer" />
+  <div class="flex flex-col gap-2.5">
+    <label class="text-sm font-semibold leading-4">¿Podemos ponernos en contacto contigo?</label>
+    <div class="flex space-x-4">
+      <label class="flex items-center gap-2 cursor-pointer text-sm leading-4 text-gray-900">
+        <app-radio name="canContact" formControlName="canContact" [value]="true"></app-radio>
         Sí
       </label>
-      <label class="flex items-center gap-2 cursor-pointer">
-        <input type="radio" formControlName="canContact" [value]="false" class="cursor-pointer" />
+      <label class="flex items-center gap-2 cursor-pointer text-sm leading-4 text-gray-900">
+        <app-radio name="canContact" formControlName="canContact" [value]="false"></app-radio>
         No
       </label>
     </div>
+    @if (form.value.canContact === true) {
+      <div class="mt-1">
+        <app-text-input [id]="'phoneNumber'" formControlName="phoneNumber" label="Número telefónico" />
+        <app-input-error [control]="form.get('phoneNumber')" />
+      </div>
+    }
   </div>
 
-  @if (form.value.canContact === true) {
-    <div>
-      <label for="phoneNumber" class="block text-sm font-medium mb-1">* Número telefónico</label>
-      <input type="tel" id="phoneNumber" formControlName="phoneNumber"
-        class="w-full border rounded p-2 text-sm focus:outline-none focus:ring"
-        placeholder="Ej. 3001234567" />
-      <small class="text-red-500" *ngIf="form.get('phoneNumber')?.invalid && form.get('phoneNumber')?.touched">
-        @if (form.get('phoneNumber')?.hasError('required')) {
-          El campo es requerido.
-        } @else if (form.get('phoneNumber')?.hasError('invalidNumber')) {
-          Ingresa un número válido.
-        }
-      </small>
-    </div>
-  }
-
-  <div class="flex justify-end gap-2 mt-4">
-    <button *ngIf="enableCloseModal" type="button" nz-button (click)="closeModal()">Cancelar</button>
-    <button type="submit" nz-button  nzType="primary">Enviar</button>
+  <div class="flex justify-end gap-2">
+    @if (enableCloseModal) {
+      <app-button
+        (click)="closeModal()"
+        variant="gray"
+        styleType="soft"
+        size="md"
+        customClass="leading-4">
+        Cancelar
+      </app-button>
+    }
+    <app-button
+      [type]="'submit'"
+      variant="primary"
+      styleType="solid"
+      size="md"
+      customClass="leading-4">
+      Enviar
+    </app-button>
   </div>
 
 </form>

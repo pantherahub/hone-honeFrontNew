@@ -5,40 +5,61 @@ import { authGuard } from './guards/auth.guard';
 import { PageNotFoundComponent } from './modules/public/page-not-found/page-not-found.component';
 import { ListDocumentsComponent } from './modules/private/documents/list-documents/list-documents.component';
 import { NgModule } from '@angular/core';
-import { AdminLayoutComponent } from './views/admin-layout/admin-layout.component';
-import { ProviderAssistancessComponent } from './modules/public/provider-assistancess/provider-assistancess.component';
+import { PrivateLayoutComponent } from './layouts/private-layout/private-layout.component';
 import { UpdateDataComponent } from './modules/private/update-data/update-data.component';
 import { canDeactivateGuard } from './guards/can-deactivate.guard';
+import { TestsComponent } from './modules/public/tests/tests.component';
+import { SupportTicketComponent } from './shared/support-ticket/support-ticket.component';
+import { PublicLayoutComponent } from './layouts/public-layout/public-layout.component';
+import { noauthGuard } from './guards/noauth.guard';
+import { ServiceLayoutComponent } from './layouts/service-layout/service-layout.component';
+import { clientSelectedGuard } from './guards/client-selected.guard';
 
 export const routes: Routes = [
   //   PUBLIC ROUTES
   {
-		path: '',
-		redirectTo: 'login',
-		pathMatch: 'full'
+    path: '',
+    redirectTo: 'login',
+    pathMatch: 'full'
   },
-	{
-		path: 'login',
-		component: LoginComponent
-	},
-	{
-		path: 'page-not-found',
-		component: PageNotFoundComponent
-	},
-	{
-		path: 'page-form-assistance',
-		component: ProviderAssistancessComponent
+  {
+    path: '',
+    component: PublicLayoutComponent,
+    canActivate: [noauthGuard],
+    children: [
+      {
+        path: 'login',
+        component: LoginComponent
+      },
+      {
+        path: 'auth-support',
+        component: SupportTicketComponent
+      }
+    ]
+  },
+  {
+    path: 'page-not-found',
+    component: PageNotFoundComponent
+  },
+  // Delete after tests
+  {
+    path: 'test',
+    component: TestsComponent
   },
 
-	//   PRIVATE ROUTES
-	{
-		path: '',
-    component: AdminLayoutComponent,
+  //   PRIVATE ROUTES
+  {
+    path: '',
+    component: PrivateLayoutComponent,
     canActivate: [authGuard],
-		children: [
+    children: [
       {
         path: 'home',
         component: HomeComponent
+      },
+      {
+        path: 'support',
+        component: SupportTicketComponent
       },
       {
         path: 'update-data',
@@ -46,35 +67,42 @@ export const routes: Routes = [
         canDeactivate: [canDeactivateGuard]
       },
       {
-        path: 'cargar-documentos/:id',
-        component: ListDocumentsComponent
-      },
-		]
+        path: 'service',
+        component: ServiceLayoutComponent,
+        canActivate: [clientSelectedGuard],
+        children: [
+          {
+            path: 'documentation',
+            component: ListDocumentsComponent
+          },
+        ],
+      }
+    ]
   },
 
-	//   DEFAULT ROUTES
-	{
-		path: '**',
-		pathMatch: 'full',
-		redirectTo: 'page-not-found'
-	},
-	{
-		path: '**',
-		pathMatch: 'full',
-		redirectTo: 'page-form-assistance'
-	}
+  //   DEFAULT ROUTES
+  {
+    path: '**',
+    pathMatch: 'full',
+    redirectTo: 'home'
+  },
+  // {
+  //   path: '**',
+  //   pathMatch: 'full',
+  //   redirectTo: 'page-not-found'
+  // },
 ];
 
 @NgModule({
-	imports: [
-		RouterModule.forRoot(routes, {
-			useHash: true,
-			/* Activa las anclas en angular */
-			anchorScrolling: 'enabled',
-			/* Restaura el scroll a la posición inicial */
-			scrollPositionRestoration: 'enabled'
-		})
-	],
-	exports: [RouterModule]
+  imports: [
+    RouterModule.forRoot(routes, {
+      useHash: true,
+      /* Activa las anclas en angular */
+      anchorScrolling: 'enabled',
+      /* Restaura el scroll a la posición inicial */
+      scrollPositionRestoration: 'enabled'
+    })
+  ],
+  exports: [RouterModule]
 })
 export class AppRoutingModule {}

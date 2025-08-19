@@ -1,4 +1,4 @@
-// const screens = require("tailwindcss/defaultTheme").screens;
+const screens = require("tailwindcss/defaultTheme").screens;
 const colors = require("tailwindcss/colors");
 const plugin = require("tailwindcss/plugin");
 
@@ -12,15 +12,16 @@ delete colors['blueGray'];
 module.exports = {
   content: [
     "./src/**/*.{html,ts}",
+    "./node_modules/flowbite/**/*.js"
   ],
+  darkMode: 'class',
   theme: {
     container: {
       center: true,
       padding: "1rem",
       screens: {
-        // ...screens,
-        // "sm": "380px",
-        "2xl": "1320px",
+        ...screens,
+        // "2xl": "1320px",
       },
     },
     colors: {
@@ -30,17 +31,17 @@ module.exports = {
       // secondary: "#9333EA",
       gray: {
         0: "#FFFFFF",
-				50: "#F8F8F8",
-				100: "#EFEFEF",
-				200: "#DCDCDC",
-				300: "#BDBDBD",
-				400: "#989898",
-				500: "#7C7C7C",
-				600: "#656565",
-				700: "#525252",
-				800: "#464646",
-				900: "#3D3D3D",
-				950: "#292929",
+				50: "#F9FAFB",
+				100: "#F3F4F6",
+				200: "#E5E7EB",
+				300: "#D1D5DB",
+				400: "#9CA3AF",
+				500: "#6B7280",
+				600: "#4B5563",
+				700: "#374151",
+				800: "#1F2A37",
+				900: "#111928",
+				950: "#090D14",
       },
       red: {
 				50: "#FEF3F2",
@@ -137,7 +138,7 @@ module.exports = {
     extend: {
       screens: {
         xs: "380px",
-        sm: "576px",
+        // sm: "576px",
       },
       colors: {
         main: {
@@ -169,6 +170,7 @@ module.exports = {
 
       addBase({ ":root": cssVars });
     }),
+    require("flowbite/plugin"),
   ],
 }
 

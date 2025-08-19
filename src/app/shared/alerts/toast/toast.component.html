@@ -1,0 +1,31 @@
+<div
+  role="alert"
+  class="flex items-center w-full p-4 text-gray-500 bg-white rounded-md gap-2.5 shadow dark:text-gray-400 dark:bg-gray-800 transition-all pointer-events-auto"
+  [ngClass]="{
+    'animate-toast-in': !closing,
+    'animate-toast-out': closing
+  }"
+>
+  <div [ngClass]="[
+    'inline-flex items-center justify-center shrink-0 p-1.5 rounded-lg',
+    colorMap[toast.type]
+  ]">
+    <svg class="w-5 h-5">
+      <use [attr.xlink:href]="'/assets/icons/outline/' + iconMap[toast.type]" />
+    </svg>
+  </div>
+
+  <div class="flex-1 flex items-center justify-between gap-3">
+    <span class="text-sm">
+      {{ toast.message }}
+    </span>
+
+    <button type="button" (click)="close()"
+      class=" bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700">
+        <svg class="w-5 h-5">
+          <use xlink:href="/assets/icons/outline/general.svg#close" />
+        </svg>
+    </button>
+  </div>
+
+</div>

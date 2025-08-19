@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Event, NavigationEnd, Router } from '@angular/router';
-import { filter } from 'rxjs';
+import { BehaviorSubject, filter } from 'rxjs';
+import { AuthService } from '../auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,8 +10,12 @@ export class NavigationService {
 
   private previousUrl: string | null = null;
   private currentUrl: string | null = null;
+  private currentUrl$ = new BehaviorSubject<string | null>(null);
 
-  constructor(private router: Router) {
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+  ) {
     this.router.events
       .pipe(
         filter((event: Event): event is NavigationEnd => event instanceof NavigationEnd)
@@ -18,6 +23,7 @@ export class NavigationService {
       .subscribe((event) => {
         this.previousUrl = this.currentUrl;
         this.currentUrl = event.urlAfterRedirects;
+        this.currentUrl$.next(this.currentUrl);
       });
   }
 
@@ -29,7 +35,12 @@ export class NavigationService {
     return this.currentUrl ?? this.router.url;
   }
 
-  getBackRoute(defaultBackRoute: string = 'home'): string {
+  getBackRoute(defaultBackRoute?: string): string {
+    if (!defaultBackRoute) {
+      defaultBackRoute = this.authService.isAuthenticated()
+        ? 'home'
+        : 'login';
+    }
     const previous = this.getPreviousUrl();
     const current = this.getCurrentUrl();
 
@@ -39,6 +50,10 @@ export class NavigationService {
     }
 
     return previous;
+  }
+
+  getCurrentUrl$() {
+    return this.currentUrl$.asObservable();
   }
 
 }

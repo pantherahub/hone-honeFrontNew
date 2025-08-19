@@ -1,0 +1,95 @@
+<div class="flex justify-center mx-4">
+  <div class="max-w-screen-sm w-full pt-10 md:pt-12 pb-20 flex flex-col gap-3">
+
+    <app-button (onClick)="goBack()" variant="primary" size="sm" styleType="ghost" customClass="leading-4">
+      <svg width="16" height="16">
+        <use xlink:href="/assets/icons/outline/arrows.svg#chevron-left" />
+      </svg>
+      Volver
+    </app-button>
+
+    <div class="relative px-4 py-6 xs:py-4 sm:p-8 xs:ps-44 sm:ps-56 rounded-xl bg-blue3h-100 xs:h-[190px] sm:h-[237px]">
+      <img src="assets/img/pqrs/banner.png"
+        alt="Imagen decorativa"
+        class="hidden xs:block absolute bottom-0 left-[23px] top-[9px] sm:left-[27px] sm:top-[17px] w-[132.987px] h-[181px] sm:w-[161.6px] sm:h-[220px]">
+      <div class="h-full flex flex-col justify-center gap-2 text-main-blue1h">
+        <h3 class="text-sm sm:text-xl font-black leading-4 sm:leading-[22px]">
+          ¿Tienes una pregunta, sugerencia, reclamo o cualquier comentario?
+        </h3>
+        <p class="text-xs sm:text-lg font-normal leading-[14px] sm:leading-5">
+          Este es el lugar para compartirlo. Valoramos tu opinión y te responderemos lo antes posible.
+        </p>
+      </div>
+    </div>
+
+    <form [formGroup]="ticketForm" (ngSubmit)="onSubmit()" class="flex flex-col p-4 gap-6 bg-gray-100 rounded-xl">
+
+      <div class="flex flex-col gap-2">
+        <div>
+          <app-text-input [id]="'name'" formControlName="name" label="Nombre" />
+          <app-input-error [control]="ticketForm.get('name')" />
+        </div>
+        <div>
+          <app-text-input [id]="'lastname'" formControlName="lastname" label="Apellido" />
+          <app-input-error [control]="ticketForm.get('lastname')" />
+        </div>
+        @if (!isLogged()) {
+          <div>
+            <app-text-input [id]="'identification'" formControlName="identification" label="Identificación del prestador" />
+            <app-input-error [control]="ticketForm.get('identification')" />
+          </div>
+          <div>
+            <app-text-input [id]="'email'" formControlName="email" label="Correo electrónico" />
+            <app-input-error [control]="ticketForm.get('email')" />
+          </div>
+        }
+        <div>
+          <app-text-input [id]="'phone'" formControlName="phone" label="Celular" />
+          <app-input-error [control]="ticketForm.get('phone')" />
+        </div>
+        @if (!isLogged()) {
+          <div>
+            <app-text-input [id]="'address'" formControlName="address" label="Dirección" />
+            <app-input-error [control]="ticketForm.get('address')" />
+          </div>
+        }
+        <div>
+          <app-text-input [id]="'observation'" formControlName="observation" label="Observación" [isTextarea]="true" />
+          <app-input-error [control]="ticketForm.get('observation')" />
+          @if (!isLogged()) {
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              Indica el cliente al que perteneces (ej. Allianz, Axa Colpatria).
+            </p>
+          }
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between">
+        <app-button
+          [type]="'submit'"
+          [loading]="loading"
+          variant="primary"
+          size="md"
+          styleType="solid"
+          customClass="leading-4">
+          Guardar
+        </app-button>
+
+        @if (!isLogged()) {
+          <a
+            [href]="'https://wa.me/+57' + 3104748360"
+            target="_blank"
+            class="flex gap-2 items-center text-sm text-gray-600 dark:text-gray-400">
+            <svg width="24" height="24">
+              <use xlink:href="/assets/icons/extras/brands.svg#whatsapp" />
+            </svg>
+            <span>3104748360</span>
+          </a>
+        }
+      </div>
+
+    </form>
+
+  </div>
+</div>
+

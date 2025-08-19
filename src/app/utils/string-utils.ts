@@ -71,6 +71,17 @@ export function trimObjectStrings(obj: Record<string, any>): Record<string, any>
 }
 
 /**
+ * Pluralize a term.
+ * @param singularStr - Singular option to return.
+ * @param pluralStr - Plural option to return.
+ * @param count - Number to determine whether the return is plural or singular.
+ * @returns The singular/plural option depending on the count param.
+ */
+export function pluralize(singularStr: string, pluralStr: string, count: number): string {
+  return count === 1 ? singularStr : pluralStr;
+}
+
+/**
  * Sanitize string values.
  * @param string - The string to sanitize.
  * @returns Sanitized string.
