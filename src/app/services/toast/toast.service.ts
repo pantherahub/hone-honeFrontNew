@@ -50,7 +50,7 @@ export class ToastService {
   }
 
   // 3000
-  show(type: Toast['type'], message: string, duration = 50000) {
+  show(type: Toast['type'], message: string, duration = 3000) {
     this.ensureContainerExists(() => {
       this.toastSubject.next({
         id: ++this.counter,
