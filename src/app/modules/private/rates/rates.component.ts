@@ -18,7 +18,7 @@ import { ButtonComponent } from 'src/app/shared/components/button/button.compone
   templateUrl: './rates.component.html',
   styleUrl: './rates.component.scss'
 })
-export class RatesComponent implements OnInit {
+export class RatesComponent implements OnInit, AfterViewInit {
 
   user = this.eventManager.userLogged();
   clientSelected: any = this.eventManager.clientSelected();
@@ -44,6 +44,10 @@ export class RatesComponent implements OnInit {
 
   ngOnInit(): void {
     this.getRates();
+  }
+
+  ngAfterViewInit(): void {
+    initDropdowns();
   }
 
   getRates() {
