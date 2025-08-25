@@ -46,7 +46,7 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     // console.log('environment prod: ', environment.production);
-    localStorage.clear();
+    this.authService.clearLocalStorage();
 
     const urlTree = this.router.parseUrl(this.router.url);
     const supportParam = urlTree.queryParams['support'];

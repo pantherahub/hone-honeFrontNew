@@ -336,6 +336,10 @@
 
       <label
         for="dropzone-file"
+        appFileDrop
+        [allowedExtensions]="clientSelected?.idClientHoneSolutions === 13 ? ['.pdf'] : []"
+        [maxFileSizeMB]="7"
+        (fileDropped)="loadFile($event)"
         class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer border-gray-300 bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
       >
         <div
@@ -359,7 +363,7 @@
           type="file"
           name="file"
           class="hidden"
-          appFileValidator
+          appFileSelect
           [allowedExtensions]="clientSelected?.idClientHoneSolutions === 13 ? ['.pdf'] : []"
           [maxFileSizeMB]="7"
           (fileValidated)="loadFile($event)"

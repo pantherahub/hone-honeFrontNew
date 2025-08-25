@@ -36,10 +36,10 @@ export class FloatingActionsComponent implements OnInit {
       clientHoneSolutions: 'Axa Colpatria',
       schedulingLink: 'https://outlook.office.com/book/AgendaAxaColpatria@hone-solutions.com/?ismsaljsauthenabled',
     }],
-    [13, {
-      clientHoneSolutions: 'Axa Colpatria',
-      schedulingLink: 'https://outlook.office.com/book/AgendaSura@hone-solutions.com/?ismsaljsauthenabled',
-    }],
+    // [13, {
+    //   clientHoneSolutions: 'Sura',
+    //   schedulingLink: 'https://outlook.office.com/book/AgendaSura@hone-solutions.com/?ismsaljsauthenabled',
+    // }],
   ]);
 
   constructor(

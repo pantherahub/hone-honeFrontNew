@@ -4,8 +4,7 @@ import { CommonModule } from '@angular/common';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { DocumentsCrudService } from '../../../../services/documents/documents-crud.service';
 import { EventManagerService } from '../../../../services/events-manager/event-manager.service';
-import { FileValidatorDirective } from 'src/app/directives/file-validator.directive';
-import { DatePickerInputComponent } from 'src/app/shared/components/date-picker-input/date-picker-input.component';
+import { FileSelectDirective } from 'src/app/directives/file-select.directive';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { formatListWithY, pluralize } from 'src/app/utils/string-utils';
 import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
@@ -15,6 +14,7 @@ import { ButtonComponent } from 'src/app/shared/components/button/button.compone
 import { SelectComponent } from 'src/app/shared/components/select/select.component';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { AlertService } from 'src/app/services/alert/alert.service';
+import { FileDropDirective } from 'src/app/directives/file-drop.directive';
 
 
 @Component({
@@ -24,8 +24,8 @@ import { AlertService } from 'src/app/services/alert/alert.service';
     NgZorroModule,
     CommonModule,
     PipesModule,
-    FileValidatorDirective,
-    DatePickerInputComponent,
+    FileSelectDirective,
+    FileDropDirective,
     TextInputComponent,
     InputErrorComponent,
     ButtonComponent,
@@ -147,9 +147,7 @@ export class ModalEditDocumentComponent implements OnInit {
       smlvOtherCities: 100,
     },
   };
-  typePolicyProviderOptions: string[] = Object.keys(
-    this.typePolicyProviderConfig
-  );
+  typePolicyProviderOptions: string[] = [];
 
   hasShownAmountMessage: boolean = false;
 
@@ -162,15 +160,24 @@ export class ModalEditDocumentComponent implements OnInit {
     private eventManager: EventManagerService,
     private alertService: AlertService,
     private formUtils: FormUtilsService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     // console.log('currentDoc', this.currentDoc);
+    this.getTypePolicyProviderOpts();
     this.createForm();
   }
 
   closeModal(response: boolean = false): void {
     this.modalRef.close({ response });
+  }
+
+  private getTypePolicyProviderOpts() {
+    const idTypeProvider = this.clientSelected?.idTypeProvider;
+    if (!idTypeProvider) return;
+
+    this.typePolicyProviderOptions = Object.keys(this.typePolicyProviderConfig)
+      .filter(opt => this.typePolicyProviderConfig[opt].idTypeProvider === idTypeProvider);
   }
 
   createForm() {
@@ -499,11 +506,6 @@ export class ModalEditDocumentComponent implements OnInit {
     });
   }
 
-  /**
-   * Carga un archivo y lo envia al api de carga de documentos
-   * @param event - evento del input que contiene el archivo para cargar
-   * @param item - elemento de la lista para saber cual documento de carga ej (cedula, nit, rethus)
-   */
   loadFile(file: any) {
     if (file) this.loadedFile = file;
   }
@@ -551,9 +553,6 @@ export class ModalEditDocumentComponent implements OnInit {
     return dataToUpload;
   }
 
-  /**
-   * Envia peticion al servicio de login para obtener el token de acceso
-   */
   submitRequest() {
     this.formUtils.markFormTouched(this.documentForm);
     if (this.documentForm.invalid) return;
