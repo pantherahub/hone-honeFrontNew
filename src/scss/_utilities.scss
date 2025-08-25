@@ -37,3 +37,12 @@
 .info-icon {
   margin-left: 0.5rem;
 }
+
+/* Hide scrollbar without losing touch scrolling */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

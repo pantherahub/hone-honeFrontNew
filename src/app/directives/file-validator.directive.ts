@@ -9,7 +9,7 @@ export class FileValidatorDirective implements OnInit {
 
   @Input() allowedExtensions: string[] = [];
   @Input() maxFileSizeMB: number = 10;
-  @Output() fileValidated: EventEmitter<File> = new EventEmitter();
+  @Output() fileValidated: EventEmitter<File> = new EventEmitter<File>();
 
   private extensionToMimeType: { [ext: string]: string } = {
     '.pdf': 'application/pdf',

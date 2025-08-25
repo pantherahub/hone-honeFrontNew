@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { clientServicesConfig, defaultServices } from 'src/app/config/service-navigation.config';
@@ -13,7 +13,7 @@ import { NavigationService } from 'src/app/services/navigation/navigation.servic
   templateUrl: './service-navigation.component.html',
   styleUrl: './service-navigation.component.scss'
 })
-export class ServiceNavigationComponent implements OnInit, OnDestroy {
+export class ServiceNavigationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   clientSelected: any = this.eventManager.clientSelected();
 
@@ -49,6 +49,8 @@ export class ServiceNavigationComponent implements OnInit, OnDestroy {
   currentLabel: string = '';
   private sub!: Subscription;
 
+  @ViewChildren('link') links!: QueryList<ElementRef<HTMLAnchorElement>>;
+
   constructor(
     private eventManager: EventManagerService,
     private navigationService: NavigationService,
@@ -63,6 +65,14 @@ export class ServiceNavigationComponent implements OnInit, OnDestroy {
     });
   }
 
+  ngAfterViewInit(): void {
+    this.scrollToActive();
+  }
+
+  ngOnDestroy(): void {
+    this.sub?.unsubscribe();
+  }
+
   private loadRoutes(): void {
     const clientId = this.clientSelected?.idClientHoneSolutions;
     const allowedKeys = clientServicesConfig[clientId] ?? defaultServices;
@@ -75,10 +85,18 @@ export class ServiceNavigationComponent implements OnInit, OnDestroy {
   setCurrentLabel(currentUrl: string): void {
     const found = this.serviceRoutes.find(r => r.path === currentUrl);
     this.currentLabel = found ? found.label : '';
+    setTimeout(() => this.scrollToActive());
   }
 
-  ngOnDestroy(): void {
-    this.sub?.unsubscribe();
+  private scrollToActive(): void {
+    const active = this.links.find(
+      link => link.nativeElement.getAttribute('aria-current') === 'page'
+    );
+    active?.nativeElement.scrollIntoView({
+      behavior: 'smooth',
+      inline: 'center', // nearest
+      block: 'nearest',
+    });
   }
 
 }

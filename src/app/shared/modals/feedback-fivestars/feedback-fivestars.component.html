@@ -5,7 +5,7 @@
   </p>
 
   <div class="flex flex-col gap-2.5">
-    <label class="text-sm font-semibold leading-4">* Califica la experiencia</label>
+    <label class="text-sm font-semibold text-gray-900 leading-4">* Califica la experiencia</label>
     <div>
       <div class="flex items-center gap-2">
         <div class="flex items-center gap-1">
@@ -38,12 +38,12 @@
   </div>
 
   <div class="flex flex-col gap-2.5">
-    <label class="text-sm font-semibold leading-4">Cuentános sobre tu experiencia en Lissom</label>
+    <label class="text-sm font-semibold text-gray-900 leading-4">Cuentános sobre tu experiencia en Lissom</label>
     <app-text-input [id]="'comments'" formControlName="comments" label="Comentarios" [isTextarea]="true" maxlength="500" />
   </div>
 
   <div class="flex flex-col gap-2.5">
-    <label class="text-sm font-semibold leading-4">¿Podemos ponernos en contacto contigo?</label>
+    <label class="text-sm font-semibold text-gray-900 leading-4">¿Podemos ponernos en contacto contigo?</label>
     <div class="flex space-x-4">
       <label class="flex items-center gap-2 cursor-pointer text-sm leading-4 text-gray-900">
         <app-radio name="canContact" formControlName="canContact" [value]="true"></app-radio>

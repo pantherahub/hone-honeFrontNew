@@ -141,7 +141,7 @@ export class RateService {
       message: 'OK',
       success: true
     };
-    return of(mockResponse).pipe(delay(1000));
+    return of(mockResponse).pipe(delay(700));
 
     // return this.httpClient.get(`${this.url}${this.urlPrefix}/GetRates/${idProvider}/${idClient}`);
   }

@@ -11,9 +11,9 @@
     </div>
 
     <app-button
+      #dropdownFormatsBtn
       id="dropdown-formats-btn"
       data-dropdown-toggle="dropdown-formats"
-      data-dropdown-placement="bottom-end"
       variant="primary"
       styleType="soft"
       size="md"
@@ -28,8 +28,8 @@
       </svg>
     </app-button>
 
-    <div id="dropdown-formats" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
-      <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdown-formats-btn">
+    <div id="dropdown-formats" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600">
+      <ul class="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdown-formats-btn">
         <li>
           <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
             Insumos
@@ -46,7 +46,7 @@
           </a>
         </li>
       </ul>
-      <div class="py-2">
+      <div class="py-1">
         <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
           Todos los formatos
         </a>
@@ -105,15 +105,9 @@
                     {{ rate.rateName }}
                   </td>
                   <td class="px-4 py-[10.5px]">
-                    <div class="inline-flex gap-1 py-1.5 px-3 rounded-full text-sm font-semibold leading-4 whitespace-nowrap"
-                      [ngClass]="[statusConfig[rate.currentRate.rateStatus].bg, statusConfig[rate.currentRate.rateStatus].text]">
-                      @if (statusConfig[rate.currentRate.rateStatus].icon) {
-                        <svg width="16" height="16">
-                          <use [attr.xlink:href]="'/assets/icons/outline/general.svg#' + statusConfig[rate.currentRate.rateStatus].icon" />
-                        </svg>
-                      }
-                      {{ statusConfig[rate.currentRate.rateStatus].label }}
-                    </div>
+                    <ng-container
+                      *ngTemplateOutlet="rateStatusTemplate; context: { rate: rate.currentRate }">
+                    </ng-container>
                   </td>
                   <td class="px-4 py-[10.5px] text-sm font-normal text-main-blue1h leading-4 dark:text-white">
                     {{
@@ -133,7 +127,7 @@
                     <div class="my-auto flex gap-2">
                       @if (rate.currentRate.rateStatus === 'EN PROCESO') {
                         <app-button
-                          (onClick)="uploadRateFile(rate)"
+                          (onClick)="triggerFileTableInput()"
                           variant="primary"
                           styleType="ghost"
                           size="xs">
@@ -144,7 +138,7 @@
                         </app-button>
                       } @else {
                         <app-button
-                          (onClick)="uploadRateFile(rate)"
+                          (onClick)="triggerFileTableInput()"
                           variant="primary"
                           styleType="solid"
                           size="xs">
@@ -161,6 +155,15 @@
                           }
                         </app-button>
                       }
+
+                      <input
+                        #fileTableInput
+                        type="file"
+                        name="file"
+                        class="hidden"
+                        appFileValidator
+                        (fileValidated)="uploadRateFile($event, rate)"
+                      />
                     </div>
                   </td>
                   <td class="px-4 py-[10.5px] text-left">
@@ -188,8 +191,8 @@
                           <use xlink:href="/assets/icons/outline/general.svg#dots-horizontal" />
                         </svg>
                       </app-button>
-                      <div [id]="'dropdown-rate-opts-' + i" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
-                        <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" [attr.aria-labelledby]="'rate-options-btn-' + i">
+                      <div [id]="'dropdown-rate-opts-' + i" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-[136px] dark:bg-gray-700 dark:divide-gray-600">
+                        <ul class="py-1 text-sm text-gray-700 dark:text-gray-200" [attr.aria-labelledby]="'rate-options-btn-' + i">
                           <li>
                             <a href="#" class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                               <svg width="18" height="18" class="text-gray-500">
@@ -207,7 +210,7 @@
                             </a>
                           </li>
                         </ul>
-                        <div class="py-2">
+                        <div class="py-1">
                           <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
                             <svg width="18" height="18">
                               <use xlink:href="/assets/icons/outline/general.svg#trash-bin" />
@@ -230,4 +233,188 @@
   </div>
 
 </div>
+
+
+<app-drawer [(isOpen)]="isRateDrawerOpen"
+  placement="right"
+  size="xl"
+  (onClose)="onDrawerClose()"
+  [hasFooter]="selectedRate?.idRateType === 1">
+  <ng-container drawer-header>
+    <h2 class="block sm:hidden text-lg font-black leading-5 text-main-blue1h">
+      Tarifas
+    </h2>
+    <h2 class="hidden sm:block text-lg font-black leading-5 text-main-blue1h">
+      {{ selectedRate?.currentRate?.nameFile || 'Tarifas' }}
+    </h2>
+  </ng-container>
+
+  @if (selectedRate) {
+    <form class="flex flex-col gap-6">
+      <div class="flex gap-6">
+        <div class="flex flex-col gap-2.5 text-sm leading-4">
+          <span class="font-semibold text-gray-900">Fecha de carga</span>
+          <span class="text-gray-500">
+            {{ selectedRate.currentRate.dateAdd | date: 'mediumDate' }}
+          </span>
+        </div>
+        <div class="flex flex-col gap-2.5 text-sm leading-4">
+          <span class="font-semibold text-gray-900">Última modificación</span>
+          <span class="text-gray-500">
+            {{ selectedRate.currentRate.updateAt | date: 'mediumDate' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-4 p-4 bg-gray-50 rounded-xl ring-[1px] ring-inset ring-gray-200">
+        <div class="flex flex-col gap-2.5">
+          <span class="text-sm font-semibold leading-4 text-gray-900">
+            @if (selectedRate.currentRate.rateStatus === 'PENDIENTE POR CARGAR'
+              || !selectedRate.rateHistory) {
+              Tarifa {{ selectedRate.rateName }}
+            } @else {
+              Actual
+            }
+          </span>
+
+          <div class="p-4 flex gap-2 items-center rounded-md ring-[1px] ring-inset ring-gray-200">
+            <div class="rounded-lg p-3 bg-blue1h-50 text-main-blue1h">
+              <svg width="20" height="20">
+                <use xlink:href="/assets/icons/outline/files-folders.svg#file-lines" />
+              </svg>
+            </div>
+            <div class="flex-1 flex flex-col gap-1 text-gray-900 text-sm leading-4">
+              <span class="font-semibold">
+                {{ selectedRate.currentRate.nameFile }}
+              </span>
+              <span>{{ selectedRate.currentRate.fileSize }}</span>
+            </div>
+            @if (selectedRate.currentRate.rateStatus === 'PENDIENTE POR CARGAR') {
+              <!-- Si esta pendiente por cargar y tiene archivo cargado en el form -->
+              <div class="p-0.5 text-gray-700">
+                <svg width="16" height="16">
+                  <use xlink:href="/assets/icons/outline/general.svg#close" />
+                </svg>
+              </div>
+            } @else {
+              <ng-container
+                *ngTemplateOutlet="rateStatusTemplate; context: { rate: selectedRate.currentRate }">
+              </ng-container>
+            }
+
+            @if (selectedRate.currentRate.rateStatus === 'APROBADO') {
+              <app-button
+                variant="gray"
+                styleType="soft"
+                size="xs">
+                <svg width="16" height="16">
+                  <use xlink:href="/assets/icons/outline/general.svg#download" />
+                </svg>
+              </app-button>
+            } @else if (selectedRate.currentRate.rateStatus === 'RECHAZADO') {
+              <!-- Si es rechazado o si esta pendiente por cargar pero no hay archivo -->
+              <app-button
+                variant="primary"
+                styleType="solid"
+                size="xs">
+                <svg width="16" height="16">
+                  <use xlink:href="/assets/icons/outline/general.svg#upload" />
+                </svg>
+                Cargar
+              </app-button>
+            }
+          </div>
+
+          @if (selectedRate.currentRate.rateStatus !== 'PENDIENTE POR CARGAR'
+              && selectedRate.rateHistory) {
+            <div class="ps-3 flex gap-4">
+              <div class="w-[3px] rounded-3xl bg-gray-200"></div>
+              <div class="flex-1 flex flex-col gap-2.5">
+                <span class="text-sm font-semibold leading-4 text-gray-900">
+                  Historial
+                </span>
+                @for (prevRate of selectedRate.rateHistory; track $index) {
+                  <div class="p-4 flex items-center gap-2 rounded-md ring-[1px] ring-inset ring-gray-200">
+                    <div class="rounded-lg p-3 bg-blue1h-50 text-main-blue1h">
+                      <svg width="20" height="20">
+                        <use xlink:href="/assets/icons/outline/files-folders.svg#file-lines" />
+                      </svg>
+                    </div>
+                    <div class="flex-1 flex flex-col gap-1 text-gray-900 text-sm leading-4">
+                      <span class="font-semibold">
+                        {{ prevRate.nameFile }}
+                      </span>
+                      <span>{{ prevRate.fileSize }}</span>
+                    </div>
+                    <span class="text-sm leading-4 text-gray-500">{{ prevRate.dateAdd }}</span>
+                    <ng-container
+                      *ngTemplateOutlet="rateStatusTemplate; context: { rate: prevRate }">
+                    </ng-container>
+                    <app-button
+                      variant="gray"
+                      styleType="soft"
+                      size="xs">
+                      <svg width="16" height="16">
+                        <use xlink:href="/assets/icons/outline/general.svg#download" />
+                      </svg>
+                    </app-button>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+      </div>
+
+      <div class="flex flex-col gap-2.5">
+        <label class="text-sm font-semibold leading-4 text-gray-900">Observaciones</label>
+        <app-text-input [id]="'observations'" formControlName="observations" label="Escribe aquí tus observaciones" [isTextarea]="true" />
+      </div>
+    </form>
+  }
+
+  @if (selectedRate?.currentRate?.rateStatus === 'PENDIENTE POR CARGAR' && rateForm.dirty) {
+    <ng-container drawer-footer>
+      <div class="flex flex-col-reverse sm:flex-row gap-4">
+        <app-button
+          (onClick)="isRateDrawerOpen = false"
+          variant="gray"
+          styleType="soft"
+          size="lg"
+          class="flex-1"
+          customClass="leading-[18px] w-full flex justify-center">
+          Cancelar
+        </app-button>
+        <app-button
+          (onClick)="onSubmitRate(selectedRate)"
+          variant="primary"
+          styleType="solid"
+          size="lg"
+          class="flex-1"
+          customClass="leading-[18px] w-full flex justify-center">
+          Subir
+        </app-button>
+      </div>
+    </ng-container>
+  }
+
+</app-drawer>
+
+
+<ng-template #rateStatusTemplate let-rate="rate">
+  <div
+    class="inline-flex gap-1 py-1.5 px-3 rounded-full text-sm font-semibold leading-4 whitespace-nowrap"
+    [ngClass]="[
+      statusConfig[rate.rateStatus].bg,
+      statusConfig[rate.rateStatus].text
+    ]">
+    @if (statusConfig[rate.rateStatus].icon) {
+      <svg width="16" height="16">
+        <use [attr.xlink:href]="'/assets/icons/outline/general.svg#' + statusConfig[rate.rateStatus].icon" />
+      </svg>
+    }
+    {{ statusConfig[rate.rateStatus].label }}
+  </div>
+</ng-template>
 
