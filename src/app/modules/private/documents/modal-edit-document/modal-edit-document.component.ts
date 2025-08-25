@@ -172,7 +172,7 @@ export class ModalEditDocumentComponent implements OnInit {
     this.modalRef.close({ response });
   }
 
-  private getTypePolicyProviderOpts() {
+  getTypePolicyProviderOpts() {
     const idTypeProvider = this.clientSelected?.idTypeProvider;
     if (!idTypeProvider) return;
 
