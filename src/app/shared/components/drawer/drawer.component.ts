@@ -8,7 +8,7 @@ import { AfterContentInit, AfterViewInit, ChangeDetectorRef, Component, ContentC
   templateUrl: './drawer.component.html',
   styleUrl: './drawer.component.scss'
 })
-export class DrawerComponent implements OnInit, AfterViewInit, AfterContentInit, OnChanges, OnDestroy {
+export class DrawerComponent implements OnInit, OnChanges, OnDestroy {
 
   @Input() isOpen: boolean = false;
   @Input() placement: 'left' | 'right' | 'top' | 'bottom' = 'right';
@@ -27,16 +27,12 @@ export class DrawerComponent implements OnInit, AfterViewInit, AfterContentInit,
   @Output() isOpenChange = new EventEmitter<boolean>();
   @Output() onClose = new EventEmitter<any>();
 
-  // @ContentChild('[drawer-footer]') footerContent?: TemplateRef<any>;
-  // @ContentChild('[drawer-footer]') footerContent?: ElementRef;
-  // @ContentChild('drawerFooter') footerContent?: TemplateRef<any>;
   @ContentChild('drawerFooter', { static: false, read: ElementRef }) footerContent?: ElementRef;
 
   @ViewChild('courseImage')
   courseImage: any;
 
   isMobile: boolean = window.innerWidth < 640;
-  // hasFooter = false;
 
   constructor(private cdr: ChangeDetectorRef) { }
 
@@ -50,21 +46,6 @@ export class DrawerComponent implements OnInit, AfterViewInit, AfterContentInit,
     if (this.isOpen && this.isBackdropVisible) {
       document.body.classList.add('overflow-hidden');
     }
-  }
-
-  ngAfterViewInit(): void {
-    // this.hasFooter = !!this.footerContent;
-    // this.cdr.detectChanges();
-    // console.log("---------this.footerContent", this.footerContent);
-    // console.log("this.hasFooter", this.hasFooter);
-  }
-
-  ngAfterContentInit(): void {
-    // this.hasFooter = !!this.footerContent;
-    // this.cdr.detectChanges();
-    // console.log("---------this.footerContent", this.footerContent);
-    // console.log("this.hasFooter", this.hasFooter);
-    // console.log("Course Image: ", this.courseImage);
   }
 
   ngOnDestroy(): void {
@@ -115,17 +96,14 @@ export class DrawerComponent implements OnInit, AfterViewInit, AfterContentInit,
     this.onClose.emit(returnData);
   }
 
-  // 🔑 Aquí decidimos si usamos el placement real o forzamos "bottom" en mobile
   private effectivePlacement(): 'left' | 'right' | 'top' | 'bottom' {
-    if (this.isMobileFull) { // this.onMobileFull && this.isMobile
+    if (this.onMobileFull && this.isMobile) {
       return 'bottom';
     }
     return this.placement;
   }
 
   get drawerClasses(): string {
-    // const base = 'fixed bg-white shadow-lg transition-transform duration-300 ease-in-out z-50';
-
     const placement = this.effectivePlacement();
 
     const placements: any = {
@@ -173,10 +151,6 @@ export class DrawerComponent implements OnInit, AfterViewInit, AfterContentInit,
       sizeClass = `h-screen sm:${sizeClass}`;
     }
     return sizeClass;
-  }
-
-  get isMobileFull(): boolean {
-    return this.onMobileFull && this.isMobile;
   }
 
 }

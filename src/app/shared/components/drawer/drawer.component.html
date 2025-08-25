@@ -10,12 +10,9 @@
 <div role="dialog" aria-modal="true"
   class="fixed bg-white shadow-lg transition-transform duration-300 ease-in-out z-50 max-w-full max-h-full flex flex-col"
   [class]="drawerClasses">
-  <!-- Handle bar para mobile -->
+
+  <!-- Handle bar for mobile -->
   @if (onMobileFull && closable) {
-    <!-- <div (click)="close()"
-      class="block sm:hidden pt-5 pb-4 cursor-pointer hover:bg-gray-50 relative">
-      <span class="absolute w-[100px] h-2 -translate-x-1/2 bg-gray-300 rounded-3xl top-5 left-1/2"></span>
-    </div> -->
     <div (click)="close()"
       class="flex sm:hidden pt-5 pb-2 cursor-pointer hover:bg-gray-50 justify-center">
       <span class="w-[100px] h-2 mx-auto bg-gray-300 rounded-3xl"></span>
@@ -50,24 +47,8 @@
   </div>
 
   <!-- Footer -->
-  <!-- <ng-content select="[drawer-footer]"></ng-content> -->
-
-  <!-- <div class="border-t p-6 shadow-2xl" [class.hidden]="!hasFooter">
-    <ng-content select="drawerFooter"></ng-content>
-  </div> -->
   <div class="border-t p-6 shadow-2xl" [class.hidden]="!hasFooter">
     <ng-content select="[drawer-footer]"></ng-content>
   </div>
-
-
-
-  <!-- @if (hasFooter) {
-    <div class="border-t p-6 shadow-2xl">
-      <ng-content select="[drawer-footer]"></ng-content>
-    </div>
-  } -->
-  <!-- <div class="border-t p-6 shadow-2xl">
-    <ng-content select="[drawer-footer]"></ng-content>
-  </div> -->
 
 </div>
