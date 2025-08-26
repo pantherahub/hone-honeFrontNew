@@ -46,9 +46,7 @@ export class AuthService {
 
    // Guarda en storage los datos del usuario logueado
    saveUserLogged (user: any) {
-      localStorage.removeItem('userLogged');
-      localStorage.setItem('userLogged', JSON.stringify(user));
-      this.eventManager.userLogged.set(user);
+      this.eventManager.setUser(user);
    }
 
    // obtiene en token del local storage para validarlo
@@ -82,12 +80,20 @@ export class AuthService {
       }
    }
 
+  clearLocalStorage() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('expire');
+    this.eventManager.clearUser();
+    this.eventManager.clearClient();
+
+    localStorage.removeItem('formState');
+    localStorage.removeItem('tutorialStep');
+    localStorage.removeItem('tutorialFinished');
+  }
+
    // Llamar esta funcion en cualquier lado, para limpiar cache y cerrar sesión
    public logout () {
-      localStorage.removeItem('token');
-      localStorage.removeItem('expire');
-      localStorage.removeItem('userLogged');
-      localStorage.clear();
+      this.clearLocalStorage();
       this.router.navigateByUrl('login');
    }
 }

@@ -55,9 +55,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    localStorage.removeItem('clientSelected');
-    this.eventManager.clientSelected.set({});
+    this.eventManager.clearClient();
 
+    this.setDefaultViewMode();
     this.getClientList();
   }
 
@@ -84,8 +84,23 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  private isMobileView(): boolean {
+    return window.innerWidth < 640; // sm breakpoint
+  }
+
+  private setDefaultViewMode() {
+    const saved = this.eventManager.viewMode();
+    if (saved) {
+      this.viewMode = saved; // User preference
+    } else {
+      this.viewMode = this.isMobileView()
+        ? 'list'
+        : 'grid';
+    }
+  }
+
   /**
-  * Obtiene la lista de clientes del prestador que inicia sesión
+  * Gets the list of clients of the provider who logs in
   */
   getClientList() {
     this.loadingData = true;
@@ -93,6 +108,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       next: (res: ClientInterface[]) => {
         this.clientList = [...res];
         this.applyFilter();
+
+        if (!this.eventManager.viewMode() && this.clientList.length > 6) {
+          this.viewMode = 'list';
+        }
         this.loadingData = false;
       },
       error: (err: any) => {
@@ -105,6 +124,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   setView(mode: 'grid' | 'list') {
     this.viewMode = mode;
+    this.eventManager.setViewMode(mode);
   }
 
   applyFilter() {
@@ -123,8 +143,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   */
   changeOptionClient(item: any, activeTutorialStep: boolean = false) {
     if (activeTutorialStep) this.nextTutorialStep();
-    localStorage.setItem('clientSelected', JSON.stringify(item));
-    this.eventManager.getDataClient();
+    this.eventManager.setClient(item);
     this.router.navigateByUrl(`/service/documentation`);
   }
 
