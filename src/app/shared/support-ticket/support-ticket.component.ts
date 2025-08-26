@@ -180,9 +180,9 @@ export class SupportTicketComponent implements OnInit {
         next: (res: any) => {
           this.loading = false;
           this.alertService.showAlert({
-            title: '¡Enviado!',
+            title: '¡Solicitud recibida!',
             variant: 'success',
-            messageHTML: 'Su ticket ha sido creado con éxito, antes de 48 horas nos contactaremos formalmente con usted, para dar solución a su requerimiento.<br>¡Gracias por preferirnos!',
+            message: 'Tu PQRS ha sido enviada exitosamente. Estaremos revisando tu caso pronto.',
           });
         },
         error: (error: any) => {
