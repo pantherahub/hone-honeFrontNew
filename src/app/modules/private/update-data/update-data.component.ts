@@ -29,7 +29,7 @@ import { isEmail } from 'src/app/utils/validation-utils';
 })
 export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeactivate {
 
-  user = this.eventManager.userLogged();
+  userState = this.eventManager.userLogged();
   providerForm!: FormGroup;
   isFirstForm: boolean = true;
 
@@ -171,34 +171,34 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
   }
 
   initializeForm() {
-    const dvValue = this.user.dv != null && this.user.dv !== '' && !isNaN(Number(this.user.dv))
-      ? Number(this.user.dv)
+    const dvValue = this.userState.user?.dv != null && this.userState.user?.dv !== '' && !isNaN(Number(this.userState.user?.dv))
+      ? Number(this.userState.user?.dv)
       : null;
 
-    const isValidEmail = this.isValidEmail(this.user.email);
+    const isValidEmail = this.isValidEmail(this.userState.email);
 
     this.providerForm = this.fb.group({
-      idProvider: [this.user.id],
+      idProvider: [this.userState.id],
       startTime: [this.formatDate(new Date())],
       endTime: [''],
       email: [
         {
-          value: isValidEmail ? this.user.email : '',
+          value: isValidEmail ? this.userState.email : '',
           disabled: isValidEmail
         },
         [Validators.required, this.formUtils.email]
       ],
       name: [
-        { value: this.user.name || '', disabled: true },
+        { value: this.userState.name || '', disabled: true },
         [Validators.required]
       ],
       languages: [[], [Validators.required]],
       idTypeDocument: [
-        { value: this.user.idTypeDocument || '', disabled: true },
+        { value: this.userState.user?.idTypeDocument || '', disabled: true },
         [Validators.required]
       ],
       identification: [
-        { value: this.user.identificacion || '', disabled: true },
+        { value: this.userState.user?.identification || '', disabled: true },
         [Validators.required, this.formUtils.numeric]
       ],
       dv: [
@@ -206,7 +206,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
         [this.dvValidator]
       ],
       repsEnableCode: [
-        { value: this.user.repsEnableCode || '', disabled: !!this.user.repsEnableCode },
+        { value: this.userState.user?.repsEnableCode || '', disabled: !!this.userState.user?.repsEnableCode },
         [Validators.required]
       ],
       website: ['', this.formUtils.url],
@@ -262,7 +262,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
 
   getCompanies() {
     this.loading = true;
-    this.clientProviderService.getClientListByProviderId(this.user.id).subscribe({
+    this.clientProviderService.getClientListByProviderId(this.userState.id).subscribe({
       next: (res: any) => {
         const clientList = res;
         const clientsIds = clientList.map((client: any) => client.idClientHoneSolutions);
@@ -289,12 +289,12 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
   }
 
   async loadFormData() {
-    if (!this.user.withData) {
+    if (!this.userState.withData) {
       await firstValueFrom(this.alertService.info('Formulario requerido', 'Por favor, complete el formulario antes de continuar.').afterClose);
     }
 
     if (this.hasSavedState()) {
-      if (!this.user.rejected) {
+      if (!this.userState.rejected) {
         const confirmed = await this.alertService.confirm(
           'Aviso', 'Se encontraron datos sin guardar de una sesión anterior. ¿Deseas continuar con estos datos?', {
             nzOkText: 'Continuar',
@@ -385,7 +385,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
 
   loadProviderData(): void {
     this.loading = true;
-    this.clientProviderService.getTemporalProviderData(this.user.id).subscribe({
+    this.clientProviderService.getTemporalProviderData(this.userState.id).subscribe({
       next: (res: any) => {
         const data = res.data;
         this.loading = false;
@@ -440,17 +440,17 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
         this.subscribeOnChange();
 
         // If repsEnableCode is not saved, add it automatically
-        if (!this.providerForm.get('repsEnableCode')?.value && this.user.repsEnableCode) {
+        if (!this.providerForm.get('repsEnableCode')?.value && this.userState.user?.repsEnableCode) {
           this.providerForm.patchValue({
-            repsEnableCode: this.user.repsEnableCode,
+            repsEnableCode: this.userState.user.repsEnableCode,
           });
         }
 
-        const user = this.user;
+        const user = this.userState;
         user.rejected = res.rejected;
         this.authService.saveUserLogged(user);
 
-        if (this.user.rejected && data.status === "Rechazado" && data.Reasons.length) {
+        if (this.userState.rejected && data.status === "Rechazado" && data.Reasons.length) {
           this.alertService.warning('Actualización requerida', `Motivo: ${data.Reasons[0].reason}`);
         }
       },
@@ -712,22 +712,22 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
     this.unsubscribeForm();
     this.removeFormState();
 
-    const dvValue = this.user.dv != null && this.user.dv !== '' && !isNaN(Number(this.user.dv))
-      ? Number(this.user.dv)
+    const dvValue = this.userState.user?.dv != null && this.userState.user?.dv !== '' && !isNaN(Number(this.userState.user?.dv))
+      ? Number(this.userState.user?.dv)
       : null;
-    const isValidEmail = this.isValidEmail(this.user.email);
+    const isValidEmail = this.isValidEmail(this.userState.email);
 
     this.providerForm.reset({
-      idProvider: this.user.id,
+      idProvider: this.userState.id,
       startTime: this.formatDate(new Date()),
       endTime: '',
-      email: isValidEmail ? this.user.email : '',
-      name: this.user.name || '',
+      email: isValidEmail ? this.userState.email : '',
+      name: this.userState.name || '',
       languages: [],
-      idTypeDocument: this.user.idTypeDocument || '',
-      identification: this.user.identificacion || '',
+      idTypeDocument: this.userState.user?.idTypeDocument || '',
+      identification: this.userState.user?.identification || '',
       dv: dvValue,
-      repsEnableCode: this.user.repsEnableCode || '',
+      repsEnableCode: this.userState.user?.repsEnableCode || '',
       website: ''
     }, { emitEvent: false });
     this.formUtils.clearFormArray(this.updatedOffices);
@@ -821,9 +821,9 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
     setTimeout(() => {
       serviceMethod(this.providerForm.getRawValue()).subscribe({
         next: (res: any) => {
-          const user = this.user;
+          const user = this.userState;
           user.rejected = false;
-          if (this.isFirstForm || !this.user.withData) {
+          if (this.isFirstForm || !this.userState.withData) {
             user.withData = true;
           }
           this.authService.saveUserLogged(user);

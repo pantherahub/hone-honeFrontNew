@@ -99,7 +99,7 @@ export class UserManagementComponent implements OnInit {
       avatar: [null],
       names: ['', Validators.required],
       lastNames: ['', Validators.required],
-      email: ['', [Validators.required, this.formUtils.emailValidator]],
+      email: ['', [Validators.required, this.formUtils.email]],
       idTypeDocument: ['', [Validators.required]],
       identification: ['', [Validators.required, this.formUtils.numeric]],
       birthDate: [null],
