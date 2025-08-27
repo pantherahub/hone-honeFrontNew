@@ -78,11 +78,11 @@ export const routes: Routes = [
             component: ListDocumentsComponent,
             canActivate: [serviceAccessGuard],
           },
-          {
-            path: 'rates',
-            component: RatesComponent,
-            canActivate: [serviceAccessGuard],
-          },
+          // {
+          //   path: 'rates',
+          //   component: RatesComponent,
+          //   canActivate: [serviceAccessGuard],
+          // },
         ],
       }
     ]

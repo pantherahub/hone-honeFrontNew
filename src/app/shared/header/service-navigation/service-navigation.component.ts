@@ -24,12 +24,12 @@ export class ServiceNavigationComponent implements OnInit, AfterViewInit, OnDest
       label: 'Documentación',
       tab: 'Documentos',
     },
-    {
-      key: 'rates',
-      path: '/service/rates',
-      label: 'Tarifas',
-      tab: 'Tarifas',
-    },
+    // {
+    //   key: 'rates',
+    //   path: '/service/rates',
+    //   label: 'Tarifas',
+    //   tab: 'Tarifas',
+    // },
     // {
     //   key: 'billing',
     //   path: '/service/billling',
