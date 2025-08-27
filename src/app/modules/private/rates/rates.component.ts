@@ -1,23 +1,19 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AfterViewInit, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { Dropdown, initDropdowns } from 'flowbite';
 import { DropdownTriggerDirective } from 'src/app/directives/dropdown-trigger.directive';
+import { FileSelectDirective } from 'src/app/directives/file-select.directive';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { AlertService } from 'src/app/services/alert/alert.service';
-import { DownloadService } from 'src/app/services/download/download.service';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
-import { ModalService } from 'src/app/services/modal/modal.service';
 import { RateService } from 'src/app/services/rate/rate.service';
-import { ToastService } from 'src/app/services/toast/toast.service';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
-import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.component';
-import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
+import { RateFormData, RateManagementComponent } from './rate-management/rate-management.component';
 
 @Component({
   selector: 'app-rates',
   standalone: true,
-  imports: [CommonModule, PipesModule, ButtonComponent, DropdownTriggerDirective, DrawerComponent, TextInputComponent],
+  imports: [CommonModule, PipesModule, ButtonComponent, DropdownTriggerDirective, FileSelectDirective, RateManagementComponent],
   templateUrl: './rates.component.html',
   styleUrl: './rates.component.scss'
 })
@@ -40,24 +36,18 @@ export class RatesComponent implements OnInit, AfterViewInit {
 
   selectedRate: any = null;
   isRateDrawerOpen: boolean = false;
+  initialFile: File | null = null;
 
-  rateForm!: FormGroup;
-
-  @ViewChild('fileTableInput') fileTableInput!: ElementRef<HTMLInputElement>;
+  @ViewChildren('fileTableInput') fileTableInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
   constructor(
-    private fb: FormBuilder,
     private eventManager: EventManagerService,
-    private modalService: ModalService,
     private alertService: AlertService,
-    private downloadService: DownloadService,
-    private toastService: ToastService,
     private rateService: RateService,
   ) { }
 
   ngOnInit(): void {
     this.getRates();
-    this.initRateForm();
   }
 
   ngAfterViewInit(): void {
@@ -89,38 +79,23 @@ export class RatesComponent implements OnInit, AfterViewInit {
     });
   }
 
-  initRateForm() {
-    this.rateForm = this.fb.group({
-      description: [null],
-      file: [null, Validators.required],
-    });
-  }
-
-  get selectedFile() {
-    return this.rateForm.get('file')?.value
-  }
-
-  triggerFileTableInput() {
-    this.fileTableInput.nativeElement.value = '';
-    this.fileTableInput.nativeElement.click();
+  triggerFileTableInput(index: number) {
+    this.fileTableInputs.toArray()[index].nativeElement.value = '';
+    this.fileTableInputs.toArray()[index].nativeElement.click();
   }
 
   uploadRateFile(uploadedFile: any, rate: any) {
     const file = uploadedFile as File;
     if (!file) return;
 
-    this.rateForm.patchValue({ file });
-    // Si era pendiente por cargar entonces apenas cargue debe abrir los detalles con el formulario y el inputfile lleno
-
     if (rate.currentRate.rateStatus === 'PENDIENTE POR CARGAR') {
-      if (!this.isRateDrawerOpen) return;
+      if (this.isRateDrawerOpen) return;
+      this.initialFile = file;
       this.openRateDetail(rate);
     } else {
-      this.onSubmitRate(rate);
+      const data = { file };
+      this.onSubmitRate(data, rate);
     }
-
-    // si dentro del modal quitan el file cuando es pendiente por cargar aparecerá el box del input file que se tienen en documentos
-    // cuando de a cancelar o a cerrar el modal unicamente debe preguntar si tienen un archivo cargado en el input file, si no tiene porque lo quitó entonces no se pregunta nada.
   }
 
   openRateDetail(rate: any) {
@@ -129,26 +104,60 @@ export class RatesComponent implements OnInit, AfterViewInit {
     this.isRateDrawerOpen = true;
   }
 
-  onDrawerClose() {
-    console.log("onClose.isRateDrawerOpen", this.isRateDrawerOpen);
-    this.selectedRate = null;
-    this.rateForm.reset();
+  onDrawerOpenChange(open: boolean) {
+    this.isRateDrawerOpen = open;
+    if (!open) this.onDrawerClose();
   }
 
-  onSubmitRate(rate: any) {
-    if (!this.selectedFile) {
-      this.alertService.warning(
-        '¡Aviso!',
-        'Debe seleccionar un documento.',
+  onDrawerClose() {
+    this.selectedRate = null;
+    this.initialFile = null;
+  }
+
+  onSubmitRate = async (rateForm: RateFormData, rate?: any): Promise<boolean> => {
+    return new Promise((resolve) => {
+      const targetRate = rate ?? this.selectedRate;
+      if (!targetRate) resolve(false);
+
+      if (!rateForm?.file) {
+        this.alertService.warning(
+          '¡Aviso!',
+          'Debe seleccionar un documento.',
+        );
+        resolve(false);
+      }
+
+      const reqData = new FormData();
+      reqData.append('archivo', rateForm.file, rateForm.file.name);
+      if (rateForm.observations) reqData.append('observations', rateForm.observations);
+
+      resolve(true);
+      // this.serviceMethod(formData).subscribe({
+      //   next: (res) => {
+      //     resolve(true);
+      //   },
+      //   error: (err) => {
+      //     resolve(false);
+      //   }
+      // });
+    });
+  }
+
+  deleteRate() {
+    this.alertService.confirmDelete(
+      '¿Estas seguro de eliminar la tarifa?',
+      'En caso de eliminar la tarifa se perderá y no podrá recuperarse'
+    ).subscribe((confirmed: boolean) => {
+      if (!confirmed) return;
+      this.alertService.success(
+        '¡Tarifa eliminada!',
+        'La tarifa se eliminó correctamente.'
       );
-      return;
-    }
-
-    const description = this.rateForm.get('description')?.value;
-
-    const reqData = new FormData();
-    reqData.append('archivo', this.selectedFile, this.selectedFile.name);
-    if (description) reqData.append('description', description);
+      // this.alertService.error(
+      //   'Error',
+      //   'Lo sentimos, no se pudo eliminar la tarifa.'
+      // );
+    });
   }
 
 }

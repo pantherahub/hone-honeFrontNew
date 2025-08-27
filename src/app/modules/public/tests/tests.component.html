@@ -9,13 +9,13 @@
 <br>
 
 
-<button class="px-4 py-2 bg-blue-600 text-white rounded"
-        (click)="drawerOpen = true">
+<button class="px-4 py-2 bg-blue-600 text-white rounded" (click)="openTestDrawer()">
   Abrir Drawer
 </button>
 
 <!-- Drawer -->
-<app-drawer [(isOpen)]="drawerOpen"
+<app-drawer
+  #testDrawer
   placement="right"
   size="lg"
   (onClose)="onDrawerClosed()">
@@ -26,7 +26,7 @@
 
   <p class="text-gray-600">Contenido dentro del drawer...</p>
   <button class="mt-4 px-4 py-2 bg-red-500 text-white rounded"
-          (click)="drawerOpen = false">
+          (click)="closeTestDrawer()">
     Cerrar desde contenido
   </button>
 </app-drawer>

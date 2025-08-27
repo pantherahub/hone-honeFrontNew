@@ -45,7 +45,7 @@ export class TestsComponent implements OnInit, AfterViewInit {
   @ViewChild('triggerBtn', { static: true }) triggerBtnRef!: ElementRef;
   popoverVisible: boolean = false;
 
-  drawerOpen: boolean = false;
+  @ViewChild('testDrawer', { static: false }) testDrawer!: DrawerComponent;
 
   constructor (
     private toastService: ToastService,
@@ -84,6 +84,13 @@ export class TestsComponent implements OnInit, AfterViewInit {
     //     console.log('Modal cerrado con:', result);
     //   });
 
+  }
+
+  openTestDrawer() {
+    this.testDrawer.open();
+  }
+  closeTestDrawer() {
+    this.testDrawer.close();
   }
 
   openModalComponentByTag() {

@@ -20,28 +20,27 @@
   }
 
   @if (showCloseButton) {
-    <button (click)="close()" class="hidden sm:inline-flex absolute top-3 end-3 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 items-center justify-center"
+    <button (click)="close()" class="hidden sm:inline-flex absolute top-3 end-3 text-gray-500 bg-transparent hover:text-gray-950 rounded-lg text-sm items-center justify-center p-0.5"
       [ngClass]="{
         'inline-flex': !onMobileFull,
         'hidden sm:inline-flex': onMobileFull,
       }">
-      ✕
+      <svg width="16" height="16">
+        <use xlink:href="/assets/icons/outline/general.svg#close" />
+      </svg>
       <span class="sr-only">Cerrar</span>
     </button>
   }
 
+  <!-- Header -->
   <div class="flex justify-between items-center p-6 border-b"
     [ngClass]="{
       'pt-2 sm:pt-6': onMobileFull && closable,
     }">
     <ng-content select="[drawer-header]"></ng-content>
-    <!-- @if (showCloseButton) {
-      <button (click)="close()" class="p-2 text-gray-400 hover:text-gray-700">
-        ✕
-      </button>
-    } -->
   </div>
 
+  <!-- Content -->
   <div class="p-6 overflow-y-auto flex-1">
     <ng-content></ng-content>
   </div>

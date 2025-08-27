@@ -9,7 +9,6 @@ import { environment } from 'src/environments/environment';
 export class RateService {
 
   public url = environment.url;
-  private urlPrefix = 'Documents/Providers';
 
   constructor(private httpClient: HttpClient) { }
 
@@ -26,6 +25,7 @@ export class RateService {
             urlObservationsDoc: '',
             nameFile: 'Insumos2025.xls',
             fileSize: '674.4 KB',
+            reportDescription: '',
           },
           rateHistory: [
             {
@@ -56,6 +56,7 @@ export class RateService {
             urlObservationsDoc: '',
             nameFile: 'Medicamentos2025.xls',
             fileSize: '674.4 KB',
+            reportDescription: '',
           },
           rateHistory: [
             {
@@ -87,6 +88,7 @@ export class RateService {
             urlObservationsDoc: '',
             nameFile: 'Prestaciones2025.xls',
             fileSize: '674.4 KB',
+            reportDescription: 'Texto que deja el administrador donde describe el por que fue rechazada las tarifas de prestaciones.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
           },
           rateHistory: [
             {
@@ -117,6 +119,7 @@ export class RateService {
             urlObservationsDoc: '',
             nameFile: 'Prestaciones2025.xls',
             fileSize: '674.4 KB',
+            reportDescription: '',
           },
           rateHistory: [
             {
@@ -143,7 +146,7 @@ export class RateService {
     };
     return of(mockResponse).pipe(delay(700));
 
-    // return this.httpClient.get(`${this.url}${this.urlPrefix}/GetRates/${idProvider}/${idClient}`);
+    // return this.httpClient.get(`${this.url}/GetRates/${idProvider}/${idClient}`);
   }
 
 }

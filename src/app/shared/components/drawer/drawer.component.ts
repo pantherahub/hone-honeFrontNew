@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterContentInit, AfterViewInit, ChangeDetectorRef, Component, ContentChild, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnDestroy, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output } from '@angular/core';
 
 @Component({
   selector: 'app-drawer',
@@ -8,9 +8,8 @@ import { AfterContentInit, AfterViewInit, ChangeDetectorRef, Component, ContentC
   templateUrl: './drawer.component.html',
   styleUrl: './drawer.component.scss'
 })
-export class DrawerComponent implements OnInit, OnChanges, OnDestroy {
+export class DrawerComponent implements OnInit, OnDestroy {
 
-  @Input() isOpen: boolean = false;
   @Input() placement: 'left' | 'right' | 'top' | 'bottom' = 'right';
   @Input() size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' = 'md';
   @Input() customSize?: string;
@@ -24,15 +23,10 @@ export class DrawerComponent implements OnInit, OnChanges, OnDestroy {
   @Input() closeOnEscape: boolean = true;
   @Input() showCloseButton: boolean = true;
 
-  @Output() isOpenChange = new EventEmitter<boolean>();
   @Output() onClose = new EventEmitter<any>();
 
-  @ContentChild('drawerFooter', { static: false, read: ElementRef }) footerContent?: ElementRef;
-
-  @ViewChild('courseImage')
-  courseImage: any;
-
   isMobile: boolean = window.innerWidth < 640;
+  isOpen: boolean = false;
 
   constructor(private cdr: ChangeDetectorRef) { }
 
@@ -50,15 +44,6 @@ export class DrawerComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnDestroy(): void {
     document.body.classList.remove('overflow-hidden');
-  }
-
-  ngOnChanges(): void {
-    if (this.isOpen && this.isBackdropVisible) {
-      document.body.classList.add('overflow-hidden');
-    } else {
-      document.body.classList.remove('overflow-hidden');
-      this.close();
-    }
   }
 
   @HostListener('window:resize')
@@ -92,7 +77,9 @@ export class DrawerComponent implements OnInit, OnChanges, OnDestroy {
       if (!result) return;
     }
     this.isOpen = false;
-    this.isOpenChange.emit(this.isOpen);
+    if (this.isBackdropVisible) {
+      document.body.classList.remove('overflow-hidden');
+    }
     this.onClose.emit(returnData);
   }
 
@@ -114,7 +101,6 @@ export class DrawerComponent implements OnInit, OnChanges, OnDestroy {
     };
 
     return placements[placement];
-    // return `${base} ${placements[placement]}`;
   }
 
   private widthClass(): string {
@@ -129,7 +115,7 @@ export class DrawerComponent implements OnInit, OnChanges, OnDestroy {
     };
 
     let sizeClass = sizes[this.size];
-    if (this.onMobileFull && sizeClass) {
+    if (this.onMobileFull && this.isMobile && sizeClass) {
       sizeClass = `w-screen sm:${sizeClass}`;
     }
     return sizeClass;
@@ -147,7 +133,7 @@ export class DrawerComponent implements OnInit, OnChanges, OnDestroy {
     };
 
     let sizeClass = sizes[this.size];
-    if (this.onMobileFull && sizeClass) {
+    if (this.onMobileFull && this.isMobile && sizeClass) {
       sizeClass = `h-screen sm:${sizeClass}`;
     }
     return sizeClass;
