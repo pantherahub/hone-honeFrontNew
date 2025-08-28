@@ -1,0 +1,55 @@
+<nav class="flex flex-col gap-4 mb-9" aria-label="Breadcrumb">
+
+  <div class="flex">
+    <ol class="inline-flex items-center gap-3">
+      <li class="inline-flex items-center gap-3 text-gray-500">
+        <a routerLink="/home" class="inline-flex items-center cursor-pointer">
+          <svg width="24" height="24">
+            <use xlink:href="/assets/icons/outline/general.svg#home" />
+          </svg>
+        </a>
+        <svg width="16" height="16">
+          <use xlink:href="/assets/icons/outline/arrows.svg#chevron-right" />
+        </svg>
+      </li>
+      <li>
+        <div class="flex items-center gap-3 text-gray-500">
+          <span class="text-sm font-semibold leading-4">
+            {{ clientSelected.clientHoneSolutions }}
+          </span>
+          <svg width="16" height="16">
+            <use xlink:href="/assets/icons/outline/arrows.svg#chevron-right" />
+          </svg>
+        </div>
+      </li>
+      <li aria-current="page">
+        <div class="flex items-center text-gray-800">
+          <span class="text-sm font-semibold leading-4">
+            {{ currentLabel }}
+          </span>
+        </div>
+      </li>
+    </ol>
+  </div>
+
+  @if (serviceRoutes.length > 1) {
+    <div class="max-w-full w-fit overflow-x-auto scrollbar-hide bg-gray-200 rounded-lg p-1">
+      <ul class=" inline-flex whitespace-nowrap">
+        @for (option of serviceRoutes; track $index) {
+          <li class="">
+            <a #link [routerLink]="option.path"
+              [attr.aria-current]="option.label === currentLabel ? 'page' : null"
+              class="inline-block py-1.5 px-3 rounded text-sm font-semibold leading-4 transition-shadow"
+              [ngClass]="{
+                'bg-white text-main-blue1h shadow-[0px_1px_2px_0px_#0000000D]': option.label === currentLabel,
+                'text-gray-500': option.label !== currentLabel,
+              }">
+              {{ option.tab }}
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  }
+
+</nav>

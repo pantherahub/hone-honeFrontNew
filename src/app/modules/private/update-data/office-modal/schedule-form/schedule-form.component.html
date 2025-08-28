@@ -82,7 +82,14 @@
       <nz-form-item>
         <nz-form-label nzFor="startTime" [nzRequired]="true">Hora de inicio</nz-form-label>
         <nz-form-control nzErrorTip="El campo es requerido.">
-          <input type="time" nz-input formControlName="startTime" />
+          <div class="relative">
+            <input type="time" nz-input formControlName="startTime" />
+            <div class="absolute inset-y-0 end-0 top-0 flex items-center pe-3.5 pointer-events-none">
+              <svg class="w-4 h-4 text-gray-500 dark:text-gray-400">
+                <use xlink:href="/assets/icons/outline/general.svg#clock" />
+              </svg>
+          </div>
+          </div>
         </nz-form-control>
       </nz-form-item>
     </nz-col>
@@ -91,7 +98,14 @@
       <nz-form-item>
         <nz-form-label nzFor="endTime" [nzRequired]="true">Hora de fin</nz-form-label>
         <nz-form-control nzErrorTip="El campo es requerido.">
-          <input type="time" nz-input formControlName="endTime" />
+          <div class="relative">
+            <input type="time" nz-input formControlName="endTime" />
+            <div class="absolute inset-y-0 end-0 top-0 flex items-center pe-3.5 pointer-events-none">
+              <svg class="w-4 h-4 text-gray-500 dark:text-gray-400">
+                <use xlink:href="/assets/icons/outline/general.svg#clock" />
+              </svg>
+            </div>
+          </div>
         </nz-form-control>
       </nz-form-item>
     </nz-col>

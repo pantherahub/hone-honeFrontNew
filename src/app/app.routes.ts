@@ -5,8 +5,7 @@ import { authGuard } from './guards/auth.guard';
 import { PageNotFoundComponent } from './modules/public/page-not-found/page-not-found.component';
 import { ListDocumentsComponent } from './modules/private/documents/list-documents/list-documents.component';
 import { NgModule } from '@angular/core';
-import { AdminLayoutComponent } from './views/admin-layout/admin-layout.component';
-import { ProviderAssistancessComponent } from './modules/public/provider-assistancess/provider-assistancess.component';
+import { PrivateLayoutComponent } from './layouts/private-layout/private-layout.component';
 import { UpdateDataComponent } from './modules/private/update-data/update-data.component';
 import { UserManagementComponent } from './modules/private/user/user-management/user-management.component';
 import { UpdatePasswordComponent } from './modules/private/user/modals/update-password/update-password.component';
@@ -22,27 +21,47 @@ import { ProfileComponent } from './modules/private/user/profile/profile.compone
 import { ProfileOverviewComponent } from './modules/private/user/profile/profile-overview/profile-overview.component';
 import { ProfileSecurityComponent } from './modules/private/user/profile/profile-security/profile-security.component';
 import { canDeactivateGuard } from './guards/can-deactivate.guard';
+import { TestsComponent } from './modules/public/tests/tests.component';
+import { SupportTicketComponent } from './shared/support-ticket/support-ticket.component';
+import { PublicLayoutComponent } from './layouts/public-layout/public-layout.component';
+import { ServiceLayoutComponent } from './layouts/service-layout/service-layout.component';
+import { clientSelectedGuard } from './guards/client-selected.guard';
+import { RatesComponent } from './modules/private/rates/rates.component';
+import { serviceAccessGuard } from './guards/service-access.guard';
 
 export const routes: Routes = [
   //   PUBLIC ROUTES
   {
-		path: '',
-		redirectTo: 'login',
-		pathMatch: 'full'
+    path: '',
+    redirectTo: 'login',
+    pathMatch: 'full'
   },
-	{
-    path: 'login',
+  {
+    path: '',
+    component: PublicLayoutComponent,
     canActivate: [noauthGuard],
-		component: LoginComponent
-	},
-	{
-		path: 'page-not-found',
-		component: PageNotFoundComponent
-	},
-	{
-		path: 'page-form-assistance',
-		component: ProviderAssistancessComponent
+    children: [
+      {
+        path: 'login',
+        component: LoginComponent
+      },
+      {
+        path: 'auth-support',
+        component: SupportTicketComponent
+      }
+    ]
   },
+
+  {
+    path: 'page-not-found',
+    component: PageNotFoundComponent
+  },
+  // Delete after tests
+  {
+    path: 'test',
+    component: TestsComponent
+  },
+
   {
     path: 'forgot-password',
     component: ForgotPasswordComponent
@@ -68,15 +87,19 @@ export const routes: Routes = [
     component: ValidatePasswordComponent
   },
 
-	//   PRIVATE ROUTES
-	{
-		path: '',
-    component: AdminLayoutComponent,
+  // PRIVATE ROUTES
+  {
+    path: '',
+    component: PrivateLayoutComponent,
     canActivate: [authGuard, authStatusGuard],
-		children: [
+    children: [
       {
         path: 'home',
         component: HomeComponent
+      },
+      {
+        path: 'support',
+        component: SupportTicketComponent
       },
       {
         path: 'update-data',
@@ -105,37 +128,49 @@ export const routes: Routes = [
         path: 'cargar-documentos/:id',
         component: ListDocumentsComponent
       },
+      {
+        path: 'service',
+        component: ServiceLayoutComponent,
+        canActivate: [clientSelectedGuard],
+        children: [
+          {
+            path: 'documentation',
+            component: ListDocumentsComponent,
+            canActivate: [serviceAccessGuard],
+          },
+          // {
+          //   path: 'rates',
+          //   component: RatesComponent,
+          //   canActivate: [serviceAccessGuard],
+          // },
+        ],
+      },
 		]
   },
 
-	//   DEFAULT ROUTES
-	{
-		path: '**',
-		pathMatch: 'full',
-		redirectTo: 'home'
-	},
-	// {
-	// 	path: '**',
-	// 	pathMatch: 'full',
-	// 	redirectTo: 'page-not-found'
-	// },
-	// {
-	// 	path: '**',
-	// 	pathMatch: 'full',
-	// 	redirectTo: 'page-form-assistance'
-	// }
+  // DEFAULT ROUTES
+  {
+    path: '**',
+    pathMatch: 'full',
+    redirectTo: 'home'
+  },
+  // {
+  //   path: '**',
+  //   pathMatch: 'full',
+  //   redirectTo: 'page-not-found'
+  // },
 ];
 
 @NgModule({
-	imports: [
-		RouterModule.forRoot(routes, {
-			useHash: true,
-			/* Activa las anclas en angular */
-			anchorScrolling: 'enabled',
-			/* Restaura el scroll a la posición inicial */
-			scrollPositionRestoration: 'enabled'
-		})
-	],
-	exports: [RouterModule]
+  imports: [
+    RouterModule.forRoot(routes, {
+      useHash: true,
+      /* Activa las anclas en angular */
+      anchorScrolling: 'enabled',
+      /* Restaura el scroll a la posición inicial */
+      scrollPositionRestoration: 'enabled'
+    })
+  ],
+  exports: [RouterModule]
 })
 export class AppRoutingModule {}

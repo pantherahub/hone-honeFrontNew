@@ -1,0 +1,45 @@
+<div #modalEl
+  tabindex="-1"
+  [attr.aria-hidden]="!isOpen"
+  class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 w-full h-full min-h-screen"
+  [ngClass]="[isBackdropVisible ? 'bg-black/25' : '']"
+  (mousedown)="onBackdropMouseDown($event)"
+  (mouseup)="onBackdropMouseUp($event)">
+
+  <div class="flex w-full min-h-full pointer-events-none" [ngClass]="positionClasses">
+    <div class="relative w-full pointer-events-auto bg-white rounded-xl shadow-[0px_1px_4px_0px_#2929291A] dark:bg-gray-700 p-4 flex flex-col gap-4 m-4"
+      [ngClass]="combinedModalClasses">
+
+      <!-- Modal header -->
+      @if (title) {
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center justify-between">
+            <h3 class="text-base font-semibold leading-[18px] text-main-blue1h dark:text-white">
+              {{ title }}
+            </h3>
+            @if (showCloseButton) {
+              <app-button (click)="close()" variant="primary" size="sm" styleType="ghost">
+                <svg width="16" height="16">
+                  <use xlink:href="/assets/icons/outline/general.svg#close" />
+                </svg>
+              </app-button>
+            }
+          </div>
+
+          <ng-content select="[modal-description]"></ng-content>
+        </div>
+      }
+
+      <!-- Content -->
+      <!-- @if (hasDynamicViewLoaded) {
+        <ng-container #content></ng-container>
+      } @else {
+        <ng-content></ng-content>
+      } -->
+      <ng-container #content></ng-container>
+      <ng-content></ng-content>
+
+    </div>
+  </div>
+
+</div>

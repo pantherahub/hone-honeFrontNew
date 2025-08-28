@@ -1,263 +1,412 @@
-import { Component, inject, AfterContentChecked, Input, OnInit } from '@angular/core';
-import { NZ_MODAL_DATA, NzModalRef } from 'ng-zorro-antd/modal';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { NgZorroModule } from '../../../../ng-zorro.module';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { NzMessageService } from 'ng-zorro-antd/message';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { DocumentsCrudService } from '../../../../services/documents/documents-crud.service';
 import { EventManagerService } from '../../../../services/events-manager/event-manager.service';
-import { NzNotificationService } from 'ng-zorro-antd/notification';
-import { FileValidatorDirective } from 'src/app/directives/file-validator.directive';
-import { DatePickerInputComponent } from 'src/app/shared/forms/date-picker-input/date-picker-input.component';
-import { AlertService } from 'src/app/services/alerts/alert.service';
+import { FileSelectDirective } from 'src/app/directives/file-select.directive';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
-import { formatListWithY } from 'src/app/utils/string-utils';
+import { formatListWithY, pluralize } from 'src/app/utils/string-utils';
+import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
+import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
+import { InputErrorComponent } from 'src/app/shared/components/input-error/input-error.component';
+import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { SelectComponent } from 'src/app/shared/components/select/select.component';
+import { PipesModule } from 'src/app/pipes/pipes.module';
+import { AlertService } from 'src/app/services/alert/alert.service';
+import { FileDropDirective } from 'src/app/directives/file-drop.directive';
+
 
 @Component({
-   selector: 'app-modal-edit-document',
-   standalone: true,
-   imports: [ NgZorroModule, CommonModule, FileValidatorDirective, DatePickerInputComponent ],
-   templateUrl: './modal-edit-document.component.html',
-   styleUrl: './modal-edit-document.component.scss'
+  selector: 'app-modal-edit-document',
+  standalone: true,
+  imports: [
+    NgZorroModule,
+    CommonModule,
+    PipesModule,
+    FileSelectDirective,
+    FileDropDirective,
+    TextInputComponent,
+    InputErrorComponent,
+    ButtonComponent,
+    SelectComponent
+  ],
+  templateUrl: './modal-edit-document.component.html',
+  styleUrl: './modal-edit-document.component.scss'
 })
-export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
-   loader: boolean = false;
-   documentForm!: FormGroup;
+export class ModalEditDocumentComponent implements OnInit {
+  loader: boolean = false;
+  documentForm!: FormGroup;
 
-   loadedFile: any;
+  loadedFile: any;
 
-   @Input() currentDoc?: any;
-   @Input() documentId?: any;
-   @Input() documentType?: any;
+  @Input() currentDoc?: any;
+  @Input() isNew: boolean = false;
+  @Input() citiesList: any[] = [];
 
-   clientSelected: any = this.eventManager.clientSelected();
+  clientSelected: any = this.eventManager.clientSelected();
 
-   readonly #modal = inject(NzModalRef);
-   readonly nzModalData: any = inject(NZ_MODAL_DATA);
+  customErrorMessagesMap: { [key: string]: any } = {
+    dateExpedition: {
+      dateExpeditionInvalid: (error: string) => error
+    },
+    expirationDate: {
+      minDate: (error: string) => error
+    },
+    amountPolicy: {
+      minPolicy: (error: string) => error
+    },
+  };
 
   suraSoftwareTypes: string[] = [
-    'Evolve Hc', 'KloudSolutions', 'Medicarte', 'Simedica', 'Sunube',
-    'HIMED', 'Netmedik', 'Ekisa', 'Medsys', 'Luku', 'Ipsa', 'Otro'
+    'Evolve Hc',
+    'KloudSolutions',
+    'Medicarte',
+    'Simedica',
+    'Sunube',
+    'HIMED',
+    'Netmedik',
+    'Ekisa',
+    'Medsys',
+    'Luku',
+    'Ipsa',
+    'Otro'
   ];
   suraArlEntities: string[] = [
-    'ARL COLSANITAS', 'ALFATEP', 'ARL SURA', 'ARP AURORA', 'ARP BOLIVAR',
-    'ARP COLMENA', 'ARP COLPATRIA', 'LA EQUIDAD SEGUROS DE VIDA S.A',
-    'LIBERTY SEGUROS DE VIDA S.A', 'MAPFRE', 'POSITIVA ARP', 'AXA ARL', 'OTRAS',
+    'ARL COLSANITAS',
+    'ALFATEP',
+    'ARL SURA',
+    'ARP AURORA',
+    'ARP BOLIVAR',
+    'ARP COLMENA',
+    'ARP COLPATRIA',
+    'LA EQUIDAD SEGUROS DE VIDA S.A',
+    'LIBERTY SEGUROS DE VIDA S.A',
+    'MAPFRE',
+    'POSITIVA ARP',
+    'AXA ARL',
+    'OTRAS'
   ];
   riskClassifierOptions = ['1', '2', '3', '4', '5'];
 
   readonly SMLV: number = 1423500;
-  readonly typePolicyProviderConfig: { [key: string]: number } = {
-    'Psicólogo': 200,
-    'Nutricionista': 200,
-    'Terapeuta': 200,
-    'Fonoaudiólogo': 200,
-    'Profesional médico': 420,
-    'IPS': 420,
+  readonly idMainCities: number[] = [
+    88, // Barranquilla
+    107, // Bogota
+    150, // Cali
+    547, // Medellin
+  ];
+  mainCities: any[] = [];
+  readonly typePolicyProviderConfig: { [key: string]: any } = {
+    // Juridica
+    'Clinica': {
+      idTypeProvider: 3,
+      smlvMainCities: 420,
+      smlvOtherCities: 370,
+    },
+    'Hospital': {
+      idTypeProvider: 3,
+      smlvMainCities: 420,
+      smlvOtherCities: 370,
+    },
+    'IPS Ambulatoria': {
+      idTypeProvider: 3,
+      smlvMainCities: 370,
+      smlvOtherCities: 230,
+    },
+
+    // Natural
+    'Profesional médico': {
+      idTypeProvider: 7,
+      smlvMainCities: 230,
+      smlvOtherCities: 200,
+    },
+    'Odontologo': {
+      idTypeProvider: 7,
+      smlvMainCities: 230,
+      smlvOtherCities: 200,
+    },
+    'Terapeuta': {
+      idTypeProvider: 7,
+      smlvMainCities: 200,
+      smlvOtherCities: 100,
+    },
+    'Psicólogo': {
+      idTypeProvider: 7,
+      smlvMainCities: 200,
+      smlvOtherCities: 100,
+    },
+    'Fonoaudiólogo': {
+      idTypeProvider: 7,
+      smlvMainCities: 200,
+      smlvOtherCities: 100,
+    },
+    'Nutricionista': {
+      idTypeProvider: 7,
+      smlvMainCities: 200,
+      smlvOtherCities: 100,
+    },
   };
+  typePolicyProviderOptions: string[] = [];
+
   hasShownAmountMessage: boolean = false;
 
-  expeditionDateRestrictions: { [key: number]: 'lastMonth' | 'currentYear' | 'last3Years' | 'last2Months' } = {
-    108: 'lastMonth',
-    113: 'lastMonth',
-    139: 'last2Months',
-    140: 'last2Months',
-    4: 'currentYear',
-    110: 'currentYear',
-    111: 'currentYear',
-    134: 'currentYear',
-    135: 'currentYear',
-    137: 'last3Years',
-  };
+  @ViewChild('dateInput', { static: true }) dateInputRef!: ElementRef;
 
-   constructor (
-      private formBuilder: FormBuilder,
-      private notificationService: NzNotificationService,
-      private documentService: DocumentsCrudService,
-      private eventManager: EventManagerService,
-      private alertService: AlertService,
-      private formUtils: FormUtilsService,
-   ) { }
+  constructor(
+    private modalRef: ModalComponent,
+    private formBuilder: FormBuilder,
+    private documentService: DocumentsCrudService,
+    private eventManager: EventManagerService,
+    private alertService: AlertService,
+    private formUtils: FormUtilsService
+  ) { }
 
-   ngAfterContentChecked (): void {}
+  ngOnInit(): void {
+    // console.log('currentDoc', this.currentDoc);
+    this.getTypePolicyProviderOpts();
+    this.createForm();
+  }
 
-   ngOnInit(): void {
-      this.createForm();
-      this.validateDocumentType();
-      // this.patchForm();
-   }
+  closeModal(response: boolean = false): void {
+    this.modalRef.close({ response });
+  }
 
-   destroyModal (response: boolean = false): void {
-      this.#modal.destroy({ response });
-   }
+  getTypePolicyProviderOpts() {
+    const idTypeProvider = this.clientSelected?.idTypeProvider;
+    if (!idTypeProvider) return;
 
-   /**
-    * Crea e Inicializa el formulario
-    */
-   createForm() {
-      this.documentForm = this.formBuilder.nonNullable.group({
-         nombredocumento: [ '' ],
-         software: [ '', [Validators.required] ],
-         fechadedocumento: [ '', [Validators.required] ],
-         dateDiligence: [ '', [Validators.required] ],
-         dateFirm: [ '', [Validators.required] ],
-         dateVaccination: [ '', [Validators.required] ],
-         dueDate: [ '', [Validators.required] ],
-         legalRepresentative: [ '', [Validators.required] ],
-         NameAlternate: [ '', [Validators.required] ],
-         documentDeliveryDate: [ '', [Validators.required] ],
-         dateOfBirth: [ '', [Validators.required] ],
-         consultationDate: [ '', [Validators.required] ],
-         endorsedSpecialtyDate: [ '', [Validators.required] ],
-         validityStartDate: [ '', [Validators.required] ],
-         dateofRealization: [ '', [Validators.required] ],
-         receptionDate: [ '', [Validators.required] ],
-         lastDosimetryDate: [ '', [Validators.required] ],
-         epsName: [ '', [Validators.required] ],
-         riskClassifier: [ '', [Validators.required] ],
-         resolutionOfThePension: ['', [Validators.required]],
-         amountPolicy: ['', [Validators.required]],
-         tipodocumento: [ '' ],
-      });
+    this.typePolicyProviderOptions = Object.keys(this.typePolicyProviderConfig)
+      .filter(opt => this.typePolicyProviderConfig[opt].idTypeProvider === idTypeProvider);
+  }
 
-      // Clear validations of fields that do not apply
-      Object.keys(this.documentForm.controls).forEach(controlName => {
-         if (!this.isFieldRequiredForDocumentType(controlName)) {
-            this.documentForm.controls[controlName].clearValidators();
-         }
-      });
-      // Update validity statuses
-      this.documentForm.updateValueAndValidity();
+  createForm() {
+    this.documentForm = this.formBuilder.nonNullable.group({
+      software: ['', [Validators.required]],
+      dateExpedition: ['', [
+        Validators.required,
+        this.dateExpeditionValidator.bind(this)
+      ]],
+      dateDiligence: ['', [Validators.required]],
+      dateSignature: ['', [Validators.required]],
+      dateVaccination: ['', [Validators.required]],
+      expirationDate: ['', [
+        Validators.required,
+        this.expirationDateValidator
+      ]],
+      legalRepresentative: ['', [Validators.required]],
+      NameAlternate: ['', [Validators.required]],
+      documentDeliveryDate: ['', [Validators.required]],
+      dateOfBirth: ['', [Validators.required]],
+      consultationDate: ['', [Validators.required]],
+      endorsedSpecialtyDate: ['', [Validators.required]],
+      validityStartDate: ['', [Validators.required]],
+      dateofRealization: ['', [Validators.required]],
+      receptionDate: ['', [Validators.required]],
+      lastDosimetryDate: ['', [Validators.required]],
+      epsName: ['', [Validators.required]],
+      riskClassifier: ['', [Validators.required]],
+      resolutionOfThePension: ['', [Validators.required]],
+      idCity: ['', [Validators.required]],
+      typePolicyProvider: ['', [Validators.required]],
+      amountPolicy: ['', [
+        Validators.required,
+        this.minPolicyDynamicValidator.bind(this)
+      ]],
+      idDocumentType: [this.currentDoc?.idDocumentType || '', [Validators.required]]
+    });
 
-      this.patchForm();
-   }
+    // Clear validations of fields that do not apply
+    Object.keys(this.documentForm.controls).forEach(controlName => {
+      if (!this.isFieldRequiredForDocumentType(controlName)) {
+        this.documentForm.controls[controlName].clearValidators();
+      }
+    });
+    // Update validity statuses
+    this.documentForm.updateValueAndValidity();
 
-   /**
-    * Checks if the field is required for the document type
-    */
-   isFieldRequiredForDocumentType(controlName: string): boolean {
-      const documentValidationMap: any = {
-         'software': [138],
-         'fechadedocumento': [
-            4, 113, 12, 110, 111, 108, 137,
-            130, 131, 132, 133, 134, 135, 136, 138, 139, 140, 141, 142
-         ],
-         'dateDiligence': [1, 35],
-         'dateFirm': [2, 19],
-         'dateVaccination': [6, 32],
-         'dueDate': [
-           8, 22, 37, 21, 133, 137,
-           132, 139, 140, 142
-         ],
-         'legalRepresentative': [113],
-         'NameAlternate': [113],
-         'documentDeliveryDate': [10, 11],
-         'dateOfBirth': [12, 130],
-         'consultationDate': [16],
-         'endorsedSpecialtyDate': [16],
-         'validityStartDate': [20],
-         'dateofRealization': [36, 24, 23],
-         'receptionDate': [25, 29],
-         'lastDosimetryDate': [0],
-         'epsName': [13, 14, 135],
-         'riskClassifier': [13, 135],
-         'resolutionOfThePension': [15],
-         'amountPolicy': [133],
-      };
-      return documentValidationMap[controlName]?.includes(this.documentType);
-   }
+    this.documentForm.get('idCity')?.valueChanges.subscribe(() => {
+      this.documentForm.get('amountPolicy')?.updateValueAndValidity();
+    });
+    this.documentForm.get('typePolicyProvider')?.valueChanges.subscribe(() => {
+      this.documentForm.get('amountPolicy')?.updateValueAndValidity();
+    });
+
+    if (this.currentDoc && !this.isNew) this.patchForm();
+  }
+
+  /**
+   * Checks if the field is required for the document type
+   */
+  isFieldRequiredForDocumentType(controlName: string): boolean {
+    const item = this.currentDoc;
+    if (!item.showInProviderSystem) return false;
+    const documentValidationMap: any = {
+      software: item.withSoftwareMedicalRecord,
+      dateExpedition: item.withExpedition,
+      dateDiligence: item.withDateDiligence,
+      dateSignature: item.withDateSignature,
+      dateVaccination: item.withDateVaccination,
+      expirationDate: item.withExpiration,
+      legalRepresentative: item.withLegalRepresentative,
+      NameAlternate: item.withLegalRepresentative,
+      documentDeliveryDate: item.withDeliveryDate,
+      dateOfBirth: item.withDateOfBirth,
+      consultationDate: item.withConsultationDate,
+      endorsedSpecialtyDate: item.withEndorsedSpecialtyDate,
+      validityStartDate: item.withValidityStartDate,
+      dateofRealization: item.withDateofRealization,
+      receptionDate: item.withReceptionDate,
+      epsName: item.withEpsName,
+      riskClassifier: item.withRiskClassifier && item.riskClassifier !== '9',
+      resolutionOfThePension: item.withResolutionOfThePension,
+      idCity: item.withAmountPolicy,
+      typePolicyProvider: item.withAmountPolicy,
+      amountPolicy: item.withAmountPolicy
+    };
+    return documentValidationMap[controlName];
+  }
 
   sanitizeWithOptions(value: any, validValues: any[]): any | null {
     return validValues.includes(value) ? value : null;
   }
 
-   patchForm () {
-      const item = this.currentDoc;
+  getExpeditionTooltipContent(): string {
+    const typeDoc = this.currentDoc;
 
-      this.documentForm.patchValue({
-         software: this.sanitizeWithOptions(item.software, this.suraSoftwareTypes),
-         consultationDate: this.convertDate(item.consultationDate),
-         dateDiligence: this.convertDate(item.dateDiligence),
-         dateFirm: this.convertDate(item.dateFirm),
-         dateOfBirth: this.convertDate(item.dateOfBirth),
-         dateofRealization: this.convertDate(item.dateofRealization),
-         dateVaccination: this.convertDate(item.dateVaccination),
-         documentDeliveryDate: this.convertDate(item.documentDeliveryDate),
-         dueDate: this.convertDate(item.dueDate),
-         endorsedSpecialtyDate: this.convertDate(item.endorsedSpecialtyDate),
-         epsName: this.sanitizeWithOptions(item.epsName, this.suraArlEntities),
-         fechadedocumento: this.convertDate(item.fechadedocumento),
-         lastDosimetryDate: this.convertDate(item.lastDosimetryDate),
-         legalRepresentative: item.legalRepresentative,
-         NameAlternate: item.NameAlternate,
-         nombredocumento: item.nombredocumento,
-         receptionDate: this.convertDate(item.receptionDate),
-         resolutionOfThePension: item.resolutionOfThePension,
-         riskClassifier: this.sanitizeWithOptions(item.riskClassifier, this.riskClassifierOptions),
-         validityStartDate: this.convertDate(item.validityStartDate),
-         amountPolicy: this.formUtils.formatCurrency(item.amountPolicy),
-         tipodocumento: item.idTypeDocuments,
-      });
-   }
+    if (typeDoc.currentYear) {
+      return 'Debe ser del año inmediatamente presente.';
+    }
+    if (typeDoc.lastMonth !== null) {
+      return `Debe ser no mayor a ${pluralize('un mes', `${typeDoc.lastMonth} meses`, typeDoc.lastMonth)}.`;
+    }
+    if (typeDoc.lastYear !== null) {
+      return `Debe ser no mayor a ${pluralize('un año', `${typeDoc.lastYear} años`, typeDoc.lastYear)}.`;
+    }
+    return '';
+  }
 
-   /**
-    * Valida el tipo de documento que se va a editar
-    */
-   validateDocumentType() { }
+  dateExpeditionValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
 
-   getExpeditionTooltipContent(): string {
-      const restriction = this.expeditionDateRestrictions[this.documentType];
-      switch (restriction) {
-        case 'lastMonth':
-          return 'Debe ser no mayor a un mes.';
-        case 'currentYear':
-          return 'Debe ser del año inmediatamente presente.';
-        case 'last3Years':
-          return 'Debe ser no mayor a tres años.';
-        case 'last2Months':
-          return 'Debe ser no mayor a dos meses.';
-        default:
-          return '';
+    const selectedDate = new Date(control.value + 'T00:00:00');
+    const today = new Date();
+    selectedDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+    const currentYear = today.getFullYear();
+
+    const typeDoc = this.currentDoc;
+
+    if (typeDoc.currentYear) {
+      if (selectedDate.getFullYear() !== currentYear || selectedDate > today) {
+        return { dateExpeditionInvalid: 'Debe ser del año inmediatamente presente.' };
+      }
+    } else if (typeDoc.lastMonth !== null) {
+      const maxMonthAgo = new Date(today);
+      maxMonthAgo.setMonth(today.getMonth() - typeDoc.lastMonth);
+      if (selectedDate < maxMonthAgo || selectedDate > today) {
+        return {
+          dateExpeditionInvalid: `Debe ser no mayor a ${pluralize(
+            'un mes', `${typeDoc.lastMonth} meses`,
+            typeDoc.lastMonth
+          )}.`
+        };
+
+      }
+    } else if (typeDoc.lastYear !== null) {
+      const maxYearsAgo = new Date(today);
+      maxYearsAgo.setFullYear(currentYear - typeDoc.lastYear);
+      if (selectedDate < maxYearsAgo || selectedDate > today) {
+        return {
+          dateExpeditionInvalid: `Debe ser no mayor a ${pluralize(
+            'un año', `${typeDoc.lastYear} años`,
+            typeDoc.lastYear
+          )}.`
+        };
       }
     }
 
-   /**
-    *
-    * @param current Bloquea las fechas antes de la fecha actual, habilita por un año y bloquea fechas posterior (para fecha de expedición)
-    * @returns
-    */
-  disableExpeditionDates = (current: Date): boolean => {
-    current.setHours(0, 0, 0, 0);
-    const restriction = this.expeditionDateRestrictions[this.documentType];
-    if (!restriction) return false;
+    return null;
+  }
 
+  expirationDateValidator(control: AbstractControl) {
+    if (!control.value) return null;
+
+    const selectedDate = new Date(control.value + 'T00:00:00');
     const today = new Date();
+    selectedDate.setHours(0, 0, 0, 0);
     today.setHours(0, 0, 0, 0);
 
-    switch (restriction) {
-      case 'lastMonth':
-        const lastMonth = new Date(today);
-        lastMonth.setMonth(today.getMonth() - 1);
-        return current < lastMonth || current > today;
+    const tomorrow = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
 
-      case 'last2Months':
-        const twoMonthsAgo = new Date(today);
-        twoMonthsAgo.setMonth(today.getMonth() - 2);
-        return current < twoMonthsAgo || current > today;
+    // expirationDate must be greater than today
+    return selectedDate < tomorrow
+      ? { minDate: 'Debe ser posterior al día de hoy' }
+      : null;
+  }
 
-      case 'currentYear':
-        const startOfYear = new Date(today.getFullYear(), 0, 1);
-        return current < startOfYear || current > today;
+  minPolicyDynamicValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control || !control.parent) return null;
 
-      case 'last3Years':
-        const threeYearsAgo = new Date(today);
-        threeYearsAgo.setFullYear(today.getFullYear() - 3);
-        return current < threeYearsAgo || current > today;
+    const form = control.parent as FormGroup;
+    const type = form.get('typePolicyProvider')?.value;
+    const idCity = form.get('idCity')?.value;
 
-      default:
-        return false;
-    }
-  };
+    if (!type || !idCity) return null;
+
+    const config = this.typePolicyProviderConfig[type];
+    if (!config) return null;
+
+    const isMainCity = this.idMainCities.includes(Number(idCity));
+    const smlvNum = isMainCity ? config.smlvMainCities : config.smlvOtherCities;
+
+    const value = Number(
+      this.formUtils.sanitizeToNumeric(String(control.value), true)
+    );
+    if (value == null || isNaN(value)) return null;
+
+    const min = this.SMLV * smlvNum;
+    const minFormatted = this.formUtils.formatCurrency(min);
+    return value < min
+      ? { minPolicy: `Mínimo permitido: $ ${minFormatted}` }
+      : null;
+  }
+
+  patchForm() {
+    const item = this.currentDoc;
+
+    this.documentForm.patchValue({
+      software: this.sanitizeWithOptions(item.software, this.suraSoftwareTypes),
+      consultationDate: this.convertDate(item.consultationDate),
+      dateDiligence: this.convertDate(item.dateDiligence),
+      dateSignature: this.convertDate(item.dateSignature),
+      dateOfBirth: this.convertDate(item.dateOfBirth),
+      dateofRealization: this.convertDate(item.dateofRealization),
+      dateVaccination: this.convertDate(item.dateVaccination),
+      documentDeliveryDate: this.convertDate(item.documentDeliveryDate),
+      expirationDate: this.convertDate(item.expirationDate),
+      endorsedSpecialtyDate: this.convertDate(item.endorsedSpecialtyDate),
+      epsName: this.sanitizeWithOptions(item.epsName, this.suraArlEntities),
+      dateExpedition: this.convertDate(item.dateExpedition),
+      lastDosimetryDate: this.convertDate(item.lastDosimetryDate),
+      legalRepresentative: item.legalRepresentative,
+      NameAlternate: item.NameAlternate,
+      receptionDate: this.convertDate(item.receptionDate),
+      resolutionOfThePension: item.resolutionOfThePension,
+      riskClassifier: this.sanitizeWithOptions(
+        item.riskClassifier,
+        this.riskClassifierOptions
+      ),
+      validityStartDate: this.convertDate(item.validityStartDate),
+      idCity: item.idCity,
+      typePolicyProvider: this.sanitizeWithOptions(
+        item.typePolicyProvider,
+        this.typePolicyProviderOptions
+      ),
+      amountPolicy: this.formUtils.formatCurrency(item.amountPolicy),
+      idDocumentType: item.idDocumentType
+    });
+  }
 
   onAmountPolicyChange(): void {
     const control = this.documentForm.get('amountPolicy');
@@ -266,150 +415,209 @@ export class ModalEditDocumentComponent implements AfterContentChecked, OnInit {
     control?.setValue(formatted, { emitEvent: false });
   }
 
+  hasAmountPolicyValidation(): boolean {
+    if (!this.clientSelected?.idTypeProvider) return false;
+    return Object.values(this.typePolicyProviderConfig).some(
+      (config: any) => config.idTypeProvider === this.clientSelected.idTypeProvider
+    );
+  }
+
+  getMainCities() {
+    if (this.citiesList?.length) {
+      this.mainCities = this.citiesList.filter(city =>
+        this.idMainCities.includes(city.idCity)
+      );
+    }
+  }
+
   amountPolicyInfoAlert(onFocus: boolean = false): void {
-    if (onFocus && this.hasShownAmountMessage) return;
+    if (!this.hasAmountPolicyValidation()
+      || (onFocus && this.hasShownAmountMessage)) return;
     this.hasShownAmountMessage = true;
 
+    this.getMainCities();
+
     // Group by SMLVs num min
-    const groups: { [smlvNum: number]: string[] } = {};
-    for (let type in this.typePolicyProviderConfig) {
-      let smlvNum = this.typePolicyProviderConfig[type];
-      if (!groups[smlvNum]) groups[smlvNum] = [];
-      groups[smlvNum].push(type);
+    const grouped: Record<string, { smlvMain: number, smlvOther: number, types: string[] }> = {};
+    for (let [type, config] of Object.entries(this.typePolicyProviderConfig)) {
+      if (config.idTypeProvider !== this.clientSelected.idTypeProvider) continue;
+
+      const key = `${config.smlvMainCities}-${config.smlvOtherCities}`;
+      if (!grouped[key]) {
+        grouped[key] = {
+          smlvMain: config.smlvMainCities,
+          smlvOther: config.smlvOtherCities,
+          types: []
+        };
+      }
+      grouped[key].types.push(type);
     }
 
+    const mainCitiesNames = this.mainCities
+      .map(city => city.city)
+      .sort();
+
     // Generate dinamic message
-    let html = '';
-    for (let smlvNum in groups) {
-      let provTypes = groups[smlvNum];
-      let value = this.SMLV * parseInt(smlvNum);
+    let html = `<p class="font-bold">Valores mínimos requeridos</p>`;
+    html += `<p><span class="font-semibold">Ciudades principales:</span> ${mainCitiesNames.join(', ')}.</p>`;
+    for (let group of Object.values(grouped)) {
+      const valueMain = group.smlvMain * this.SMLV;
+      const valueOther = group.smlvOther * this.SMLV;
       html += `
-        <p>
-          Para <strong>${formatListWithY(provTypes)}</strong>, el valor mínimo requerido de la póliza es equivalente a
-          <strong>${smlvNum} SMLV</strong>
-          (<strong>${smlvNum} x $${this.SMLV.toLocaleString('es-CO')} = $${value.toLocaleString('es-CO')}</strong>)
+        <p class="mt-2">
+          Para <strong>${formatListWithY(group.types)}</strong>:
+          <ul class="list-disc list-inside mt-1">
+            <li><strong>${group.smlvMain} SMLV</strong> en ciudades principales (<strong>$${valueMain.toLocaleString('es-CO')}</strong>)</li>
+            <li><strong>${group.smlvOther} SMLV</strong> en otras ciudades (<strong>$${valueOther.toLocaleString('es-CO')}</strong>)</li>
+          </ul>
         </p>
       `;
     }
-    html += `<p class="mt-3">Por favor verifica este monto.</p>`;
+    html += `<p class="mt-3">Por favor verifica este monto según el tipo de prestador y la ciudad correspondiente.</p>`;
 
-    const modalRef = this.alertService.info(
-      'Información sobre valores de póliza',
-      html,
-      {
-        nzOkText: 'Entendido',
-        nzClosable: false,
-        nzWidth: 600,
-        nzContent: html,
-        nzOnOk: () => {
-          this.policyCloseAlert(modalRef);
-          return false; // Avoid close modal
-        }
+    this.alertService.showAlert({
+      title: 'Información sobre valores de póliza',
+      messageHTML: html,
+      variant: 'info',
+      isConfirmation: true,
+      customSize: 'max-w-lg',
+      beforeClose: async () => {
+        return await this.policyCloseAlert();
       }
-    );
+    });
   }
 
-  policyCloseAlert(firstModalRef: NzModalRef) {
-    this.alertService.confirm(
-      'IMPORTANTE',
-      'Debe leer la información anterior sobre los valores de la póliza para evitar devoluciones y retrasos en la gestión documental.',
-      {
-        nzClosable: false,
-        nzWidth: 500,
-        nzCancelText: 'Volver a revisar',
-        nzOkText: 'Ya leí la información anterior',
-        nzOkDanger: true,
-        nzOnOk: () => {
-          firstModalRef.destroy();
-        },
-      }
-    );
+  policyCloseAlert(): Promise<boolean> {
+    return new Promise(resolve => {
+      this.alertService
+        .confirm(
+          '¡IMPORTANTE!',
+          'Debe leer la información anterior sobre los valores de la póliza para evitar devoluciones y retrasos en la gestión documental.',
+          {
+            iconVariant: 'error',
+            confirmBtnVariant: 'red',
+            cancelBtnText: 'Volver a revisar',
+            confirmBtnText: 'Ya leí la información'
+          }
+        )
+        .subscribe(confirmed => {
+          resolve(confirmed);
+        });
+    });
   }
 
-   /**
-    * Carga un archivo y lo envia al api de carga de documentos
-    * @param event - evento del input que contiene el archivo para cargar
-    * @param item - elemento de la lista para saber cual documento de carga ej (cedula, nit, rethus)
-    */
-   loadFile (file: any) {
-      if (file) this.loadedFile = file;
-   }
+  loadFile(file: any) {
+    if (file) this.loadedFile = file;
+  }
 
-   submitRequest() {
-      if (this.documentForm.invalid) {
-         Object.values(this.documentForm.controls).forEach(control => {
-            if (control.invalid) {
-               control.markAsDirty();
-               control.updateValueAndValidity({ onlySelf: true });
-            }
-         });
-         return;
-      }
-      this.loader = true;
+  createFormData(): FormData {
+    const dataToUpload = new FormData();
+    const unifiedData: any = {};
 
-      const fileToUpload = new FormData();
-      if (this.loadedFile) {
-         fileToUpload.append('archivo', this.loadedFile);
-      }
-      const { idProvider } = this.clientSelected;
-      fileToUpload.append('idUser', idProvider);
+    if (this.loadedFile) {
+      unifiedData['nameDocument'] = this.loadedFile.name;
+    }
 
-      const docForm: Object = { ...this.documentForm.value };
+    const { idProvider, idClientHoneSolutions } = this.clientSelected;
+    unifiedData['idProvider'] = idProvider;
+    unifiedData['idClientHoneSolutions'] = idClientHoneSolutions;
 
-      for (const [key, value] of Object.entries(docForm)) {
-        if (value && value instanceof Date) {
-          fileToUpload.append(key, value.toString().split('T')[0]);
-        } else if (value != null && value.toString().trim() != '') {
-          let appendValue = value;
-          if (key === 'amountPolicy') {
-            appendValue = this.formUtils.sanitizeToNumeric(value, true);
-          }
-          fileToUpload.append(key, appendValue);
-        } else {
-          fileToUpload.append(key, '');
+    // Add form data
+    const docForm = { ...this.documentForm.value };
+    for (const [key, value] of Object.entries(docForm)) {
+      if (value && value instanceof Date) {
+        unifiedData[key] = value.toString().split('T')[0];
+      } else if (value != null && value.toString().trim() != '') {
+        let appendValue: any = value;
+        if (key === 'amountPolicy') {
+          appendValue = this.formUtils.sanitizeToNumeric(
+            value.toString(),
+            true
+          );
         }
-      }
-
-      this.documentService.updateDocuments(this.documentId, fileToUpload).subscribe({
-         next: (res: any) => {
-            this.loader = false;
-            this.createNotificacion('success', 'Documento actualizado', 'El documento se actualizó correctamente.');
-            this.destroyModal(true);
-         },
-        error: (err: any) => {
-          this.loader = false;
-          const msg = err.error && err.error.message;
-          if (err.status == 400 && msg) {
-            this.alertService.error('Oops...', msg);
-            return;
-          }
-          this.createNotificacion('error', 'Error', 'Lo sentimos, hubo un error en el servidor.');
-         },
-         complete: () => {}
-      });
-   }
-
-   /**
-    * Crea una notificacion de alerta
-    * @param type - string recibe el tipo de notificacion (error, success, warning, info)
-    * @param title - string recibe el titulo de la notificacion
-    * @param message - string recibe el mensaje de la notificacion
-    */
-   createNotificacion (type: string, title: string, message: string) {
-      this.notificationService.create(type, title, message);
-   }
-
-   convertDate (date: any) {
-      if (date) {
-         if (date.length > 10) {
-            const dateFormatted = date.split('T')[0];
-            return dateFormatted;
-         }
-         const d = new Date(date);
-         const today = `${d.getFullYear()}-${`0${d.getMonth() + 1}`.slice(-2)}-${`0${d.getDate()}`.slice(-2)}`;
-         return today;
+        unifiedData[key] = appendValue;
       } else {
-         return '';
+        // unifiedData[key] = '';
       }
-   }
+    }
+
+    for (const [key, value] of Object.entries(unifiedData)) {
+      dataToUpload.append(key, String(value));
+    }
+
+    // Add the separate file (binary only)
+    if (this.loadedFile) {
+      dataToUpload.append('archivo', this.loadedFile);
+    }
+
+    return dataToUpload;
+  }
+
+  submitRequest() {
+    this.formUtils.markFormTouched(this.documentForm);
+    if (this.documentForm.invalid) return;
+    else if (!this.loadedFile && (this.isNew || this.currentDoc.documentStatus === 'VENCIDO')) {
+      this.alertService.warning(
+        '¡Aviso!',
+        'Debe seleccionar un documento.',
+      );
+      return;
+    }
+    this.loader = true;
+
+    const fileToUpload = this.createFormData();
+
+    if (this.isNew) {
+      this.saveDocument(fileToUpload);
+      return;
+    }
+
+    this.documentService.updateDocuments(this.currentDoc.idDocumentsProvider, fileToUpload)
+      .subscribe({
+        next: (res: any) => {
+          this.loader = false;
+          this.alertService.success(
+            '¡Actualizado!',
+            'El documento se actualizó correctamente.',
+          );
+          this.closeModal(true);
+        },
+        error: (error: any) => {
+          this.alertService.error(
+            '¡Error!',
+            'Lo sentimos, hubo un error en el servidor.',
+          );
+          this.loader = false;
+        }
+      });
+  }
+
+  saveDocument(fileToUpload: FormData) {
+    this.documentService.uploadDocuments(fileToUpload).subscribe({
+      next: (res: any) => {
+        this.loader = false;
+        this.alertService.success(
+          '¡Carga exitosa!',
+          'El documento se subió de manera satisfactoria.',
+        )
+        this.closeModal(true);
+      },
+      error: (error: any) => {
+        this.loader = false;
+        this.alertService.error(
+          '¡Error!',
+          'Lo sentimos, hubo un error en el servidor.',
+        );
+      }
+    });
+  }
+
+  convertDate(date: any) {
+    if (!date) return '';
+
+    if (date.length > 10) {
+      return date.split('T')[0];
+    }
+    return date;
+  }
 }

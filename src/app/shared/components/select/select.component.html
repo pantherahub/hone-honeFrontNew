@@ -1,0 +1,120 @@
+<div class="relative w-full" #dropdownRef>
+
+  <!-- Selector -->
+  <button type="button"
+    (click)="toggleDropdown()"
+    [disabled]="disabled"
+    class="w-full border text-sm rounded-lg p-2.5 text-left flex justify-between items-center
+      transition focus:outline-none focus:ring-0 bg-white dark:bg-gray-900
+      disabled:cursor-not-allowed disabled:border-gray-300
+    disabled:bg-gray-100 disabled:text-gray-400
+    dark:disabled:bg-gray-800 dark:disabled:text-gray-500 dark:disabled:border-gray-600"
+    [ngClass]="{
+      'text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500 dark:focus:border-blue-500':
+        !showError,
+      'text-red-600 dark:text-red-500 bg-red-50 border-red-600 dark:border-red-500 focus:border-red-600 dark:focus:border-red-500':
+        showError
+    }"
+  >
+    @if (multiple && selected?.length) {
+      @if(maxVisibleSelected != null && selected.length > maxVisibleSelected) {
+        <span>{{ selected.length }} {{ selected.length | pluralize:'seleccionado':'seleccionados' }}</span>
+      } @else {
+        <span class="flex flex-wrap gap-1">
+          @for (item of selected; track $index) {
+            <span class="flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs dark:bg-blue-600 dark:text-white">
+              {{ getItemLabel(item) }}
+              <button type="button" class="hover:text-red-600" (click)="removeItem(item); $event.stopPropagation()" tabindex="-1">
+                <svg width="12" height="12">
+                  <use xlink:href="/assets/icons/outline/general.svg#close" />
+                </svg>
+              </button>
+            </span>
+          }
+        </span>
+      }
+    } @else {
+      <span>{{ selectedLabel }}</span>
+    }
+
+    <div class="flex items-center gap-1">
+      <!-- Clearable X icon -->
+      @if (clearable && selected != null) {
+        <button
+          type="button"
+          (click)="clearSelection($event)"
+          class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-0.5 rounded"
+          tabindex="-1">
+          <svg width="14" height="14">
+            <use xlink:href="/assets/icons/outline/general.svg#close" />
+          </svg>
+        </button>
+      }
+
+      <!-- Dropdown arrow icon -->
+      <svg width="16" height="16">
+        <use xlink:href="/assets/icons/outline/arrows.svg#angle-down" />
+      </svg>
+    </div>
+  </button>
+
+  <!-- Dropdown -->
+  @if (isDropdownInDOM) {
+    <div class="absolute z-50 w-full dropdown-menu bg-white border border-gray-200 rounded-md shadow-lg dark:bg-gray-700 dark:border-gray-600"
+      [ngClass]="{
+        'mt-1': !dropdownAbove,
+        'bottom-full mb-1': dropdownAbove,
+        'opacity-100': isOpen,
+        'opacity-0 pointer-events-none': !isOpen
+      }">
+
+      @if (searchable) {
+        <!-- Searchbox -->
+        <div class="px-4 pt-2 pb-1 dark:border-gray-600">
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 start-0 flex items-center px-3 text-sm text-gray-600 dark:text-gray-300"
+              tabindex="-1"
+            >
+              <svg width="16" height="16">
+                <use xlink:href="/assets/icons/outline/general.svg#search" />
+              </svg>
+            </div>
+            <input
+              #searchInput
+              type="text"
+              [(ngModel)]="searchTerm"
+              class="w-full px-2 py-1 ps-9 text-sm rounded-md border border-gray-300 focus:outline-none focus:ring-0 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-500 dark:text-white"
+              placeholder="Buscar..." />
+          </div>
+        </div>
+      }
+
+      <ul class="max-h-60 overflow-y-auto text-sm">
+        @for (item of filteredItems; track $index) {
+          <li (click)="selectItem(item)"
+              class="px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-white flex items-center gap-2"
+              [ngClass]="{
+                'bg-blue-100 dark:bg-blue-600 text-blue-800 dark:text-white': isSelected(item),
+              }">
+            @if (multiple) {
+              <app-checkbox
+                [checked]="isSelected(item)"
+                (onClick)="selectItem(item); $event.stopPropagation()"
+              />
+            }
+            <span class="block truncate max-w-full">
+              {{ getItemLabel(item) }}
+            </span>
+          </li>
+        }
+        @if (filteredItems.length === 0) {
+          <li class="px-4 py-2 text-gray-400 dark:text-gray-500">
+            No hay resultados
+          </li>
+        }
+      </ul>
+    </div>
+  }
+
+</div>

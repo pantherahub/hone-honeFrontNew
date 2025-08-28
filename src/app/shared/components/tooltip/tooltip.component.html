@@ -1,0 +1,31 @@
+<!-- Element -->
+<div
+  class="flex"
+  #tooltipTarget
+  [attr.data-tooltip-target]="'tooltip-' + id"
+  [attr.data-tooltip-placement]="position"
+  [attr.data-tooltip-trigger]="trigger"
+  [attr.data-tooltip-style]="styleType"
+>
+  <ng-content></ng-content>
+</div>
+
+<!-- Tooltip -->
+<div
+  #tooltipElement
+  [id]="'tooltip-' + id"
+  role="tooltip"
+  [ngClass]="[
+    'absolute z-10 invisible inline-block px-3 py-2.5 text-xs font-normal rounded-lg shadow-sm opacity-0 tooltip max-w-[231px]',
+    styleType === 'light'
+      ? 'text-gray-500 bg-white border-[0.5px] border-gray-100'
+      : 'text-white bg-gray-900'
+  ]"
+>
+  {{ text }}
+  <div
+    class="tooltip-arrow"
+    [ngClass]="{ 'before:!border-gray-200 after:!border-white': styleType === 'light' }"
+    data-popper-arrow
+  ></div>
+</div>

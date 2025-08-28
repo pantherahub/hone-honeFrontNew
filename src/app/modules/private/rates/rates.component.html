@@ -1,0 +1,267 @@
+<div class="flex flex-col gap-9 pb-20">
+
+  <div class="flex flex-col sm:flex-row justify-between gap-6">
+    <div class="flex flex-col gap-2">
+      <h2 class="text-xl font-black leading-[22px] text-main-blue1h">
+        Tarifas
+      </h2>
+      <p class="text-gray-600 text-base font-normal leading-[18px]">
+        Asegúrate de que estén completas, actualizadas y correctas. Súbelas aquí para revisión y aprobación.
+      </p>
+    </div>
+
+    <app-button
+      #dropdownFormatsBtn
+      id="dropdown-formats-btn"
+      data-dropdown-toggle="dropdown-formats"
+      variant="primary"
+      styleType="soft"
+      size="md"
+      class="my-auto"
+      customClass="whitespace-nowrap w-full flex justify-center">
+      <svg width="20" height="20">
+        <use xlink:href="/assets/icons/outline/general.svg#download" />
+      </svg>
+      Descargar formatos
+      <svg width="20" height="20">
+        <use xlink:href="/assets/icons/outline/arrows.svg#chevron-down" />
+      </svg>
+    </app-button>
+
+    <div id="dropdown-formats" class="z-30 hidden bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600">
+      <ul class="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdown-formats-btn">
+        <li>
+          <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+            Insumos
+          </a>
+        </li>
+        <li>
+          <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+            Medicamentos
+          </a>
+        </li>
+        <li>
+          <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+            Prestaciones
+          </a>
+        </li>
+      </ul>
+      <div class="py-1">
+        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
+          Todos los formatos
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-4">
+
+    <div class="flex flex-col gap-4 p-4 rounded-xl bg-gray-100">
+      <div class="flex gap-2 text-main-blue1h">
+        <h4 class="text-lg font-semibold leading-5">Tipo de tarifa</h4>
+      </div>
+
+
+      <div class="relative overflow-x-auto overflow-y-hidden rounded-xl">
+        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+          <thead class="text-sm leading-4 text-blue1h-950 bg-gray-50 dark:bg-gray-700 dark:text-gray-400 whitespace-nowrap">
+            <tr>
+              <th scope="col" class="px-4 py-3 font-semibold">
+                Nombre
+              </th>
+              <th scope="col" class="px-4 py-3 font-semibold">
+                Estado
+              </th>
+              <th scope="col" class="px-4 py-3 font-semibold">
+                Fecha de carga
+              </th>
+              <th scope="col" class="px-4 py-3 font-semibold">
+                Última modificación
+              </th>
+              <th scope="col" class="px-4 py-3 font-semibold">
+                Estado del documento
+              </th>
+              <th scope="col" class="px-4 py-3 font-semibold sticky right-0 bg-gray-50">
+                <span class="hidden sm:block">
+                  Acciones
+                </span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (loadingRates) {
+              <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+                <td colspan="6" class="px-4 h-[54px] text-left">
+                  <div class="text-md text-main-blue1h leading-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-current animate-spin fill-gray-200">
+                      <use xlink:href="/assets/icons/extras/animations.svg#spin" />
+                    </svg>
+                    Cargando...
+                  </div>
+                </td>
+              </tr>
+            } @else {
+              @for (rate of rateList; track rate.idRateType; let i = $index) {
+                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+                  <td class="px-4 py-[10.5px] text-sm font-normal text-main-blue1h leading-4 dark:text-white ">
+                    {{ rate.rateName }}
+                  </td>
+                  <td class="px-4 py-[10.5px]">
+                    <ng-container
+                      *ngTemplateOutlet="rateStatusTemplate; context: { rate: rate.currentRate }">
+                    </ng-container>
+                  </td>
+                  <td class="px-4 py-[10.5px] text-sm font-normal text-main-blue1h leading-4 dark:text-white">
+                    {{
+                      rate.currentRate.rateStatus === 'PENDIENTE POR CARGAR'
+                        ? 'N/A'
+                        : rate.currentRate.dateAdd | date: 'mediumDate'
+                    }}
+                  </td>
+                  <td class="px-4 py-[10.5px] text-sm font-normal text-main-blue1h leading-4 dark:text-white">
+                    {{
+                      rate.currentRate.rateStatus === 'PENDIENTE POR CARGAR'
+                        ? 'N/A'
+                        : rate.currentRate.updateAt | date: 'mediumDate'
+                    }}
+                  </td>
+                  <td class="px-4 py-[10.5px] text-left">
+                    <div class="my-auto flex gap-2">
+                      @if (rate.currentRate.rateStatus === 'EN PROCESO') {
+                        <app-button
+                          variant="primary"
+                          styleType="ghost"
+                          size="xs">
+                          <svg width="16" height="16">
+                            <use xlink:href="/assets/icons/outline/files-folders.svg#file" />
+                          </svg>
+                          {{ rate.currentRate.nameFile }}
+                        </app-button>
+                      } @else {
+                        <app-button
+                          (onClick)="triggerFileTableInput(i)"
+                          variant="primary"
+                          styleType="solid"
+                          size="xs">
+                          @if (rate.currentRate.rateStatus === 'APROBADO') {
+                            <svg width="16" height="16">
+                              <use xlink:href="/assets/icons/outline/arrows.svg#refresh" />
+                            </svg>
+                            Actualizar
+                          } @else {
+                            <svg width="16" height="16">
+                              <use xlink:href="/assets/icons/outline/general.svg#upload" />
+                            </svg>
+                            Cargar
+                          }
+                        </app-button>
+                      }
+
+                      <input
+                        #fileTableInput
+                        appFileSelect
+                        type="file"
+                        name="file"
+                        class="hidden"
+                        (fileValidated)="uploadRateFile($event, rate)"
+                      />
+                    </div>
+                  </td>
+                  <td class="px-4 py-[10.5px] text-left sticky right-0 bg-white">
+                    <div class="my-auto flex gap-2">
+                      <app-button
+                        (onClick)="openRateDetail(rate)"
+                        variant="gray"
+                        styleType="soft"
+                        size="xs"
+                        class="hidden sm:block">
+                        <svg width="16" height="16">
+                          <use xlink:href="/assets/icons/outline/general.svg#close-sidebar" />
+                        </svg>
+                        Abrir
+                      </app-button>
+
+                      <app-button
+                        appDropdownTrigger
+                        [id]="'rate-options-btn-' + i"
+                        [attr.data-dropdown-toggle]="'dropdown-rate-opts-' + i"
+                        data-dropdown-placement="bottom-end"
+                        variant="gray"
+                        styleType="soft"
+                        size="xs">
+                        <svg width="16" height="16">
+                          <use xlink:href="/assets/icons/outline/general.svg#dots-horizontal" />
+                        </svg>
+                      </app-button>
+                      <div [id]="'dropdown-rate-opts-' + i" class="z-30 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-[136px] dark:bg-gray-700 dark:divide-gray-600">
+                        <ul class="py-1 text-sm text-gray-700 dark:text-gray-200" [attr.aria-labelledby]="'rate-options-btn-' + i">
+                          <li>
+                            <a (click)="openRateDetail(rate)" class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                              <svg width="18" height="18" class="text-gray-500">
+                                <use xlink:href="/assets/icons/outline/general.svg#close-sidebar" />
+                              </svg>
+                              Abrir
+                            </a>
+                          </li>
+                          @if (rate.currentRate.rateStatus !== 'EN PROCESO') {
+                            <li>
+                              <a (click)="triggerFileTableInput(i)" class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                <svg width="18" height="18" class="text-gray-500">
+                                  <use xlink:href="/assets/icons/outline/arrows.svg#refresh" />
+                                </svg>
+                                Actualizar
+                              </a>
+                            </li>
+                          }
+                        </ul>
+                        <div class="py-1">
+                          <a (click)="deleteRate()" class="flex items-center gap-3 px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
+                            <svg width="18" height="18">
+                              <use xlink:href="/assets/icons/outline/general.svg#trash-bin" />
+                            </svg>
+                            Eliminar
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<app-rate-management
+  [isOpen]="isRateDrawerOpen"
+  (isOpenChange)="onDrawerOpenChange($event)"
+  [statusConfig]="statusConfig"
+  [selectedRate]="selectedRate"
+  [initialFile]="initialFile"
+  [submitRate]="onSubmitRate">
+</app-rate-management>
+
+
+<ng-template #rateStatusTemplate let-rate="rate">
+  <div
+    class="inline-flex gap-1 py-1.5 px-3 rounded-full text-sm font-semibold leading-4 whitespace-nowrap"
+    [ngClass]="[
+      statusConfig[rate.rateStatus].bg,
+      statusConfig[rate.rateStatus].text
+    ]">
+    @if (statusConfig[rate.rateStatus].icon) {
+      <svg width="16" height="16">
+        <use [attr.xlink:href]="'/assets/icons/outline/general.svg#' + statusConfig[rate.rateStatus].icon" />
+      </svg>
+    }
+    {{ statusConfig[rate.rateStatus].label }}
+  </div>
+</ng-template>
+

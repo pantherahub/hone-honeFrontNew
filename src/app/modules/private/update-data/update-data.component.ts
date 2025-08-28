@@ -10,15 +10,16 @@ import { LANGUAGES } from 'src/app/constants/languages';
 import { ContactFormComponent } from './contact-form/contact-form.component';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { AlertService } from 'src/app/services/alerts/alert.service';
+import { AlertNzService } from 'src/app/services/alert-nz/alert-nz.service';
 import { format } from 'date-fns';
-import { BackendErrorsComponent } from 'src/app/shared/forms/backend-errors/backend-errors.component';
+import { BackendErrorsComponent } from 'src/app/shared/components/backend-errors/backend-errors.component';
 import { debounceTime, firstValueFrom } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
 import { CanComponentDeactivate } from 'src/app/guards/can-deactivate.interface';
 import { Router } from '@angular/router';
 import { NavigationService } from 'src/app/services/navigation/navigation.service';
 import { isEmail } from 'src/app/utils/validation-utils';
+import { ClientInterface } from 'src/app/models/client.interface';
 
 @Component({
   selector: 'app-update-data',
@@ -64,7 +65,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
     private fb: FormBuilder,
     private formUtils: FormUtilsService,
     private messageService: NzMessageService,
-    private alertService: AlertService,
+    private alertNzService: AlertNzService,
     private modalService: NzModalService,
     private clientProviderService: ClientProviderService,
     private location: Location,
@@ -90,7 +91,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
   }
 
   async canDeactivate(): Promise<boolean> {
-    return !this.hasSavedState() || await this.alertService.confirm(
+    return !this.hasSavedState() || await this.alertNzService.confirm(
       'Aviso', 'Tienes cambios pendientes. ¿Deseas salir?', {
         nzOkText: 'Salir',
         nzCancelText: 'Cancelar',
@@ -237,6 +238,10 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
 
   async goBack(): Promise<void> {
     const backRoute = this.navigationService.getBackRoute();
+    if (!this.userState.withData && backRoute === '/service/documentation') {
+      this.router.navigateByUrl('/home');
+      return;
+    }
     this.router.navigateByUrl(backRoute);
   }
 
@@ -263,7 +268,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
   getCompanies() {
     this.loading = true;
     this.clientProviderService.getClientListByProviderId(this.userState.id).subscribe({
-      next: (res: any) => {
+      next: (res: ClientInterface[]) => {
         const clientList = res;
         const clientsIds = clientList.map((client: any) => client.idClientHoneSolutions);
         this.getProviderCompanies(clientsIds);
@@ -290,12 +295,12 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
 
   async loadFormData() {
     if (!this.userState.withData) {
-      await firstValueFrom(this.alertService.info('Formulario requerido', 'Por favor, complete el formulario antes de continuar.').afterClose);
+      await firstValueFrom(this.alertNzService.info('Formulario requerido', 'Por favor, complete el formulario antes de continuar.').afterClose);
     }
 
     if (this.hasSavedState()) {
       if (!this.userState.rejected) {
-        const confirmed = await this.alertService.confirm(
+        const confirmed = await this.alertNzService.confirm(
           'Aviso', 'Se encontraron datos sin guardar de una sesión anterior. ¿Deseas continuar con estos datos?', {
             nzOkText: 'Continuar',
             nzCancelText: 'No',
@@ -451,7 +456,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
         this.authService.saveUserLogged(user);
 
         if (this.userState.rejected && data.status === "Rechazado" && data.Reasons.length) {
-          this.alertService.warning('Actualización requerida', `Motivo: ${data.Reasons[0].reason}`);
+          this.alertNzService.warning('Actualización requerida', `Motivo: ${data.Reasons[0].reason}`);
         }
       },
       error: (err: any) => {
@@ -502,7 +507,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
       nzOnCancel: () => {
         const componentInstance = modalRef.getContentComponent();
         if (componentInstance.hasChanges) {
-          this.alertService.confirm(
+          this.alertNzService.confirm(
             'Cambios sin guardar',
             'Tienes cambios en la sede. Si sales sin guardar, se perderán.',
             {
@@ -577,7 +582,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
       nzOnCancel: () => {
         const componentInstance = modalRef.getContentComponent();
         if (componentInstance.hasChanges) {
-          this.alertService.confirm(
+          this.alertNzService.confirm(
             'Cambios sin guardar',
             'Tienes cambios en el contacto. Si sales sin guardar, se perderán.',
             {
@@ -635,7 +640,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
   }
 
   async deleteOffice(index: number) {
-    const confirmed = await this.alertService.confirmDelete(
+    const confirmed = await this.alertNzService.confirmDelete(
       '¿Eliminar sede?',
       'Eliminar sede de prestación de servicio del listado'
     );
@@ -670,7 +675,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
   }
 
   async deleteContact(index: number) {
-    const confirmed = await this.alertService.confirmDelete(
+    const confirmed = await this.alertNzService.confirmDelete(
       '¿Eliminar contacto?',
       'Eliminar contacto del listado'
     );
@@ -754,11 +759,11 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
 
     // Validate the existence of offices and contacts
     if (!this.existingOffices?.length) {
-      this.alertService.warning('Aviso', 'Debe agregar al menos una sede de prestación de servicio.');
+      this.alertNzService.warning('Aviso', 'Debe agregar al menos una sede de prestación de servicio.');
       return;
     }
     if (!this.existingContacts?.length) {
-      this.alertService.warning('Aviso', 'Debe agregar al menos un contacto.');
+      this.alertNzService.warning('Aviso', 'Debe agregar al menos un contacto.');
       return;
     }
 
@@ -768,7 +773,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
       (!office.TemporalSchedules?.length && !office.createdSchedules?.length)
     );
     if (hasInvalidOffice) {
-      this.alertService.warning('Aviso', 'Algunas sedes tienen información incompleta.');
+      this.alertNzService.warning('Aviso', 'Algunas sedes tienen información incompleta.');
       return;
     }
 
@@ -795,7 +800,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
         .map(c => c.name)
         .join(', ');
 
-      this.alertService.warning(
+      this.alertNzService.warning(
         'Aviso',
         `Debes agregar las siguientes compañías asociadas a alguna sede: ${names}`
       );
@@ -829,14 +834,14 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
           this.authService.saveUserLogged(user);
 
           this.loading = false;
-          this.alertService.success('Enviado', 'Actualización enviada.');
+          this.alertNzService.success('Enviado', 'Actualización enviada.');
           this.resetForm();
         },
         error: (err: any) => {
           this.loading = false;
           if (err.status == 422) this.backendError = err.error;
           console.error(err);
-          this.alertService.error();
+          this.alertNzService.error();
         }
       });
     }, 550);

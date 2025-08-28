@@ -1,6 +1,6 @@
+import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { inject } from '@angular/core';
 
 export const noauthGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
@@ -11,6 +11,11 @@ export const noauthGuard: CanActivateFn = (route, state) => {
 
     if (requiresPasswordReset) {
       router.navigateByUrl('/reset-password');
+      return false;
+    }
+
+    if (state.url === '/auth-support') {
+      router.navigateByUrl('/support');
       return false;
     }
 

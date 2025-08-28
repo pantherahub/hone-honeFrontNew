@@ -9,11 +9,11 @@ export class FormatNameDocPipe implements PipeTransform {
     136: 'Rethus-registro Sispro',
   };
 
-  transform(value: string | undefined, idTypeDocuments?: number): string {
+  transform(value: string | undefined, idDocumentType?: number): string {
     if (!value) return '';
 
-    if (idTypeDocuments && this.documentNameOverrides[idTypeDocuments]) {
-      value = this.documentNameOverrides[idTypeDocuments];
+    if (idDocumentType && this.documentNameOverrides[idDocumentType]) {
+      value = this.documentNameOverrides[idDocumentType];
     }
 
     const formatted = value.replace(/\s*\[SURA\]$/, '');

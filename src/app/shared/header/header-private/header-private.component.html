@@ -1,0 +1,139 @@
+<nav class="header-container h-[80px] bg-gray-50 flex justify-center border-b">
+  <div class="w-full flex items-center justify-between max-w-screen-2xl py-3 px-4 2xl:py-4 2xl:px-5">
+    <a routerLink="/home">
+      <img class="h-[48px] cursor-pointer" src="assets/img/logo-hone.png" alt="Logo" />
+    </a>
+
+    <div class="flex gap-2">
+      <app-popover
+        [title]="'Tu perfil'"
+        [text]="'Mantén tus datos actualizados para asegurar la correcta publicación de tus sedes en los directorios médicos.'"
+        [placement]="'bottom-end'"
+        [triggerType]="'manual'"
+        [highlighted]="true"
+        [(visible)]="configTutorialVisible"
+        [contentTemplate]="popoverContent"
+        extraPopoverClass="max-w-[380px]"
+        [autoScrollOnOpen]="true"
+        (onClose)="nextTutorialStep()"
+      >
+        <!-- extraPopoverClass="max-w-[330px] md:max-w-[486px]" -->
+        <ng-template #triggerTemplate>
+          <app-button
+              (click)="navigateToUpdateData()"
+              variant="gray"
+              size="sm"
+              styleType="soft"
+              customClass="leading-4 tutorial-option"
+            >
+            <span class="truncate max-w-[50px] sm:hidden">
+              {{ getProviderNameInitials(user.name) }}
+            </span>
+            <span class="truncate max-w-[310px] hidden sm:block">
+              {{user.name ? user.name : 'No reporta nombre'}}
+            </span>
+            <svg width="16" height="16">
+              <use xlink:href="/assets/icons/solid/general.svg#cog" />
+            </svg>
+          </app-button>
+        </ng-template>
+      </app-popover>
+
+      <app-button
+        variant="gray"
+        size="sm"
+        styleType="soft"
+        customClass="leading-4"
+        id="header-menu-btn"
+        data-dropdown-toggle="dropdown-header-menu"
+        data-dropdown-placement="bottom-end"
+      >
+        <svg width="16" height="16">
+          <use xlink:href="/assets/icons/solid/user.svg#users" />
+        </svg>
+      </app-button>
+
+      <div id="dropdown-header-menu" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600">
+        <ul class="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="header-menu-btn">
+          <li>
+            <a routerLink="/profile" class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+              <svg width="18" height="18" class="text-gray-500">
+                <use xlink:href="/assets/icons/outline/user.svg#user" />
+              </svg>
+              Perfil
+            </a>
+          </li>
+          <li>
+            <a routerLink="/user-management" class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+              <svg width="18" height="18" class="text-gray-500">
+                <use xlink:href="/assets/icons/outline/user.svg#users-group" />
+              </svg>
+              Gestionar usuarios
+            </a>
+          </li>
+          <li>
+            <a routerLink="/update-password" class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+              <svg width="18" height="18" class="text-gray-500">
+                <use xlink:href="/assets/icons/outline/general.svg#lock" />
+              </svg>
+              Cambiar contraseña
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <app-button
+        (click)="logout()"
+        variant="primary"
+        size="sm"
+        styleType="ghost"
+        customClass="leading-4"
+      >
+        <svg width="16" height="16">
+          <use xlink:href="/assets/icons/outline/arrows.svg#arrow-left-to-bracket" />
+        </svg>
+      </app-button>
+    </div>
+  </div>
+</nav>
+
+
+<!-- Tutorial popover content -->
+<ng-template #popoverContent>
+  <!-- <img src="assets/img/home/guide1.webp"
+    alt="Imagen previsualización"
+    class="hidden md:block rounded-md"
+  /> -->
+  <div class="flex justify-between items-center">
+    <span class="text-base leading-5 md:leading-[18px] font-normal text-main-blue1h">1 de 2</span>
+    <div class="flex gap-2">
+      <app-button
+        (click)="backTutorialStep()"
+        variant="primary"
+        styleType="ghost"
+        size="md"
+        class="hidden md:block"
+        customClass="leading-4">
+        Atrás
+      </app-button>
+      <app-button
+        (click)="nextTutorialStep()"
+        variant="primary"
+        styleType="soft"
+        size="md"
+        class="hidden md:block"
+        customClass="leading-4">
+        {{ this.user.withData && !this.user.rejected ? 'Siguiente' : 'Ir' }}
+      </app-button>
+      <app-button
+        (click)="nextTutorialStep()"
+        variant="primary"
+        styleType="soft"
+        size="sm"
+        class="block md:hidden"
+        customClass="leading-4">
+        {{ this.user.withData && !this.user.rejected ? 'Siguiente' : 'Ir' }}
+      </app-button>
+    </div>
+  </div>
+</ng-template>

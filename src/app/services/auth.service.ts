@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { Observable, of } from 'rxjs';
-import { catchError, delay, tap } from 'rxjs/operators';
+import { delay, tap } from 'rxjs/operators';
 import { EventManagerService } from './events-manager/event-manager.service';
 import { RefreshTokenResponse, TemporalLoginData, VerifyEmailReq } from '../models/auth.interface';
 import { AuthUserState } from '../models/user-state.interface';
@@ -59,7 +59,7 @@ export class AuthService {
   }
 
   removeSession() {
-    localStorage.removeItem("userLogged");
+    this.eventManager.clearUser();
     localStorage.removeItem(this.ACCESS_TOKEN_KEY);
     localStorage.removeItem(this.REFRESH_TOKEN_KEY);
   }
@@ -90,9 +90,7 @@ export class AuthService {
 
   // Saves the logged-in user's data to storage
   saveUserLogged(user: AuthUserState) {
-    localStorage.removeItem('userLogged');
-    localStorage.setItem('userLogged', JSON.stringify(user));
-    this.eventManager.userLogged.set(user);
+    this.eventManager.setUser(user);
   }
 
   loadUser(): Observable<any> {
@@ -214,7 +212,7 @@ export class AuthService {
     localStorage.removeItem('requires2fa');
     localStorage.removeItem('requiresEmailVerification');
     localStorage.removeItem('requiresPasswordReset');
-    localStorage.removeItem('clientSelected');
+    this.eventManager.clearClient();
     localStorage.removeItem('formState');
     localStorage.removeItem('tutorialStep');
     localStorage.removeItem('tutorialFinished');
