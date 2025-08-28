@@ -5,7 +5,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalRef } from 'ng-zorro-antd/modal';
 import { AuthUserState } from 'src/app/models/user-state.interface';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
-import { AlertService } from 'src/app/services/alerts/alert.service';
+import { AlertService } from 'src/app/services/alert/alert.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 // import { VerificationCodeFormComponent } from 'src/app/shared/forms/verification-code-form/verification-code-form.component';

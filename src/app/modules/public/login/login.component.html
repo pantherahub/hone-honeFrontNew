@@ -37,16 +37,17 @@
           Iniciar sesión
         </app-button>
 
-        <!-- <div nz-col [nzSpan]="24">
-          <nz-form-item class="flex items-center">
-              <nz-form-control>
-                  <label nz-checkbox formControlName="remember">
-                      Recuérdame
-                  </label>
-              </nz-form-control>
-              <a [routerLink]="['/forgot-password']" class="text-blue-600">¿Olvidaste la contraseña?</a>
-          </nz-form-item>
-        </div> -->
+        <div class="flex justify-between gap-2">
+          <label>
+            <app-checkbox formControlName="remember"></app-checkbox>
+            Recuérdame
+          </label>
+
+          <a [routerLink]="['/forgot-password']"
+            class="text-blue-600 dark:text-blue-500 hover:underline">
+            ¿Olvidaste la contraseña?
+          </a>
+        </div>
 
       </form>
     </div>

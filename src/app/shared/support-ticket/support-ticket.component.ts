@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { ButtonComponent } from '../components/button/button.component';
 import { TextInputComponent } from '../components/text-input/text-input.component';
 import { NavigationService } from 'src/app/services/navigation/navigation.service';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { InputErrorComponent } from '../components/input-error/input-error.component';
 import { Router } from '@angular/router';
@@ -28,7 +28,7 @@ export class SupportTicketComponent implements OnInit {
   ticketForm!: FormGroup;
   loading: boolean = false;
 
-  user = this.eventManager.userLogged();
+  userState = this.eventManager.userLogged();
   clientSelected: any = this.eventManager.clientSelected();
 
   constructor(
@@ -62,11 +62,11 @@ export class SupportTicketComponent implements OnInit {
       name: ['', [Validators.required]],
       lastname: ['', [Validators.required]],
       identification: [
-        this.isLogged() ? this.user.identificacion || '' : '',
+        this.isLogged() ? this.userState.user?.identification || '' : '',
         [Validators.required, this.formUtils.numeric]
       ],
       email: [
-        this.isLogged() ? this.user.email || '' : '',
+        this.isLogged() ? this.userState.email || '' : '',
         [Validators.required]
       ],
       phone: ['', [Validators.required, Validators.pattern(REGEX_PATTERNS.telNumberWithIndicative)]],
@@ -93,8 +93,8 @@ export class SupportTicketComponent implements OnInit {
     if (this.isLogged()) {
       const userInfo = [
         '<strong>Información del usuario que genera caso:</strong>',
-        `Nombre: ${this.user.name}`,
-        `Identificacion: ${this.user.identificacion}`,
+        `Nombre: ${this.userState.name}`,
+        `Identificacion: ${this.userState.user?.identification || ''}`,
       ];
       if (this.clientSelected?.clientHoneSolutions) {
         userInfo.push(`Cliente: ${this.clientSelected.clientHoneSolutions}`);
@@ -140,17 +140,17 @@ export class SupportTicketComponent implements OnInit {
     };
 
     if (this.isLogged()) {
-      idRole = this.user?.roles?.idRoles;
+      idRole = this.userState.roles?.idRoles;
       data = {
         ...data,
         requestName: 'Solicitud prestador',
-        employeeCode: this.user.id,
+        employeeCode: this.userState.id,
         typeRequest: 1,
-        userId: this.user.id,
-        email: this.user.email,
+        userId: this.userState.id,
+        email: this.userState.email,
         idClientHone: this.clientSelected?.idClientHoneSolutions ?? idClientHone,
-        idRole: this.user?.roles?.idRoles,
-        userLogged: this.user.id,
+        idRole: this.userState?.roles?.idRoles,
+        userLogged: this.userState.id,
       };
     } else {
       idRole = 4; // Admin

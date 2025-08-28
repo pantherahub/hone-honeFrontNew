@@ -7,7 +7,7 @@ import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { NzUploadFile, NzUploadXHRArgs } from 'ng-zorro-antd/upload';
 import { of } from 'rxjs';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
-import { AlertService } from 'src/app/services/alerts/alert.service';
+import { AlertService } from 'src/app/services/alert/alert.service';
 import { ClientProviderService } from 'src/app/services/clients/client-provider.service';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 

@@ -7,11 +7,12 @@ import { TutorialService } from 'src/app/services/tutorial/tutorial.service';
 import { Subscription } from 'rxjs';
 import { ButtonComponent } from '../../components/button/button.component';
 import { PopoverComponent } from '../../components/popover/popover.component';
+import { DropdownTriggerDirective } from 'src/app/directives/dropdown-trigger.directive';
 
 @Component({
   selector: 'app-header-private',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonComponent, PopoverComponent],
+  imports: [CommonModule, RouterModule, ButtonComponent, PopoverComponent, DropdownTriggerDirective],
   templateUrl: './header-private.component.html',
   styleUrl: './header-private.component.scss'
 })
