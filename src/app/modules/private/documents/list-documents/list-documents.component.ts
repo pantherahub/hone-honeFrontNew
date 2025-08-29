@@ -18,6 +18,7 @@ import { DocumentConfig, DownloadService } from 'src/app/services/download/downl
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CitiesService } from 'src/app/services/cities/cities.service';
 import { CompliancePercentInterface, PercentInterface } from 'src/app/models/doc-percent.interface';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-list-documents',
@@ -52,19 +53,19 @@ export class ListDocumentsComponent implements OnInit {
   private downloadConfigs: Record<string, DocumentConfig> = {
     '8-9': {
       files: [
-        { url: 'https://honesolutions.blob.core.windows.net/documents/docs-prestadores-axa-gestion-preventiva.zip', name: 'Documentos para diligenciar axa gestión preventiva.zip' }
+        { url: `${environment.azureAssetsHost}documents/docs-prestadores-axa-gestion-preventiva.zip`, name: 'Documentos para diligenciar axa gestión preventiva.zip' }
       ],
       displayName: 'Documentos obligatorios a diligenciar',
     },
     '8-*': {
       files: [
-        { url: 'https://honesolutions.blob.core.windows.net/documents/docs-prestadores-axa.zip', name: 'Documentos para diligenciar axa.zip' },
+        { url: `${environment.azureAssetsHost}documents/docs-prestadores-axa.zip`, name: 'Documentos para diligenciar axa.zip' },
       ],
       displayName: 'Documentos obligatorios a diligenciar',
     },
     '13-7': {
       files: [
-        { url: 'https://honesolutions.blob.core.windows.net/documents/carta_mipres.pdf', name: 'Carta_Mipres.pdf' }
+        { url: `${environment.azureAssetsHost}documents/carta_mipres.pdf`, name: 'Carta_Mipres.pdf' }
       ],
       displayName: 'Carta Mipres a diligenciar',
     }
