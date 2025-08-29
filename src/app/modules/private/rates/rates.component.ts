@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { Dropdown, initDropdowns } from 'flowbite';
+import { Component, ElementRef, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { DropdownTriggerDirective } from 'src/app/directives/dropdown-trigger.directive';
 import { FileSelectDirective } from 'src/app/directives/file-select.directive';
 import { PipesModule } from 'src/app/pipes/pipes.module';
@@ -17,7 +16,7 @@ import { RateFormData, RateManagementComponent } from './rate-management/rate-ma
   templateUrl: './rates.component.html',
   styleUrl: './rates.component.scss'
 })
-export class RatesComponent implements OnInit, AfterViewInit {
+export class RatesComponent implements OnInit {
 
   user = this.eventManager.userLogged();
   clientSelected: any = this.eventManager.clientSelected();
@@ -32,11 +31,11 @@ export class RatesComponent implements OnInit, AfterViewInit {
     'PENDIENTE POR CARGAR': { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Pendiente por cargar' },
   };
 
-  @ViewChild('dropdownFormatsBtn', { static: true, read: ElementRef }) dropdownFormatsBtn!: ElementRef<any>;
-
   selectedRate: any = null;
   isRateDrawerOpen: boolean = false;
   initialFile: File | null = null;
+
+  isSmall: boolean = window.innerWidth < 640;
 
   @ViewChildren('fileTableInput') fileTableInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
@@ -50,13 +49,6 @@ export class RatesComponent implements OnInit, AfterViewInit {
     this.getRates();
   }
 
-  ngAfterViewInit(): void {
-    const btn = this.dropdownFormatsBtn.nativeElement;
-    const isSmall = window.innerWidth < 640; // sm breakpoint
-    btn.setAttribute('data-dropdown-placement', isSmall ? 'bottom' : 'bottom-end');
-    initDropdowns();
-  }
-
   getRates() {
     this.loadingRates = true;
     const { idProvider, idClientHoneSolutions } = this.clientSelected;
@@ -64,14 +56,6 @@ export class RatesComponent implements OnInit, AfterViewInit {
       next: (res: any) => {
         this.rateList = res.data;
         this.loadingRates = false;
-
-        this.rateList.forEach((_, i) => {
-          const $trigger = document.getElementById(`rate-options-btn-${i}`);
-          const $dropdown = document.getElementById(`dropdown-rate-opts-${i}`);
-          if ($trigger && $dropdown) {
-            new Dropdown($dropdown, $trigger);
-          }
-        });
       },
       error: (error: any) => {
         this.loadingRates = false;

@@ -113,10 +113,8 @@
                   </app-button>
                 } @else if (isRejected) {
                   <app-button
-                    appDropdownTrigger
-                    id="rate-options-btn"
-                    data-dropdown-toggle="dropdown-rate-opts"
-                    data-dropdown-placement="bottom-end"
+                    appDropdownTrigger="dropdown-rate-opts"
+                    dropdownPlacement="bottom-end"
                     variant="gray"
                     styleType="soft"
                     size="xs">
@@ -125,9 +123,9 @@
                     </svg>
                   </app-button>
                   <div id="dropdown-rate-opts" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600">
-                    <ul class="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="rate-options-btn">
+                    <ul class="py-1 text-sm text-gray-700 dark:text-gray-200">
                       <li>
-                        <a (click)="triggerFileInput()" class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                        <a (click)="triggerFileInput()" data-dropdown-close class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                           <svg width="18" height="18" class="text-gray-500">
                             <use xlink:href="/assets/icons/outline/general.svg#upload" />
                           </svg>
@@ -135,7 +133,7 @@
                         </a>
                       </li>
                       <li>
-                        <a (click)="downloadReport()" class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                        <a (click)="downloadReport()" data-dropdown-close class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                           <svg width="18" height="18" class="text-gray-500">
                             <use xlink:href="/assets/icons/outline/general.svg#download" />
                           </svg>
