@@ -150,13 +150,19 @@
 
 <!-- Tutorial video modal -->
 <ng-template #videoModal>
-  <iframe
-    src="https://www.youtube.com/embed/HNnISS31dPs"
-    frameborder="0"
-    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-    allowfullscreen
-    class="h-[391.47px]"
-  ></iframe>
+  <div class="h-[391.47px] bg-gray-50">
+    <video
+      #tutorialVideo
+      class="h-full w-full"
+      controls
+      preload="metadata"
+      playsinline
+      disablePictureInPicture
+    >
+      <source [src]="videoUrl" type="video/mp4" />
+      Tu navegador no soporta reproducción de video.
+    </video>
+  </div>
   <app-button (onClick)="closeVideoModal()" variant="primary" size="xl" styleType="solid" customClass="w-full flex justify-center">
     Iniciar recorrido
     <svg width="24" height="24">
