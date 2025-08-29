@@ -40,14 +40,12 @@
       </app-popover>
 
       <app-button
+        appDropdownTrigger="dropdown-header-menu"
+        dropdownPlacement="bottom-end"
         variant="gray"
         size="sm"
         styleType="soft"
         customClass="leading-4"
-        appDropdownTrigger
-        id="header-menu-btn"
-        data-dropdown-toggle="dropdown-header-menu"
-        data-dropdown-placement="bottom-end"
       >
         <svg width="16" height="16">
           <use xlink:href="/assets/icons/solid/user.svg#users" />
@@ -55,9 +53,9 @@
       </app-button>
 
       <div id="dropdown-header-menu" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600">
-        <ul class="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="header-menu-btn">
+        <ul class="py-1 text-sm text-gray-700 dark:text-gray-200">
           <li>
-            <a routerLink="/profile" class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+            <a routerLink="/profile" data-dropdown-close class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
               <svg width="18" height="18" class="text-gray-500">
                 <use xlink:href="/assets/icons/outline/user.svg#user" />
               </svg>
@@ -65,7 +63,7 @@
             </a>
           </li>
           <li>
-            <a routerLink="/user-management" class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+            <a routerLink="/user-management" data-dropdown-close class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
               <svg width="18" height="18" class="text-gray-500">
                 <use xlink:href="/assets/icons/outline/user.svg#users-group" />
               </svg>
@@ -73,7 +71,7 @@
             </a>
           </li>
           <li>
-            <a routerLink="/update-password" class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+            <a routerLink="/update-password" data-dropdown-close class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
               <svg width="18" height="18" class="text-gray-500">
                 <use xlink:href="/assets/icons/outline/general.svg#lock" />
               </svg>
