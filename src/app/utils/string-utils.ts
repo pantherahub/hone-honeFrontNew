@@ -90,3 +90,16 @@ export function sanitizeString(strValue: string): string {
   const safeText = strValue.replace(/</g, "&lt;").replace(/>/g, "&gt;");
   return safeText;
 }
+
+/**
+ * Format file bytes to string by converting data size.
+ * @param bytes - Size in bytes.
+ * @returns Formatted String.
+ */
+export function formatFileBytes(bytes: number): string {
+  if (bytes === 0 || bytes == null) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}

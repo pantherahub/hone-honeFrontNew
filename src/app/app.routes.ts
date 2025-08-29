@@ -14,6 +14,8 @@ import { PublicLayoutComponent } from './layouts/public-layout/public-layout.com
 import { noauthGuard } from './guards/noauth.guard';
 import { ServiceLayoutComponent } from './layouts/service-layout/service-layout.component';
 import { clientSelectedGuard } from './guards/client-selected.guard';
+import { RatesComponent } from './modules/private/rates/rates.component';
+import { serviceAccessGuard } from './guards/service-access.guard';
 
 export const routes: Routes = [
   //   PUBLIC ROUTES
@@ -42,10 +44,10 @@ export const routes: Routes = [
     component: PageNotFoundComponent
   },
   // Delete after tests
-  // {
-  //   path: 'test',
-  //   component: TestsComponent
-  // },
+  {
+    path: 'test',
+    component: TestsComponent
+  },
 
   //   PRIVATE ROUTES
   {
@@ -73,8 +75,14 @@ export const routes: Routes = [
         children: [
           {
             path: 'documentation',
-            component: ListDocumentsComponent
+            component: ListDocumentsComponent,
+            canActivate: [serviceAccessGuard],
           },
+          // {
+          //   path: 'rates',
+          //   component: RatesComponent,
+          //   canActivate: [serviceAccessGuard],
+          // },
         ],
       }
     ]

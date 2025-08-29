@@ -16,6 +16,7 @@ import { NavigationService } from 'src/app/services/navigation/navigation.servic
 import { PopoverComponent } from 'src/app/shared/components/popover/popover.component';
 import { ModalService } from 'src/app/services/modal/modal.service';
 import { ModalRef } from 'src/app/models/modal.interface';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -38,9 +39,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   clientTutorialVisible: boolean = false;
 
+  videoUrl = `${environment.s3AssetsHost}Hone+Solutions+Lissom+2025+1080p+Hi.mp4`;
   videoModalRef: ModalRef | null = null;
-
   @ViewChild('videoModal') videoModal!: TemplateRef<any>;
+
   @ViewChild('reminderModal') reminderModal!: ModalComponent;
 
   private tutorialSubscription!: Subscription;
@@ -152,9 +154,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   startTutorial(step: number) {
     if (step === 1) {
-      this.nextTutorialStep();
-      // this.clientTutorialVisible = false;
-      // this.openVideoModal();
+      this.clientTutorialVisible = false;
+      this.openVideoModal();
     } else if (step === 3) {
       this.clientTutorialVisible = true;
     } else {

@@ -13,6 +13,7 @@ import { AlertService } from 'src/app/services/alert/alert.service';
 import { Router } from '@angular/router';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { PopoverComponent } from 'src/app/shared/components/popover/popover.component';
+import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.component';
 
 @Component({
   selector: 'app-tests',
@@ -27,7 +28,8 @@ import { PopoverComponent } from 'src/app/shared/components/popover/popover.comp
     SelectComponent,
     CheckboxComponent,
     ButtonComponent,
-    PopoverComponent
+    PopoverComponent,
+    DrawerComponent,
   ],
   templateUrl: './tests.component.html',
   styleUrl: './tests.component.scss'
@@ -42,6 +44,8 @@ export class TestsComponent implements OnInit, AfterViewInit {
   @ViewChild('popover') popover!: PopoverComponent;
   @ViewChild('triggerBtn', { static: true }) triggerBtnRef!: ElementRef;
   popoverVisible: boolean = false;
+
+  @ViewChild('testDrawer', { static: false }) testDrawer!: DrawerComponent;
 
   constructor (
     private toastService: ToastService,
@@ -80,6 +84,13 @@ export class TestsComponent implements OnInit, AfterViewInit {
     //     console.log('Modal cerrado con:', result);
     //   });
 
+  }
+
+  openTestDrawer() {
+    this.testDrawer.open();
+  }
+  closeTestDrawer() {
+    this.testDrawer.close();
   }
 
   openModalComponentByTag() {
@@ -161,5 +172,11 @@ export class TestsComponent implements OnInit, AfterViewInit {
   //   console.log('Acción confirmada');
   //   this.popover.close();
   // }
+
+
+  /* Drawer */
+  onDrawerClosed() {
+    console.log("Drawer cerrado");
+  }
 
 }

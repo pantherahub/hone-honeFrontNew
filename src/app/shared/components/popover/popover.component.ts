@@ -87,7 +87,7 @@ export class PopoverComponent implements OnInit, AfterViewInit, OnChanges, OnDes
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['visible']) {
+    if (changes['visible'] && changes['visible'].previousValue !== undefined) {
       const isVisible = changes['visible'].currentValue;
       this.toggleVisibility(isVisible);
     }
