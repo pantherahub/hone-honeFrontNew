@@ -1,219 +1,220 @@
-<form nz-form nzLayout="vertical" [formGroup]="addressForm" (ngSubmit)="onSubmit()" class="address-form">
-  <nz-row [nzGutter]="8">
-    <nz-col [nzSpan]="24" [nzSm]="12" [nzMd]="5">
-      <nz-form-item>
-        <nz-form-label nzRequired>Tipo de vía</nz-form-label>
-        <nz-form-control nzErrorTip="Requerido.">
-          <nz-select nzSize="small" nzAllowClear formControlName="typeOfRoad" nzPlaceHolder="Seleccione">
-            <nz-option *ngFor="let option of viaOptions" [nzValue]="option" [nzLabel]="option"></nz-option>
-          </nz-select>
-        </nz-form-control>
-      </nz-form-item>
-    </nz-col>
+<form [formGroup]="addressForm" (ngSubmit)="onSubmit()">
+  <app-drawer
+    #addressDrawer
+    placement="right"
+    size="xl"
+    (onClose)="onDrawerClose($event)"
+    [hasFooter]="true">
+    <ng-container drawer-header>
+      <h2 class="text-lg font-black leading-5 text-main-blue1h">
+        Dirección de atención de usuarios
+      </h2>
+    </ng-container>
 
-    <nz-col [nzSpan]="24" [nzSm]="12" [nzMd]="9">
-      <nz-form-item>
-        <nz-form-label nzRequired>Nombre/número de vía</nz-form-label>
-        <nz-form-control [nzErrorTip]="roadNameErrorTip">
-          <ng-template #roadNameErrorTip>
-            @if (addressForm.controls['roadName'].hasError('required')) {
-              Requerido.
-            } @else if (addressForm.controls['roadName'].hasError('invalidRoadName')) {
-              {{ addressForm.controls['roadName'].errors?.['invalidRoadName'] }}
-            }
-          </ng-template>
-          <input nz-input nzSize="small" formControlName="roadName" placeholder="Ej: 13, Circunvalar" />
-        </nz-form-control>
-      </nz-form-item>
-    </nz-col>
+    <div class="grid grid-cols-12 gap-2 p-4 bg-gray-50 rounded-xl ring-[1px] ring-inset ring-gray-200">
+      <div class="col-span-12 sm:col-span-6">
+        <app-select
+          [items]="viaOptions"
+          formControlName="typeOfRoad"
+          placeholder="Tipo de vía"
+          [clearable]="true">
+        </app-select>
+        <app-input-error [control]="addressForm.get('typeOfRoad')" />
+      </div>
+      <div class="col-span-12 sm:col-span-6">
+        <app-text-input
+          [id]="'roadName'"
+          label="Nombre/número de vía"
+          formControlName="roadName"
+        />
+        <app-input-error
+          [control]="addressForm.get('roadName')"
+          [customMessages]="customErrorMessagesMap['roadName']"
+        />
+      </div>
+      <div class="col-span-12 sm:col-span-6">
+        <app-select
+          [items]="lettersWithBis"
+          formControlName="roadMainComplement"
+          placeholder="Letra/Bis"
+          [clearable]="true">
+        </app-select>
+        <app-input-error [control]="addressForm.get('roadMainComplement')" />
+      </div>
+      <div class="col-span-12 sm:col-span-6">
+        <app-select
+          [items]="allNumberComplementOptions"
+          formControlName="roadSecondaryComplement"
+          placeholder="Complemento vía"
+          [clearable]="true">
+        </app-select>
+        <app-input-error [control]="addressForm.get('roadSecondaryComplement')" />
+      </div>
 
-    <nz-col [nzSpan]="24" [nzSm]="12" [nzMd]="4">
-      <nz-form-item>
-        <nz-form-label>Letra/Bis</nz-form-label>
-        <nz-form-control>
-          <nz-select nzSize="small" nzAllowClear formControlName="roadMainComplement" nzPlaceHolder="Opcional">
-            <nz-option *ngFor="let option of lettersWithBis" [nzValue]="option" [nzLabel]="option"></nz-option>
-          </nz-select>
-        </nz-form-control>
-      </nz-form-item>
-    </nz-col>
-
-    <nz-col [nzSpan]="24" [nzSm]="12" [nzMd]="6">
-      <nz-form-item>
-        <nz-form-label>Complemento vía</nz-form-label>
-        <nz-form-control>
-          <nz-select nzSize="small" nzAllowClear formControlName="roadSecondaryComplement" nzPlaceHolder="Opcional">
-            <nz-option *ngFor="let option of allNumberComplementOptions" [nzValue]="option" [nzLabel]="option"></nz-option>
-          </nz-select>
-        </nz-form-control>
-      </nz-form-item>
-    </nz-col>
-  </nz-row>
-
-  <nz-row [nzGutter]="8">
-    <nz-col [nzSpan]="1" class="flex pt-6 sm:justify-center">#</nz-col>
-
-    <nz-col [nzSpan]="11" [nzSm]="11" [nzMd]="5">
-      <nz-form-item>
-        <nz-form-label nzRequired>Número</nz-form-label>
-        <nz-form-control nzErrorTip="Ingrese un número de máximo 3 dígitos">
-          <input nz-input nzSize="small" formControlName="mainNumber" placeholder="Ej: 13" />
-        </nz-form-control>
-      </nz-form-item>
-    </nz-col>
-
-    <nz-col [nzSpan]="12" [nzSm]="12" [nzMd]="6">
-      <nz-form-item>
-        <nz-form-label>
-          Complemento
-          <div
-            nz-tooltip
-            nzTooltipTitle="Si no esta el complemento de tu dirección puedes seleccionar la opción de 'Otro Valor' para digitarlo"
-            nzTooltipPlacement="top">
-            <i nz-icon nzType="info-circle" nzTheme="fill" class="info-icon"></i>
-          </div>
-        </nz-form-label>
-        <nz-form-control>
-          <nz-select nzSize="small" nzAllowClear formControlName="mainNumberComplement" nzPlaceHolder="Opcional">
-            <nz-option [nzValue]="otherOption" [nzLabel]="otherOption"></nz-option>
-            <nz-option *ngFor="let option of lettersWithBis" [nzValue]="option" [nzLabel]="option"></nz-option>
-          </nz-select>
-        </nz-form-control>
+      <div class="col-span-12 grid grid-cols-12 gap-2">
+        <div class="col-span-12"
+          [class]="addressForm.get('mainNumberComplement')?.value === otherOption ? 'sm:col-span-4' : 'sm:col-span-6'">
+          <app-text-input
+            [id]="'mainNumber'"
+            label="# Número"
+            formControlName="mainNumber"
+          />
+          <app-input-error
+            [control]="addressForm.get('mainNumber')"
+            [customMessages]="customErrorMessagesMap['mainNumber']"
+          />
+        </div>
+        <div class="col-span-12"
+          [class]="addressForm.get('mainNumberComplement')?.value === otherOption ? 'sm:col-span-4' : 'sm:col-span-6'">
+          <app-select
+            [items]="getListWithOther(lettersWithBis)"
+            formControlName="mainNumberComplement"
+            placeholder="Complemento"
+            [clearable]="true">
+          </app-select>
+          <app-input-error [control]="addressForm.get('mainNumberComplement')" />
+          @if (addressForm.get('mainNumberComplement')?.value !== otherOption) {
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Selecciona "Otro valor" para digitar un complemento distinto.
+            </p>
+          }
+        </div>
         @if (addressForm.get('mainNumberComplement')?.value === otherOption) {
-          <nz-form-control [nzErrorTip]="customMainComplementErrorTip">
-            <ng-template #customMainComplementErrorTip>
-              @if (addressForm.controls['customMainNumberCompl'].hasError('invalidAlphanumWithSpaces')) {
-                Debe ser alfanumérico
-              } @else if (addressForm.controls['customMainNumberCompl'].hasError('maxlength')) {
-                Máximo 15 carácteres
-              }
-            </ng-template>
-            <input
-              nz-input
-              nzSize="small"
+          <div class="col-span-12 sm:col-span-4">
+            <app-text-input
+              [id]="'customMainNumberCompl'"
+              label="Complemento"
               formControlName="customMainNumberCompl"
-              placeholder="Ingrese otro valor"
               maxlength="15"
             />
-          </nz-form-control>
-        }
-      </nz-form-item>
-
-    </nz-col>
-
-    <nz-col [nzSpan]="1" class="flex pt-6 sm:justify-center">-</nz-col>
-
-    <nz-col [nzSpan]="11" [nzSm]="11" [nzMd]="5">
-      <nz-form-item>
-        <nz-form-label nzRequired>2do número</nz-form-label>
-        <nz-form-control nzErrorTip="Ingrese un número de máximo 3 dígitos">
-          <input nz-input nzSize="small" formControlName="secondaryNumber" placeholder="Ej: 23" />
-        </nz-form-control>
-      </nz-form-item>
-    </nz-col>
-
-    <nz-col [nzSpan]="12" [nzSm]="12" [nzMd]="6">
-      <nz-form-item>
-        <nz-form-label>
-          Complemento
-          <div
-            nz-tooltip
-            nzTooltipTitle="Si no esta el complemento de tu dirección puedes seleccionar la opción de 'Otro Valor' para digitarlo"
-            nzTooltipPlacement="top">
-            <i nz-icon nzType="info-circle" nzTheme="fill" class="info-icon"></i>
+            <app-input-error [control]="addressForm.get('customMainNumberCompl')" />
           </div>
-        </nz-form-label>
-        <nz-form-control>
-          <nz-select nzSize="small" nzAllowClear formControlName="secondaryNumberComplement" nzPlaceHolder="Opcional">
-            <nz-option [nzValue]="otherOption" [nzLabel]="otherOption"></nz-option>
-            <nz-option *ngFor="let option of allNumberComplementOptions" [nzValue]="option" [nzLabel]="option"></nz-option>
-          </nz-select>
-        </nz-form-control>
+        }
+      </div>
+
+      <div class="col-span-12 grid grid-cols-12 gap-2">
+        <div class="col-span-12"
+          [class]="addressForm.get('secondaryNumberComplement')?.value === otherOption ? 'sm:col-span-4' : 'sm:col-span-6'">
+          <app-text-input
+            [id]="'secondaryNumber'"
+            label="- 2do número"
+            formControlName="secondaryNumber"
+          />
+          <app-input-error
+            [control]="addressForm.get('secondaryNumber')"
+            [customMessages]="customErrorMessagesMap['secondaryNumber']"
+          />
+        </div>
+        <div class="col-span-12"
+          [class]="addressForm.get('secondaryNumberComplement')?.value === otherOption ? 'sm:col-span-4' : 'sm:col-span-6'">
+          <app-select
+            [items]="getListWithOther(allNumberComplementOptions)"
+            formControlName="secondaryNumberComplement"
+            placeholder="Complemento"
+            [clearable]="true">
+          </app-select>
+          <app-input-error [control]="addressForm.get('secondaryNumberComplement')" />
+          @if (addressForm.get('secondaryNumberComplement')?.value !== otherOption) {
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Selecciona "Otro valor" para digitar un complemento distinto.
+            </p>
+          }
+        </div>
         @if (addressForm.get('secondaryNumberComplement')?.value === otherOption) {
-          <nz-form-control [nzErrorTip]="customMainComplementErrorTip">
-            <ng-template #customMainComplementErrorTip>
-              @if (addressForm.controls['customSecNumberCompl'].hasError('invalidAlphanumWithSpaces')) {
-                Debe ser alfanumérico
-              } @else if (addressForm.controls['customSecNumberCompl'].hasError('maxlength')) {
-                Máximo 15 carácteres
-              }
-            </ng-template>
-            <input
-              nz-input
-              nzSize="small"
+          <div class="col-span-12 sm:col-span-4">
+            <app-text-input
+              [id]="'customSecNumberCompl'"
+              label="Complemento"
               formControlName="customSecNumberCompl"
-              placeholder="Ingrese otro valor"
               maxlength="15"
             />
-          </nz-form-control>
+            <app-input-error [control]="addressForm.get('customSecNumberCompl')" />
+          </div>
         }
-      </nz-form-item>
-    </nz-col>
+      </div>
 
-  </nz-row>
+      <div class="col-span-12">
+        <app-text-input
+          [id]="'neighborhood'"
+          label="Barrio"
+          formControlName="neighborhood"
+        />
+        <app-input-error [control]="addressForm.get('neighborhood')" />
+      </div>
 
-  <nz-row [nzGutter]="16">
-    <nz-col [nzSpan]="24">
-      <nz-form-item>
-        <nz-form-label nzRequired>Barrio</nz-form-label>
-        <nz-form-control nzErrorTip="Requerido.">
-          <input nz-input nzSize="small" formControlName="neighborhood" placeholder="Ej: Santa Mónica" />
-        </nz-form-control>
-      </nz-form-item>
-    </nz-col>
+      <div class="col-span-12"
+        [ngClass]="{ 'sm:col-span-6': addressForm.get('addressMainComplement')?.value }">
+        <app-select
+          [items]="addressMainComplementOptions"
+          formControlName="addressMainComplement"
+          placeholder="Complemento de dirección"
+          [clearable]="true">
+        </app-select>
+        <app-input-error [control]="addressForm.get('addressMainComplement')" />
+      </div>
+      @if (addressForm.get('addressMainComplement')?.value) {
+        <div class="col-span-12 sm:col-span-6">
+          <app-text-input
+            [id]="'addressMainNameComplement'"
+            label="Número o nombre"
+            formControlName="addressMainNameComplement"
+          />
+          <app-input-error [control]="addressForm.get('addressMainNameComplement')" />
+        </div>
+      }
 
-    <nz-col [nzSpan]="24">
-      <nz-form-item>
-        <nz-form-label>Complemento de dirección</nz-form-label>
-        <nz-form-control [nzValidateStatus]="addressForm.controls['addressMainNameComplement']"
-        nzErrorTip="Número/nombre requerido.">
-          <nz-row>
-            <nz-col [nzSpan]="24" [nzSm]="addressForm.get('addressMainComplement')?.value ? 9 : 24">
-              <nz-select nzSize="small" nzAllowClear formControlName="addressMainComplement" nzPlaceHolder="Opcional">
-                <nz-option *ngFor="let option of addressMainComplementOptions" [nzValue]="option" [nzLabel]="option"></nz-option>
-              </nz-select>
-            </nz-col>
-            @if (addressForm.get('addressMainComplement')?.value) {
-              <nz-col [nzSpan]="24" [nzSm]="15">
-                <input nz-input nzSize="small" formControlName="addressMainNameComplement" placeholder="Número o nombre" />
-              </nz-col>
-            }
-          </nz-row>
-        </nz-form-control>
-      </nz-form-item>
-    </nz-col>
+      <div class="col-span-12"
+        [ngClass]="{ 'sm:col-span-6': addressForm.get('addressSecondaryComplement')?.value }">
+        <app-select
+          [items]="addressSecondaryComplementOptions"
+          formControlName="addressSecondaryComplement"
+          placeholder="2do complemento de dirección"
+          [clearable]="true">
+        </app-select>
+        <app-input-error [control]="addressForm.get('addressSecondaryComplement')" />
+      </div>
+      @if (addressForm.get('addressSecondaryComplement')?.value) {
+        <div class="col-span-12 sm:col-span-6">
+          <app-text-input
+            [id]="'addressSecondaryNameComplement'"
+            label="Número o nombre"
+            formControlName="addressSecondaryNameComplement"
+          />
+          <app-input-error [control]="addressForm.get('addressSecondaryNameComplement')" />
+        </div>
+      }
 
-    <nz-col [nzSpan]="24">
-      <nz-form-item>
-        <nz-form-label>2do complemento de dirección</nz-form-label>
-        <nz-form-control [nzValidateStatus]="addressForm.controls['addressSecondaryNameComplement']" nzErrorTip="Número/nombre requerido.">
-          <nz-row>
-            <nz-col [nzSpan]="24" [nzSm]="addressForm.get('addressSecondaryComplement')?.value ? 9 : 24">
-              <nz-select nzSize="small" nzAllowClear formControlName="addressSecondaryComplement" nzPlaceHolder="Opcional">
-                <nz-option *ngFor="let option of addressSecondaryComplementOptions" [nzValue]="option" [nzLabel]="option"></nz-option>
-              </nz-select>
-            </nz-col>
-            @if (addressForm.get('addressSecondaryComplement')?.value) {
-              <nz-col [nzSpan]="24" [nzSm]="15">
-                <input nz-input nzSize="small" formControlName="addressSecondaryNameComplement" placeholder="Número o nombre" />
-              </nz-col>
-            }
-          </nz-row>
-        </nz-form-control>
-      </nz-form-item>
-    </nz-col>
+      <div class="col-span-12">
+        <app-text-input
+          [id]="'formattedAddress'"
+          label="Dirección Formateada"
+          [value]="formattedAddress"
+          [disabled]="true"
+        />
+      </div>
+    </div>
 
-  </nz-row>
-
-  <nz-form-item>
-    <nz-form-label class="font-semibold">Dirección Formateada</nz-form-label>
-    <nz-form-control>
-      <input nz-input [value]="formattedAddress" disabled />
-    </nz-form-control>
-  </nz-form-item>
-
-
-  <div nz-row nzJustify="end" class="mt-5">
-    <button nz-button nzType="primary" type="submit">Guardar</button>
-  </div>
+    <ng-container drawer-footer>
+      <div class="flex flex-col-reverse sm:flex-row gap-4">
+        <app-button
+          (onClick)="close()"
+          variant="gray"
+          styleType="soft"
+          size="lg"
+          class="flex-1"
+          customClass="leading-[18px] w-full flex justify-center">
+          Cancelar
+        </app-button>
+        <app-button
+          [type]="'submit'"
+          variant="primary"
+          styleType="solid"
+          size="lg"
+          class="flex-1"
+          customClass="leading-[18px] w-full flex justify-center">
+          Guardar
+        </app-button>
+      </div>
+    </ng-container>
+  </app-drawer>
 </form>

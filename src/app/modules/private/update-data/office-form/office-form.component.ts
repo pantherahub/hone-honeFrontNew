@@ -1,39 +1,40 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
-import {
-  AbstractControl,
-  FormArray,
-  FormBuilder,
-  FormGroup,
-  Validators
-} from '@angular/forms';
-import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
-import { NgZorroModule } from 'src/app/ng-zorro.module';
-import { CitiesService } from 'src/app/services/cities/cities.service';
-import { ContactFormComponent } from '../contact-form/contact-form.component';
-import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
-import { ContactsProviderService } from 'src/app/services/contacts-provider/contacts-provider.service';
-import { ClientProviderService } from 'src/app/services/clients/client-provider.service';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
 import { CompanyInterface } from 'src/app/models/client.interface';
-import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
-import { AlertNzService } from 'src/app/services/alert-nz/alert-nz.service';
-import { ScheduleFormComponent } from './schedule-form/schedule-form.component';
-import { AddressFormComponent } from './address-form/address-form.component';
-import { DatePickerInputComponent } from 'src/app/shared/components/date-picker-input/date-picker-input.component';
-import { format } from 'date-fns';
 import { ShortcutContact } from 'src/app/models/shortcut-contact.interface';
+import { AlertService } from 'src/app/services/alert/alert.service';
+import { CitiesService } from 'src/app/services/cities/cities.service';
+import { ClientProviderService } from 'src/app/services/clients/client-provider.service';
+import { ContactsProviderService } from 'src/app/services/contacts-provider/contacts-provider.service';
+import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
+import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
+import { AddressFormComponent } from '../office-modal/address-form/address-form.component';
+import { NzModalService } from 'ng-zorro-antd/modal';
+import { ScheduleFormComponent } from '../office-modal/schedule-form/schedule-form.component';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { ContactFormComponent } from '../contact-form/contact-form.component';
+import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
+import { InputErrorComponent } from 'src/app/shared/components/input-error/input-error.component';
+import { SelectComponent } from 'src/app/shared/components/select/select.component';
+import { DropdownTriggerDirective } from 'src/app/directives/dropdown-trigger.directive';
 
 @Component({
-  selector: 'app-office-modal',
+  selector: 'app-office-form',
   standalone: true,
-  imports: [NgZorroModule, CommonModule, DatePickerInputComponent],
-  templateUrl: './office-modal.component.html',
-  styleUrl: './office-modal.component.scss'
+  imports: [CommonModule, ReactiveFormsModule, ButtonComponent, TextInputComponent, InputErrorComponent, SelectComponent, AddressFormComponent, ScheduleFormComponent, DropdownTriggerDirective],
+  templateUrl: './office-form.component.html',
+  styleUrl: './office-form.component.scss'
 })
-export class OfficeModalComponent implements OnInit {
+export class OfficeFormComponent {
+
   @Input() providerCompanies: any[] = [];
   @Input() office: any | null = null;
+
+  @Output() cancel = new EventEmitter<void>();
+  @Output() save = new EventEmitter<any>();
 
   officeForm!: FormGroup;
   hasChanges = false;
@@ -43,6 +44,8 @@ export class OfficeModalComponent implements OnInit {
 
   existingSchedules: any[] = [];
   existingContacts: any[] = [];
+
+  selectedScheduleIndex: number | null = null;
 
   schedulePage: number = 1;
   schedulePageSize: number = 3;
@@ -66,18 +69,33 @@ export class OfficeModalComponent implements OnInit {
     }
   ];
 
+  customErrorMessagesMap: { [key: string]: any } = {
+    enableCode: {
+      invalidLength: (error: string) => error
+    },
+    enableStartDateCode: {
+      enableDateRange_startDateRequired: 'Este campo es requerido porque tiene una fecha de vencimiento.'
+    },
+    enableEndDateCode: {
+      enableDateRange_endDateRequired: 'Este campo es requerido porque tiene una fecha de expedición.',
+      enableDateRange_invalidDateRange: 'La fecha de vencimiento no puede ser menor a la fecha de expedición.',
+    },
+  };
+
+  @ViewChild('addressDrawer', { static: false }) addressDrawer!: AddressFormComponent;
+  @ViewChild('scheduleDrawer', { static: false }) scheduleDrawer!: ScheduleFormComponent;
+
   constructor(
     private eventManager: EventManagerService,
-    private modal: NzModalRef,
     private fb: FormBuilder,
     private formUtils: FormUtilsService,
-    private toastService: ToastService,
-    private alertNzService: AlertNzService,
-    private modalService: NzModalService,
+    private alertService: AlertService,
     private citiesService: CitiesService,
     private clientService: ClientProviderService,
-    private contactsProviderService: ContactsProviderService
-  ) {}
+    private contactsProviderService: ContactsProviderService,
+    private toastService: ToastService,
+    private modalService: NzModalService,
+  ) { }
 
   ngOnInit(): void {
     this.getCities();
@@ -107,6 +125,10 @@ export class OfficeModalComponent implements OnInit {
         console.error(err);
       }
     });
+  }
+
+  goBack() {
+    this.cancel.emit();
   }
 
   /**
@@ -295,9 +317,11 @@ export class OfficeModalComponent implements OnInit {
 
       const hasContacts = this.existingContacts && this.existingContacts.length;
       if (hasContacts) {
-        const confirmed = await this.alertNzService.confirmDelete(
-          '¿Está seguro?',
-          'Si actualiza la ciudad todos los indicativos de teléfonos fijos de los contactos serán actualizados a la ciudad seleccionada.'
+        const confirmed = await firstValueFrom(
+          this.alertService.confirmDelete(
+            '¿Está seguro?',
+            'Si actualiza la ciudad todos los indicativos de teléfonos fijos de los contactos serán actualizados a la ciudad seleccionada.'
+          )
         );
         if (!confirmed) {
           this.officeForm.patchValue(
@@ -464,29 +488,101 @@ export class OfficeModalComponent implements OnInit {
   }
 
   openAddressModal() {
-    const modalRef = this.modalService.create<AddressFormComponent, any>({
-      nzTitle: 'Dirección de atención de usuarios',
-      nzContent: AddressFormComponent,
-      nzCentered: true,
-      nzClosable: true,
-      nzWidth: '800px',
-      nzStyle: { 'max-width': '90%', margin: '22px 0' }
-    });
+    this.addressDrawer.open();
+    // const modalRef = this.modalService.create<AddressFormComponent, any>({
+    //   nzTitle: 'Dirección de atención de usuarios',
+    //   nzContent: AddressFormComponent,
+    //   nzCentered: true,
+    //   nzClosable: true,
+    //   nzWidth: '800px',
+    //   nzStyle: { 'max-width': '90%', margin: '22px 0' }
+    // });
 
-    const instanceModal = modalRef.getContentComponent();
-    instanceModal.address = this.officeForm.value.address;
+    // const instanceModal = modalRef.getContentComponent();
+    // instanceModal.address = this.officeForm.value.address;
 
-    modalRef.afterClose.subscribe((result: any) => {
-      if (result && result.address) {
-        const newAddress = result.address;
-        const idCity = this.officeForm.get('idCity')?.value;
-        this.officeForm.patchValue({ address: { ...newAddress, idCity } });
-      }
-    });
+    // modalRef.afterClose.subscribe((result: any) => {
+    //   if (result && result.address) {
+    //     const newAddress = result.address;
+    //     const idCity = this.officeForm.get('idCity')?.value;
+    //     this.officeForm.patchValue({ address: { ...newAddress, idCity } });
+    //   }
+    // });
+  }
+
+  onAddressDrawerClose(result: any) {
+    if (result && result.address) {
+      const newAddress = result.address;
+      const idCity = this.officeForm.get('idCity')?.value;
+      this.officeForm.patchValue({ address: { ...newAddress, idCity } });
+    }
   }
 
   getGlobalIndex(page: number, pageSize: number, localIndex: number): number {
     return (page - 1) * pageSize + localIndex;
+  }
+
+  openScheduleForm(index: number | null = null) {
+    this.selectedScheduleIndex = index;
+    const schedule = this.selectedScheduleIndex != null
+        ? this.existingSchedules[this.selectedScheduleIndex]
+        : null;
+    this.scheduleDrawer.open(schedule);
+  }
+
+  onScheduleDrawerClose(result: any) {
+    if (result) {
+      this.handleSaveSchedule(result);
+    }
+    this.selectedScheduleIndex = null;
+  }
+
+  private handleSaveSchedule(result: any) {
+    const scheduleIndex = this.selectedScheduleIndex;
+
+    if (result && result.schedule) {
+      const newSchedule = result.schedule;
+
+      if (result.isNew && newSchedule.value.idAddedTemporal) {
+        if (scheduleIndex != null) {
+          const createdSchedulesIndex = this.createdSchedules.controls.findIndex(
+            control =>
+              control.value.idAddedTemporal ===
+              newSchedule.value.idAddedTemporal
+          );
+          (this.createdSchedules as FormArray).setControl(
+            createdSchedulesIndex,
+            newSchedule
+          );
+          this.existingSchedules[scheduleIndex] = newSchedule.value;
+        } else {
+          this.createdSchedules.push(newSchedule);
+          this.existingSchedules.push(newSchedule.value);
+        }
+        this.existingSchedules = [...this.existingSchedules];
+        this.toastService.success(
+          `Horario por ${scheduleIndex != null ? 'actualizar' : 'agregar'}.`,
+          { color: 'info' }
+        );
+      } else if (!result.isNew && scheduleIndex != null) {
+        const updatedSchedulesIndex = this.updatedSchedules.controls.findIndex(
+          control =>
+            control.value.idTemporalSchedule ===
+            newSchedule.value.idTemporalSchedule
+        );
+        if (updatedSchedulesIndex !== -1) {
+          (this.updatedSchedules as FormArray).setControl(
+            updatedSchedulesIndex,
+            newSchedule
+          );
+        } else {
+          this.updatedSchedules.push(newSchedule);
+        }
+        this.existingSchedules[scheduleIndex] = newSchedule.value;
+        this.existingSchedules = [...this.existingSchedules];
+        this.toastService.success('Horario por actualizar.', { color: 'info' });
+      }
+    }
   }
 
   openScheduleModal(scheduleIndex: number | null = null) {
@@ -508,56 +604,58 @@ export class OfficeModalComponent implements OnInit {
     instanceModal.existingSchedules = [...this.existingSchedules];
 
     modalRef.afterClose.subscribe((result: any) => {
-      if (result && result.schedule) {
-        const newSchedule = result.schedule;
+      // if (result && result.schedule) {
+      //   const newSchedule = result.schedule;
 
-        if (result.isNew && newSchedule.value.idAddedTemporal) {
-          if (scheduleIndex != null) {
-            const createdSchedulesIndex = this.createdSchedules.controls.findIndex(
-              control =>
-                control.value.idAddedTemporal ===
-                newSchedule.value.idAddedTemporal
-            );
-            (this.createdSchedules as FormArray).setControl(
-              createdSchedulesIndex,
-              newSchedule
-            );
-            this.existingSchedules[scheduleIndex] = newSchedule.value;
-          } else {
-            this.createdSchedules.push(newSchedule);
-            this.existingSchedules.push(newSchedule.value);
-          }
-          this.existingSchedules = [...this.existingSchedules];
-          this.toastService.success(
-            `Horario por ${scheduleIndex != null ? 'actualizar' : 'agregar'}.`,
-            { color: 'info' }
-          );
-        } else if (!result.isNew && scheduleIndex != null) {
-          const updatedSchedulesIndex = this.updatedSchedules.controls.findIndex(
-            control =>
-              control.value.idTemporalSchedule ===
-              newSchedule.value.idTemporalSchedule
-          );
-          if (updatedSchedulesIndex !== -1) {
-            (this.updatedSchedules as FormArray).setControl(
-              updatedSchedulesIndex,
-              newSchedule
-            );
-          } else {
-            this.updatedSchedules.push(newSchedule);
-          }
-          this.existingSchedules[scheduleIndex] = newSchedule.value;
-          this.existingSchedules = [...this.existingSchedules];
-          this.toastService.success('Horario por actualizar.', { color: 'info' });
-        }
-      }
+      //   if (result.isNew && newSchedule.value.idAddedTemporal) {
+      //     if (scheduleIndex != null) {
+      //       const createdSchedulesIndex = this.createdSchedules.controls.findIndex(
+      //         control =>
+      //           control.value.idAddedTemporal ===
+      //           newSchedule.value.idAddedTemporal
+      //       );
+      //       (this.createdSchedules as FormArray).setControl(
+      //         createdSchedulesIndex,
+      //         newSchedule
+      //       );
+      //       this.existingSchedules[scheduleIndex] = newSchedule.value;
+      //     } else {
+      //       this.createdSchedules.push(newSchedule);
+      //       this.existingSchedules.push(newSchedule.value);
+      //     }
+      //     this.existingSchedules = [...this.existingSchedules];
+      //     this.toastService.success(
+      //       `Horario por ${scheduleIndex != null ? 'actualizar' : 'agregar'}.`,
+      //       { color: 'info' }
+      //     );
+      //   } else if (!result.isNew && scheduleIndex != null) {
+      //     const updatedSchedulesIndex = this.updatedSchedules.controls.findIndex(
+      //       control =>
+      //         control.value.idTemporalSchedule ===
+      //         newSchedule.value.idTemporalSchedule
+      //     );
+      //     if (updatedSchedulesIndex !== -1) {
+      //       (this.updatedSchedules as FormArray).setControl(
+      //         updatedSchedulesIndex,
+      //         newSchedule
+      //       );
+      //     } else {
+      //       this.updatedSchedules.push(newSchedule);
+      //     }
+      //     this.existingSchedules[scheduleIndex] = newSchedule.value;
+      //     this.existingSchedules = [...this.existingSchedules];
+      //     this.toastService.success('Horario por actualizar.', { color: 'info' });
+      //   }
+      // }
     });
   }
 
   async deleteSchedule(index: number) {
-    const confirmed = await this.alertNzService.confirmDelete(
-      '¿Eliminar horario?',
-      'Eliminar horario de atención del listado'
+    const confirmed = await firstValueFrom(
+      this.alertService.confirmDelete(
+        '¿Eliminar horario?',
+        'Eliminar horario de atención del listado'
+      )
     );
     if (!confirmed) return;
 
@@ -601,7 +699,7 @@ export class OfficeModalComponent implements OnInit {
     this.formUtils.trimFormStrControls(this.officeForm);
     if (this.officeForm.invalid) {
       this.formUtils.markFormTouched(this.officeForm);
-      this.alertNzService.warning(
+      this.alertService.warning(
         'Aviso',
         'Para actualizar contactos primero debe diligenciar la información de la sede.'
       );
@@ -622,17 +720,17 @@ export class OfficeModalComponent implements OnInit {
       nzOnCancel: () => {
         const componentInstance = modalRef.getContentComponent();
         if (componentInstance.hasChanges) {
-          this.alertNzService.confirm(
+          this.alertService.confirm(
             'Cambios sin guardar',
             'Tienes cambios en el contacto. Si sales sin guardar, se perderán.',
             {
-              nzOkText: 'Salir',
-              nzCancelText: 'Cancelar',
-              nzOnOk: () => {
-                modalRef.destroy();
-              }
+              confirmBtnText: 'Salir',
+              cancelBtnText: 'Cancelar',
             }
-          );
+          ).subscribe((confirmed: boolean) => {
+            if (!confirmed) return;
+            modalRef.destroy();
+          });
           return false;
         }
         return true; // Close modal
@@ -670,7 +768,7 @@ export class OfficeModalComponent implements OnInit {
             { color: 'info' }
           );
           if (contactShortcut) {
-            this.alertNzService.success(
+            this.alertService.success(
               'Agregado',
               `Contacto de ${contactShortcut.label} agregado para crear`
             );
@@ -698,9 +796,11 @@ export class OfficeModalComponent implements OnInit {
   }
 
   async deleteContact(index: number) {
-    const confirmed = await this.alertNzService.confirmDelete(
-      '¿Eliminar contacto?',
-      'Eliminar contacto del listado'
+    const confirmed = await firstValueFrom(
+      this.alertService.confirmDelete(
+        '¿Eliminar contacto?',
+        'Eliminar contacto del listado'
+      )
     );
     if (!confirmed) return;
 
@@ -742,18 +842,18 @@ export class OfficeModalComponent implements OnInit {
     if (this.officeForm.invalid) return;
 
     if (!this.existingSchedules?.length) {
-      this.alertNzService.warning(
+      this.alertService.warning(
         'Aviso',
         'Debe agregar al menos un horario de atención.'
       );
       return;
     }
     if (!this.existingContacts?.length) {
-      this.alertNzService.warning('Aviso', 'Debe agregar al menos un contacto.');
+      this.alertService.warning('Aviso', 'Debe agregar al menos un contacto.');
       return;
     }
     if (this.getMissingContacts(true).length > 0) {
-      this.alertNzService.warning(
+      this.alertService.warning(
         'Aviso',
         'Faltan algunos contactos requeridos. Por favor diligéncialos.'
       );
@@ -783,10 +883,11 @@ export class OfficeModalComponent implements OnInit {
       idsCompanies: companiesIds
     });
 
-    this.modal.close({
+    this.save.emit({
       office: this.officeForm,
       isNew:
         this.office === null || this.office.idTemporalOfficeProvider === null
     });
   }
+
 }

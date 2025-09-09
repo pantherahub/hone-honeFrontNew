@@ -1,6 +1,6 @@
 import { TemplateRef } from "@angular/core";
 
-export type AlertVariant = 'info' | 'success' | 'error' | 'warning';
+export type AlertVariant = 'info' | 'success' | 'danger' | 'warning';
 
 export interface AlertOptions {
   title: string;

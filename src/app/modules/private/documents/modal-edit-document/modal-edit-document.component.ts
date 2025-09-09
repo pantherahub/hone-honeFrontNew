@@ -494,7 +494,7 @@ export class ModalEditDocumentComponent implements OnInit {
           '¡IMPORTANTE!',
           'Debe leer la información anterior sobre los valores de la póliza para evitar devoluciones y retrasos en la gestión documental.',
           {
-            iconVariant: 'error',
+            iconVariant: 'danger',
             confirmBtnVariant: 'red',
             cancelBtnText: 'Volver a revisar',
             confirmBtnText: 'Ya leí la información'

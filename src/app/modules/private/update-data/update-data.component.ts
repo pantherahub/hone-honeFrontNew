@@ -9,22 +9,28 @@ import { ClientProviderService } from 'src/app/services/clients/client-provider.
 import { LANGUAGES } from 'src/app/constants/languages';
 import { ContactFormComponent } from './contact-form/contact-form.component';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
-import { NzMessageService } from 'ng-zorro-antd/message';
 import { AlertNzService } from 'src/app/services/alert-nz/alert-nz.service';
 import { format } from 'date-fns';
 import { BackendErrorsComponent } from 'src/app/shared/components/backend-errors/backend-errors.component';
 import { debounceTime, firstValueFrom } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
 import { CanComponentDeactivate } from 'src/app/guards/can-deactivate.interface';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { NavigationService } from 'src/app/services/navigation/navigation.service';
 import { isEmail } from 'src/app/utils/validation-utils';
 import { ClientInterface } from 'src/app/models/client.interface';
+import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { AlertComponent } from 'src/app/shared/components/alert/alert.component';
+import { ProviderFormComponent } from './provider-form/provider-form.component';
+import { OfficeListComponent } from './office-list/office-list.component';
+import { ContactListComponent } from './contact-list/contact-list.component';
+import { AlertService } from 'src/app/services/alert/alert.service';
+import { ToastService } from 'src/app/services/toast/toast.service';
 
 @Component({
   selector: 'app-update-data',
   standalone: true,
-  imports: [NgZorroModule, CommonModule, BackendErrorsComponent],
+  imports: [NgZorroModule, CommonModule, BackendErrorsComponent, ButtonComponent, AlertComponent, RouterModule, ProviderFormComponent, OfficeListComponent, ContactListComponent],
   templateUrl: './update-data.component.html',
   styleUrl: './update-data.component.scss'
 })
@@ -49,29 +55,67 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
 
   loading: boolean = false;
   backendError: any = null;
+  // backendError: any = {
+  //   error: {
+  //     details: [
+  //       { message: 'Primer número de la placa debe ser positivo' },
+  //       { message: 'El "Nombre o Razón social" ya existe en la base de datos' },
+  //     ]
+  //   }
+  // };
 
   private formSubscription: any;
-
-  showFloatingButton = true;
-  @ViewChild('footerButton') footerButton!: ElementRef;
 
   emailInfoMessage: string[] = [
     "Correo único corporativo o personal del prestador.",
     "En caso de que administres o gestiones mas de un prestador, asegúrate de que el correo electrónico registrado sea el personal o corporativo correspondiente a cada uno de ellos."
   ];
 
+  steps = [
+    {
+      key: 'provider',
+      label: 'Información del prestador',
+      enabled: true,
+      icon: '/assets/icons/outline/general.svg#briefcase',
+    },
+    {
+      key: 'offices',
+      label: 'Sedes de prestación',
+      enabled: false,
+      icon: '/assets/icons/outline/general.svg#map-pin-alt',
+    },
+    {
+      key: 'contacts',
+      label: 'Contactos',
+      enabled: false,
+      icon: '/assets/icons/outline/general.svg#phone',
+    },
+  ];
+  activeStep: string = 'offices';
+
+  providerFormFields: string[] = [
+    'name',
+    'email',
+    'languages',
+    'idTypeDocument',
+    'identification',
+    'dv',
+    'repsEnableCode',
+    'website',
+  ];
+
   constructor (
     private eventManager: EventManagerService,
     private fb: FormBuilder,
     private formUtils: FormUtilsService,
-    private messageService: NzMessageService,
+    private toastService: ToastService,
     private alertNzService: AlertNzService,
     private modalService: NzModalService,
     private clientProviderService: ClientProviderService,
-    private location: Location,
     private authService: AuthService,
     private router: Router,
     private navigationService: NavigationService,
+    private alertService: AlertService,
   ) { }
 
   ngOnInit(): void {
@@ -82,6 +126,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
 
     this.getCompanies();
 
+    // return;
     this.loadFormData();
 
   }
@@ -108,18 +153,8 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
   subscribeOnChange() {
     this.formSubscription = this.providerForm.valueChanges.pipe(debounceTime(500)).subscribe(() => {
       if (!this.providerForm.get('updatedBasicData')?.value) {
-        const keysToCheck = [
-          'name',
-          'email',
-          'languages',
-          'idTypeDocument',
-          'identification',
-          'dv',
-          'repsEnableCode',
-          'website'
-        ];
         // Check if any of these specific controls have changed
-        const updatedBasicData = keysToCheck.some(key => {
+        const updatedBasicData = this.providerFormFields.some(key => {
           const control = this.providerForm.get(key);
           return control?.dirty;
         });
@@ -136,39 +171,116 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
     }
   }
 
-  @HostListener('window:scroll', [])
-  onWindowScroll() {
-    if (!this.footerButton) return;
+  // goPrevStep() {
+  //   if (this.activeStep === 'contacts') {
+  //     this.activeStep = 'offices';
+  //   } else if (this.activeStep === 'offices') {
+  //     this.activeStep = 'provider';
+  //   }
+  // }
 
-    const rect = this.footerButton.nativeElement.getBoundingClientRect();
-    const isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
+  // goNextStep() {
+  //   if (this.activeStep === 'provider') {
+  //     this.goToStep('offices', true);
+  //   } else if (this.activeStep === 'offices') {
+  //     this.goToStep('contacts', true);
+  //   }
+  // }
 
-    this.showFloatingButton = !isVisible;
-  }
+  goToStep(stepKey: string, canEnable: boolean = false) {
+    const step = this.steps.find(s => s.key === stepKey);
+    if (!step || step.key === this.activeStep) return;
 
-  scrollToFooter(): void {
-    this.footerButton?.nativeElement?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    this.highlightSubmitBtn();
-  }
-
-  highlightSubmitBtn() {
-    const element = this.footerButton?.nativeElement;
-    if (element) {
-      setTimeout(() => {
-        element.classList.add(
-          'ring-2',
-          'ring-green-400',
-          'ring-offset-2',
-          'scale-105',
-          'transition',
-          'duration-500'
-        );
-      }, 280);
-
-      setTimeout(() => {
-        element.classList.remove('ring-2', 'ring-green-400', 'ring-offset-2', 'scale-105');
-      }, 2000);
+    if (this.activeStep === 'provider' && !this.validateProviderForm()) {
+      return;
     }
+    if (this.activeStep === 'offices' && !this.validateOffices()) {
+      return;
+    }
+    if (this.activeStep === 'contacts' && !this.validateContacts()) {
+      return;
+    }
+
+    if (step.enabled) {
+      this.activeStep = stepKey;
+    } else if (canEnable) {
+      step.enabled = true;
+      this.activeStep = stepKey;
+    }
+  }
+
+  private validateProviderForm(): boolean {
+    this.providerFormFields.forEach(field => {
+      const control = this.providerForm.get(field);
+      control?.markAsTouched();
+      control?.updateValueAndValidity();
+    });
+
+    if (this.providerFormFields.some(f => this.providerForm.get(f)?.invalid)) {
+      this.alertService.warning(
+        'Datos incompletos',
+        'Por favor completa los datos del prestador antes de continuar.'
+      );
+      return false;
+    }
+    return true;
+  }
+
+  private validateOffices(): boolean {
+    if (!this.existingOffices?.length) {
+      this.alertService.warning('Sedes incompletas', 'Debes registrar al menos una sede.');
+      return false;
+    }
+
+    // Validate incomplete information
+    const hasInvalidOffice = this.existingOffices.some(office =>
+      (!office.TemporalAddress && !office.address) ||
+      (!office.TemporalSchedules?.length && !office.createdSchedules?.length)
+    );
+    if (hasInvalidOffice) {
+      this.alertNzService.warning('Aviso', 'Algunas sedes tienen información incompleta.');
+      return false;
+    }
+
+    // Validate that the offices are associated with the provider companies
+    const companiesIds = this.providerCompanies.map((c: any) => c.idCompany);
+    const companiesNotLinked: number[] = [];
+    companiesIds.forEach(companyId => {
+      const isLinked = this.existingOffices.some(office => {
+        if (office.idsCompanies) {
+          return office.idsCompanies.includes(companyId);
+        } else if (office.Companies) {
+          return office.Companies.some((company: any) => company.idCompany === companyId);
+        }
+        return false;
+      });
+      if (!isLinked) {
+        companiesNotLinked.push(companyId);
+      }
+    });
+
+    if (companiesNotLinked.length > 0) {
+      const names = this.providerCompanies
+        .filter(c => companiesNotLinked.includes(c.idCompany))
+        .map(c => c.name)
+        .join(', ');
+
+      this.alertNzService.warning(
+        'Aviso',
+        `Debes agregar las siguientes compañías asociadas a alguna sede: ${names}`
+      );
+      return false;
+    }
+
+    return true;
+  }
+
+  private validateContacts(): boolean {
+    if (!this.existingContacts?.length) {
+      this.alertService.warning('Contactos incompletos', 'Debes registrar al menos un contacto.');
+      return false;
+    }
+    return true;
   }
 
   initializeForm() {
@@ -182,16 +294,16 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
       idProvider: [this.user.id],
       startTime: [this.formatDate(new Date())],
       endTime: [''],
+      name: [
+        { value: this.user.name || '', disabled: true },
+        [Validators.required]
+      ],
       email: [
         {
           value: isValidEmail ? this.user.email : '',
           disabled: isValidEmail
         },
         [Validators.required, this.formUtils.email]
-      ],
-      name: [
-        { value: this.user.name || '', disabled: true },
-        [Validators.required]
       ],
       languages: [[], [Validators.required]],
       idTypeDocument: [
@@ -462,7 +574,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
       error: (err: any) => {
         this.loading = false;
         console.error(err);
-        this.messageService.create('error', 'Algo salió mal.');
+        this.toastService.error('Algo salió mal.');
       }
     });
   }
@@ -487,83 +599,16 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
     return this.providerForm.get('deletedContacts') as FormArray;
   }
 
-  getGlobalIndex(localIndex: number, currentPage: number, pageSize: number): number {
-    return (currentPage - 1) * pageSize + localIndex;
+  onOfficesChanged(updatedList: any[]) {
+    this.existingOffices = updatedList;
   }
 
-  openOfficeModal(officeIndex: number | null = null) {
-    const office = officeIndex != null
-      ? this.existingOffices[officeIndex]
-      : null;
+  onContactsChanged(updatedList: any[]) {
+    this.existingContacts = updatedList;
+  }
 
-    const modalRef = this.modalService.create<OfficeModalComponent, any>({
-      nzTitle: office ? 'Actualizar sede de prestación de servicio' : 'Agregar sede de prestación de servicio',
-      nzContent: OfficeModalComponent,
-      nzCentered: true,
-      nzClosable: true,
-      nzMaskClosable: false,
-      nzWidth: '900px',
-      nzStyle: { 'max-width': '90%', 'margin': '22px 0' },
-      nzOnCancel: () => {
-        const componentInstance = modalRef.getContentComponent();
-        if (componentInstance.hasChanges) {
-          this.alertNzService.confirm(
-            'Cambios sin guardar',
-            'Tienes cambios en la sede. Si sales sin guardar, se perderán.',
-            {
-              nzOkText: 'Salir',
-              nzCancelText: 'Cancelar',
-              nzOnOk: () => {
-                modalRef.destroy();
-              },
-            }
-          );
-          return false;
-        }
-        return true; // Close modal
-      }
-    });
-    const instanceModal = modalRef.getContentComponent();
-    if (office) {
-      instanceModal.office = office;
-    }
-    instanceModal.providerCompanies = this.providerCompanies;
-
-    modalRef.afterClose.subscribe((result: any) => {
-      if (result && result.office) {
-        const newOffice = result.office;
-
-        if (result.isNew && newOffice.value.idAddedTemporal) {
-          if (officeIndex != null) {
-            const createdOfficesIndex = this.createdOffices.controls.findIndex(
-              (control) => control.value.idAddedTemporal === newOffice.value.idAddedTemporal
-            );
-            (this.createdOffices as FormArray).setControl(createdOfficesIndex, newOffice);
-            this.existingOffices[officeIndex] = newOffice.value;
-          } else {
-            this.createdOffices.push(newOffice);
-            this.existingOffices.push(newOffice.value);
-          }
-          this.existingOffices = [...this.existingOffices];
-          this.messageService.create(
-            'info',
-            `Sede por ${officeIndex != null ? 'actualizar' : 'agregar'}.`
-          );
-        } else if (!result.isNew && officeIndex != null) {
-          const updatedOfficesIndex = this.updatedOffices.controls.findIndex(
-            (control) => control.value.idTemporalOfficeProvider === newOffice.value.idTemporalOfficeProvider
-          );
-          if (updatedOfficesIndex !== -1) {
-            (this.updatedOffices as FormArray).setControl(updatedOfficesIndex, newOffice);
-          } else {
-            this.updatedOffices.push(newOffice);
-          }
-          this.existingOffices[officeIndex] = newOffice.value;
-          this.existingOffices = [...this.existingOffices];
-          this.messageService.create('info', 'Sede por actualizar.');
-        }
-      }
-    });
+  getGlobalIndex(localIndex: number, currentPage: number, pageSize: number): number {
+    return (currentPage - 1) * pageSize + localIndex;
   }
 
   openContactModal(contactIndex: number | null = null) {
@@ -618,9 +663,9 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
             this.existingContacts.push(newContact.value);
           }
           this.existingContacts = [...this.existingContacts];
-          this.messageService.create(
-            'info',
-            `Contacto por ${contactIndex != null ? 'actualizar' : 'agregar'}.`
+          this.toastService.success(
+            `Contacto por ${contactIndex != null ? 'actualizar' : 'agregar'}.`,
+            { color: 'info' }
           );
         } else if (!result.isNew && contactIndex != null) {
           const updatedContactsIndex = this.updatedContacts.controls.findIndex(
@@ -633,45 +678,10 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
           }
           this.existingContacts[contactIndex] = newContact.value;
           this.existingContacts = [...this.existingContacts];
-          this.messageService.create('info', 'Contacto por actualizar.');
+          this.toastService.success('Contacto por actualizar.', { color: 'info' });
         }
       }
     });
-  }
-
-  async deleteOffice(index: number) {
-    const confirmed = await this.alertNzService.confirmDelete(
-      '¿Eliminar sede?',
-      'Eliminar sede de prestación de servicio del listado'
-    );
-    if (!confirmed) return;
-
-    const deletedOffice = this.existingOffices[index];
-
-    // Remove from existingOffices
-    this.existingOffices.splice(index, 1);
-
-    if (deletedOffice.idTemporalOfficeProvider !== null) {
-      // Search in updatedOffices and delete if it exists
-      const updatedIndex = this.updatedOffices.controls.findIndex(office =>
-        office.value.idTemporalOfficeProvider == deletedOffice.idTemporalOfficeProvider
-      );
-      if (updatedIndex !== -1) {
-        this.updatedOffices.removeAt(updatedIndex);
-      }
-      // Push to deleted array if it already existed
-      this.deletedOffices.push(this.fb.control(deletedOffice.idTemporalOfficeProvider));
-    } else {
-      // Search in createdOffices and delete if it exists
-      const createdIndex = this.createdOffices.controls.findIndex(office =>
-        JSON.stringify(office.value) === JSON.stringify(deletedOffice)
-      );
-      if (createdIndex !== -1) {
-        this.createdOffices.removeAt(createdIndex);
-      }
-    }
-    this.existingOffices = [...this.existingOffices];
-    this.messageService.create('info', 'Sede por eliminar.');
   }
 
   async deleteContact(index: number) {
@@ -706,7 +716,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
       }
     }
     this.existingContacts = [...this.existingContacts];
-    this.messageService.create('info', 'Contacto por eliminar.');
+    this.toastService.success('Contacto por eliminar.', { color: 'info' });
   }
 
   formatDate(date: Date): string {
@@ -754,7 +764,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
     };
 
     // Clear messages
-    this.messageService.remove();
+    this.toastService.clear();
     this.backendError = null;
 
     // Validate the existence of offices and contacts

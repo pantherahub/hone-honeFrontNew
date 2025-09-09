@@ -15,7 +15,7 @@ import { PopoverStateService } from 'src/app/services/popover-state/popover-stat
 export class PopoverComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
 
   @Input() contentTemplate?: TemplateRef<any>;
-  @Input() title?: string;
+  @Input() title: string = '';
   @Input() text?: string;
   @Input() placement: Placement = 'top';
   @Input() triggerType: 'click' | 'hover' | 'manual' = 'click';

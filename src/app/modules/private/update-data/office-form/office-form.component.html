@@ -1,0 +1,243 @@
+<form [formGroup]="officeForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+  <div class="flex justify-between gap-2">
+    <app-button
+      (onClick)="goBack()"
+      variant="primary"
+      styleType="ghost"
+      size="sm"
+      customClass="leading-4">
+      <svg width="16" height="16">
+        <use xlink:href="/assets/icons/outline/arrows.svg#chevron-left" />
+      </svg>
+      Volver
+    </app-button>
+    <div class="flex gap-2">
+      <app-button
+        [type]="'submit'"
+        variant="primary"
+        styleType="solid"
+        size="xs">
+        Guardar
+      </app-button>
+      <app-button
+        (onClick)="goBack()"
+        variant="primary"
+        styleType="soft"
+        size="xs">
+        Cancelar
+      </app-button>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-2 p-4 rounded-xl bg-gray-100">
+    <h4 class="text-base font-semibold leading-[18px] text-main-blue1h">
+      Ubicación
+    </h4>
+    <div>
+      <app-select
+        [items]="cities"
+        bindLabel="city"
+        bindValue="idCity"
+        formControlName="idCity"
+        placeholder="Ciudad"
+        [searchable]="true">
+      </app-select>
+      <app-input-error [control]="officeForm.get('idCity')" />
+    </div>
+
+    <div>
+      <app-text-input
+        [id]="'address'"
+        label="Dirección de atención de usuarios"
+        [value]="officeForm.get('address')?.value?.formattedAddress"
+        (onClick)="openAddressModal()"
+        [readonly]="true"
+        [customInputClass]="'cursor-pointer'"
+        [customLabelClass]="'cursor-pointer'"
+      />
+      <app-input-error [control]="officeForm.get('address')" />
+    </div>
+    <div>
+      <app-text-input
+        [id]="'officeName'"
+        label="Nombre"
+        formControlName="name"
+      />
+      <app-input-error [control]="officeForm.get('name')" />
+    </div>
+    <div>
+      <app-text-input
+        [id]="'schedulingLink'"
+        label="Link de agendamiento"
+        formControlName="schedulingLink"
+      />
+      <app-input-error [control]="officeForm.get('schedulingLink')" />
+    </div>
+    <div>
+      <app-text-input
+        [id]="'emailGlosas'"
+        label="Correo glosas"
+        formControlName="emailGlosas"
+      />
+      <app-input-error [control]="officeForm.get('emailGlosas')" />
+    </div>
+    <div>
+      <app-text-input
+        [id]="'enableCode'"
+        label="Código habilitación"
+        formControlName="enableCode"
+      />
+      <app-input-error
+        [control]="officeForm.get('enableCode')"
+        [customMessages]="customErrorMessagesMap['enableCode']"
+      />
+    </div>
+    <div>
+      <app-text-input
+        [id]="'enableStartDateCode'"
+        label="Expedición habilitación"
+        [type]="'date'"
+        formControlName="enableStartDateCode"
+      />
+      <app-input-error
+        [control]="officeForm.get('enableStartDateCode')"
+        [customMessages]="customErrorMessagesMap['enableStartDateCode']"
+      />
+    </div>
+    <div>
+      <app-text-input
+        [id]="'enableEndDateCode'"
+        label="Vencimiento habilitación"
+        [type]="'date'"
+        formControlName="enableEndDateCode"
+      />
+      <app-input-error
+        [control]="officeForm.get('enableEndDateCode')"
+        [customMessages]="customErrorMessagesMap['enableEndDateCode']"
+      />
+    </div>
+    <div>
+      <app-select
+        [multiple]="true"
+        [searchable]="true"
+        [clearable]="true"
+        [maxVisibleSelected]="3"
+        [items]="companyList"
+        bindLabel="name"
+        bindValue="idCompany"
+        formControlName="idsCompanies"
+        placeholder="Compañías con convenio"
+      >
+      </app-select>
+      <app-input-error [control]="officeForm.get('idsCompanies')" />
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-4 p-4 rounded-xl bg-gray-100">
+    <div class="flex justify-between items-center gap-4">
+      <h4 class="text-base font-semibold leading-[18px] text-main-blue1h">
+        Horario de atención
+      </h4>
+      <app-button
+        (onClick)="openScheduleForm()"
+        variant="primary"
+        styleType="soft"
+        size="xs">
+        <svg width="16" height="16">
+          <use xlink:href="/assets/icons/outline/general.svg#plus" />
+        </svg>
+        Agregar
+      </app-button>
+    </div>
+
+    <div class="relative overflow-x-auto rounded-xl">
+      <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead class="text-sm font-semibold leading-4 text-blue1h-950 bg-gray-50 dark:bg-gray-700 dark:text-gray-400 whitespace-nowrap">
+          <tr>
+            <th scope="col" class="px-4 py-3 font-semibold">
+              Días
+            </th>
+            <th scope="col" class="px-4 py-3 font-semibold">
+              Jornada
+            </th>
+            <th scope="col" class="px-4 py-3 font-semibold">
+              Horario
+            </th>
+            <th scope="col" class="px-4 py-3 font-semibold">
+              Acciones
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (!existingSchedules || !existingSchedules.length) {
+            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+              <td colspan="4" class="px-4 h-[54px] text-left">
+                <div class="text-md text-main-blue1h leading-4 flex items-center gap-2">
+                  Aún no has agregado horarios
+                </div>
+              </td>
+            </tr>
+          } @else {
+            @for (data of existingSchedules; let i = $index; track i) {
+              <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+                <td class="px-4 py-[10.5px]">{{ data.schedule || '' }}</td>
+                <td class="px-4 py-[10.5px]">{{ data.type || '' }}</td>
+                <td class="px-4 py-[10.5px]">
+                  {{ data.startTime + ' - ' + data.endTime || '' }}
+                </td>
+                <td class="px-4 py-[10.5px]">
+                  <app-button
+                    [appDropdownTrigger]="'dropdown-schedule-opts-' + i"
+                    dropdownPlacement="bottom-end"
+                    variant="gray"
+                    styleType="soft"
+                    size="xs">
+                    <svg width="16" height="16">
+                      <use xlink:href="/assets/icons/outline/general.svg#dots-horizontal" />
+                    </svg>
+                  </app-button>
+                  <div [id]="'dropdown-schedule-opts-' + i" class="z-30 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-[136px] dark:bg-gray-700 dark:divide-gray-600">
+                    <ul class="py-1 text-sm text-gray-700 dark:text-gray-200">
+                      <li>
+                        <a (click)="openScheduleForm(i)"
+                          data-dropdown-close class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                          <svg width="18" height="18" class="text-gray-500">
+                            <use xlink:href="/assets/icons/outline/general.svg#edit" />
+                          </svg>
+                          Editar
+                        </a>
+                      </li>
+                    </ul>
+                    <div class="py-1">
+                      <a (click)="deleteSchedule(i)" data-dropdown-close class="flex items-center gap-3 px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
+                        <svg width="18" height="18">
+                          <use xlink:href="/assets/icons/outline/general.svg#trash-bin" />
+                        </svg>
+                        Eliminar
+                      </a>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div></div>
+</form>
+
+
+<app-address-form
+  #addressDrawer
+  [address]="officeForm.get('address')?.value"
+  (onClose)="onAddressDrawerClose($event)">
+</app-address-form>
+
+<app-schedule-form
+  #scheduleDrawer
+  [existingSchedules]="existingSchedules"
+  (onClose)="onScheduleDrawerClose($event)">
+</app-schedule-form>

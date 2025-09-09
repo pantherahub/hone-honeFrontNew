@@ -1,0 +1,130 @@
+<div [formGroup]="form" class="flex flex-col gap-4">
+  <div class="flex flex-col gap-2 text-main-blue1h">
+    <h2 class="text-lg font-semibold leading-5">
+      Información del prestador
+    </h2>
+    <p class="text-sm leading-4">
+      Diligencia los campos solicitados para identificar y contactar al prestador de manera adecuada.
+    </p>
+  </div>
+
+  <div class="flex flex-col gap-2 p-4 rounded-xl bg-gray-100">
+    <div>
+      <app-text-input
+        [id]="'name'"
+        label="Nombre o razón social"
+        formControlName="name"
+      />
+      <app-input-error [control]="form.get('name')" />
+    </div>
+    <div>
+      <app-popover
+        [contentTemplate]="popoverContent"
+        [triggerType]="'hover'"
+        [placement]="'bottom'"
+        extraPopoverClass="max-w-[380px]">
+        <ng-template #triggerTemplate>
+          <app-text-input
+            [id]="'email'"
+            label="Correo electrónico"
+            formControlName="email"
+          />
+        </ng-template>
+        <ng-template #popoverContent>
+          <div class="flex flex-col gap-1 text-sm">
+            <h3 class="font-semibold text-gray-900 dark:text-white">
+              Correo único corporativo o personal del prestador.
+            </h3>
+            <div class="">
+              <p>En caso de que administres o gestiones mas de un prestador, asegúrate de que el correo electrónico registrado sea el personal o corporativo correspondiente a cada uno de ellos.</p>
+            </div>
+          </div>
+        </ng-template>
+      </app-popover>
+      <app-input-error [control]="form.get('email')" />
+      <a (click)="openEmailInfo()"
+        class="mt-1 inline-flex gap-1 items-center text-xs text-blue-600 dark:text-blue-500 hover:underline">
+        <svg width="16" height="16">
+          <use xlink:href="/assets/icons/outline/general.svg#info-circle" />
+        </svg>
+        <span>Información importante</span>
+      </a>
+    </div>
+    <div>
+      <app-select
+        [items]="identificationTypes"
+        bindLabel="typeDocument"
+        bindValue="idTypeDocument"
+        formControlName="idTypeDocument"
+        placeholder="Tipo de identificación">
+      </app-select>
+      <app-input-error [control]="form.get('idTypeDocument')" />
+    </div>
+    <div>
+      <app-text-input
+        [id]="'identification'"
+        label="Número de identificación"
+        formControlName="identification"
+      />
+      <app-input-error [control]="form.get('identification')" />
+    </div>
+    @if (form.get('idTypeDocument')?.value !== 6) {
+      <div>
+        <app-text-input
+          [id]="'dv'"
+          label="Dígito de verificación"
+          formControlName="dv"
+          [type]="'number'"
+          min="0" max="9"
+        />
+        <app-input-error
+          [control]="form.get('dv')"
+          [customMessages]="customErrorMessagesMap['dv']"
+        />
+      </div>
+    }
+    <div>
+      <app-text-input
+        [id]="'repsEnableCode'"
+        label="Código habilitación REPS"
+        formControlName="repsEnableCode"
+      />
+      <app-input-error [control]="form.get('repsEnableCode')" />
+    </div>
+    <div>
+      <app-select
+        [multiple]="true"
+        [searchable]="true"
+        [maxVisibleSelected]="3"
+        [items]="languageList"
+        bindLabel="name"
+        bindValue="code"
+        formControlName="languages"
+        placeholder="Idiomas de prestación de servicio"
+        [clearable]="true">
+      </app-select>
+      <app-input-error [control]="form.get('languages')" />
+    </div>
+    <div>
+      <app-text-input
+        [id]="'website'"
+        label="Sitio o página web"
+        formControlName="website"
+      />
+      <app-input-error [control]="form.get('website')" />
+    </div>
+  </div>
+
+  <div>
+    <app-button
+      (onClick)="goNext()"
+      variant="primary"
+      styleType="solid"
+      size="md">
+      Siguiente
+      <svg width="20" height="20">
+        <use xlink:href="/assets/icons/outline/arrows.svg#chevron-right" />
+      </svg>
+    </app-button>
+  </div>
+</div>

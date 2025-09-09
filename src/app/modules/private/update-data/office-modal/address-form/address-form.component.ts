@@ -1,21 +1,27 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
-import { NzModalRef } from 'ng-zorro-antd/modal';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
+import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.component';
+import { InputErrorComponent } from 'src/app/shared/components/input-error/input-error.component';
+import { SelectComponent } from 'src/app/shared/components/select/select.component';
+import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
 import { capitalizeWords, trimObjectStrings } from 'src/app/utils/string-utils';
 
 @Component({
   selector: 'app-address-form',
   standalone: true,
-  imports: [NgZorroModule, CommonModule],
+  imports: [NgZorroModule, CommonModule, DrawerComponent, ButtonComponent, TextInputComponent, InputErrorComponent, SelectComponent],
   templateUrl: './address-form.component.html',
   styleUrl: './address-form.component.scss'
 })
 export class AddressFormComponent implements OnInit {
 
   @Input() address: any | null = null;
+  @Output() onClose = new EventEmitter<any>();
+
   addressForm!: FormGroup;
 
   viaOptions: string[] = ['Autopista', 'Avenida', 'Av. Calle', 'Av. Carrera', 'Barrio', 'Calle', 'Callejón', 'Carrera', 'Circular', 'Diagonal', 'Kilómetro', 'Pasaje', 'Paso', 'Ramal', 'SubRamal', 'Tramo', 'Transversal', 'Vereda'];
@@ -32,15 +38,49 @@ export class AddressFormComponent implements OnInit {
 
   formattedAddress: string = '';
 
+  customErrorMessagesMap: { [key: string]: any } = {
+    mainNumber: {
+      pattern: () => 'Ingrese un número de máximo 3 dígitos'
+    },
+    secondaryNumber: {
+      pattern: () => 'Ingrese un número de máximo 3 dígitos'
+    },
+    roadName: {
+      invalidRoadName: (error: string) => error
+    },
+  };
+
+  @ViewChild('addressDrawer', { static: false }) addressDrawer!: DrawerComponent;
+
   constructor(
     private fb: FormBuilder,
-    private modal: NzModalRef,
     private formUtils: FormUtilsService,
   ) { }
 
   ngOnInit(): void {
     this.allNumberComplementOptions = [...this.complementOptions, ...this.lettersWithBis];
     this.initializeForm();
+  }
+
+  open() {
+    this.addressForm.reset();
+    if (this.address) {
+      this.loadAddressData();
+    }
+    this.addressDrawer.open();
+  }
+
+  close(addressData?: any) {
+    this.addressForm.reset();
+    this.addressDrawer.close(addressData);
+  }
+
+  onDrawerClose(addressData?: any) {
+    this.onClose.emit(addressData);
+  }
+
+  getListWithOther(list: string[]): string[] {
+    return [this.otherOption, ...list];
   }
 
   loadAddressData(): void {
@@ -213,7 +253,7 @@ export class AddressFormComponent implements OnInit {
     const addressData = Object.fromEntries(
       Object.entries(rawValues).map(([key, value]) => [key, value === "" ? null : value])
     );
-    this.modal.close({ address: addressData });
+    this.close({ address: addressData });
   }
 
   /**

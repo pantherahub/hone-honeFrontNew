@@ -43,7 +43,7 @@ export class AlertService {
   }
 
   error(title: string = 'Ups...', message: string = 'Algo salió mal.', options: Partial<AlertOptions> = {}): Observable<void> {
-    return this.showAlert({ title, message, variant: 'error', ...options }) as Observable<void>;
+    return this.showAlert({ title, message, variant: 'danger', ...options }) as Observable<void>;
   }
 
   warning(title: string, message: string, options: Partial<AlertOptions> = {}): Observable<void> {
@@ -71,7 +71,7 @@ export class AlertService {
 
   confirmDelete(title: string = '¿Está seguro?', message: string = 'Esta acción no se puede deshacer.'): Observable<boolean> {
     return this.confirm(title, message, {
-      variant: 'error',
+      variant: 'danger',
       customIconPath: '/assets/icons/outline/general.svg#trash-bin',
     });
   }

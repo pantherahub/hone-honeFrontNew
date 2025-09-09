@@ -14,6 +14,7 @@ import { Router } from '@angular/router';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { PopoverComponent } from 'src/app/shared/components/popover/popover.component';
 import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.component';
+import { AlertComponent } from 'src/app/shared/components/alert/alert.component';
 
 @Component({
   selector: 'app-tests',
@@ -30,6 +31,7 @@ import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.compone
     ButtonComponent,
     PopoverComponent,
     DrawerComponent,
+    AlertComponent,
   ],
   templateUrl: './tests.component.html',
   styleUrl: './tests.component.scss'

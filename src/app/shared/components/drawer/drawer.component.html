@@ -20,7 +20,7 @@
   }
 
   @if (showCloseButton) {
-    <button (click)="close()" class="hidden sm:inline-flex absolute top-3 end-3 text-gray-500 bg-transparent hover:text-gray-950 rounded-lg text-sm items-center justify-center p-0.5"
+    <button (click)="close()" type="button" class="hidden sm:inline-flex absolute top-3 end-3 text-gray-500 bg-transparent hover:text-gray-950 rounded-lg text-sm items-center justify-center p-0.5"
       [ngClass]="{
         'inline-flex': !onMobileFull,
         'hidden sm:inline-flex': onMobileFull,

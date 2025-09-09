@@ -52,7 +52,7 @@ export class FileValidationService {
         title: '¡Error!',
         messageHTML: `Archivo no permitido.<br>
           Formatos permitidos: ${allowedExt.join(', ')}`,
-        variant: 'error',
+        variant: 'danger',
       });
       return false;
     }
@@ -71,7 +71,7 @@ export class FileValidationService {
         messageHTML: `El archivo excede el tamaño máximo de ${maxSizeMB}MB.<br>
           Puedes usar este compresor para reducir su tamaño: <a href="https://www.wecompress.com/es/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">
           ir al compresor</a>.`,
-        variant: 'error',
+        variant: 'danger',
       });
       return false;
     }

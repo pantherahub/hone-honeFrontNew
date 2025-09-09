@@ -25,6 +25,7 @@ export class TextInputComponent implements ControlValueAccessor, OnInit, AfterVi
   @Input() type: string = 'text';
   @Input() placeholder: string = ' ';
   @Input() disabled: boolean = false;
+  @Input() readonly: boolean = false;
   @Input() clearable: boolean = false;
   @Input() searcher: boolean = false;
   @Input() isTextarea: boolean = false;
@@ -34,8 +35,8 @@ export class TextInputComponent implements ControlValueAccessor, OnInit, AfterVi
   @Input() invalid: boolean = false;
   @Input() togglePassword: boolean = false;
   @Input() iconSize: string = '18';
-  @Output() onInput = new EventEmitter<any>();
-  @Output() onFocus = new EventEmitter<FocusEvent>();
+  @Input() customInputClass: string = '';
+  @Input() customLabelClass: string = '';
 
   @Input() rows?: string;
   @Input() maxlength?: string;
@@ -43,6 +44,10 @@ export class TextInputComponent implements ControlValueAccessor, OnInit, AfterVi
   @Input() max?: string;
   @Input() min?: string;
   @Input() autocomplete?: string;
+
+  @Output() onInput = new EventEmitter<any>();
+  @Output() onFocus = new EventEmitter<FocusEvent>();
+  @Output() onClick = new EventEmitter<MouseEvent>();
 
   onChange: any = () => {};
   onTouched: any = () => { };
@@ -63,6 +68,10 @@ export class TextInputComponent implements ControlValueAccessor, OnInit, AfterVi
     this.ngControl = this.injector.get(NgControl, { optional: true, self: true });
     if (this.ngControl) {
       this.ngControl.valueAccessor = this;
+    }
+
+    if (this.type === 'date') {
+      this.readonly = true;
     }
   }
 
@@ -106,6 +115,10 @@ export class TextInputComponent implements ControlValueAccessor, OnInit, AfterVi
 
   handleFocus(event: FocusEvent) {
     this.onFocus.emit(event);
+  }
+
+  handleClick(event: MouseEvent) {
+    this.onClick.emit(event);
   }
 
   get actualInputType(): string {

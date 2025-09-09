@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, EventEmitter, forwardRef, HostListener, Injector, Input, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, forwardRef, HostListener, Injector, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, NgControl } from '@angular/forms';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { CheckboxComponent } from '../checkbox/checkbox.component';
@@ -18,7 +18,7 @@ import { CheckboxComponent } from '../checkbox/checkbox.component';
     }
   ]
 })
-export class SelectComponent implements ControlValueAccessor {
+export class SelectComponent implements ControlValueAccessor, OnInit {
 
   @Input() items: any[] = [];
   @Input() multiple: boolean = false;
@@ -123,7 +123,13 @@ export class SelectComponent implements ControlValueAccessor {
     this.searchTerm = '';
   }
 
-  getItemLabel(item: any): string {
+  getItemLabel(itemOrValue: any): string {
+    let item = itemOrValue;
+
+    if (this.bindValue && (typeof itemOrValue !== 'object')) {
+      item = this.items.find(i => this.areEqual(this.getItemValue(i), itemOrValue));
+    }
+
     if (this.bindLabel) {
       return item?.[this.bindLabel] ?? '';
     }
@@ -190,8 +196,8 @@ export class SelectComponent implements ControlValueAccessor {
     this.clearSearch();
   }
 
-  removeItem(item: any) {
-    const value = this.getItemValue(item);
+  removeItem(itemOrValue: any) {
+    const value = this.getItemValue(itemOrValue) ?? itemOrValue;
     this.selected = this.selected.filter((s: any) => !this.areEqual(s, value));
     this.onChange(this.selected);
     this.selectedChange.emit(this.selected);

@@ -1,15 +1,19 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { NzModalRef } from 'ng-zorro-antd/modal';
 import { distinctUntilChanged } from 'rxjs';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
+import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.component';
+import { InputErrorComponent } from 'src/app/shared/components/input-error/input-error.component';
+import { SelectComponent } from 'src/app/shared/components/select/select.component';
+import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
 
 @Component({
   selector: 'app-schedule-form',
   standalone: true,
-  imports: [NgZorroModule, CommonModule],
+  imports: [NgZorroModule, CommonModule, TextInputComponent, InputErrorComponent, DrawerComponent, ButtonComponent, SelectComponent],
   templateUrl: './schedule-form.component.html',
   styleUrl: './schedule-form.component.scss'
 })
@@ -17,6 +21,7 @@ export class ScheduleFormComponent implements OnInit {
 
   @Input() schedule: any | null = null;
   @Input() existingSchedules: any[] = [];
+  @Output() onClose = new EventEmitter<any>();
 
   scheduleForm!: FormGroup;
   loading: boolean = false;
@@ -38,14 +43,44 @@ export class ScheduleFormComponent implements OnInit {
 
   availableEndDays: string[] = [...this.dayOptionsEnd];
 
+  customErrorMessagesMap: { [key: string]: any } = {
+    scheduleType: {
+      overlappingSchedule: (error: string) => error
+    },
+    type: {
+      duplicateSchedule: (error: string) => error
+    },
+  };
+
+  @ViewChild('scheduleDrawer', { static: false }) scheduleDrawer!: DrawerComponent;
+
   constructor(
-    private modal: NzModalRef,
     private fb: FormBuilder,
     private formUtils: FormUtilsService,
   ) { }
 
   ngOnInit(): void {
     this.initializeForm();
+  }
+
+  open(schedule?: any) {
+    this.schedule = schedule ?? null;
+    this.scheduleForm.reset({
+      idAddedTemporal: Date.now().toString(),
+    });
+    if (this.schedule) {
+      this.loadScheduleData();
+    }
+    this.scheduleDrawer.open();
+  }
+
+  close(scheduleData?: any) {
+    this.scheduleForm.reset();
+    this.scheduleDrawer.close(scheduleData);
+  }
+
+  onDrawerClose(scheduleData?: any) {
+    this.onClose.emit(scheduleData);
   }
 
   loadScheduleData() {
@@ -308,7 +343,7 @@ export class ScheduleFormComponent implements OnInit {
       endTime: this.convertTo12Hour(formValues.endTime),
     });
 
-    this.modal.close({
+    this.close({
       schedule: clonedForm,
       isNew: this.schedule === null || this.schedule.idTemporalSchedule === null
     });
