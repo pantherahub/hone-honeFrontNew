@@ -87,6 +87,16 @@ export class ModalEditDocumentComponent implements OnInit {
     'AXA ARL',
     'OTRAS'
   ];
+  policyCompanies: string[] = [
+    'Suramericana',
+    'Seguros del estado',
+    'Mapre',
+    'Seguros Mundial',
+    'HDI',
+    'Axa colpatria',
+    'Aurora',
+    'Otra',
+  ];
   riskClassifierOptions = ['1', '2', '3', '4', '5'];
 
   readonly SMLV: number = 1423500;
@@ -207,6 +217,7 @@ export class ModalEditDocumentComponent implements OnInit {
       epsName: ['', [Validators.required]],
       riskClassifier: ['', [Validators.required]],
       resolutionOfThePension: ['', [Validators.required]],
+      policyCompany: ['', [Validators.required]],
       idCity: ['', [Validators.required]],
       typePolicyProvider: ['', [Validators.required]],
       amountPolicy: ['', [
@@ -260,6 +271,7 @@ export class ModalEditDocumentComponent implements OnInit {
       epsName: item.withEpsName,
       riskClassifier: item.withRiskClassifier && item.riskClassifier !== '9',
       resolutionOfThePension: item.withResolutionOfThePension,
+      policyCompany: item.withAmountPolicy,
       idCity: item.withAmountPolicy,
       typePolicyProvider: item.withAmountPolicy,
       amountPolicy: item.withAmountPolicy
@@ -398,6 +410,10 @@ export class ModalEditDocumentComponent implements OnInit {
         this.riskClassifierOptions
       ),
       validityStartDate: this.convertDate(item.validityStartDate),
+      policyCompany: this.sanitizeWithOptions(
+        item.policyCompany,
+        this.policyCompanies
+      ),
       idCity: item.idCity,
       typePolicyProvider: this.sanitizeWithOptions(
         item.typePolicyProvider,

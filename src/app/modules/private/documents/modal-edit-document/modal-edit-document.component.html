@@ -269,6 +269,19 @@
       </div>
     }
 
+    <!-- Campo Aseguradora emisora de la poliza -->
+    @if (isFieldRequiredForDocumentType('policyCompany')) {
+      <div>
+        <app-select
+          [items]="policyCompanies"
+          formControlName="policyCompany"
+          placeholder="Aseguradora emisora"
+        >
+        </app-select>
+        <app-input-error [control]="documentForm.get('policyCompany')" />
+      </div>
+    }
+
     <!-- Campo Ciudad -->
     @if (isFieldRequiredForDocumentType('idCity')) {
       <div>
