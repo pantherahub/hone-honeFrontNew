@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { ClientInterface } from '../../models/client.interface';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
+import { DocumentType } from 'src/app/models/document-type.interface';
 
 @Injectable({
    providedIn: 'root'
@@ -19,8 +20,8 @@ export class ClientProviderService {
     return this.httpClient.get<ClientInterface[]>(url);
   }
 
-  getIdentificationTypes(): Observable<any> {
-    return this.httpClient.get(this.url + "getTypeDocument");
+  getIdentificationTypes(): Observable<DocumentType[]> {
+    return this.httpClient.get<DocumentType[]>(this.url + "getTypeDocument");
   }
 
   getProviderData(idProvider: any): Observable<any> {

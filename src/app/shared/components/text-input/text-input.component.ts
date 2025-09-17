@@ -44,6 +44,8 @@ export class TextInputComponent implements ControlValueAccessor, OnInit, AfterVi
   @Input() max?: string;
   @Input() min?: string;
   @Input() autocomplete?: string;
+  @Input() minDate: string | Date | null = null; // 'yyyy-mm-dd'
+  @Input() maxDate: string | Date | null = null; // 'yyyy-mm-dd'
 
   @Output() onInput = new EventEmitter<any>();
   @Output() onFocus = new EventEmitter<FocusEvent>();
@@ -147,6 +149,8 @@ export class TextInputComponent implements ControlValueAccessor, OnInit, AfterVi
       todayHighlight: true,
       autoSelectToday: true,
       clearBtn: true,
+      minDate: this.minDate ?? null,
+      maxDate: this.maxDate ?? null,
     });
 
     document.addEventListener('mousedown', (e) => {
@@ -200,6 +204,15 @@ export class TextInputComponent implements ControlValueAccessor, OnInit, AfterVi
             this.onTouched();
           });
         }
+
+        // Close popup when clicking outside
+        document.addEventListener('mousedown', (e) => {
+          if (datepickerPopup &&
+              !datepickerPopup.contains(e.target as Node) &&
+              !this.inputRef.nativeElement.contains(e.target as Node)) {
+            this.dpInstance?.hide();
+          }
+        });
       });
 
     }, 100);

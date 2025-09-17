@@ -27,8 +27,10 @@
       </app-alert>
     </div>
 
-    <div class="flex gap-4">
-      <div class="flex flex-col gap-4">
+    <div class="flex flex-col md:flex-row gap-4">
+
+      <!-- Desktop navigation -->
+      <div class="hidden md:flex flex-col gap-4">
         <div class="flex flex-col gap-1">
           @for (step of steps; track step.key) {
             <app-button
@@ -65,7 +67,57 @@
         </div>
       </div>
 
-      <div class="flex flex-col gap-4">
+      <!-- Mobile navigation -->
+      <div class="flex gap-2 md:hidden h-8">
+        @if (!atStart) {
+          <app-button
+            variant="primary"
+            styleType="ghost"
+            size="sm"
+            (onClick)="scrollStep('left')"
+            customClass="h-full !p-2">
+            <svg width="24" height="24">
+              <use xlink:href="/assets/icons/outline/arrows.svg#chevron-double-left" />
+            </svg>
+          </app-button>
+        }
+
+        <!-- Scrollable container on mobile -->
+        <div #stepsContainer
+          class="flex-1 flex gap-1 overflow-x-auto scrollbar-hide scroll-smooth whitespace-nowrap rounded-xl min-w-0">
+          @for (step of steps; track step.key) {
+            <div #stepBtn>
+              <app-button
+                variant="primary"
+                [styleType]="step.key === activeStep ? 'soft' : 'ghost'"
+                size="sm"
+                customClass="flex-shrink-0 min-w-[120px] leading-4"
+                [disabled]="!step.enabled"
+                (onClick)="goToStep(step.key, false, stepBtn)">
+                <svg width="16" height="16">
+                  <use [attr.xlink:href]="step.icon" />
+                </svg>
+                {{ step.label }}
+              </app-button>
+            </div>
+          }
+        </div>
+
+        @if (!atEnd) {
+          <app-button
+            variant="primary"
+            styleType="ghost"
+            size="sm"
+            (onClick)="scrollStep('right')"
+            customClass="h-full !p-2">
+            <svg width="24" height="24">
+              <use xlink:href="/assets/icons/outline/arrows.svg#chevron-double-right" />
+            </svg>
+          </app-button>
+        }
+      </div>
+
+      <div class="flex-1 flex flex-col gap-4">
         @switch (activeStep) {
           @case ('provider') {
             <app-provider-form

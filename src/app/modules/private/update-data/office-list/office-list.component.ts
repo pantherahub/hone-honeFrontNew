@@ -1,23 +1,24 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder } from '@angular/forms';
-import { NzModalService } from 'ng-zorro-antd/modal';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
-import { OfficeModalComponent } from '../office-modal/office-modal.component';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { DropdownTriggerDirective } from 'src/app/directives/dropdown-trigger.directive';
 import { firstValueFrom } from 'rxjs';
 import { OfficeFormComponent } from '../office-form/office-form.component';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { OfficeDetailComponent } from '../office-detail/office-detail.component';
+import { CompanyInterface } from 'src/app/models/client.interface';
+import { ClientProviderService } from 'src/app/services/clients/client-provider.service';
 
 @Component({
   selector: 'app-office-list',
   standalone: true,
-  imports: [CommonModule, ButtonComponent, DropdownTriggerDirective, OfficeFormComponent],
+  imports: [CommonModule, ButtonComponent, DropdownTriggerDirective, OfficeFormComponent, OfficeDetailComponent],
   templateUrl: './office-list.component.html',
   styleUrl: './office-list.component.scss'
 })
-export class OfficeListComponent {
+export class OfficeListComponent implements OnInit {
 
   @Input() providerCompanies: any[] = [];
   @Input() createdOffices!: FormArray;
@@ -32,19 +33,40 @@ export class OfficeListComponent {
   isEditingOffice = false;
   selectedOfficeIndex: number | null = null;
 
+  companyList: CompanyInterface[] = [];
+
+  @ViewChild('officeDetailDrawer', { static: false }) officeDetailDrawer!: OfficeDetailComponent;
+
   constructor(
     private alertService: AlertService,
     private fb: FormBuilder,
-    private modalService: NzModalService,
     private toastService: ToastService,
+    private clientService: ClientProviderService,
   ) { }
+
+  ngOnInit(): void {
+    this.getCompanyList();
+  }
 
   goPrev() { this.prev.emit(); }
   goNext() { this.next.emit(); }
 
-  // get isEditingOffice(): boolean {
-  //   return this.selectedOfficeIndex != null;
-  // }
+  getCompanyList() {
+    this.clientService.getCompanies().subscribe({
+      next: (res: any) => {
+        this.companyList = res.data;
+      },
+      error: (err: any) => {
+        console.error(err);
+      }
+    });
+  }
+
+  viewOffice(officeIndex: number | null = null) {
+    if (officeIndex == null) return;
+    const office = this.existingOffices[officeIndex];
+    this.officeDetailDrawer.open(office);
+  }
 
   openOfficeForm(index: number | null = null) {
     this.isEditingOffice = true;
@@ -96,84 +118,6 @@ export class OfficeListComponent {
       }
       this.officesChanged.emit(this.existingOffices);
     }
-  }
-
-  viewOffice(officeIndex: number | null = null) { }
-
-  openOfficeModal(officeIndex: number | null = null) {
-    const office = officeIndex != null
-      ? this.existingOffices[officeIndex]
-      : null;
-
-    const modalRef = this.modalService.create<OfficeModalComponent, any>({
-      nzTitle: office ? 'Actualizar sede de prestación de servicio' : 'Agregar sede de prestación de servicio',
-      nzContent: OfficeModalComponent,
-      nzCentered: true,
-      nzClosable: true,
-      nzMaskClosable: false,
-      nzWidth: '900px',
-      nzStyle: { 'max-width': '90%', 'margin': '22px 0' },
-      nzOnCancel: () => {
-        const componentInstance = modalRef.getContentComponent();
-        if (componentInstance.hasChanges) {
-          this.alertService.confirm(
-            'Cambios sin guardar',
-            'Tienes cambios en la sede. Si sales sin guardar, se perderán.',
-            {
-              confirmBtnText: 'Salir',
-              cancelBtnText: 'Cancelar',
-            }
-          ).subscribe((confirmed: boolean) => {
-            if (!confirmed) return;
-            modalRef.destroy();
-          });
-          return false;
-        }
-        return true; // Close modal
-      }
-    });
-    const instanceModal = modalRef.getContentComponent();
-    if (office) {
-      instanceModal.office = office;
-    }
-    instanceModal.providerCompanies = this.providerCompanies;
-
-    modalRef.afterClose.subscribe((result: any) => {
-      // if (result && result.office) {
-      //   const newOffice = result.office;
-
-      //   if (result.isNew && newOffice.value.idAddedTemporal) {
-      //     if (officeIndex != null) {
-      //       const createdOfficesIndex = this.createdOffices.controls.findIndex(
-      //         (control) => control.value.idAddedTemporal === newOffice.value.idAddedTemporal
-      //       );
-      //       (this.createdOffices as FormArray).setControl(createdOfficesIndex, newOffice);
-      //       this.existingOffices[officeIndex] = newOffice.value;
-      //     } else {
-      //       this.createdOffices.push(newOffice);
-      //       this.existingOffices.push(newOffice.value);
-      //     }
-      //     this.existingOffices = [...this.existingOffices];
-      //     this.toastService.success(
-      //       `Sede por ${officeIndex != null ? 'actualizar' : 'agregar'}.`,
-      //       { color: 'info' }
-      //     );
-      //   } else if (!result.isNew && officeIndex != null) {
-      //     const updatedOfficesIndex = this.updatedOffices.controls.findIndex(
-      //       (control) => control.value.idTemporalOfficeProvider === newOffice.value.idTemporalOfficeProvider
-      //     );
-      //     if (updatedOfficesIndex !== -1) {
-      //       (this.updatedOffices as FormArray).setControl(updatedOfficesIndex, newOffice);
-      //     } else {
-      //       this.updatedOffices.push(newOffice);
-      //     }
-      //     this.existingOffices[officeIndex] = newOffice.value;
-      //     this.existingOffices = [...this.existingOffices];
-      //     this.toastService.success('Sede por actualizar.', { color: 'info' });
-      //   }
-      //   this.officesChanged.emit(this.existingOffices);
-      // }
-    });
   }
 
   async deleteOffice(index: number) {

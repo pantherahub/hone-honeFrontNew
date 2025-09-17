@@ -41,9 +41,13 @@
   </div>
 
   <!-- Content -->
-  <div class="p-6 overflow-y-auto flex-1">
-    <ng-content></ng-content>
-  </div>
+  @if (!hasCustomContent) {
+    <div class="p-6 overflow-y-auto flex-1">
+      <ng-content></ng-content>
+    </div>
+  }
+
+  <ng-content select="[drawer-custom-content]"></ng-content>
 
   <!-- Footer -->
   <div class="border-t p-6 shadow-2xl" [class.hidden]="!hasFooter">

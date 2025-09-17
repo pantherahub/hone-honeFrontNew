@@ -1,10 +1,9 @@
-import { CommonModule, Location } from '@angular/common';
-import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, Renderer2, ViewChild, ViewChildren } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
-import { OfficeModalComponent } from './office-modal/office-modal.component';
 import { ClientProviderService } from 'src/app/services/clients/client-provider.service';
 import { LANGUAGES } from 'src/app/constants/languages';
 import { ContactFormComponent } from './contact-form/contact-form.component';
@@ -12,7 +11,7 @@ import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service
 import { AlertNzService } from 'src/app/services/alert-nz/alert-nz.service';
 import { format } from 'date-fns';
 import { BackendErrorsComponent } from 'src/app/shared/components/backend-errors/backend-errors.component';
-import { debounceTime, firstValueFrom } from 'rxjs';
+import { debounceTime, firstValueFrom, fromEvent } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
 import { CanComponentDeactivate } from 'src/app/guards/can-deactivate.interface';
 import { Router, RouterModule } from '@angular/router';
@@ -34,7 +33,7 @@ import { ToastService } from 'src/app/services/toast/toast.service';
   templateUrl: './update-data.component.html',
   styleUrl: './update-data.component.scss'
 })
-export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeactivate {
+export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, CanComponentDeactivate {
 
   user = this.eventManager.userLogged();
   providerForm!: FormGroup;
@@ -91,7 +90,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
       icon: '/assets/icons/outline/general.svg#phone',
     },
   ];
-  activeStep: string = 'offices';
+  activeStep: string = 'provider';
 
   providerFormFields: string[] = [
     'name',
@@ -103,6 +102,14 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
     'repsEnableCode',
     'website',
   ];
+
+  atStart: boolean = true;
+  atEnd: boolean = false;
+
+  visibleIndex = 0;
+
+  @ViewChild('stepsContainer') stepsContainer!: ElementRef<HTMLDivElement>;
+  @ViewChildren('stepBtn') stepBtns!: QueryList<ElementRef<HTMLDivElement>>;
 
   constructor (
     private eventManager: EventManagerService,
@@ -116,6 +123,7 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
     private router: Router,
     private navigationService: NavigationService,
     private alertService: AlertService,
+    private renderer: Renderer2,
   ) { }
 
   ngOnInit(): void {
@@ -126,9 +134,73 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
 
     this.getCompanies();
 
-    // return;
     this.loadFormData();
+  }
 
+  ngAfterViewInit(): void {
+    this.updateArrows(true);
+
+    // Update navigation arrows on mobile when scrolling stops
+    const container = this.stepsContainer.nativeElement;
+    fromEvent(container, 'scroll')
+      .pipe(debounceTime(200))
+      .subscribe(() => this.updateArrows(false));
+  }
+
+  scrollStep(direction: 'left' | 'right') {
+    if (this.steps.length === 0) return;
+
+    if (direction === 'right' && this.visibleIndex < this.steps.length - 1) {
+      this.visibleIndex++;
+    } else if (direction === 'left' && this.visibleIndex > 0) {
+      this.visibleIndex--;
+    }
+
+    const target = this.stepBtns.toArray()[this.visibleIndex]?.nativeElement;
+    if (target) {
+      target.scrollIntoView({
+        behavior: 'smooth',
+        inline: 'start',
+        block: 'nearest'
+      });
+    }
+
+    this.atStart = this.visibleIndex === 0;
+    this.atEnd = this.visibleIndex === this.steps.length - 1;
+    this.updateArrows(true);
+  }
+
+  updateArrows(useDelay = false) {
+    const tolerance = 4;
+
+    const run = () => {
+      const parent = this.stepsContainer.nativeElement.parentElement as HTMLElement;
+      const steps = this.stepBtns.toArray().map(btn => btn.nativeElement);
+
+      if (!parent || steps.length === 0) return;
+
+      const parentRect = parent.getBoundingClientRect();
+      const firstRect = steps[0].getBoundingClientRect();
+      const lastRect = steps[steps.length - 1].getBoundingClientRect();
+
+      this.atStart = firstRect.left >= parentRect.left;
+      // if (this.atStart) {
+      //   this.visibleIndex = 0;
+      // }
+
+      this.atEnd = lastRect.right <= parentRect.right + tolerance;
+      // if (this.atEnd) {
+      //   this.visibleIndex = steps.length - 1;
+      // }
+    }
+
+    if (useDelay) {
+      // With delay, when executing a scroll programmatically
+      setTimeout(run, 300);
+    } else {
+      // No delay, for debounceTime
+      run();
+    }
   }
 
   ngOnDestroy(): void {
@@ -148,6 +220,11 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
     if (this.hasSavedState()) {
       $event.preventDefault();
     }
+  }
+
+  @HostListener('window:resize')
+  onResize() {
+    this.updateArrows();
   }
 
   subscribeOnChange() {
@@ -187,8 +264,16 @@ export class UpdateDataComponent implements OnInit, OnDestroy, CanComponentDeact
   //   }
   // }
 
-  goToStep(stepKey: string, canEnable: boolean = false) {
+  goToStep(stepKey: string, canEnable: boolean = false, element?: HTMLElement) {
     const step = this.steps.find(s => s.key === stepKey);
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+        inline: 'center',
+        block: 'nearest'
+      });
+    }
+
     if (!step || step.key === this.activeStep) return;
 
     if (this.activeStep === 'provider' && !this.validateProviderForm()) {

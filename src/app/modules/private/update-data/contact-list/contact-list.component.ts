@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder } from '@angular/forms';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { AlertService } from 'src/app/services/alert/alert.service';
@@ -8,11 +8,12 @@ import { ButtonComponent } from 'src/app/shared/components/button/button.compone
 import { DropdownTriggerDirective } from 'src/app/directives/dropdown-trigger.directive';
 import { firstValueFrom } from 'rxjs';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { ContactDetailComponent } from '../contact-detail/contact-detail.component';
 
 @Component({
   selector: 'app-contact-list',
   standalone: true,
-  imports: [CommonModule, ButtonComponent, DropdownTriggerDirective],
+  imports: [CommonModule, ButtonComponent, DropdownTriggerDirective, ContactFormComponent, ContactDetailComponent],
   templateUrl: './contact-list.component.html',
   styleUrl: './contact-list.component.scss'
 })
@@ -26,6 +27,12 @@ export class ContactListComponent {
   @Output() contactsChanged = new EventEmitter<any>();
   @Output() prev = new EventEmitter<void>();
   @Output() onFormSubmit = new EventEmitter<any>();
+
+  isEditingContact = false;
+  selectedContactIndex: number | null = null;
+
+  @ViewChild('contactDrawer', { static: false }) contactDrawer!: ContactFormComponent;
+  @ViewChild('contactDetailDrawer', { static: false }) contactDetailDrawer!: ContactDetailComponent;
 
   constructor(
     private alertService: AlertService,
@@ -42,80 +49,67 @@ export class ContactListComponent {
     this.onFormSubmit.emit();
   }
 
-  viewOffice(officeIndex: number | null = null) { }
+  viewContact(contactIndex: number | null = null) {
+    if (contactIndex == null) return;
+    const contact = this.existingContacts[contactIndex];
+    this.contactDetailDrawer.open(contact);
+  }
 
-  openContactModal(contactIndex: number | null = null) {
-    const contact = contactIndex != null
-      ? this.existingContacts[contactIndex]
-      : null;
+  openContactForm(index: number | null = null) {
+    this.isEditingContact = true;
+    this.selectedContactIndex = index;
 
-    const modalRef = this.modalService.create<ContactFormComponent, any>({
-      nzTitle: contact ? 'Actualizar contacto' : 'Agregar contacto',
-      nzContent: ContactFormComponent,
-      nzCentered: true,
-      nzClosable: true,
-      nzMaskClosable: false,
-      nzWidth: '650px',
-      nzStyle: { 'max-width': '90%', 'margin': '22px 0' },
-      nzOnCancel: () => {
-        const componentInstance = modalRef.getContentComponent();
-        if (componentInstance.hasChanges) {
-          this.alertService.confirm(
-            'Cambios sin guardar',
-            'Tienes cambios en el contacto. Si sales sin guardar, se perderán.',
-            {
-              confirmBtnText: 'Salir',
-              cancelBtnText: 'Cancelar',
-            }
-          ).subscribe((confirmed: boolean) => {
-            if (!confirmed) return;
-            modalRef.destroy();
-          });
-          return false;
-        }
-        return true; // Close modal
-      }
-    });
-    const instanceModal = modalRef.getContentComponent();
-    instanceModal.contactModelType = 'Prestador';
-    if (contact) instanceModal.contact = contact;
+    const contact = this.selectedContactIndex != null
+        ? this.existingContacts[this.selectedContactIndex]
+        : null;
+    this.contactDrawer.open({ contact });
+  }
 
-    modalRef.afterClose.subscribe((result: any) => {
-      if (result && result.contact) {
-        const newContact = result.contact;
+  onContactFormClose(savedContact?: any) {
+    if (savedContact) {
+      this.handleSaveContact(savedContact);
+    }
+    this.isEditingContact = false;
+    this.selectedContactIndex = null;
+  }
 
-        if (result.isNew && newContact.value.idAddedTemporal) {
-          if (contactIndex != null) {
-            const createdContactsIndex = this.createdContacts.controls.findIndex(
-              (control) => control.value.idAddedTemporal === newContact.value.idAddedTemporal
-            );
-            (this.createdContacts as FormArray).setControl(createdContactsIndex, newContact);
-            this.existingContacts[contactIndex] = newContact.value;
-          } else {
-            this.createdContacts.push(newContact);
-            this.existingContacts.push(newContact.value);
-          }
-          this.existingContacts = [...this.existingContacts];
-          this.toastService.success(
-            `Contacto por ${contactIndex != null ? 'actualizar' : 'agregar'}.`,
-            { color: 'info' }
+  private handleSaveContact(result: any) {
+    const contactIndex = this.selectedContactIndex;
+
+    if (result && result.contact) {
+      const newContact = result.contact;
+
+      if (result.isNew && newContact.value.idAddedTemporal) {
+        if (contactIndex != null) {
+          const createdContactsIndex = this.createdContacts.controls.findIndex(
+            (control) => control.value.idAddedTemporal === newContact.value.idAddedTemporal
           );
-        } else if (!result.isNew && contactIndex != null) {
-          const updatedContactsIndex = this.updatedContacts.controls.findIndex(
-            (control) => control.value.idTemporalContact === newContact.value.idTemporalContact
-          );
-          if (updatedContactsIndex !== -1) {
-            (this.updatedContacts as FormArray).setControl(updatedContactsIndex, newContact);
-          } else {
-            this.updatedContacts.push(newContact);
-          }
+          (this.createdContacts as FormArray).setControl(createdContactsIndex, newContact);
           this.existingContacts[contactIndex] = newContact.value;
-          this.existingContacts = [...this.existingContacts];
-          this.toastService.success('Contacto por actualizar.', { color: 'info' });
+        } else {
+          this.createdContacts.push(newContact);
+          this.existingContacts.push(newContact.value);
         }
-        this.contactsChanged.emit(this.existingContacts);
+        this.existingContacts = [...this.existingContacts];
+        this.toastService.success(
+          `Contacto por ${contactIndex != null ? 'actualizar' : 'agregar'}.`,
+          { color: 'info' }
+        );
+      } else if (!result.isNew && contactIndex != null) {
+        const updatedContactsIndex = this.updatedContacts.controls.findIndex(
+          (control) => control.value.idTemporalContact === newContact.value.idTemporalContact
+        );
+        if (updatedContactsIndex !== -1) {
+          (this.updatedContacts as FormArray).setControl(updatedContactsIndex, newContact);
+        } else {
+          this.updatedContacts.push(newContact);
+        }
+        this.existingContacts[contactIndex] = newContact.value;
+        this.existingContacts = [...this.existingContacts];
+        this.toastService.success('Contacto por actualizar.', { color: 'info' });
       }
-    });
+      this.contactsChanged.emit(this.existingContacts);
+    }
   }
 
   async deleteContact(index: number) {

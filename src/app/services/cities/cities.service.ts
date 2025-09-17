@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { City } from 'src/app/models/city.interface';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -12,7 +13,7 @@ export class CitiesService {
 
   constructor(private http: HttpClient) { }
 
-  getCities(): Observable<any> {
-    return this.http.get(`${this.url}getCities`);
+  getCities(): Observable<City[]> {
+    return this.http.get<City[]>(`${this.url}getCities`);
   }
 }

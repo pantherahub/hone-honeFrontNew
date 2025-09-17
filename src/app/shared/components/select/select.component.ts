@@ -70,6 +70,7 @@ export class SelectComponent implements ControlValueAccessor, OnInit {
   }
 
   closeDropdown() {
+    if (this.isOpen) this.onTouched();
     this.isOpen = false;
     this.isDropdownInDOM = false;
     this.clearSearch();

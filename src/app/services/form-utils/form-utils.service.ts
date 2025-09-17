@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AbstractControl, FormArray, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { AbstractControl, FormArray, FormControl, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { isAlphanumeric, isAlphanumericWithSpaces, isEmail, isNumeric, isTelephoneNumber, isUrl } from 'src/app/utils/validation-utils';
 
 @Injectable({
@@ -125,6 +125,25 @@ export class FormUtilsService {
     while (formArray.length !== 0) {
       formArray.removeAt(0);
     }
+  }
+
+  cloneAbstractControl(control: AbstractControl): AbstractControl {
+    if (control instanceof FormGroup) {
+      const group = new FormGroup({});
+      Object.keys(control.controls).forEach(key => {
+        group.addControl(key, this.cloneAbstractControl(control.controls[key]));
+      });
+      return group;
+    } else if (control instanceof FormArray) {
+      const array = new FormArray<AbstractControl>([]);
+      control.controls.forEach(c => {
+        array.push(this.cloneAbstractControl(c))
+      });
+      return array;
+    } else if (control instanceof FormControl) {
+      return new FormControl(control.value);
+    }
+    throw new Error('Unsupported control type');
   }
 
   /**

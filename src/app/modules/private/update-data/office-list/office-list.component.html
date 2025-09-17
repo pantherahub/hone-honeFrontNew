@@ -137,8 +137,13 @@
     [office]="selectedOfficeIndex != null
       ? existingOffices[selectedOfficeIndex]
       : null"
+    [companyList]="companyList"
     [providerCompanies]="providerCompanies"
-    (cancel)="closeOfficeForm()"
-    (save)="closeOfficeForm($event)">
+    (onClose)="closeOfficeForm($event)">
   </app-office-form>
 }
+
+<app-office-detail
+  #officeDetailDrawer
+  [companyList]="companyList">
+</app-office-detail>

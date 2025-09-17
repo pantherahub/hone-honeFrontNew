@@ -1,270 +1,306 @@
-<form nz-form nzLayout="vertical" [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="contact-form">
+<!-- @if (loading) {
+  <div class="loading-overlay">
+    <nz-spin [nzSize]="'large'" nzTip="Cargando..."></nz-spin>
+  </div>
+} -->
 
-  @if (loading) {
-    <div class="loading-overlay">
-      <nz-spin [nzSize]="'large'" nzTip="Cargando..."></nz-spin>
+
+@if (!isDrawer() && isEditingContact) {
+  <ng-container
+    *ngTemplateOutlet="formTemplate">
+  </ng-container>
+}
+
+<app-drawer
+  #contactDrawer
+  placement="right"
+  size="xl"
+  [beforeClose]="canClose.bind(this)"
+  [hasCustomContent]="true"
+  (onClose)="onFormClose($event)">
+  <ng-container drawer-header>
+    <h2 class="text-lg font-black leading-5 text-main-blue1h">
+      Información de contacto
+    </h2>
+  </ng-container>
+
+  @if (isDrawer() && isEditingContact) {
+    <div drawer-custom-content class="flex-1 min-h-0">
+      <ng-container
+        *ngTemplateOutlet="formTemplate">
+      </ng-container>
     </div>
   }
+</app-drawer>
 
-  <div nz-row [nzGutter]="16">
 
-    <nz-col [nzSpan]="24" [nzSm]="12">
-      <nz-form-item>
-        <nz-form-label [nzRequired]="true" nzFor="idOccupationType">Tipo de contacto</nz-form-label>
-        <nz-form-control nzErrorTip="El campo es requerido.">
-          <nz-select
-            id="idOccupationType"
-            formControlName="idOccupationType"
-            nzPlaceHolder="Seleccionar"
-          >
-            <nz-option *ngFor="let type of contactOccupationTypes" [nzValue]="type.idOccupationType" [nzLabel]="type.type"></nz-option>
-          </nz-select>
-        </nz-form-control>
-      </nz-form-item>
-    </nz-col>
+<ng-template #formTemplate>
+  <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="h-full flex flex-col"
+    [ngClass]="{ 'gap-4': !isDrawer() }">
+    @if (!isDrawer()) {
+      <div class="flex justify-between gap-2">
+        <app-button
+          (onClick)="close()"
+          variant="primary"
+          styleType="ghost"
+          size="sm"
+          customClass="leading-4">
+          <svg width="16" height="16">
+            <use xlink:href="/assets/icons/outline/arrows.svg#chevron-left" />
+          </svg>
+          Volver
+        </app-button>
+        <div class="flex gap-2">
+          <app-button
+            [type]="'submit'"
+            variant="primary"
+            styleType="solid"
+            size="xs">
+            Guardar
+          </app-button>
+          <app-button
+            (onClick)="close()"
+            variant="primary"
+            styleType="soft"
+            size="xs">
+            Cancelar
+          </app-button>
+        </div>
+      </div>
+    }
 
-    <nz-col [nzSpan]="24" [nzSm]="12">
-      <nz-form-item>
-        <nz-form-label [nzRequired]="true" nzFor="idOccupation">
-          {{ selectedOccupationType === 1 ? 'Área' : 'Cargo' }}
-        </nz-form-label>
-        <nz-form-control nzErrorTip="El campo es requerido.">
-          <nz-select
-            id="idOccupation"
-            formControlName="idOccupation"
-            nzShowSearch
-            [nzShowArrow]="true"
-            nzPlaceHolder="Seleccionar"
-          >
-            <nz-option *ngFor="let occupation of contactOccupations" [nzValue]="occupation.idOccupation" [nzLabel]="occupation.occupation"></nz-option>
-          </nz-select>
-        </nz-form-control>
-      </nz-form-item>
-    </nz-col>
+    <div [ngClass]="{ 'p-6 overflow-y-auto flex-1': isDrawer() }">
+      <div class="flex flex-col p-4 rounded-xl"
+        [ngClass]="{
+          'gap-4 bg-gray-50 ring-[1px] ring-inset ring-gray-200': isDrawer(),
+          'gap-6 bg-gray-100': !isDrawer()
+        }">
 
-    <!-- Person contact -->
-    <nz-col [nzSpan]="24" [nzSm]="12" *ngIf="selectedOccupationType === 2">
-      <nz-form-item>
-        <nz-form-label [nzRequired]="true" nzFor="officeName">Nombre</nz-form-label>
-        <nz-form-control [nzErrorTip]="nameErrorTip">
-          <ng-template #nameErrorTip>
-            <p *ngIf="contactForm.controls['name'].hasError('required')">El campo es requerido.</p>
-          </ng-template>
-          <input nz-input id="officeName" formControlName="name" placeholder="Nombre" />
-        </nz-form-control>
-      </nz-form-item>
-    </nz-col>
+        <div class="flex flex-col gap-2">
+          <div>
+            <app-select
+              [items]="contactOccupationTypes"
+              bindLabel="type"
+              bindValue="idOccupationType"
+              formControlName="idOccupationType"
+              placeholder="Tipo de contacto">
+            </app-select>
+            <app-input-error [control]="contactForm.get('idOccupationType')" />
+          </div>
+          <div>
+            <app-select
+              [items]="contactOccupations"
+              bindLabel="occupation"
+              bindValue="idOccupation"
+              formControlName="idOccupation"
+              [searchable]="true"
+              [placeholder]="selectedOccupationType === 1 ? 'Seleccionar área' : 'Cargo'">
+            </app-select>
+            <app-input-error [control]="contactForm.get('idOccupation')" />
+          </div>
+          @if (selectedOccupationType === 2) {
+            <div>
+              <app-text-input
+                [id]="'contactName'"
+                label="Nombre"
+                formControlName="name"
+              />
+              <app-input-error [control]="contactForm.get('name')" />
+            </div>
+          }
+          @if (identificationEnabled) {
+            <div>
+              <app-select
+                [items]="identificationTypes"
+                bindLabel="typeDocument"
+                bindValue="idTypeDocument"
+                formControlName="idTypeDocument"
+                placeholder="Tipo de identificación">
+              </app-select>
+              <app-input-error [control]="contactForm.get('idTypeDocument')" />
+            </div>
+            <div>
+              <app-text-input
+                [id]="'identification'"
+                label="Identificación"
+                formControlName="identification"
+              />
+              <app-input-error [control]="contactForm.get('identification')" />
+            </div>
+            <div>
+              <app-text-input
+                [id]="'expeditionDate'"
+                label="Fecha de expedición"
+                [type]="'date'"
+                [maxDate]="todayDate"
+                formControlName="expeditionDate"
+              />
+              <app-input-error [control]="contactForm.get('expeditionDate')" />
+            </div>
+            <div>
+              <app-select
+                [items]="cities"
+                bindLabel="city"
+                bindValue="idCity"
+                formControlName="idCityExpedition"
+                [searchable]="true"
+                placeholder="Ciudad de expedición">
+              </app-select>
+              <app-input-error [control]="contactForm.get('idCityExpedition')" />
+            </div>
+          }
+        </div>
 
-    <nz-col [nzSpan]="24" [nzSm]="12" *ngIf="identificationEnabled">
-      <nz-form-item>
-        <nz-form-label [nzRequired]="true" nzFor="idTypeDocument">Tipo de identificación</nz-form-label>
-        <nz-form-control nzErrorTip="El campo es requerido.">
-          <nz-select
-            id="idTypeDocument"
-            formControlName="idTypeDocument"
-            nzPlaceHolder="Seleccionar"
-          >
-            <nz-option *ngFor="let type of identificationTypes" [nzValue]="type.idTypeDocument" [nzLabel]="type.typeDocument"></nz-option>
-          </nz-select>
-        </nz-form-control>
-      </nz-form-item>
-    </nz-col>
+        <div class="flex flex-col gap-2" formArrayName="Emails">
+          <div class="flex items-center justify-between">
+            <h4 class="text-base font-semibold leading-[18px]">Correos</h4>
+            <app-button
+              (onClick)="addEmail()"
+              [disabled]="emailsArray.length >= 5"
+              variant="primary"
+              styleType="soft"
+              size="sm"
+              customClass="leading-4">
+              <svg width="16" height="16">
+                <use xlink:href="/assets/icons/outline/general.svg#plus" />
+              </svg>
+              Agregar
+            </app-button>
+          </div>
+          @for (control of emailsArray.controls; track control; let i = $index) {
+            <div [formGroupName]="i">
+              <div class="flex items-center gap-2">
+                <div class="flex-1">
+                  <app-text-input
+                    [id]="'email-' + i"
+                    label="Correo"
+                    formControlName="email"
+                  />
+                </div>
+                @if (canRemoveEmail) {
+                  <app-tooltip
+                    [id]="'remove-email-' + i"
+                    [text]="'Eliminar correo'"
+                    position="left"
+                    styleType="dark">
+                    <app-button
+                      (onClick)="removeEmail(i)"
+                      variant="red"
+                      styleType="soft"
+                      size="sm">
+                      <svg width="20" height="20">
+                        <use xlink:href="/assets/icons/outline/general.svg#minus" />
+                      </svg>
+                    </app-button>
+                  </app-tooltip>
+                }
+              </div>
+              <app-input-error [control]="control.get('email')" />
+            </div>
+          }
+        </div>
 
-    <nz-col [nzSpan]="24" [nzSm]="12" *ngIf="identificationEnabled">
-      <nz-form-item>
-        <nz-form-label [nzRequired]="true" nzFor="identification">Identificación</nz-form-label>
-        <nz-form-control [nzErrorTip]="identificationErrorTip">
-          <ng-template #identificationErrorTip>
-            @if (contactForm.controls['identification'].hasError('required')) {
-              <p>El campo es requerido.</p>
-            } @else if (contactForm.controls['identification'].hasError('invalidNumber')) {
-              <p>Ingresa un valor válido.</p>
-            }
-          </ng-template>
-          <input nz-input id="identification" formControlName="identification" placeholder="Identificación" />
-        </nz-form-control>
-      </nz-form-item>
-    </nz-col>
-
-    <nz-col [nzSpan]="24" [nzSm]="12" *ngIf="identificationEnabled">
-      <nz-form-item>
-        <nz-form-label [nzRequired]="true" nzFor="expeditionDate">Fecha de expedición</nz-form-label>
-        <nz-form-control [nzErrorTip]="expeditionDateErrorTip">
-          <ng-template #expeditionDateErrorTip>
-            <p *ngIf="contactForm.controls['expeditionDate'].hasError('required')">El campo es requerido.</p>
-          </ng-template>
-          <nz-date-picker formControlName="expeditionDate" nzPlaceHolder="Fecha" [nzDisabledDate]="disableFutureDates"></nz-date-picker>
-        </nz-form-control>
-      </nz-form-item>
-    </nz-col>
-
-    <nz-col [nzSpan]="24" [nzSm]="12" *ngIf="identificationEnabled">
-      <nz-form-item>
-        <nz-form-label [nzRequired]="true" nzFor="idCityExpedition">Ciudad de expedición</nz-form-label>
-        <nz-form-control nzErrorTip="El campo es requerido.">
-          <nz-select
-            id="idCityExpedition"
-            formControlName="idCityExpedition"
-            nzShowSearch
-            [nzShowArrow]="true"
-            nzPlaceHolder="Seleccionar"
-          >
-            <nz-option *ngFor="let city of cities" [nzValue]="city.idCity" [nzLabel]="city.city"></nz-option>
-          </nz-select>
-        </nz-form-control>
-      </nz-form-item>
-    </nz-col>
-
-    <nz-col [nzSpan]="24">
-      <nz-form-label [nzRequired]="isEmailRequired">Correo(s)</nz-form-label>
-      <div nz-row [nzGutter]="16" formArrayName="Emails">
-        @for (control of emailsArray.controls; track control; let i = $index) {
-          <nz-col [nzSpan]="24" [nzSm]="12">
-            <nz-form-item [formGroupName]="i" class="email-form-item pb-1">
-              <nz-form-control [nzErrorTip]="emailErrorTip">
-                <ng-template #emailErrorTip>
-                  @if (control.get('email')?.hasError('required')) {
-                    El campo es requerido.
-                  } @else if (control.get('email')?.hasError('invalidEmail')) {
-                    Ingresa un correo válido.
-                  }
-                </ng-template>
-                <input
-                  nz-input
-                  type="email"
-                  placeholder="Correo"
-                  formControlName="email"
-                  class="passenger-input"
-                  [id]="'email-' + i"
+        <div class="flex flex-col gap-2" formArrayName="Phones">
+          <div class="flex items-center justify-between">
+            <h4 class="text-base font-semibold leading-[18px]">Teléfonos</h4>
+            <app-button
+              (onClick)="addPhone()"
+              [disabled]="phonesArray.length >= 5"
+              variant="primary"
+              styleType="soft"
+              size="sm"
+              customClass="leading-4">
+              <svg width="16" height="16">
+                <use xlink:href="/assets/icons/outline/general.svg#plus" />
+              </svg>
+              Agregar
+            </app-button>
+          </div>
+          @for (control of phonesArray.controls; track control; let i = $index) {
+            <div [formGroupName]="i" class="flex flex-col gap-2">
+              <div>
+                <app-select
+                  [items]="phoneNumberTypes"
+                  formControlName="type"
+                  placeholder="Tipo">
+                </app-select>
+                <app-input-error [control]="control.get('type')" />
+              </div>
+              @if (isFijoPhone(control)) {
+                <div>
+                  <app-select
+                    [items]="cities"
+                    bindLabel="label"
+                    bindValue="idCity"
+                    formControlName="idCity"
+                    [searchable]="true"
+                    placeholder="Indicativo">
+                  </app-select>
+                  <app-input-error [control]="control.get('idCity')" />
+                </div>
+              }
+              <div>
+                <app-text-input
+                  [id]="'number-' + i"
+                  label="Número"
+                  formControlName="number"
                 />
-              </nz-form-control>
-              <span
-                nz-icon
-                nzType="minus-circle-o"
-                class="dynamic-delete-button mt-1"
-                *ngIf="canRemoveEmail"
-                (click)="removeEmail(i)"
-                nz-tooltip
-                nzTooltipTitle="Eliminar correo"
-                nzTooltipPlacement="right"
-              ></span>
-            </nz-form-item>
-          </nz-col>
-        }
-        <nz-col [nzSpan]="24" [nzSm]="12">
-          <nz-form-item>
-            <nz-form-control>
-              <button nz-button nzType="dashed" type="button" (click)="addEmail()" [disabled]="emailsArray.length >= 5" class="flex items-center">
-                <span nz-icon nzType="plus"></span> Agregar correo
-              </button>
-            </nz-form-control>
-          </nz-form-item>
-        </nz-col>
+                <app-input-error
+                  [control]="control.get('number')"
+                  [customMessages]="customErrorMessagesMap['phoneNumber']"
+                />
+              </div>
+              <div>
+                <app-text-input
+                  [id]="'extension-' + i"
+                  label="Extensión - Opcional"
+                  formControlName="extension"
+                />
+                <app-input-error [control]="control.get('extension')" />
+              </div>
+              @if (canRemovePhone) {
+                <app-button
+                  (onClick)="removePhone(i)"
+                  variant="red"
+                  styleType="soft"
+                  size="xs">
+                  <svg width="16" height="16">
+                    <use xlink:href="/assets/icons/outline/general.svg#minus" />
+                  </svg>
+                  Eliminar teléfono
+                </app-button>
+              }
+            </div>
+          }
+        </div>
       </div>
-    </nz-col>
+    </div>
 
-    <nz-col [nzSpan]="24" [nzSm]="24">
-      <nz-form-label [nzRequired]="isPhoneRequired">Teléfono(s)</nz-form-label>
-      <div nz-row [nzGutter]="4" formArrayName="Phones">
-        @for (control of phonesArray.controls; track control; let i = $index) {
-          <nz-col [nzSpan]="isFijoPhone(control) ? 12 : 9" [nzSm]="5">
-            <nz-form-item [formGroupName]="i" class="sm:mb-0" [ngClass]="{ 'mb-0': !isFijoPhone(control) }">
-              <nz-form-control nzErrorTip="El campo es requerido.">
-                <nz-select formControlName="type" nzPlaceHolder="Tipo">
-                  <nz-option *ngFor="let option of phoneNumberTypes" [nzValue]="option" [nzLabel]="option"></nz-option>
-                </nz-select>
-              </nz-form-control>
-            </nz-form-item>
-          </nz-col>
-
-          <nz-col [nzSpan]="12" [nzSm]="7" *ngIf="control.get('type')?.value === 'Fijo'">
-            <nz-form-item [formGroupName]="i" class="sm:mb-0" [ngClass]="{ 'mb-0': !isFijoPhone(control) }">
-              <nz-form-control nzErrorTip="El campo es requerido.">
-                <nz-select formControlName="idCity" nzPlaceHolder="Indicativo" nzShowSearch [nzCustomTemplate]="selectedTemplate">
-                  <nz-option *ngFor="let option of cities" [nzValue]="option.idCity" [nzLabel]="option.label"></nz-option>
-                  <ng-template #selectedTemplate let-selected>
-                    <span class="custom-selected">{{ getSelectedIndicative(selected.nzValue) }}</span>
-                  </ng-template>
-                </nz-select>
-              </nz-form-control>
-            </nz-form-item>
-          </nz-col>
-
-          <nz-col [nzSpan]="isFijoPhone(control) ? 24 : 15" [nzSm]="isFijoPhone(control) ? 12 : 19">
-            <nz-form-item [formGroupName]="i" class="mb-0">
-              <nz-form-control>
-                <nz-row>
-                  <nz-col [nzSpan]="13">
-                    <nz-form-item class="mb-0">
-                      <nz-form-control [nzErrorTip]="phoneErrorTip">
-                        <ng-template #phoneErrorTip>
-                          @if (control.get('number')?.hasError('required')) {
-                            El campo es requerido.
-                          } @else if (control.get('number')?.hasError('invalidTelNumber')) {
-                            Ingresa un número válido.
-                          } @else if (control.get('number')?.hasError('invalidLength')) {
-                            {{ control.get('number')?.errors?.['invalidLength'] }}
-                          }
-                        </ng-template>
-                        <input
-                          nz-input
-                          type="text"
-                          placeholder="Número"
-                          formControlName="number"
-                        />
-                      </nz-form-control>
-                    </nz-form-item>
-                  </nz-col>
-                  <nz-col [nzSpan]="11">
-                    <nz-form-item class="mb-0">
-                      <nz-form-control>
-                        <input
-                          nz-input
-                          type="text"
-                          placeholder="Ext. Opcional"
-                          formControlName="extension"
-                        />
-                      </nz-form-control>
-                    </nz-form-item>
-                  </nz-col>
-                </nz-row>
-              </nz-form-control>
-            </nz-form-item>
-          </nz-col>
-
-          <nz-col
-            [nzSpan]="24" class="delete-button mt-1 mb-4"
-            *ngIf="canRemovePhone"
-          >
-            <span
-              nz-icon
-              nzType="minus-circle-o"
-              class="dynamic-delete-button"
-              (click)="removePhone(i)"
-              nz-tooltip
-              nzTooltipTitle="Eliminar teléfono"
-              nzTooltipPlacement="right">
-            </span>
-          </nz-col>
-        }
-        <nz-col [nzSpan]="24" [nzSm]="24">
-          <nz-form-item [ngClass]="{ 'mt-2': phonesArray.length == 1 }">
-            <nz-form-control>
-              <button nz-button nzType="dashed" type="button" (click)="addPhone()" [disabled]="phonesArray.length >= 5" class="flex items-center">
-                <span nz-icon nzType="plus"></span> Agregar teléfono
-              </button>
-            </nz-form-control>
-          </nz-form-item>
-        </nz-col>
+    @if (isDrawer()) {
+      <div class="border-t p-6 shadow-2xl flex flex-col-reverse sm:flex-row gap-4">
+        <app-button
+          (onClick)="close()"
+          variant="gray"
+          styleType="soft"
+          size="lg"
+          class="flex-1"
+          customClass="leading-[18px] w-full flex justify-center">
+          Cancelar
+        </app-button>
+        <app-button
+          [type]="'submit'"
+          variant="primary"
+          styleType="solid"
+          size="lg"
+          class="flex-1"
+          customClass="leading-[18px] w-full flex justify-center">
+          Guardar
+        </app-button>
       </div>
-    </nz-col>
+    }
+  </form>
 
-  </div>
+</ng-template>
 
-  <div class="footer">
-    <button class="btn-primary bg-green-500 hover:bg-green-500/80" type="submit">
-      {{ contact ? 'Actualizar' : 'Guardar' }}
-    </button>
-  </div>
 
-</form>
+

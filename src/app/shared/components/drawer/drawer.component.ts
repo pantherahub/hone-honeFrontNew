@@ -14,6 +14,7 @@ export class DrawerComponent implements OnInit, OnDestroy {
   @Input() size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' = 'md';
   @Input() customSize?: string;
   @Input() onMobileFull: boolean = true;
+  @Input() hasCustomContent: boolean = false;
   @Input() hasFooter: boolean = false;
   @Input() isBackdropVisible: boolean = true;
 

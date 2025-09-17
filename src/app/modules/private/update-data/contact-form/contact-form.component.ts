@@ -1,26 +1,32 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import {
   AbstractControl,
   FormArray,
   FormBuilder,
   FormGroup,
-  ValidationErrors,
   Validators
 } from '@angular/forms';
 import { format } from 'date-fns';
-import { NzModalRef } from 'ng-zorro-antd/modal';
-import { distinctUntilChanged } from 'rxjs';
+import { distinctUntilChanged, firstValueFrom } from 'rxjs';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
+import { AlertService } from 'src/app/services/alert/alert.service';
+import { CatalogService } from 'src/app/services/catalog/catalog.service';
 import { CitiesService } from 'src/app/services/cities/cities.service';
 import { ClientProviderService } from 'src/app/services/clients/client-provider.service';
 import { ContactsProviderService } from 'src/app/services/contacts-provider/contacts-provider.service';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
+import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.component';
+import { InputErrorComponent } from 'src/app/shared/components/input-error/input-error.component';
+import { SelectComponent } from 'src/app/shared/components/select/select.component';
+import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
+import { TooltipComponent } from 'src/app/shared/components/tooltip/tooltip.component';
 
 @Component({
   selector: 'app-contact-form',
   standalone: true,
-  imports: [NgZorroModule, CommonModule],
+  imports: [NgZorroModule, CommonModule, DrawerComponent, ButtonComponent, TextInputComponent, InputErrorComponent, SelectComponent, TooltipComponent],
   templateUrl: './contact-form.component.html',
   styleUrl: './contact-form.component.scss'
 })
@@ -29,7 +35,9 @@ export class ContactFormComponent implements OnInit {
   @Input() contactModelType: string = 'Prestador'; // 'Prestador' or 'Sede'
   @Input() officeIdCity: number | null = null;
   @Input() shortcut: any | null = null; // Shortcut in creation to add default values
+  @Output() onClose = new EventEmitter<any>();
 
+  isEditingContact: boolean = false;
   contactForm!: FormGroup;
   formInitialized = false;
   hasChanges = false;
@@ -51,13 +59,23 @@ export class ContactFormComponent implements OnInit {
   loading: boolean = false;
   loadingSetupContactData: boolean = false;
 
+  customErrorMessagesMap: { [key: string]: any } = {
+    phoneNumber: {
+      invalidLength: (error: string) => error
+    },
+  };
+
+  todayDate = new Date().toISOString().split('T')[0];
+
+  @ViewChild('contactDrawer', { static: false }) contactDrawer!: DrawerComponent;
+
   constructor(
-    private modal: NzModalRef,
     private fb: FormBuilder,
     private formUtils: FormUtilsService,
     private contactsProviderService: ContactsProviderService,
     private clientProviderService: ClientProviderService,
-    private citiesService: CitiesService
+    private alertService: AlertService,
+    private catalogService: CatalogService,
   ) {}
 
   ngOnInit(): void {
@@ -67,6 +85,70 @@ export class ContactFormComponent implements OnInit {
 
     this.initializeForm();
     this.detectFormChanges();
+  }
+
+  isDrawer(): boolean {
+    return !this.contact || this.contactModelType === 'Sede';
+  }
+
+  open(options?: {
+    contact?: any;
+    officeIdCity?: number | null;
+    shortcut?: any | null;
+  }) {
+    this.contact = options?.contact ?? null;
+    this.officeIdCity = options?.officeIdCity ?? null;
+    this.shortcut = options?.shortcut ?? null;
+
+    this.isEditingContact = true;
+    this.contactForm.reset({
+      idAddedTemporal: Date.now().toString(),
+    });
+    this.formInitialized = false;
+    this.loadContactData();
+    this.hasChanges = false;
+    if (this.isDrawer()) {
+      this.contactDrawer.open();
+    }
+  }
+
+  async canClose(): Promise<boolean> {
+    if (this.hasChanges) {
+      const confirmed = await firstValueFrom(
+        this.alertService.confirm(
+          'Cambios sin guardar',
+          'Tienes cambios en el contacto. Si sales sin guardar, se perderán.',
+          {
+            confirmBtnText: 'Salir',
+            cancelBtnText: 'Cancelar',
+          }
+        )
+      );
+      return confirmed;
+    }
+    return true;
+  }
+
+  async close(contactData?: any) {
+    if (!contactData && !this.isDrawer() && this.hasChanges) {
+      const canClose = await this.canClose();
+      if (!canClose) return;
+    }
+    if (contactData) this.hasChanges = false;
+
+    if (this.isDrawer()) {
+      this.contactDrawer.close(contactData);
+    } else {
+      this.onFormClose(contactData);
+    }
+  }
+
+  onFormClose(contactData?: any) {
+    this.onClose.emit(contactData);
+    this.resetForm();
+    this.isEditingContact = false;
+    this.hasChanges = false;
+    this.formInitialized = false;
   }
 
   loadContactOccupationTypes() {
@@ -126,7 +208,7 @@ export class ContactFormComponent implements OnInit {
   }
 
   loadCities() {
-    this.citiesService.getCities().subscribe({
+    this.catalogService.getCities().subscribe({
       next: (data: any) => {
         this.cities = data;
         this.cities = data.map((option: any) => ({
@@ -138,13 +220,6 @@ export class ContactFormComponent implements OnInit {
         console.error(err);
       }
     });
-  }
-  getSelectedCity(id: number) {
-    return this.cities.find(c => c.idCity === id);
-  }
-  getSelectedIndicative(id: number): string {
-    const option = this.getSelectedCity(id);
-    return option ? option.indicative : '';
   }
 
   detectFormChanges() {
@@ -198,6 +273,19 @@ export class ContactFormComponent implements OnInit {
       });
 
     this.loadContactData();
+  }
+
+  clearAllFormArrays(control: AbstractControl) {
+    if (control instanceof FormGroup) {
+      Object.values(control.controls).forEach(c => this.clearAllFormArrays(c));
+    } else if (control instanceof FormArray) {
+      this.formUtils.clearFormArray(control);
+    }
+  }
+
+  resetForm() {
+    this.clearAllFormArrays(this.contactForm);
+    this.contactForm.reset();
   }
 
   private shouldAddByRequired(array: FormArray, isRequired: boolean): boolean {
@@ -375,10 +463,9 @@ export class ContactFormComponent implements OnInit {
       this.loading = true;
       this.loadingSetupContactData = true;
 
-      const existingOccupation =
-        this.contactModelType == 'Prestador'
-          ? this.contact.OccupationForProvider
-          : this.contact.OccupationForOffice;
+      const existingOccupation = this.contactModelType == 'Prestador'
+        ? this.contact.OccupationForProvider
+        : this.contact.OccupationForOffice;
 
       this.contactForm.patchValue({
         idTemporalContact: this.contact.idTemporalContact,
@@ -599,10 +686,6 @@ export class ContactFormComponent implements OnInit {
     return control.get('type')?.value === 'Fijo';
   }
 
-  disableFutureDates = (current: Date): boolean => {
-    return current > new Date();
-  };
-
   enableControls(form: FormGroup, controls: string[]) {
     controls.forEach(control =>
       form.get(control)?.enable({ emitEvent: false })
@@ -704,9 +787,11 @@ export class ContactFormComponent implements OnInit {
 
     this.enableControls(this.contactForm, ['idOccupationType', 'idOccupation']);
 
-    this.modal.close({
-      contact: this.contactForm,
-      isNew: this.contact === null || this.contact.idTemporalContact === null
+    const clonedForm = this.formUtils.cloneAbstractControl(this.contactForm);
+    const isNewContact = this.contact === null || this.contact.idTemporalContact === null;
+    this.close({
+      contact: clonedForm,
+      isNew: isNewContact
     });
   }
 }

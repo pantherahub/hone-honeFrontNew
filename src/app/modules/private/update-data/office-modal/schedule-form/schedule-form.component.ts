@@ -63,20 +63,25 @@ export class ScheduleFormComponent implements OnInit {
     this.initializeForm();
   }
 
-  open(schedule?: any) {
-    this.schedule = schedule ?? null;
+  open(options?: {
+    schedule?: any;
+    existingSchedules?: any[];
+  }) {
+    this.schedule = options?.schedule ?? null;
+    this.existingSchedules = options?.existingSchedules
+      ? [...options?.existingSchedules]
+      : [];
     this.scheduleForm.reset({
       idAddedTemporal: Date.now().toString(),
     });
-    if (this.schedule) {
-      this.loadScheduleData();
-    }
+
+    this.loadScheduleData();
     this.scheduleDrawer.open();
   }
 
   close(scheduleData?: any) {
-    this.scheduleForm.reset();
     this.scheduleDrawer.close(scheduleData);
+    this.scheduleForm.reset();
   }
 
   onDrawerClose(scheduleData?: any) {
@@ -331,12 +336,7 @@ export class ScheduleFormComponent implements OnInit {
       ? `${formValues.startDayRange} - ${formValues.endDayRange}`
       : formValues.day;
 
-    const clonedForm = new FormGroup(
-      Object.keys(this.scheduleForm.controls).reduce((acc, key) => {
-        acc[key] = new FormControl(formValues[key]);
-        return acc;
-      }, {} as { [key: string]: FormControl })
-    );
+    const clonedForm = this.formUtils.cloneAbstractControl(this.scheduleForm);
     clonedForm.patchValue({
       schedule: formattedSchedule,
       startTime: this.convertTo12Hour(formValues.startTime),
