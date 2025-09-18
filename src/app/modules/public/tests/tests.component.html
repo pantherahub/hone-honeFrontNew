@@ -38,6 +38,26 @@
           (click)="closeTestDrawer()">
     Cerrar desde contenido
   </button>
+  <button class="px-4 py-2 bg-blue-600 text-white rounded" (click)="openTest2Drawer()">
+    Abrir Otro Drawer
+  </button>
+</app-drawer>
+
+<app-drawer
+  #test2Drawer
+  placement="right"
+  size="lg"
+  (onClose)="onDrawerClosed()">
+
+  <div drawer-header>
+    <h2 class="text-lg font-semibold">Segundo</h2>
+  </div>
+
+  <p class="text-gray-600">Contenido dentro del drawer...</p>
+  <button class="mt-4 px-4 py-2 bg-red-500 text-white rounded"
+          (click)="closeTest2Drawer()">
+    Cerrar desde contenido
+  </button>
 </app-drawer>
 
 

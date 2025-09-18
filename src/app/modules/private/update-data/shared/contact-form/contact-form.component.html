@@ -38,7 +38,7 @@
   <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="h-full flex flex-col"
     [ngClass]="{ 'gap-4': !isDrawer() }">
     @if (!isDrawer()) {
-      <div class="flex justify-between gap-2">
+      <div class="flex flex-col sm:flex-row justify-between gap-2">
         <app-button
           (onClick)="close()"
           variant="primary"
@@ -48,21 +48,25 @@
           <svg width="16" height="16">
             <use xlink:href="/assets/icons/outline/arrows.svg#chevron-left" />
           </svg>
-          Volver
+          Volver a contactos
         </app-button>
-        <div class="flex gap-2">
+        <div class="flex gap-2 w-full sm:w-auto">
           <app-button
             [type]="'submit'"
             variant="primary"
             styleType="solid"
-            size="xs">
+            size="xs"
+            class="flex-1"
+            customClass="w-full flex justify-center">
             Guardar
           </app-button>
           <app-button
             (onClick)="close()"
             variant="primary"
             styleType="soft"
-            size="xs">
+            size="xs"
+            class="flex-1"
+            customClass="w-full flex justify-center">
             Cancelar
           </app-button>
         </div>
@@ -160,7 +164,8 @@
               variant="primary"
               styleType="soft"
               size="sm"
-              customClass="leading-4">
+              customClass="leading-4"
+              [ngClass]="{ 'hidden sm:block': isDrawer() }">
               <svg width="16" height="16">
                 <use xlink:href="/assets/icons/outline/general.svg#plus" />
               </svg>
@@ -198,6 +203,21 @@
               <app-input-error [control]="control.get('email')" />
             </div>
           }
+          @if (isDrawer() && emailsArray.length < 5) {
+            <app-button
+              (onClick)="addEmail()"
+              [disabled]="emailsArray.length >= 5"
+              variant="primary"
+              styleType="soft"
+              size="sm"
+              class="block sm:hidden"
+              customClass="leading-4 w-full flex justify-center">
+              <svg width="16" height="16">
+                <use xlink:href="/assets/icons/outline/general.svg#plus" />
+              </svg>
+              Agregar
+            </app-button>
+          }
         </div>
 
         <div class="flex flex-col gap-2" formArrayName="Phones">
@@ -209,7 +229,8 @@
               variant="primary"
               styleType="soft"
               size="sm"
-              customClass="leading-4">
+              customClass="leading-4"
+              [ngClass]="{ 'hidden sm:block': isDrawer() }">
               <svg width="16" height="16">
                 <use xlink:href="/assets/icons/outline/general.svg#plus" />
               </svg>
@@ -263,7 +284,8 @@
                   (onClick)="removePhone(i)"
                   variant="red"
                   styleType="soft"
-                  size="xs">
+                  size="xs"
+                  customClass="w-full flex justify-center">
                   <svg width="16" height="16">
                     <use xlink:href="/assets/icons/outline/general.svg#minus" />
                   </svg>
@@ -272,7 +294,23 @@
               }
             </div>
           }
+          @if (isDrawer() && phonesArray.length < 5) {
+            <app-button
+              (onClick)="addPhone()"
+              [disabled]="phonesArray.length >= 5"
+              variant="primary"
+              styleType="soft"
+              size="sm"
+              class="block sm:hidden"
+              customClass="leading-4 w-full flex justify-center">
+              <svg width="16" height="16">
+                <use xlink:href="/assets/icons/outline/general.svg#plus" />
+              </svg>
+              Agregar
+            </app-button>
+          }
         </div>
+
       </div>
     </div>
 

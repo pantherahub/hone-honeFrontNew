@@ -164,8 +164,10 @@
             <th scope="col" class="px-4 py-3 font-semibold">
               Horario
             </th>
-            <th scope="col" class="px-4 py-3 font-semibold">
-              Acciones
+            <th scope="col" class="px-4 py-3 font-semibold sticky right-0 bg-gray-50 before:content-[''] before:absolute before:top-0 before:bottom-0 before:left-0 before:w-px before:bg-gray-200 sm:before:hidden">
+              <span class="hidden sm:block">
+                Acciones
+              </span>
             </th>
           </tr>
         </thead>
@@ -186,7 +188,7 @@
                 <td class="px-4 py-[10.5px]">
                   {{ data.startTime + ' - ' + data.endTime || '' }}
                 </td>
-                <td class="px-4 py-[10.5px]">
+                <td class="px-4 py-[10.5px] sticky right-0 bg-white before:content-[''] before:absolute before:top-0 before:bottom-0 before:left-0 before:w-px before:bg-gray-200 sm:before:hidden">
                   <app-button
                     [appDropdownTrigger]="'dropdown-schedule-opts-' + i"
                     dropdownPlacement="bottom-end"
@@ -252,8 +254,10 @@
             <th scope="col" class="px-4 py-3 font-semibold">
               Nombre
             </th>
-            <th scope="col" class="px-4 py-3 font-semibold">
-              Acciones
+            <th scope="col" class="px-4 py-3 font-semibold sticky right-0 bg-gray-50 before:content-[''] before:absolute before:top-0 before:bottom-0 before:left-0 before:w-px before:bg-gray-200 sm:before:hidden">
+              <span class="hidden sm:block">
+                Acciones
+              </span>
             </th>
           </tr>
         </thead>
@@ -272,8 +276,10 @@
                 <td class="px-4 py-[10.5px]">
                   {{ data.occupationName || data.OccupationForOffice?.occupation || '' }}
                 </td>
-                <td class="px-4 py-[10.5px]">{{ data.name || 'N/A' }}</td>
-                <td class="px-4 py-[10.5px]">
+                <td class="px-4 py-[10.5px] truncate max-w-[200px] overflow-hidden text-ellipsis">
+                  {{ data.name || 'N/A' }}
+                </td>
+                <td class="px-4 py-[10.5px] sticky right-0 bg-white before:content-[''] before:absolute before:top-0 before:bottom-0 before:left-0 before:w-px before:bg-gray-200 sm:before:hidden">
                   <app-button
                     [appDropdownTrigger]="'dropdown-contact-opts-' + i"
                     dropdownPlacement="bottom-end"
@@ -358,7 +364,7 @@
   (onClose)="onContactDrawerClose($event)">
 </app-contact-form>
 
-<app-contact-detail
+<!-- <app-contact-detail
   #contactDetailDrawer
   [contactModelType]="'Sede'">
-</app-contact-detail>
+</app-contact-detail> -->

@@ -62,50 +62,57 @@
         }
       </div>
 
-      <div class="flex flex-col gap-4 p-4 rounded-xl bg-gray-50 ring-[1px] ring-inset ring-gray-200">
-        <span class="text-sm font-semibold leading-4 text-gray-900">
-          Contacto
-        </span>
-        <div class="p-4 flex flex-col sm:flex-row sm:items-center gap-2 rounded-md ring-[1px] ring-inset ring-gray-200 bg-white">
-          <div class="flex items-center gap-2">
-            <div class="mb-auto rounded-lg p-3 bg-blue1h-50 text-main-blue1h">
-              <svg width="20" height="20">
-                <use xlink:href="/assets/icons/outline/user.svg#address-book" />
-              </svg>
-            </div>
-            <div class="flex flex-col gap-2 min-w-0">
-              <div class="flex flex-wrap gap-1">
-                <span class="text-sm font-semibold leading-4 text-gray-900">
-                  Teléfono
-                </span>
-                <div class="flex gap-1 flex-wrap min-w-0">
-                  @for (phone of contact.Phones; track $index) {
-                    <div class="flex items-center bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded text-xs font-semibold leading-[14px] max-w-[210px] overflow-hidden">
-                      <span class="block truncate w-full" [title]="getCompletePhone(phone)">
-                        {{ getCompletePhone(phone) }}
-                      </span>
-                    </div>
-                  }
-                </div>
+      @if (contact.Phones?.length || contact.Emails?.length) {
+        <div class="flex flex-col gap-4 p-4 rounded-xl bg-gray-50 ring-[1px] ring-inset ring-gray-200">
+          <span class="text-sm font-semibold leading-4 text-gray-900">
+            Contacto
+          </span>
+          <div class="p-4 flex flex-col sm:flex-row sm:items-center gap-2 rounded-md ring-[1px] ring-inset ring-gray-200 bg-white">
+            <div class="flex items-center gap-2">
+              <div class="mb-auto rounded-lg p-3 bg-blue1h-50 text-main-blue1h">
+                <svg width="20" height="20">
+                  <use xlink:href="/assets/icons/outline/user.svg#address-book" />
+                </svg>
               </div>
-              <div class="flex flex-wrap gap-1">
-                <span class="text-sm font-semibold leading-4 text-gray-900">
-                  Correo
-                </span>
-                <div class="flex gap-1 flex-wrap min-w-0">
-                  @for (email of contact.Emails; track $index) {
-                    <div class="flex items-center bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded text-xs font-semibold leading-[14px] max-w-[210px] overflow-hidden">
-                      <span class="block truncate w-full" [title]="email.email">
-                        {{ email.email }}
-                      </span>
+              <div class="flex flex-col gap-2 min-w-0">
+                @if (contact.Phones?.length) {
+                  <div class="flex flex-wrap gap-1">
+                    <span class="text-sm font-semibold leading-4 text-gray-900">
+                      Teléfono
+                    </span>
+                    <div class="flex gap-1 flex-wrap min-w-0">
+                      @for (phone of contact.Phones; track $index) {
+                        <div class="flex items-center bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded text-xs font-semibold leading-[14px] max-w-[210px] overflow-hidden">
+                          <span class="block truncate w-full" [title]="getCompletePhone(phone)">
+                            {{ getCompletePhone(phone) }}
+                          </span>
+                        </div>
+                      }
                     </div>
-                  }
-                </div>
+                  </div>
+                }
+                @if (contact.Emails?.length) {
+                  <div class="flex flex-wrap gap-1">
+                    <span class="text-sm font-semibold leading-4 text-gray-900">
+                      Correo
+                    </span>
+                    <div class="flex gap-1 flex-wrap min-w-0">
+                      @for (email of contact.Emails; track $index) {
+                        <div class="flex items-center bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded text-xs font-semibold leading-[14px] max-w-[210px] overflow-hidden">
+                          <span class="block truncate w-full" [title]="email.email">
+                            {{ email.email }}
+                          </span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
               </div>
             </div>
+
           </div>
         </div>
-      </div>
+      }
 
     </div>
   }

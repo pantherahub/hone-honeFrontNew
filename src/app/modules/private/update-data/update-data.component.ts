@@ -1,14 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, Renderer2, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { NzModalService } from 'ng-zorro-antd/modal';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 import { ClientProviderService } from 'src/app/services/clients/client-provider.service';
 import { LANGUAGES } from 'src/app/constants/languages';
-import { ContactFormComponent } from './contact-form/contact-form.component';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
-import { AlertNzService } from 'src/app/services/alert-nz/alert-nz.service';
 import { format } from 'date-fns';
 import { BackendErrorsComponent } from 'src/app/shared/components/backend-errors/backend-errors.component';
 import { debounceTime, firstValueFrom, fromEvent } from 'rxjs';
@@ -65,11 +62,6 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
 
   private formSubscription: any;
 
-  emailInfoMessage: string[] = [
-    "Correo único corporativo o personal del prestador.",
-    "En caso de que administres o gestiones mas de un prestador, asegúrate de que el correo electrónico registrado sea el personal o corporativo correspondiente a cada uno de ellos."
-  ];
-
   steps = [
     {
       key: 'provider',
@@ -112,18 +104,15 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
   @ViewChildren('stepBtn') stepBtns!: QueryList<ElementRef<HTMLDivElement>>;
 
   constructor (
-    private eventManager: EventManagerService,
+    public eventManager: EventManagerService,
     private fb: FormBuilder,
     private formUtils: FormUtilsService,
     private toastService: ToastService,
-    private alertNzService: AlertNzService,
-    private modalService: NzModalService,
     private clientProviderService: ClientProviderService,
     private authService: AuthService,
     private router: Router,
     private navigationService: NavigationService,
     private alertService: AlertService,
-    private renderer: Renderer2,
   ) { }
 
   ngOnInit(): void {
@@ -147,27 +136,31 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
       .subscribe(() => this.updateArrows(false));
   }
 
-  scrollStep(direction: 'left' | 'right') {
-    if (this.steps.length === 0) return;
+  private scrollToIndex(index: number, useDelay = true) {
+    this.visibleIndex = index;
 
-    if (direction === 'right' && this.visibleIndex < this.steps.length - 1) {
-      this.visibleIndex++;
-    } else if (direction === 'left' && this.visibleIndex > 0) {
-      this.visibleIndex--;
-    }
-
-    const target = this.stepBtns.toArray()[this.visibleIndex]?.nativeElement;
+    const target = this.stepBtns.toArray()[index]?.nativeElement;
     if (target) {
       target.scrollIntoView({
         behavior: 'smooth',
-        inline: 'start',
+        inline: 'start', // center
         block: 'nearest'
       });
     }
 
     this.atStart = this.visibleIndex === 0;
     this.atEnd = this.visibleIndex === this.steps.length - 1;
-    this.updateArrows(true);
+    this.updateArrows(useDelay);
+  }
+
+  scrollStep(direction: 'left' | 'right') {
+    if (this.steps.length === 0) return;
+
+    if (direction === 'right' && this.visibleIndex < this.steps.length - 1) {
+      this.scrollToIndex(this.visibleIndex + 1);
+    } else if (direction === 'left' && this.visibleIndex > 0) {
+      this.scrollToIndex(this.visibleIndex - 1);
+    }
   }
 
   updateArrows(useDelay = false) {
@@ -208,11 +201,13 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
   }
 
   async canDeactivate(): Promise<boolean> {
-    return !this.hasSavedState() || await this.alertNzService.confirm(
-      'Aviso', 'Tienes cambios pendientes. ¿Deseas salir?', {
-        nzOkText: 'Salir',
-        nzCancelText: 'Cancelar',
-    });
+    return !this.hasSavedState() || await firstValueFrom(
+      this.alertService.confirm(
+        '¡Aviso!', 'Tienes cambios pendientes. ¿Deseas salir?', {
+          confirmBtnText: 'Salir',
+          cancelBtnText: 'Cancelar',
+      })
+    );
   }
 
   @HostListener('window:beforeunload', ['$event'])
@@ -265,32 +260,23 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
   // }
 
   goToStep(stepKey: string, canEnable: boolean = false, element?: HTMLElement) {
-    const step = this.steps.find(s => s.key === stepKey);
-    if (element) {
-      element.scrollIntoView({
-        behavior: 'smooth',
-        inline: 'center',
-        block: 'nearest'
-      });
-    }
-
+    const stepIndex = this.steps.findIndex(s => s.key === stepKey);
+    const step = this.steps[stepIndex];
     if (!step || step.key === this.activeStep) return;
 
-    if (this.activeStep === 'provider' && !this.validateProviderForm()) {
-      return;
-    }
-    if (this.activeStep === 'offices' && !this.validateOffices()) {
-      return;
-    }
-    if (this.activeStep === 'contacts' && !this.validateContacts()) {
-      return;
+    const currentIndex = this.steps.findIndex(s => s.key === this.activeStep);
+    const isGoingBack = stepIndex < currentIndex;
+
+    if (!isGoingBack) {
+      if (this.activeStep === 'provider' && !this.validateProviderForm()) return;
+      if (this.activeStep === 'offices' && !this.validateOffices()) return;
+      if (this.activeStep === 'contacts' && !this.validateContacts()) return;
     }
 
-    if (step.enabled) {
+    if (step.enabled || canEnable) {
+      if (canEnable) step.enabled = true;
       this.activeStep = stepKey;
-    } else if (canEnable) {
-      step.enabled = true;
-      this.activeStep = stepKey;
+      this.scrollToIndex(stepIndex, true);
     }
   }
 
@@ -303,7 +289,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
 
     if (this.providerFormFields.some(f => this.providerForm.get(f)?.invalid)) {
       this.alertService.warning(
-        'Datos incompletos',
+        '¡Acción requerida!',
         'Por favor completa los datos del prestador antes de continuar.'
       );
       return false;
@@ -313,7 +299,10 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
 
   private validateOffices(): boolean {
     if (!this.existingOffices?.length) {
-      this.alertService.warning('Sedes incompletas', 'Debes registrar al menos una sede.');
+      this.alertService.warning(
+        '¡Acción requerida!',
+        'Debes agregar al menos una sede de prestación de servicio.'
+      );
       return false;
     }
 
@@ -323,7 +312,10 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
       (!office.TemporalSchedules?.length && !office.createdSchedules?.length)
     );
     if (hasInvalidOffice) {
-      this.alertNzService.warning('Aviso', 'Algunas sedes tienen información incompleta.');
+      this.alertService.warning(
+        '¡Acción requerida!',
+        'Algunas sedes tienen información incompleta.'
+      );
       return false;
     }
 
@@ -350,8 +342,8 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
         .map(c => c.name)
         .join(', ');
 
-      this.alertNzService.warning(
-        'Aviso',
+      this.alertService.warning(
+        '¡Acción requerida!',
         `Debes agregar las siguientes compañías asociadas a alguna sede: ${names}`
       );
       return false;
@@ -362,7 +354,10 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
 
   private validateContacts(): boolean {
     if (!this.existingContacts?.length) {
-      this.alertService.warning('Contactos incompletos', 'Debes registrar al menos un contacto.');
+      this.alertService.warning(
+        '¡Acción requerida!',
+        'Debes agregar al menos un contacto.'
+      );
       return false;
     }
     return true;
@@ -433,17 +428,22 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     return null;
   }
 
-  async goBack(): Promise<void> {
+  goBack(): void {
     const backRoute = this.navigationService.getBackRoute();
-    if (!this.user.withData && backRoute === '/service/documentation') {
+    if (
+      (!this.user.withData && backRoute === '/service/documentation') ||
+      backRoute === '/support'
+    ) {
       this.router.navigateByUrl('/home');
       return;
     }
     this.router.navigateByUrl(backRoute);
   }
 
-  enableFormControls() {
-    Object.values(this.providerForm.controls).forEach(control => control.enable());
+  private disableProviderFields() {
+    this.providerFormFields.forEach(field => {
+      this.providerForm.get(field)?.disable({ emitEvent: false });
+    });
   }
 
   isValidEmail(email: string | undefined): boolean {
@@ -492,32 +492,24 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
 
   async loadFormData() {
     if (!this.user.withData) {
-      await firstValueFrom(this.alertNzService.info('Formulario requerido', 'Por favor, complete el formulario antes de continuar.').afterClose);
-    }
-
-    if (this.hasSavedState()) {
-      if (!this.user.rejected) {
-        const confirmed = await this.alertNzService.confirm(
-          'Aviso', 'Se encontraron datos sin guardar de una sesión anterior. ¿Deseas continuar con estos datos?', {
-            nzOkText: 'Continuar',
-            nzCancelText: 'No',
-        });
-        if (confirmed) {
-          this.restoreFormFromLocalStorage();
-          return;
-        }
-      }
-      this.removeFormState();
+      await firstValueFrom(
+        this.alertService.confirm(
+          'Formulario requerido',
+          'Por favor, complete el formulario antes de continuar.',
+          { cancelBtnText: null }
+        )
+      );
     }
     this.loadProviderData();
   }
 
   saveFormToLocalStorage(): void {
+    if (!this.isFirstForm) return;
     const newState = {
       formValue: this.providerForm.getRawValue(),
       existingOffices: this.existingOffices,
       existingContacts: this.existingContacts,
-      isFirstForm: this.isFirstForm
+      activeStep: this.activeStep,
     };
     localStorage.setItem('formState', JSON.stringify(newState));
   }
@@ -531,16 +523,35 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     }
     return false;
   }
-  restoreFormFromLocalStorage() {
+  async restoreFormFromLocalStorage() {
+    if (!this.hasSavedState()) {
+      this.subscribeOnChange();
+      return;
+    }
+    const confirmed = await firstValueFrom(
+      this.alertService.confirm(
+        '¡Aviso!', 'Se encontraron datos sin guardar de una sesión anterior. ¿Deseas continuar con estos datos?', {
+          confirmBtnText: 'Continuar',
+          cancelBtnText: 'No',
+      })
+    );
+    if (!confirmed) {
+      this.subscribeOnChange();
+      return;
+    }
+
     const storageState = localStorage.getItem('formState');
     if (!storageState) return;
     const state = JSON.parse(storageState);
     const formState = state.formValue;
 
-    this.isFirstForm = state.isFirstForm;
-    if (this.isFirstForm === false) {
-      this.enableFormControls();
-    }
+    this.activeStep = state.activeStep;
+
+    // Enable all steps up to the activeStep
+    const activeIndex = this.steps.findIndex(s => s.key === this.activeStep);
+    this.steps.forEach((step, index) => {
+      step.enabled = index <= activeIndex;
+    });
 
     this.providerForm.patchValue({
       startTime: formState.startTime,
@@ -592,12 +603,17 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
         const data = res.data;
         this.loading = false;
         if (!data) {
-          this.subscribeOnChange();
+          this.isFirstForm = true;
+          this.restoreFormFromLocalStorage();
           return;
         };
 
         this.isFirstForm = false;
-        this.enableFormControls();
+        this.removeFormState();
+        this.disableProviderFields();
+
+        // Enable all modules
+        this.steps.forEach(step => step.enabled = true);
 
         // Convert to an array
         let languages = [];
@@ -653,7 +669,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
         this.authService.saveUserLogged(user);
 
         if (this.user.rejected && data.status === "Rechazado" && data.Reasons.length) {
-          this.alertNzService.warning('Actualización requerida', `Motivo: ${data.Reasons[0].reason}`);
+          this.alertService.warning('Actualización requerida', `Motivo: ${data.Reasons[0].reason}`);
         }
       },
       error: (err: any) => {
@@ -696,83 +712,17 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     return (currentPage - 1) * pageSize + localIndex;
   }
 
-  openContactModal(contactIndex: number | null = null) {
-    const contact = contactIndex != null
-      ? this.existingContacts[contactIndex]
-      : null;
-
-    const modalRef = this.modalService.create<ContactFormComponent, any>({
-      nzTitle: contact ? 'Actualizar contacto' : 'Agregar contacto',
-      nzContent: ContactFormComponent,
-      nzCentered: true,
-      nzClosable: true,
-      nzMaskClosable: false,
-      nzWidth: '650px',
-      nzStyle: { 'max-width': '90%', 'margin': '22px 0' },
-      nzOnCancel: () => {
-        const componentInstance = modalRef.getContentComponent();
-        if (componentInstance.hasChanges) {
-          this.alertNzService.confirm(
-            'Cambios sin guardar',
-            'Tienes cambios en el contacto. Si sales sin guardar, se perderán.',
-            {
-              nzOkText: 'Salir',
-              nzCancelText: 'Cancelar',
-              nzOnOk: () => {
-                modalRef.destroy();
-              },
-            }
-          );
-          return false;
-        }
-        return true; // Close modal
-      }
-    });
-    const instanceModal = modalRef.getContentComponent();
-    instanceModal.contactModelType = 'Prestador';
-    if (contact) instanceModal.contact = contact;
-
-    modalRef.afterClose.subscribe((result: any) => {
-      if (result && result.contact) {
-        const newContact = result.contact;
-
-        if (result.isNew && newContact.value.idAddedTemporal) {
-          if (contactIndex != null) {
-            const createdContactsIndex = this.createdContacts.controls.findIndex(
-              (control) => control.value.idAddedTemporal === newContact.value.idAddedTemporal
-            );
-            (this.createdContacts as FormArray).setControl(createdContactsIndex, newContact);
-            this.existingContacts[contactIndex] = newContact.value;
-          } else {
-            this.createdContacts.push(newContact);
-            this.existingContacts.push(newContact.value);
-          }
-          this.existingContacts = [...this.existingContacts];
-          this.toastService.success(
-            `Contacto por ${contactIndex != null ? 'actualizar' : 'agregar'}.`,
-            { color: 'info' }
-          );
-        } else if (!result.isNew && contactIndex != null) {
-          const updatedContactsIndex = this.updatedContacts.controls.findIndex(
-            (control) => control.value.idTemporalContact === newContact.value.idTemporalContact
-          );
-          if (updatedContactsIndex !== -1) {
-            (this.updatedContacts as FormArray).setControl(updatedContactsIndex, newContact);
-          } else {
-            this.updatedContacts.push(newContact);
-          }
-          this.existingContacts[contactIndex] = newContact.value;
-          this.existingContacts = [...this.existingContacts];
-          this.toastService.success('Contacto por actualizar.', { color: 'info' });
-        }
-      }
-    });
+  successToast(message: string) {
+    if (!this.isFirstForm) return;
+    this.toastService.success(message, { color: 'info' });
   }
 
   async deleteContact(index: number) {
-    const confirmed = await this.alertNzService.confirmDelete(
-      '¿Eliminar contacto?',
-      'Eliminar contacto del listado'
+    const confirmed = await firstValueFrom(
+      this.alertService.confirmDelete(
+        '¿Eliminar contacto?',
+        'Eliminar contacto del listado'
+      )
     );
     if (!confirmed) return;
 
@@ -801,7 +751,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
       }
     }
     this.existingContacts = [...this.existingContacts];
-    this.toastService.success('Contacto por eliminar.', { color: 'info' });
+    this.successToast('Contacto por eliminar.');
   }
 
   formatDate(date: Date): string {
@@ -845,6 +795,10 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     this.formUtils.trimFormStrControls(this.providerForm);
     if (this.providerForm.invalid) {
       this.formUtils.markFormTouched(this.providerForm);
+      this.alertService.warning(
+        '¡Acción requerida!',
+        'Formulario incompleto, faltan algunos campos por diligenciar.'
+      );
       return;
     };
 
@@ -852,56 +806,11 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     this.toastService.clear();
     this.backendError = null;
 
-    // Validate the existence of offices and contacts
-    if (!this.existingOffices?.length) {
-      this.alertNzService.warning('Aviso', 'Debe agregar al menos una sede de prestación de servicio.');
-      return;
-    }
-    if (!this.existingContacts?.length) {
-      this.alertNzService.warning('Aviso', 'Debe agregar al menos un contacto.');
-      return;
-    }
-
-    // Validate incomplete information
-    const hasInvalidOffice = this.existingOffices.some(office =>
-      (!office.TemporalAddress && !office.address) ||
-      (!office.TemporalSchedules?.length && !office.createdSchedules?.length)
-    );
-    if (hasInvalidOffice) {
-      this.alertNzService.warning('Aviso', 'Algunas sedes tienen información incompleta.');
-      return;
-    }
-
-    // Validate that the offices are associated with the provider companies
-    const companiesIds = this.providerCompanies.map((c: any) => c.idCompany);
-    const companiesNotLinked: number[] = [];
-    companiesIds.forEach(companyId => {
-      const isLinked = this.existingOffices.some(office => {
-        if (office.idsCompanies) {
-          return office.idsCompanies.includes(companyId);
-        } else if (office.Companies) {
-          return office.Companies.some((company: any) => company.idCompany === companyId);
-        }
-        return false;
-      });
-      if (!isLinked) {
-        companiesNotLinked.push(companyId);
-      }
-    });
-
-    if (companiesNotLinked.length > 0) {
-      const names = this.providerCompanies
-        .filter(c => companiesNotLinked.includes(c.idCompany))
-        .map(c => c.name)
-        .join(', ');
-
-      this.alertNzService.warning(
-        'Aviso',
-        `Debes agregar las siguientes compañías asociadas a alguna sede: ${names}`
-      );
-      return;
-    }
-
+    // Validate offices and contacts
+    if (
+      !this.validateOffices() ||
+      !this.validateContacts()
+    ) return;
 
     const website = this.providerForm.get('website')?.value?.toLowerCase() || null;
     const email = this.providerForm.get('email')?.value?.toLowerCase() || null;
@@ -929,14 +838,21 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
           this.authService.saveUserLogged(user);
 
           this.loading = false;
-          this.alertNzService.success('Enviado', 'Actualización enviada.');
+          if (this.isFirstForm) {
+            this.alertService.success('Enviado', 'Actualización enviada.');
+          } else {
+            this.alertService.success(
+              '¡Actualización exitosa!',
+              'Tu información se ha actualizado sin problemas.'
+            );
+          }
           this.resetForm();
         },
         error: (err: any) => {
           this.loading = false;
           if (err.status == 422) this.backendError = err.error;
           console.error(err);
-          this.alertNzService.error();
+          this.alertService.error();
         }
       });
     }, 550);

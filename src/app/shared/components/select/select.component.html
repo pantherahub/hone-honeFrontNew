@@ -24,11 +24,13 @@
           @for (item of selected; track $index) {
             <span class="flex items-center gap-1 bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded text-xs font-semibold leading-[14px]">
               {{ getItemLabel(item) }}
-              <button type="button" class="hover:text-red-600" (click)="removeItem(item); $event.stopPropagation()" tabindex="-1">
-                <svg width="13" height="13">
-                  <use xlink:href="/assets/icons/outline/general.svg#close" />
-                </svg>
-              </button>
+              @if (!disabled) {
+                <button type="button" class="hover:text-red-600" (click)="removeItem(item); $event.stopPropagation()" tabindex="-1">
+                  <svg width="13" height="13">
+                    <use xlink:href="/assets/icons/outline/general.svg#close" />
+                  </svg>
+                </button>
+              }
             </span>
           }
         </span>
@@ -39,7 +41,7 @@
 
     <div class="flex items-center gap-1">
       <!-- Clearable X icon -->
-      @if (clearable && (!multiple && selected) || (multiple && selected?.length)) {
+      @if (clearable && !disabled && ((!multiple && selected) || (multiple && selected?.length))) {
         <button
           type="button"
           (click)="clearSelection($event)"

@@ -37,8 +37,10 @@
               <th scope="col" class="px-4 py-3 font-semibold">
                 Dirección
               </th>
-              <th scope="col" class="px-4 py-3 font-semibold">
-                Acciones
+              <th scope="col" class="px-4 py-3 font-semibold sticky right-0 bg-gray-50 before:content-[''] before:absolute before:top-0 before:bottom-0 before:left-0 before:w-px before:bg-gray-200 sm:before:hidden">
+                <span class="hidden sm:block">
+                  Acciones
+                </span>
               </th>
             </tr>
           </thead>
@@ -54,14 +56,16 @@
             } @else {
               @for (data of existingOffices; let i = $index; track i) {
                 <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
-                  <td class="px-4 py-[10.5px]">{{ data.name }}</td>
+                  <td class="px-4 py-[10.5px] truncate max-w-[200px] overflow-hidden text-ellipsis">
+                    {{ data.name }}
+                  </td>
                   <td class="px-4 py-[10.5px]">
                     {{ data.cityName || data.TemporalAddress?.City?.city || '' }}
                   </td>
                   <td class="px-4 py-[10.5px] truncate max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap">
                     {{ data.address?.formattedAddress || '' }}
                   </td>
-                  <td class="px-4 py-[10.5px]">
+                  <td class="px-4 py-[10.5px] sticky right-0 bg-white before:content-[''] before:absolute before:top-0 before:bottom-0 before:left-0 before:w-px before:bg-gray-200 sm:before:hidden">
                     <app-button
                       [appDropdownTrigger]="'dropdown-office-opts-' + i"
                       dropdownPlacement="bottom-end"
@@ -109,31 +113,34 @@
       </div>
     </div>
 
-    <div class="flex justify-between">
-      <app-button
-        (onClick)="goPrev()"
-        variant="primary"
-        styleType="ghost"
-        size="md">
-        <svg width="20" height="20">
-          <use xlink:href="/assets/icons/outline/arrows.svg#chevron-left" />
-        </svg>
-        Atrás
-      </app-button>
-      <app-button
-        (onClick)="goNext()"
-        variant="primary"
-        styleType="solid"
-        size="md">
-        Siguiente
-        <svg width="20" height="20">
-          <use xlink:href="/assets/icons/outline/arrows.svg#chevron-right" />
-        </svg>
-      </app-button>
-    </div>
+    @if (isFirstForm) {
+      <div class="flex justify-between">
+        <app-button
+          (onClick)="goPrev()"
+          variant="primary"
+          styleType="ghost"
+          size="md">
+          <svg width="20" height="20">
+            <use xlink:href="/assets/icons/outline/arrows.svg#chevron-left" />
+          </svg>
+          Atrás
+        </app-button>
+        <app-button
+          (onClick)="goNext()"
+          variant="primary"
+          styleType="solid"
+          size="md">
+          Siguiente
+          <svg width="20" height="20">
+            <use xlink:href="/assets/icons/outline/arrows.svg#chevron-right" />
+          </svg>
+        </app-button>
+      </div>
+    }
   </div>
 } @else {
   <app-office-form
+    [isFirstForm]="isFirstForm"
     [office]="selectedOfficeIndex != null
       ? existingOffices[selectedOfficeIndex]
       : null"

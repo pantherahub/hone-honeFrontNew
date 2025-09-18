@@ -48,6 +48,7 @@ export class TestsComponent implements OnInit, AfterViewInit {
   popoverVisible: boolean = false;
 
   @ViewChild('testDrawer', { static: false }) testDrawer!: DrawerComponent;
+  @ViewChild('test2Drawer', { static: false }) test2Drawer!: DrawerComponent;
 
   constructor (
     private toastService: ToastService,
@@ -93,6 +94,13 @@ export class TestsComponent implements OnInit, AfterViewInit {
   }
   closeTestDrawer() {
     this.testDrawer.close();
+  }
+
+  openTest2Drawer() {
+    this.test2Drawer.open();
+  }
+  closeTest2Drawer() {
+    this.test2Drawer.close();
   }
 
   openModalComponentByTag() {

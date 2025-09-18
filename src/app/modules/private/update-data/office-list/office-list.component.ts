@@ -5,11 +5,12 @@ import { ButtonComponent } from 'src/app/shared/components/button/button.compone
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { DropdownTriggerDirective } from 'src/app/directives/dropdown-trigger.directive';
 import { firstValueFrom } from 'rxjs';
-import { OfficeFormComponent } from '../office-form/office-form.component';
+import { OfficeFormComponent } from './office-form/office-form.component';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { OfficeDetailComponent } from '../office-detail/office-detail.component';
+import { OfficeDetailComponent } from './office-detail/office-detail.component';
 import { CompanyInterface } from 'src/app/models/client.interface';
 import { ClientProviderService } from 'src/app/services/clients/client-provider.service';
+import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 
 @Component({
   selector: 'app-office-list',
@@ -20,6 +21,7 @@ import { ClientProviderService } from 'src/app/services/clients/client-provider.
 })
 export class OfficeListComponent implements OnInit {
 
+  @Input() isFirstForm: boolean = true;
   @Input() providerCompanies: any[] = [];
   @Input() createdOffices!: FormArray;
   @Input() updatedOffices!: FormArray;
@@ -29,6 +31,7 @@ export class OfficeListComponent implements OnInit {
   @Output() officesChanged = new EventEmitter<any>();
   @Output() prev = new EventEmitter<void>();
   @Output() next = new EventEmitter<void>();
+  @Output() save = new EventEmitter<void>();
 
   isEditingOffice = false;
   selectedOfficeIndex: number | null = null;
@@ -42,6 +45,7 @@ export class OfficeListComponent implements OnInit {
     private fb: FormBuilder,
     private toastService: ToastService,
     private clientService: ClientProviderService,
+    private eventManager: EventManagerService,
   ) { }
 
   ngOnInit(): void {
@@ -62,6 +66,11 @@ export class OfficeListComponent implements OnInit {
     });
   }
 
+  successToast(message: string) {
+    if (!this.isFirstForm) return;
+    this.toastService.success(message, { color: 'info' });
+  }
+
   viewOffice(officeIndex: number | null = null) {
     if (officeIndex == null) return;
     const office = this.existingOffices[officeIndex];
@@ -71,6 +80,7 @@ export class OfficeListComponent implements OnInit {
   openOfficeForm(index: number | null = null) {
     this.isEditingOffice = true;
     this.selectedOfficeIndex = index;
+    this.eventManager.startEditingProvider();
   }
 
   closeOfficeForm(savedOffice?: any) {
@@ -79,6 +89,7 @@ export class OfficeListComponent implements OnInit {
     }
     this.isEditingOffice = false;
     this.selectedOfficeIndex = null;
+    this.eventManager.stopEditingProvider();
   }
 
   private handleSaveOffice(result: any) {
@@ -99,10 +110,7 @@ export class OfficeListComponent implements OnInit {
           this.existingOffices.push(newOffice.value);
         }
         this.existingOffices = [...this.existingOffices];
-        this.toastService.success(
-          `Sede por ${officeIndex != null ? 'actualizar' : 'agregar'}.`,
-          { color: 'info' }
-        );
+        this.successToast(`Sede por ${officeIndex != null ? 'actualizar' : 'agregar'}.`);
       } else if (!result.isNew && officeIndex != null) {
         const updatedOfficesIndex = this.updatedOffices.controls.findIndex(
           (control) => control.value.idTemporalOfficeProvider === newOffice.value.idTemporalOfficeProvider
@@ -114,13 +122,22 @@ export class OfficeListComponent implements OnInit {
         }
         this.existingOffices[officeIndex] = newOffice.value;
         this.existingOffices = [...this.existingOffices];
-        this.toastService.success('Sede por actualizar.', { color: 'info' });
+        this.successToast('Sede por actualizar.');
       }
       this.officesChanged.emit(this.existingOffices);
+      if (!this.isFirstForm) this.save.emit();
     }
   }
 
   async deleteOffice(index: number) {
+    if (!this.isFirstForm && this.existingOffices.length <= 1) {
+      this.alertService.warning(
+        '¡Requerido!',
+        'Debe existir al menos una sede de prestación de servicio, actualízala o crea otra sede antes de eliminarla.'
+      );
+      return;
+    }
+
     const confirmed = await firstValueFrom(
       this.alertService.confirmDelete(
         '¿Eliminar sede?',
@@ -154,7 +171,9 @@ export class OfficeListComponent implements OnInit {
       }
     }
     this.existingOffices = [...this.existingOffices];
-    this.toastService.success('Sede por eliminar.', { color: 'info' });
+    this.successToast('Sede por eliminar.');
+
+    if (!this.isFirstForm) this.save.emit();
   }
 
 }

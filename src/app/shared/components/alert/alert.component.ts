@@ -28,7 +28,7 @@ export class AlertComponent {
   visible = true;
 
   iconMap: { [variant: string]: string } = {
-    success: '/assets/icons/outline/general.svg#check',
+    success: '/assets/icons/outline/general.svg#check-circle',
     info: '/assets/icons/outline/general.svg#info-circle',
     danger: '/assets/icons/outline/general.svg#exclamation-circle',
     warning: '/assets/icons/outline/general.svg#exclamation-circle',
@@ -40,7 +40,7 @@ export class AlertComponent {
     info: 'bg-blue1h-100 text-blue-700',
     warning: 'bg-yellow-100 text-yellow-700',
     danger: 'bg-red-100 text-red-700',
-    dark: 'bg-yellow-100 text-yellow-700',
+    dark: 'bg-gray-100 text-gray-900',
   };
 
   get iconPath(): string {

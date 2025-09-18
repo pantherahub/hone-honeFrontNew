@@ -19,13 +19,30 @@
       Volver
     </app-button>
 
-    <div>
+    @if (isFirstForm) {
       <app-alert
         variant="info"
         [closable]="true"
-        [title]="'Para guardar la información y reflejar los cambios, asegúrate de completar todas las secciones del formulario.'">
+        [title]="'Para guardar la información y reflejar los cambios, asegúrate de completar todas las secciones del formulario.'"
+        customIconPath="/assets/icons/outline/general.svg#check-circle">
       </app-alert>
-    </div>
+    } @else {
+      @if (eventManager.isEditingProvider()) {
+        <app-alert
+          variant="info"
+          [closable]="true"
+          [title]="'Confirma que los datos que modificaste estén correctos antes de actualizar la información.'"
+          customIconPath="/assets/icons/outline/general.svg#check-circle">
+        </app-alert>
+      } @else {
+        <app-alert
+          variant="dark"
+          [closable]="true"
+          [title]="'Recuerda mantener la información actualizada para que los datos guardados se reflejen correctamente.'"
+          customIconPath="/assets/icons/outline/general.svg#check-circle">
+        </app-alert>
+      }
+    }
 
     <div class="flex flex-col md:flex-row gap-4">
 
@@ -117,18 +134,21 @@
         }
       </div>
 
-      <div class="flex-1 flex flex-col gap-4">
+      <div class="flex-1 min-w-0 flex flex-col gap-4">
         @switch (activeStep) {
           @case ('provider') {
             <app-provider-form
+              [isFirstForm]="isFirstForm"
               [form]="providerForm"
               [providerFormFields]="providerFormFields"
               [identificationTypes]="identificationTypes"
-              (next)="goToStep('offices', true)">
+              (next)="goToStep('offices', true)"
+              (save)="onSubmit()">
             </app-provider-form>
           }
           @case ('offices') {
             <app-office-list
+              [isFirstForm]="isFirstForm"
               [providerCompanies]="providerCompanies"
               [createdOffices]="createdOffices"
               [updatedOffices]="updatedOffices"
@@ -136,17 +156,20 @@
               [existingOffices]="existingOffices"
               (officesChanged)="onOfficesChanged($event)"
               (prev)="goToStep('provider')"
-              (next)="goToStep('contacts', true)">
+              (next)="goToStep('contacts', true)"
+              (save)="onSubmit()">
             </app-office-list>
           }
           @case ('contacts') {
             <app-contact-list
+              [isFirstForm]="isFirstForm"
               [createdContacts]="createdContacts"
               [updatedContacts]="updatedContacts"
               [deletedContacts]="deletedContacts"
               [existingContacts]="existingContacts"
               (contactsChanged)="onContactsChanged($event)"
-              (prev)="goToStep('offices')">
+              (prev)="goToStep('offices')"
+              (save)="onSubmit()">
             </app-contact-list>
           }
         }
@@ -162,62 +185,8 @@
 </div>
 
 
+<!-- <button nz-button nzType="primary" type="button" (click)="openOfficeModal(getGlobalIndex(i, officePage, officePageSize))" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
+<button nz-button nzDanger nzType="primary" type="button" (click)="deleteOffice(getGlobalIndex(i, officePage, officePageSize))" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button> -->
 
-<nz-row nzJustify="center" class="pb-20">
-  <nz-col [nzSpan]="24" [nzMd]="20" [nzLg]="16" [nzXXl]="12">
-    <div class="update-data">
-      <div class="update-data__header flex flex-col gap-2">
-        <h2 class="update-data__header__title text-center my-4">Información prestador</h2>
-      </div>
-
-      <form nz-form nzLayout="vertical" [formGroup]="providerForm" (ngSubmit)="onSubmit()">
-        <div class="update-data__body">
-
-          <!-- <div nz-row [nzGutter]="16">
-            <nz-col [nzSpan]="24" [nzSm]="12">
-              <nz-form-item>
-                <nz-form-label [nzRequired]="true" nzFor="email">
-                  Correo electrónico del prestador
-                  <div
-                    nz-tooltip
-                    [nzTooltipTitle]="emailTooltip"
-                    nzTooltipPlacement="top"
-                    nzTooltipOverlayClassName="large-tooltip-custom">
-                    <i nz-icon nzType="info-circle" nzTheme="fill" class="info-icon"></i>
-                  </div>
-                  <ng-template #emailTooltip>
-                    @for (msg of emailInfoMessage; track $index) {
-                      <p>{{ msg }}</p>
-                    }
-                  </ng-template>
-                </nz-form-label>
-                <nz-form-control [nzErrorTip]="emailErrorTip">
-                  <ng-template #emailErrorTip>
-                    @if (providerForm.controls['email'].hasError('required')) {
-                      <p>El campo es requerido.</p>
-                    } @else if (providerForm.controls['email'].hasError('invalidEmail')) {
-                      <p>Ingresa un correo válido.</p>
-                    }
-                  </ng-template>
-                  <input nz-input id="email" formControlName="email" placeholder="Correo" />
-                </nz-form-control>
-              </nz-form-item>
-            </nz-col>
-          </div> -->
-
-          <!-- <button nz-button nzType="primary" type="button" (click)="openOfficeModal(getGlobalIndex(i, officePage, officePageSize))" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
-          <button nz-button nzDanger nzType="primary" type="button" (click)="deleteOffice(getGlobalIndex(i, officePage, officePageSize))" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button> -->
-
-
-          <!-- <button nz-button nzType="primary" type="button" (click)="openContactModal(getGlobalIndex(i, contactPage, contactPageSize))" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
-          <button nz-button nzDanger nzType="primary" type="button" (click)="deleteContact(getGlobalIndex(i, contactPage, contactPageSize))" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button> -->
-        </div>
-
-        <div class="update-data__footer">
-          <button class="btn-primary bg-green-500 hover:bg-green-500/80" type="submit" [disabled]="loading">Actualizar datos</button>
-        </div>
-      </form>
-
-    </div>
-  </nz-col>
-</nz-row>
+<!-- <button nz-button nzType="primary" type="button" (click)="openContactModal(getGlobalIndex(i, contactPage, contactPageSize))" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
+<button nz-button nzDanger nzType="primary" type="button" (click)="deleteContact(getGlobalIndex(i, contactPage, contactPageSize))" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button> -->

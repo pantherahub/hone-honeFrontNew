@@ -12,9 +12,9 @@ import { distinctUntilChanged, firstValueFrom } from 'rxjs';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { CatalogService } from 'src/app/services/catalog/catalog.service';
-import { CitiesService } from 'src/app/services/cities/cities.service';
 import { ClientProviderService } from 'src/app/services/clients/client-provider.service';
 import { ContactsProviderService } from 'src/app/services/contacts-provider/contacts-provider.service';
+import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.component';
@@ -76,6 +76,7 @@ export class ContactFormComponent implements OnInit {
     private clientProviderService: ClientProviderService,
     private alertService: AlertService,
     private catalogService: CatalogService,
+    private eventManager: EventManagerService,
   ) {}
 
   ngOnInit(): void {
@@ -109,6 +110,8 @@ export class ContactFormComponent implements OnInit {
     this.hasChanges = false;
     if (this.isDrawer()) {
       this.contactDrawer.open();
+    } else {
+      this.eventManager.startEditingProvider();
     }
   }
 
@@ -140,6 +143,7 @@ export class ContactFormComponent implements OnInit {
       this.contactDrawer.close(contactData);
     } else {
       this.onFormClose(contactData);
+      this.eventManager.stopEditingProvider();
     }
   }
 

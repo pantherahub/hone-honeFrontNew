@@ -13,7 +13,7 @@ export interface AlertOptions {
   loading?: boolean;
 
   iconVariant?: AlertVariant;
-  cancelBtnText?: string;
+  cancelBtnText?: string | null;
   confirmBtnText?: string;
   confirmBtnVariant?: 'primary' | 'gray' | 'red' | 'green';
   confirmBtnStyle?: 'solid' | 'soft' | 'ghost';

@@ -22,7 +22,7 @@ export class AlertModalComponent {
   @Input() loading: boolean = false;
   @Input() showConfirmBtn: boolean = false;
   @Input() confirmBtnText: string = 'Aceptar';
-  @Input() cancelBtnText: string = 'Cancelar';
+  @Input() cancelBtnText: string | null = 'Cancelar';
   @Input() iconVariant?: AlertVariant;
   @Input() confirmBtnVariant?: 'primary' | 'gray' | 'red' | 'green';
   @Input() confirmBtnStyle?: 'solid' | 'soft' | 'ghost';

@@ -1,14 +1,13 @@
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder } from '@angular/forms';
-import { NzModalService } from 'ng-zorro-antd/modal';
 import { AlertService } from 'src/app/services/alert/alert.service';
-import { ContactFormComponent } from '../contact-form/contact-form.component';
+import { ContactFormComponent } from '../shared/contact-form/contact-form.component';
 import { CommonModule } from '@angular/common';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { DropdownTriggerDirective } from 'src/app/directives/dropdown-trigger.directive';
 import { firstValueFrom } from 'rxjs';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { ContactDetailComponent } from '../contact-detail/contact-detail.component';
+import { ContactDetailComponent } from '../shared/contact-detail/contact-detail.component';
 
 @Component({
   selector: 'app-contact-list',
@@ -19,6 +18,7 @@ import { ContactDetailComponent } from '../contact-detail/contact-detail.compone
 })
 export class ContactListComponent {
 
+  @Input() isFirstForm: boolean = true;
   @Input() createdContacts!: FormArray;
   @Input() updatedContacts!: FormArray;
   @Input() deletedContacts!: FormArray;
@@ -26,7 +26,7 @@ export class ContactListComponent {
 
   @Output() contactsChanged = new EventEmitter<any>();
   @Output() prev = new EventEmitter<void>();
-  @Output() onFormSubmit = new EventEmitter<any>();
+  @Output() save = new EventEmitter<any>();
 
   isEditingContact = false;
   selectedContactIndex: number | null = null;
@@ -37,7 +37,6 @@ export class ContactListComponent {
   constructor(
     private alertService: AlertService,
     private fb: FormBuilder,
-    private modalService: NzModalService,
     private toastService: ToastService,
   ) { }
 
@@ -46,7 +45,12 @@ export class ContactListComponent {
   }
 
   onSubmit() {
-    this.onFormSubmit.emit();
+    this.save.emit();
+  }
+
+  successToast(message: string) {
+    if (!this.isFirstForm) return;
+    this.toastService.success(message, { color: 'info' });
   }
 
   viewContact(contactIndex: number | null = null) {
@@ -60,8 +64,8 @@ export class ContactListComponent {
     this.selectedContactIndex = index;
 
     const contact = this.selectedContactIndex != null
-        ? this.existingContacts[this.selectedContactIndex]
-        : null;
+      ? this.existingContacts[this.selectedContactIndex]
+      : null;
     this.contactDrawer.open({ contact });
   }
 
@@ -91,9 +95,8 @@ export class ContactListComponent {
           this.existingContacts.push(newContact.value);
         }
         this.existingContacts = [...this.existingContacts];
-        this.toastService.success(
-          `Contacto por ${contactIndex != null ? 'actualizar' : 'agregar'}.`,
-          { color: 'info' }
+        this.successToast(
+          `Contacto por ${contactIndex != null ? 'actualizar' : 'agregar'}.`
         );
       } else if (!result.isNew && contactIndex != null) {
         const updatedContactsIndex = this.updatedContacts.controls.findIndex(
@@ -106,13 +109,22 @@ export class ContactListComponent {
         }
         this.existingContacts[contactIndex] = newContact.value;
         this.existingContacts = [...this.existingContacts];
-        this.toastService.success('Contacto por actualizar.', { color: 'info' });
+        this.successToast('Contacto por actualizar.');
       }
       this.contactsChanged.emit(this.existingContacts);
+      if (!this.isFirstForm) this.save.emit();
     }
   }
 
   async deleteContact(index: number) {
+    if (!this.isFirstForm && this.existingContacts.length <= 1) {
+      this.alertService.warning(
+        '¡Requerido!',
+        'Debe existir al menos un contacto, actualízalo o crea otro antes de eliminarlo.'
+      );
+      return;
+    }
+
     const confirmed = await firstValueFrom(
       this.alertService.confirmDelete(
         '¿Eliminar contacto?',
@@ -147,7 +159,9 @@ export class ContactListComponent {
       }
     }
     this.existingContacts = [...this.existingContacts];
-    this.toastService.success('Contacto por eliminar.', { color: 'info' });
+    this.successToast('Contacto por eliminar.');
+
+    if (!this.isFirstForm) this.save.emit();
   }
 
 }

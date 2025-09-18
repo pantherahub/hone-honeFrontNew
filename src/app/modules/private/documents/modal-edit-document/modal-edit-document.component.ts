@@ -492,7 +492,7 @@ export class ModalEditDocumentComponent implements OnInit {
       this.alertService
         .confirm(
           '¡IMPORTANTE!',
-          'Debe leer la información anterior sobre los valores de la póliza para evitar devoluciones y retrasos en la gestión documental.',
+          'Debes leer la información anterior sobre los valores de la póliza para evitar devoluciones y retrasos en la gestión documental.',
           {
             iconVariant: 'danger',
             confirmBtnVariant: 'red',
@@ -558,8 +558,8 @@ export class ModalEditDocumentComponent implements OnInit {
     if (this.documentForm.invalid) return;
     else if (!this.loadedFile && (this.isNew || this.currentDoc.documentStatus === 'VENCIDO')) {
       this.alertService.warning(
-        '¡Aviso!',
-        'Debe seleccionar un documento.',
+        '¡Acción requerida!',
+        'Debes seleccionar un documento.',
       );
       return;
     }
