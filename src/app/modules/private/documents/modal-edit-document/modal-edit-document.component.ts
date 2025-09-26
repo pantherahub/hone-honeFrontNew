@@ -95,6 +95,10 @@ export class ModalEditDocumentComponent implements OnInit {
     'HDI',
     'Axa colpatria',
     'Aurora',
+    'Chubb',
+    'Previsora',
+    'Seguros Bolivar',
+    'Solidaria',
     'Otra',
   ];
   riskClassifierOptions = ['1', '2', '3', '4', '5'];
