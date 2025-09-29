@@ -101,7 +101,6 @@ export class DrawerComponent implements OnInit, OnDestroy {
   }
 
   get drawerClasses(): string {
-    console.log("drawerClasses", this.isOpen);
     const placement = this.effectivePlacement();
 
     const placements: any = {

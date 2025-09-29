@@ -1,7 +1,6 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { NgZorroModule } from '../../../../ng-zorro.module';
 import { CommonModule } from '@angular/common';
-import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { DocumentsCrudService } from '../../../../services/documents/documents-crud.service';
 import { EventManagerService } from '../../../../services/events-manager/event-manager.service';
 import { FileSelectDirective } from 'src/app/directives/file-select.directive';
@@ -21,8 +20,8 @@ import { FileDropDirective } from 'src/app/directives/file-drop.directive';
   selector: 'app-modal-edit-document',
   standalone: true,
   imports: [
-    NgZorroModule,
     CommonModule,
+    ReactiveFormsModule,
     PipesModule,
     FileSelectDirective,
     FileDropDirective,

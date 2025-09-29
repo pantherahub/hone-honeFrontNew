@@ -1,8 +1,10 @@
-<!-- @if (loading) {
-  <div class="loading-overlay fixed">
-    <nz-spin [nzSize]="'large'" nzTip="Cargando..."></nz-spin>
+@if (loading) {
+  <div class="absolute inset-0 z-50 bg-gray-50/60 flex items-center justify-center">
+    <svg class="w-7 h-7 text-main-blue1h animate-spin fill-gray-200">
+      <use xlink:href="/assets/icons/extras/animations.svg#spin" />
+    </svg>
   </div>
-} -->
+}
 
 <div class="flex justify-center mx-4">
   <div class="max-w-screen-md w-full pt-10 pb-20 md:pt-6 flex flex-col gap-3">

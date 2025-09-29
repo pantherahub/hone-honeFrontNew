@@ -9,7 +9,6 @@ import { ContactsProviderService } from 'src/app/services/contacts-provider/cont
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { AddressFormComponent } from './address-form/address-form.component';
-import { NzModalService } from 'ng-zorro-antd/modal';
 import { ScheduleFormComponent } from './schedule-form/schedule-form.component';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ContactFormComponent } from '../../shared/contact-form/contact-form.component';
@@ -95,7 +94,6 @@ export class OfficeFormComponent {
     private alertService: AlertService,
     private contactsProviderService: ContactsProviderService,
     private toastService: ToastService,
-    private modalService: NzModalService,
     private catalogService: CatalogService,
     private officeDataService: OfficeDataService,
   ) { }

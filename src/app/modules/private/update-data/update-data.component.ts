@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 import { ClientProviderService } from 'src/app/services/clients/client-provider.service';
 import { LANGUAGES } from 'src/app/constants/languages';
@@ -26,7 +25,7 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 @Component({
   selector: 'app-update-data',
   standalone: true,
-  imports: [NgZorroModule, CommonModule, BackendErrorsComponent, ButtonComponent, AlertComponent, RouterModule, ProviderFormComponent, OfficeListComponent, ContactListComponent],
+  imports: [CommonModule, BackendErrorsComponent, ButtonComponent, AlertComponent, RouterModule, ProviderFormComponent, OfficeListComponent, ContactListComponent],
   templateUrl: './update-data.component.html',
   styleUrl: './update-data.component.scss'
 })
@@ -51,14 +50,6 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
 
   loading: boolean = false;
   backendError: any = null;
-  // backendError: any = {
-  //   error: {
-  //     details: [
-  //       { message: 'Primer número de la placa debe ser positivo' },
-  //       { message: 'El "Nombre o Razón social" ya existe en la base de datos' },
-  //     ]
-  //   }
-  // };
 
   private formSubscription: any;
 

@@ -1,5 +1,4 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { NgZorroModule } from '../../../../ng-zorro.module';
 import { EventManagerService } from '../../../../services/events-manager/event-manager.service';
 import { DocumentsCrudService } from '../../../../services/documents/documents-crud.service';
 import { DocumentInterface } from '../../../../models/client.interface';
@@ -23,7 +22,7 @@ import { environment } from 'src/environments/environment';
 @Component({
   selector: 'app-list-documents',
   standalone: true,
-  imports: [NgZorroModule, CommonModule, PipesModule, ButtonComponent, TooltipComponent],
+  imports: [CommonModule, PipesModule, ButtonComponent, TooltipComponent],
   templateUrl: './list-documents.component.html',
   styleUrl: './list-documents.component.scss'
 })

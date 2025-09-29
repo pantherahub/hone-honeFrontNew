@@ -5,11 +5,11 @@ import {
   FormArray,
   FormBuilder,
   FormGroup,
+  ReactiveFormsModule,
   Validators
 } from '@angular/forms';
 import { format } from 'date-fns';
 import { distinctUntilChanged, firstValueFrom } from 'rxjs';
-import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { CatalogService } from 'src/app/services/catalog/catalog.service';
 import { ClientProviderService } from 'src/app/services/clients/client-provider.service';
@@ -26,7 +26,7 @@ import { TooltipComponent } from 'src/app/shared/components/tooltip/tooltip.comp
 @Component({
   selector: 'app-contact-form',
   standalone: true,
-  imports: [NgZorroModule, CommonModule, DrawerComponent, ButtonComponent, TextInputComponent, InputErrorComponent, SelectComponent, TooltipComponent],
+  imports: [CommonModule, ReactiveFormsModule, DrawerComponent, ButtonComponent, TextInputComponent, InputErrorComponent, SelectComponent, TooltipComponent],
   templateUrl: './contact-form.component.html',
   styleUrl: './contact-form.component.scss'
 })

@@ -11,7 +11,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ModalService } from 'src/app/services/modal/modal.service';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { Router } from '@angular/router';
-import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { PopoverComponent } from 'src/app/shared/components/popover/popover.component';
 import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.component';
 import { AlertComponent } from 'src/app/shared/components/alert/alert.component';
@@ -55,7 +54,6 @@ export class TestsComponent implements OnInit, AfterViewInit {
     private modalService: ModalService,
     private alertService: AlertService,
     private router: Router,
-    private notificationService: NzNotificationService,
   ) { }
 
   navigateTo(url: string): void {

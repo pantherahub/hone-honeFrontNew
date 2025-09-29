@@ -1,12 +1,9 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, TemplateRef, ViewChild, effect } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { ClientInterface } from '../../../models/client.interface';
 import { ClientProviderService } from '../../../services/clients/client-provider.service';
-
-import { NgZorroModule } from '../../../ng-zorro.module';
 import { EventManagerService } from '../../../services/events-manager/event-manager.service';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { NzModalService } from 'ng-zorro-antd/modal';
 import { TutorialService } from 'src/app/services/tutorial/tutorial.service';
 import { Subscription } from 'rxjs';
 import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
@@ -17,11 +14,12 @@ import { PopoverComponent } from 'src/app/shared/components/popover/popover.comp
 import { ModalService } from 'src/app/services/modal/modal.service';
 import { ModalRef } from 'src/app/models/modal.interface';
 import { environment } from 'src/environments/environment';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [ NgZorroModule, CommonModule, RouterModule, TextInputComponent, ButtonComponent, ModalComponent, PopoverComponent ],
+  imports: [ FormsModule, CommonModule, RouterModule, TextInputComponent, ButtonComponent, ModalComponent, PopoverComponent ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })

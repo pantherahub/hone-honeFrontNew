@@ -1,8 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { distinctUntilChanged } from 'rxjs';
-import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.component';
@@ -13,7 +12,7 @@ import { TextInputComponent } from 'src/app/shared/components/text-input/text-in
 @Component({
   selector: 'app-schedule-form',
   standalone: true,
-  imports: [NgZorroModule, CommonModule, TextInputComponent, InputErrorComponent, DrawerComponent, ButtonComponent, SelectComponent],
+  imports: [CommonModule, ReactiveFormsModule, TextInputComponent, InputErrorComponent, DrawerComponent, ButtonComponent, SelectComponent],
   templateUrl: './schedule-form.component.html',
   styleUrl: './schedule-form.component.scss'
 })

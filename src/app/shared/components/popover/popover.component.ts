@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, ChangeDetectorRef, Component, ContentChild, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { createPopper, Instance, Placement } from '@popperjs/core';
 import { ButtonComponent } from '../button/button.component';
-import { PopoverStateService } from 'src/app/services/popover-state/popover-state.service';
+import { OverlayStateService } from 'src/app/services/overlay-state/overlay-state.service';
 
 
 @Component({
@@ -55,7 +55,7 @@ export class PopoverComponent implements OnInit, AfterViewInit, OnChanges, OnDes
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private popoverState: PopoverStateService,
+    private overlayStateService: OverlayStateService,
   ) { }
 
   ngOnInit(): void {
@@ -153,7 +153,7 @@ export class PopoverComponent implements OnInit, AfterViewInit, OnChanges, OnDes
 
     if (isVisible) {
       if (this.highlighted) {
-        this.popoverState.addHighlight();
+        this.overlayStateService.addOverlay();
       }
       this.popperInstance?.update();
       if (this.autoScrollOnOpen) {
@@ -169,7 +169,7 @@ export class PopoverComponent implements OnInit, AfterViewInit, OnChanges, OnDes
       this.popperInstance?.update();
     } else {
       if (this.highlighted) {
-        this.popoverState.removeHighlight();
+        this.overlayStateService.removeOverlay();
       }
       this.popperInstance?.update();
     }

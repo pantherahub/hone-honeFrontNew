@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
-import { NgZorroModule } from 'src/app/ng-zorro.module';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.component';
@@ -13,7 +12,7 @@ import { capitalizeWords, trimObjectStrings } from 'src/app/utils/string-utils';
 @Component({
   selector: 'app-address-form',
   standalone: true,
-  imports: [NgZorroModule, CommonModule, DrawerComponent, ButtonComponent, TextInputComponent, InputErrorComponent, SelectComponent],
+  imports: [CommonModule, ReactiveFormsModule, DrawerComponent, ButtonComponent, TextInputComponent, InputErrorComponent, SelectComponent],
   templateUrl: './address-form.component.html',
   styleUrl: './address-form.component.scss'
 })
