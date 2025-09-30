@@ -53,19 +53,19 @@ export class ListDocumentsComponent implements OnInit {
   private downloadConfigs: Record<string, DocumentConfig> = {
     '8-9': {
       files: [
-        { url: `${environment.azureAssetsHost}documents/docs-prestadores-axa-gestion-preventiva.zip`, name: 'Documentos para diligenciar axa gestión preventiva.zip' }
+        { url: `${environment.s3AssetsHost}docs-prestadores-axa-gestion-preventiva.zip`, name: 'Documentos para diligenciar axa gestión preventiva.zip' }
       ],
       displayName: 'Documentos obligatorios a diligenciar',
     },
     '8-*': {
       files: [
-        { url: `${environment.azureAssetsHost}documents/docs-prestadores-axa.zip`, name: 'Documentos para diligenciar axa.zip' },
+        { url: `${environment.s3AssetsHost}docs-prestadores-axa.zip`, name: 'Documentos para diligenciar axa.zip' },
       ],
       displayName: 'Documentos obligatorios a diligenciar',
     },
     '13-7': {
       files: [
-        { url: `${environment.azureAssetsHost}documents/carta_mipres.pdf`, name: 'Carta_Mipres.pdf' }
+        { url: `${environment.s3AssetsHost}carta_mipres.pdf`, name: 'Carta_Mipres.pdf' }
       ],
       displayName: 'Carta Mipres a diligenciar',
     }
