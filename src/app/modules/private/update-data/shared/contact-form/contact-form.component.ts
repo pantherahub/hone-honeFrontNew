@@ -12,7 +12,6 @@ import { format } from 'date-fns';
 import { distinctUntilChanged, firstValueFrom } from 'rxjs';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { CatalogService } from 'src/app/services/catalog/catalog.service';
-import { ClientProviderService } from 'src/app/services/clients/client-provider.service';
 import { ContactsProviderService } from 'src/app/services/contacts-provider/contacts-provider.service';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
@@ -73,7 +72,6 @@ export class ContactFormComponent implements OnInit {
     private fb: FormBuilder,
     private formUtils: FormUtilsService,
     private contactsProviderService: ContactsProviderService,
-    private clientProviderService: ClientProviderService,
     private alertService: AlertService,
     private catalogService: CatalogService,
     private eventManager: EventManagerService,
@@ -201,7 +199,7 @@ export class ContactFormComponent implements OnInit {
   }
 
   loadIdentificationTypes() {
-    this.clientProviderService.getIdentificationTypes().subscribe({
+    this.catalogService.getDocTypes().subscribe({
       next: (res: any) => {
         this.identificationTypes = res;
       },

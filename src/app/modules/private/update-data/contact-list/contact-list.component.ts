@@ -59,7 +59,18 @@ export class ContactListComponent {
     this.contactDetailDrawer.open(contact);
   }
 
-  openContactForm(index: number | null = null) {
+  async openContactForm(index: number | null = null) {
+    if (index != null && !this.isFirstForm) {
+      const confirmed = await firstValueFrom(
+        this.alertService.confirmUpdate(
+          '¿Editar ahora?',
+          'Estás por cambiar información ya guardada. Confirma si deseas continuar.',
+          { confirmBtnText: 'Continuar', }
+        )
+      );
+      if (!confirmed) return;
+    }
+
     this.isEditingContact = true;
     this.selectedContactIndex = index;
 

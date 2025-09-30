@@ -62,17 +62,19 @@ export class AlertService {
     }) as Observable<boolean>;
   }
 
-  confirmUpdate(title: string = '¿Está seguro?', message: string = 'Esta acción no se puede deshacer.'): Observable<boolean> {
+  confirmUpdate(title: string = '¿Está seguro?', message: string = 'Esta acción no se puede deshacer.', options: Partial<AlertOptions> = {}): Observable<boolean> {
     return this.confirm(title, message, {
       variant: 'info',
       customIconPath: '/assets/icons/outline/general.svg#edit',
+      ...options
     });
   }
 
-  confirmDelete(title: string = '¿Está seguro?', message: string = 'Esta acción no se puede deshacer.'): Observable<boolean> {
+  confirmDelete(title: string = '¿Está seguro?', message: string = 'Esta acción no se puede deshacer.', options: Partial<AlertOptions> = {}): Observable<boolean> {
     return this.confirm(title, message, {
       variant: 'danger',
       customIconPath: '/assets/icons/outline/general.svg#trash-bin',
+      ...options
     });
   }
 

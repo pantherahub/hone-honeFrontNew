@@ -21,6 +21,7 @@ import { OfficeListComponent } from './office-list/office-list.component';
 import { ContactListComponent } from './contact-list/contact-list.component';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { CatalogService } from 'src/app/services/catalog/catalog.service';
 
 @Component({
   selector: 'app-update-data',
@@ -104,6 +105,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     private router: Router,
     private navigationService: NavigationService,
     private alertService: AlertService,
+    private catalogService: CatalogService,
   ) { }
 
   ngOnInit(): void {
@@ -443,7 +445,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
   }
 
   getIdentificationTypes() {
-    this.clientProviderService.getIdentificationTypes().subscribe({
+    this.catalogService.getDocTypes().subscribe({
       next: (res: any) => {
         this.identificationTypes = res;
       },
@@ -591,15 +593,21 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     this.loading = true;
     this.clientProviderService.getTemporalProviderData(this.user.id).subscribe({
       next: (res: any) => {
-        const data = res.data;
         this.loading = false;
+        const user = this.user;
+
+        const data = res.data;
         if (!data) {
           this.isFirstForm = true;
+          user.withData = false;
+          this.authService.saveUserLogged(user);
           this.restoreFormFromLocalStorage();
           return;
         };
 
         this.isFirstForm = false;
+        user.withData = true;
+        this.authService.saveUserLogged(user);
         this.removeFormState();
         this.disableProviderFields();
 
@@ -655,7 +663,6 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
           });
         }
 
-        const user = this.user;
         user.rejected = res.rejected;
         this.authService.saveUserLogged(user);
 

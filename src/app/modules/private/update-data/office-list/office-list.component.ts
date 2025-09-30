@@ -77,7 +77,17 @@ export class OfficeListComponent implements OnInit {
     this.officeDetailDrawer.open(office);
   }
 
-  openOfficeForm(index: number | null = null) {
+  async openOfficeForm(index: number | null = null) {
+    if (index != null && !this.isFirstForm) {
+      const confirmed = await firstValueFrom(
+        this.alertService.confirmUpdate(
+          '¿Editar ahora?',
+          'Estás por cambiar información ya guardada. Confirma si deseas continuar.',
+          { confirmBtnText: 'Continuar', }
+        )
+      );
+      if (!confirmed) return;
+    }
     this.isEditingOffice = true;
     this.selectedOfficeIndex = index;
     this.eventManager.startEditingProvider();

@@ -15,9 +15,9 @@ import { TooltipComponent } from 'src/app/shared/components/tooltip/tooltip.comp
 import { ModalEditDocumentComponent } from '../modal-edit-document/modal-edit-document.component';
 import { DocumentConfig, DownloadService } from 'src/app/services/download/download.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { CitiesService } from 'src/app/services/cities/cities.service';
 import { CompliancePercentInterface, PercentInterface } from 'src/app/models/doc-percent.interface';
 import { environment } from 'src/environments/environment';
+import { CatalogService } from 'src/app/services/catalog/catalog.service';
 
 @Component({
   selector: 'app-list-documents',
@@ -78,7 +78,7 @@ export class ListDocumentsComponent implements OnInit {
     private alertService: AlertService,
     private downloadService: DownloadService,
     private toastService: ToastService,
-    private citiesService: CitiesService,
+    private catalogService: CatalogService,
   ) { }
 
   ngOnInit(): void {
@@ -186,7 +186,7 @@ export class ListDocumentsComponent implements OnInit {
   }
 
   getCities() {
-    this.citiesService.getCities().subscribe({
+    this.catalogService.getCities().subscribe({
       next: (resp: any[]) => {
         this.citiesList = resp;
       },

@@ -442,7 +442,6 @@ export class OfficeFormComponent {
   }
 
   successToast(message: string) {
-    if (!this.isFirstForm) return;
     this.toastService.success(message, { color: 'info' });
   }
 
