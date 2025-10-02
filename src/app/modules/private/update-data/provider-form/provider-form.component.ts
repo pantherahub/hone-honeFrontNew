@@ -51,6 +51,10 @@ export class ProviderFormComponent {
   }
 
   goNext() {
+    if (!this.isFirstForm) {
+      this.next.emit();
+      return;
+    }
     this.providerFormFields.forEach(field => {
       const control = this.form.get(field);
       control?.markAsTouched();

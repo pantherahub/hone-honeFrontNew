@@ -88,7 +88,7 @@
               bindLabel="type"
               bindValue="idOccupationType"
               formControlName="idOccupationType"
-              placeholder="Tipo de contacto">
+              placeholder="* Tipo de contacto">
             </app-select>
             <app-input-error [control]="contactForm.get('idOccupationType')" />
           </div>
@@ -99,7 +99,7 @@
               bindValue="idOccupation"
               formControlName="idOccupation"
               [searchable]="true"
-              [placeholder]="selectedOccupationType === 1 ? 'Seleccionar área' : 'Cargo'">
+              [placeholder]="selectedOccupationType === 1 ? '* Seleccionar área' : '* Cargo'">
             </app-select>
             <app-input-error [control]="contactForm.get('idOccupation')" />
           </div>
@@ -107,7 +107,7 @@
             <div>
               <app-text-input
                 [id]="'contactName'"
-                label="Nombre"
+                label="* Nombre"
                 formControlName="name"
               />
               <app-input-error [control]="contactForm.get('name')" />
@@ -120,14 +120,14 @@
                 bindLabel="typeDocument"
                 bindValue="idTypeDocument"
                 formControlName="idTypeDocument"
-                placeholder="Tipo de identificación">
+                placeholder="* Tipo de identificación">
               </app-select>
               <app-input-error [control]="contactForm.get('idTypeDocument')" />
             </div>
             <div>
               <app-text-input
                 [id]="'identification'"
-                label="Identificación"
+                label="* Identificación"
                 formControlName="identification"
               />
               <app-input-error [control]="contactForm.get('identification')" />
@@ -135,7 +135,7 @@
             <div>
               <app-text-input
                 [id]="'expeditionDate'"
-                label="Fecha de expedición"
+                label="* Fecha de expedición"
                 [type]="'date'"
                 [maxDate]="todayDate"
                 formControlName="expeditionDate"
@@ -149,7 +149,7 @@
                 bindValue="idCity"
                 formControlName="idCityExpedition"
                 [searchable]="true"
-                placeholder="Ciudad de expedición">
+                placeholder="* Ciudad de expedición">
               </app-select>
               <app-input-error [control]="contactForm.get('idCityExpedition')" />
             </div>
@@ -179,7 +179,7 @@
                 <div class="flex-1">
                   <app-text-input
                     [id]="'email-' + i"
-                    label="Correo"
+                    label="* Correo"
                     formControlName="email"
                   />
                 </div>
@@ -244,7 +244,7 @@
                 <app-select
                   [items]="phoneNumberTypes"
                   formControlName="type"
-                  placeholder="Tipo">
+                  placeholder="* Tipo">
                 </app-select>
                 <app-input-error [control]="control.get('type')" />
               </div>
@@ -256,7 +256,7 @@
                     bindValue="idCity"
                     formControlName="idCity"
                     [searchable]="true"
-                    placeholder="Indicativo">
+                    placeholder="* Indicativo">
                   </app-select>
                   <app-input-error [control]="control.get('idCity')" />
                 </div>
@@ -264,7 +264,7 @@
               <div>
                 <app-text-input
                   [id]="'number-' + i"
-                  label="Número"
+                  label="* Número"
                   formControlName="number"
                 />
                 <app-input-error

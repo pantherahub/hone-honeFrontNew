@@ -67,7 +67,7 @@
     <div>
       <app-text-input
         [id]="'name'"
-        label="Nombre o razón social"
+        label="* Nombre o razón social"
         formControlName="name"
       />
       <app-input-error [control]="selectedForm.get('name')" />
@@ -75,7 +75,7 @@
     <div>
       <app-text-input
         [id]="'email'"
-        label="Correo electrónico"
+        label="* Correo electrónico"
         formControlName="email"
       />
       <app-input-error [control]="selectedForm.get('email')" />
@@ -95,14 +95,14 @@
         bindLabel="typeDocument"
         bindValue="idTypeDocument"
         formControlName="idTypeDocument"
-        placeholder="Tipo de identificación">
+        placeholder="* Tipo de identificación">
       </app-select>
       <app-input-error [control]="selectedForm.get('idTypeDocument')" />
     </div>
     <div>
       <app-text-input
         [id]="'identification'"
-        label="Número de identificación"
+        label="* Número de identificación"
         formControlName="identification"
       />
       <app-input-error [control]="selectedForm.get('identification')" />
@@ -125,7 +125,7 @@
     <div>
       <app-text-input
         [id]="'repsEnableCode'"
-        label="Código habilitación REPS"
+        label="* Código habilitación REPS"
         formControlName="repsEnableCode"
       />
       <app-input-error [control]="selectedForm.get('repsEnableCode')" />
@@ -139,7 +139,7 @@
         bindLabel="name"
         bindValue="code"
         formControlName="languages"
-        placeholder="Idiomas de prestación de servicio"
+        placeholder="* Idiomas de prestación de servicio"
         [clearable]="true">
       </app-select>
       <app-input-error [control]="selectedForm.get('languages')" />
@@ -154,7 +154,7 @@
     </div>
   </div>
 
-  @if (isFirstForm) {
+  @if (!isEditing) {
     <div>
       <app-button
         (onClick)="goNext()"

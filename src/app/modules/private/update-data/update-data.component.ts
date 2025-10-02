@@ -378,7 +378,6 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
         },
         [Validators.required, this.formUtils.email]
       ],
-      languages: [[], [Validators.required]],
       idTypeDocument: [
         { value: this.user.idTypeDocument || '', disabled: true },
         [Validators.required]
@@ -395,6 +394,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
         { value: this.user.repsEnableCode || '', disabled: !!this.user.repsEnableCode },
         [Validators.required]
       ],
+      languages: [[], [Validators.required]],
       website: ['', this.formUtils.url],
 
       updatedBasicData: [false],

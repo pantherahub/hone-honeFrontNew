@@ -56,7 +56,7 @@
             } @else {
               @for (data of existingOffices; let i = $index; track i) {
                 <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
-                  <td class="px-4 py-[10.5px] truncate max-w-[200px] overflow-hidden text-ellipsis">
+                  <td class="px-4 py-[10.5px] truncate max-w-[180px] overflow-hidden text-ellipsis">
                     {{ data.name }}
                   </td>
                   <td class="px-4 py-[10.5px]">
@@ -66,16 +66,28 @@
                     {{ data.address?.formattedAddress || '' }}
                   </td>
                   <td class="px-4 py-[10.5px] sticky right-0 bg-white before:content-[''] before:absolute before:top-0 before:bottom-0 before:left-0 before:w-px before:bg-gray-200 sm:before:hidden">
-                    <app-button
-                      [appDropdownTrigger]="'dropdown-office-opts-' + i"
-                      dropdownPlacement="bottom-end"
-                      variant="gray"
-                      styleType="soft"
-                      size="xs">
-                      <svg width="16" height="16">
-                        <use xlink:href="/assets/icons/outline/general.svg#dots-horizontal" />
-                      </svg>
-                    </app-button>
+                    <div class="flex gap-2">
+                      <app-button
+                        [appDropdownTrigger]="'dropdown-office-opts-' + i"
+                        dropdownPlacement="bottom-end"
+                        variant="gray"
+                        styleType="soft"
+                        size="xs">
+                        <svg width="16" height="16">
+                          <use xlink:href="/assets/icons/outline/general.svg#dots-horizontal" />
+                        </svg>
+                      </app-button>
+                      <app-button
+                        (onClick)="openOfficeForm(i)"
+                        variant="gray"
+                        styleType="soft"
+                        size="xs"
+                        class="hidden sm:block">
+                        <svg width="16" height="16">
+                          <use xlink:href="/assets/icons/outline/general.svg#edit" />
+                        </svg>
+                      </app-button>
+                    </div>
                     <div [id]="'dropdown-office-opts-' + i" class="z-30 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-[136px] dark:bg-gray-700 dark:divide-gray-600">
                       <ul class="py-1 text-sm text-gray-700 dark:text-gray-200">
                         <li>
@@ -113,30 +125,28 @@
       </div>
     </div>
 
-    @if (isFirstForm) {
-      <div class="flex justify-between">
-        <app-button
-          (onClick)="goPrev()"
-          variant="primary"
-          styleType="ghost"
-          size="md">
-          <svg width="20" height="20">
-            <use xlink:href="/assets/icons/outline/arrows.svg#chevron-left" />
-          </svg>
-          Atrás
-        </app-button>
-        <app-button
-          (onClick)="goNext()"
-          variant="primary"
-          styleType="solid"
-          size="md">
-          Siguiente
-          <svg width="20" height="20">
-            <use xlink:href="/assets/icons/outline/arrows.svg#chevron-right" />
-          </svg>
-        </app-button>
-      </div>
-    }
+    <div class="flex justify-between">
+      <app-button
+        (onClick)="goPrev()"
+        variant="primary"
+        styleType="ghost"
+        size="md">
+        <svg width="20" height="20">
+          <use xlink:href="/assets/icons/outline/arrows.svg#chevron-left" />
+        </svg>
+        Atrás
+      </app-button>
+      <app-button
+        (onClick)="goNext()"
+        variant="primary"
+        styleType="solid"
+        size="md">
+        Siguiente
+        <svg width="20" height="20">
+          <use xlink:href="/assets/icons/outline/arrows.svg#chevron-right" />
+        </svg>
+      </app-button>
+    </div>
   </div>
 } @else {
   <app-office-form

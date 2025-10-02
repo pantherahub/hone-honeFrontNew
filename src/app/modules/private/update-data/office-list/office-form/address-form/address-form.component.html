@@ -16,7 +16,7 @@
         <app-select
           [items]="viaOptions"
           formControlName="typeOfRoad"
-          placeholder="Tipo de vía"
+          placeholder="* Tipo de vía"
           [clearable]="true">
         </app-select>
         <app-input-error [control]="addressForm.get('typeOfRoad')" />
@@ -24,7 +24,7 @@
       <div class="col-span-12 sm:col-span-6">
         <app-text-input
           [id]="'roadName'"
-          label="Nombre/número de vía"
+          label="* Nombre/número de vía"
           formControlName="roadName"
         />
         <app-input-error
@@ -56,7 +56,7 @@
           [class]="addressForm.get('mainNumberComplement')?.value === otherOption ? 'sm:col-span-4' : 'sm:col-span-6'">
           <app-text-input
             [id]="'mainNumber'"
-            label="# Número"
+            label="* # Número"
             formControlName="mainNumber"
           />
           <app-input-error
@@ -97,7 +97,7 @@
           [class]="addressForm.get('secondaryNumberComplement')?.value === otherOption ? 'sm:col-span-4' : 'sm:col-span-6'">
           <app-text-input
             [id]="'secondaryNumber'"
-            label="- 2do número"
+            label="* - 2do número"
             formControlName="secondaryNumber"
           />
           <app-input-error
@@ -136,7 +136,7 @@
       <div class="col-span-12">
         <app-text-input
           [id]="'neighborhood'"
-          label="Barrio"
+          label="* Barrio"
           formControlName="neighborhood"
         />
         <app-input-error [control]="addressForm.get('neighborhood')" />
@@ -156,7 +156,7 @@
         <div class="col-span-12 sm:col-span-6">
           <app-text-input
             [id]="'addressMainNameComplement'"
-            label="Número o nombre"
+            label="* Número o nombre"
             formControlName="addressMainNameComplement"
           />
           <app-input-error [control]="addressForm.get('addressMainNameComplement')" />
@@ -177,7 +177,7 @@
         <div class="col-span-12 sm:col-span-6">
           <app-text-input
             [id]="'addressSecondaryNameComplement'"
-            label="Número o nombre"
+            label="* Número o nombre"
             formControlName="addressSecondaryNameComplement"
           />
           <app-input-error [control]="addressForm.get('addressSecondaryNameComplement')" />
