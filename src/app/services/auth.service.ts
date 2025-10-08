@@ -6,6 +6,7 @@ import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { EventManagerService } from './events-manager/event-manager.service';
+import { decodeJwtPayload } from '../utils/string-utils';
 
 @Injectable({
    providedIn: 'root'
@@ -72,7 +73,7 @@ export class AuthService {
 
   isTokenValid(token: string): boolean {
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const payload = decodeJwtPayload(token);
       let now = Math.floor(Date.now() / 1000); // in secs
       return payload.exp > now;
     } catch (e) {

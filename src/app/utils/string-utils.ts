@@ -103,3 +103,29 @@ export function formatFileBytes(bytes: number): string {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
+
+/**
+ * Decodes the payload of a JWT token from Base64URL to a JSON object.
+ * Handles URL-safe characters and missing padding before decoding.
+ * @param token - The JWT token string.
+ * @returns The decoded payload as an object.
+ * @throws Error if the token format is invalid.
+ */
+export function decodeJwtPayload(token: string) {
+  const base64Url = token.split('.')[1];
+  if (!base64Url) throw new Error('Invalid JWT');
+
+  // JWT uses Base64URL, special characters are replaced and filled correctly
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  // Base64 encoding requires the text length to be a multiple of 4, it is padded with "="
+  const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4);
+
+  // Decode using atob
+  const json = decodeURIComponent(
+    atob(padded)
+      .split('')
+      .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+      .join('')
+  );
+  return JSON.parse(json);
+}
