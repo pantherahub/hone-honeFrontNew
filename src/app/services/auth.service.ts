@@ -6,6 +6,7 @@ import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { EventManagerService } from './events-manager/event-manager.service';
+import { decodeJwtPayload } from '../utils/string-utils';
 
 @Injectable({
    providedIn: 'root'
@@ -26,7 +27,7 @@ export class AuthService {
               error: { message: 'El usuario no tiene roles asignados. Contacte con soporte.' }
             };
           }
-          this.saveToken(resp.token, resp.expir);
+          this.saveToken(resp.token);
           this.saveUserLogged(resp.usuario);
           return resp;
         })
@@ -34,11 +35,10 @@ export class AuthService {
    }
 
    // Guarda el token en el storage
-   private saveToken (token: string, expiration: string) {
+   private saveToken (token: string) {
       if (token != null) {
          this.token = token;
          localStorage.setItem('token', token);
-         localStorage.setItem('expire', expiration);
       } else {
          this.token = '';
       }
@@ -50,10 +50,10 @@ export class AuthService {
    }
 
    // obtiene en token del local storage para validarlo
-   public getStorageToken () {
-      if (localStorage.getItem('token')) {
-         const isToken: any = localStorage.getItem('token')!;
-         this.token = isToken;
+   public getStorageToken() {
+      const token = localStorage.getItem('token');
+      if (token) {
+         this.token = token;
          return this.token;
       }
       return (this.token = '');
@@ -61,24 +61,25 @@ export class AuthService {
 
    // Esta funcion valida fecha de expiracion del token, para dar acceso al sistema
    public isAuthenticated (): boolean {
-      // return this.token.length > 0; // Eliminas esta linea y descomentar todas las de abajo
-
-      this.getStorageToken();
-
-      if (localStorage.getItem('token') && localStorage.getItem('expire')) {
-         let res: boolean = true;
-         const expirationDate = localStorage.getItem('expire')!;
-         const today = new Date();
-         const expiration = new Date(expirationDate.toString());
-         if (today > expiration) {
-            res = false;
-            return res;
-         }
-         return res;
-      } else {
-         return false;
+      const token = this.getStorageToken();
+      if (token) {
+        if (!this.isTokenValid(token)) {
+          return false;
+        }
+        return true;
       }
+      return false;
    }
+
+  isTokenValid(token: string): boolean {
+    try {
+      const payload = decodeJwtPayload(token);
+      let now = Math.floor(Date.now() / 1000); // in secs
+      return payload.exp > now;
+    } catch (e) {
+      return false;
+    }
+  }
 
   clearLocalStorage() {
     localStorage.removeItem('token');
