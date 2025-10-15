@@ -355,13 +355,6 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
       return;
     }
 
-    // Find the index of the last enabled step
-    // const lastEnabledIndex = this.steps
-    //   .map((s, i) => (s.enabled ? i : -1))
-    //   .filter(i => i !== -1)
-    //   .pop() ?? 0;
-    // this.progressPercentage = Math.round(((lastEnabledIndex) / totalSteps) * 100);
-
     const completedCount = this.steps.filter(s => s.valid).length;
     this.progressPercentage = Math.round((completedCount / totalSteps) * 100);
   }
