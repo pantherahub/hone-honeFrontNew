@@ -23,7 +23,7 @@
     class="relative"
     before=""
     [ngClass]="{
-      'before:absolute before:-top-[5px] before:-left-[5px] before:-right-[5px] before:-bottom-[5px] before:content-[attr(before)] before:z-[60] before:bg-white before:rounded-lg': visible && highlighted,
+      'before:absolute before:-inset-[5px] before:content-[attr(before)] before:z-[60] before:bg-white before:rounded-lg': visible && highlighted,
     }"
     [class]="customTriggerClasses">
     <div class="relative"

@@ -47,14 +47,6 @@
             </span>
           </div>
         }
-        @if (office.enableCode) {
-          <div class="flex flex-col gap-2.5 text-sm leading-4">
-            <span class="font-semibold text-gray-900">Código habilitación</span>
-            <span class="text-gray-500">
-              {{ office.enableCode }}
-            </span>
-          </div>
-        }
         <div class="flex flex-col gap-2.5 text-sm leading-4">
           <span class="font-semibold text-gray-900">Compañías con convenio</span>
           <div class="flex gap-1 flex-wrap">
@@ -65,20 +57,6 @@
             }
           </div>
         </div>
-        @if (office.enableStartDateCode && office.enableEndDateCode) {
-          <div class="flex flex-col gap-2.5 text-sm leading-4">
-            <span class="font-semibold text-gray-900">Expedición habilitación</span>
-            <span class="text-gray-500">
-              {{ office.enableStartDateCode | date: 'mediumDate' }}
-            </span>
-          </div>
-          <div class="flex flex-col gap-2.5 text-sm leading-4">
-            <span class="font-semibold text-gray-900">Vencimiento habilitación</span>
-            <span class="text-gray-500">
-              {{ office.enableEndDateCode | date: 'mediumDate' }}
-            </span>
-          </div>
-        }
       </div>
 
       <div class="flex flex-col gap-4 p-4 rounded-xl bg-gray-50 ring-[1px] ring-inset ring-gray-200">

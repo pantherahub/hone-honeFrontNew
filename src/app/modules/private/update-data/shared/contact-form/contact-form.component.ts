@@ -10,6 +10,7 @@ import {
 } from '@angular/forms';
 import { format } from 'date-fns';
 import { distinctUntilChanged, firstValueFrom } from 'rxjs';
+import { City } from 'src/app/models/city.interface';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { CatalogService } from 'src/app/services/catalog/catalog.service';
 import { ContactsProviderService } from 'src/app/services/contacts-provider/contacts-provider.service';
@@ -65,6 +66,9 @@ export class ContactFormComponent implements OnInit {
   };
 
   todayDate = new Date().toISOString().split('T')[0];
+
+  cityLabel = (item: City) => `${item.city}, ${item.department}`;
+  cityLabelWithIndicative = (item: City) => `${item.city} (${item.indicative}), ${item.department}`;
 
   @ViewChild('contactDrawer', { static: false }) contactDrawer!: DrawerComponent;
 
@@ -213,10 +217,6 @@ export class ContactFormComponent implements OnInit {
     this.catalogService.getCities().subscribe({
       next: (data: any) => {
         this.cities = data;
-        this.cities = data.map((option: any) => ({
-          ...option,
-          label: `${option.city} (${option.indicative})`
-        }));
       },
       error: (err: any) => {
         console.error(err);

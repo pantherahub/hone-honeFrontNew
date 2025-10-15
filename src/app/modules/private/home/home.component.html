@@ -148,37 +148,14 @@
 </div>
 
 
-<!-- Tutorial video modal -->
-<ng-template #videoModal>
-  <div class="max-h-[391.47px] bg-gray-50">
-    <video
-      #tutorialVideo
-      class="h-full w-full"
-      controls
-      preload="metadata"
-      playsinline
-      disablePictureInPicture>
-      <source [src]="videoUrl" type="video/mp4" />
-      Tu navegador no soporta reproducción de video.
-    </video>
-  </div>
-  <app-button (onClick)="closeVideoModal()" variant="primary" size="xl" styleType="solid" customClass="w-full flex justify-center">
-    Iniciar recorrido
-    <svg width="24" height="24">
-      <use xlink:href="/assets/icons/outline/arrows.svg#arrow-right" />
-    </svg>
-  </app-button>
-</ng-template>
-
-
 <!-- Tutorial popover content -->
 <ng-template #popoverContent>
   <img src="assets/img/home/guide2.webp"
     alt="Imagen previsualización"
     class="hidden md:block rounded-md"
   />
-  <div class="flex justify-between items-center">
-    <span class="text-base leading-5 md:leading-[18px] font-normal text-main-blue1h">2 de 2</span>
+  <div class="flex justify-between items-center gap-2">
+    <span class="text-base leading-5 md:leading-[18px] font-normal text-main-blue1h whitespace-nowrap">2 de 3</span>
     <div class="flex gap-2 md:hidden">
       <app-button
         (click)="backTutorialStep()"
@@ -191,10 +168,10 @@
       <app-button
         (click)="nextTutorialStep()"
         variant="primary"
-        styleType="solid"
+        styleType="soft"
         size="sm"
         customClass="leading-4">
-        Entendido
+        Siguiente
       </app-button>
     </div>
     <div class="hidden md:flex gap-2">
@@ -209,10 +186,10 @@
       <app-button
         (click)="nextTutorialStep()"
         variant="primary"
-        styleType="solid"
+        styleType="soft"
         size="md"
         customClass="leading-4">
-        Entendido
+        Siguiente
       </app-button>
     </div>
   </div>

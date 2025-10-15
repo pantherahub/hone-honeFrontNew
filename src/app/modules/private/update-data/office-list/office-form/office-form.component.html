@@ -36,7 +36,7 @@
     <div>
       <app-select
         [items]="cities"
-        bindLabel="city"
+        [bindLabel]="cityLabel"
         bindValue="idCity"
         formControlName="idCity"
         placeholder="* Ciudad"
@@ -81,41 +81,6 @@
         formControlName="emailGlosas"
       />
       <app-input-error [control]="officeForm.get('emailGlosas')" />
-    </div>
-    <div>
-      <app-text-input
-        [id]="'enableCode'"
-        label="Código habilitación"
-        formControlName="enableCode"
-      />
-      <app-input-error
-        [control]="officeForm.get('enableCode')"
-        [customMessages]="customErrorMessagesMap['enableCode']"
-      />
-    </div>
-    <div>
-      <app-text-input
-        [id]="'enableStartDateCode'"
-        label="Expedición habilitación"
-        [type]="'date'"
-        formControlName="enableStartDateCode"
-      />
-      <app-input-error
-        [control]="officeForm.get('enableStartDateCode')"
-        [customMessages]="customErrorMessagesMap['enableStartDateCode']"
-      />
-    </div>
-    <div>
-      <app-text-input
-        [id]="'enableEndDateCode'"
-        label="Vencimiento habilitación"
-        [type]="'date'"
-        formControlName="enableEndDateCode"
-      />
-      <app-input-error
-        [control]="officeForm.get('enableEndDateCode')"
-        [customMessages]="customErrorMessagesMap['enableEndDateCode']"
-      />
     </div>
     <div>
       <app-select

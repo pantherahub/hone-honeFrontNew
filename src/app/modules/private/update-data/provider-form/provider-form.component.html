@@ -67,7 +67,7 @@
     <div>
       <app-text-input
         [id]="'name'"
-        label="* Nombre o razón social"
+        [label]="getLabel('name', 'Nombre o razón social')"
         formControlName="name"
       />
       <app-input-error [control]="selectedForm.get('name')" />
@@ -75,11 +75,11 @@
     <div>
       <app-text-input
         [id]="'email'"
-        label="* Correo electrónico"
+        [label]="getLabel('email', 'Correo electrónico')"
         formControlName="email"
       />
       <app-input-error [control]="selectedForm.get('email')" />
-      @if (isFirstForm || isEditing) {
+      @if ((isFirstForm && !selectedForm.get('email')?.disabled) || isEditing) {
         <a (click)="openEmailInfo()"
           class="mt-1 inline-flex gap-1 items-center text-xs text-blue-600 dark:text-blue-500 hover:underline">
           <svg width="16" height="16">
@@ -95,14 +95,14 @@
         bindLabel="typeDocument"
         bindValue="idTypeDocument"
         formControlName="idTypeDocument"
-        placeholder="* Tipo de identificación">
+        [placeholder]="getLabel('idTypeDocument', 'Tipo de identificación')">
       </app-select>
       <app-input-error [control]="selectedForm.get('idTypeDocument')" />
     </div>
     <div>
       <app-text-input
         [id]="'identification'"
-        label="* Número de identificación"
+        [label]="getLabel('identification', 'Número de identificación')"
         formControlName="identification"
       />
       <app-input-error [control]="selectedForm.get('identification')" />
@@ -125,7 +125,7 @@
     <div>
       <app-text-input
         [id]="'repsEnableCode'"
-        label="* Código habilitación REPS"
+        [label]="getLabel('repsEnableCode', 'Código habilitación REPS')"
         formControlName="repsEnableCode"
       />
       <app-input-error [control]="selectedForm.get('repsEnableCode')" />

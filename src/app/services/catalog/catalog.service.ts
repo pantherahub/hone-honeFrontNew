@@ -3,7 +3,7 @@ import { catchError, map, Observable, of, shareReplay, startWith } from 'rxjs';
 import { City } from 'src/app/models/city.interface';
 import { DocumentType } from 'src/app/models/document-type.interface';
 import { CitiesService } from '../cities/cities.service';
-import { ClientProviderService } from '../clients/client-provider.service';
+import { ProviderService } from '../provider/provider.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +15,7 @@ export class CatalogService {
 
   constructor(
     private citiesService: CitiesService,
-    private clientProviderService: ClientProviderService,
+    private providerService: ProviderService,
   ) { }
 
   // -------------------
@@ -47,7 +47,7 @@ export class CatalogService {
   // -------------------
   getDocTypes(): Observable<DocumentType[]> {
     if (!this.docucmentTypes$) {
-      this.docucmentTypes$ = this.clientProviderService.getIdentificationTypes().pipe(
+      this.docucmentTypes$ = this.providerService.getIdentificationTypes().pipe(
         catchError(err => {
           this.docucmentTypes$ = undefined;
           return of([] as DocumentType[]);

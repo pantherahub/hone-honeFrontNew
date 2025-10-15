@@ -1,6 +1,6 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ClientInterface } from '../../../models/client.interface';
-import { ClientProviderService } from '../../../services/clients/client-provider.service';
+import { ClientProviderService } from '../../../services/client-provider/client-provider.service';
 import { EventManagerService } from '../../../services/events-manager/event-manager.service';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -12,14 +12,13 @@ import { ModalComponent } from 'src/app/shared/components/modal/modal.component'
 import { NavigationService } from 'src/app/services/navigation/navigation.service';
 import { PopoverComponent } from 'src/app/shared/components/popover/popover.component';
 import { ModalService } from 'src/app/services/modal/modal.service';
-import { ModalRef } from 'src/app/models/modal.interface';
-import { environment } from 'src/environments/environment';
 import { FormsModule } from '@angular/forms';
+import { TutorialVideoComponent } from 'src/app/shared/modals/tutorial-video/tutorial-video.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [ FormsModule, CommonModule, RouterModule, TextInputComponent, ButtonComponent, ModalComponent, PopoverComponent ],
+  imports: [FormsModule, CommonModule, RouterModule, TextInputComponent, ButtonComponent, ModalComponent, PopoverComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -37,15 +36,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   clientTutorialVisible: boolean = false;
 
-  videoUrl = `${environment.s3AssetsHost}Hone+Solutions+Lissom+2025+1080p+Hi.mp4`;
-  videoModalRef: ModalRef | null = null;
-  @ViewChild('videoModal') videoModal!: TemplateRef<any>;
-
   @ViewChild('reminderModal') reminderModal!: ModalComponent;
 
   private tutorialSubscription!: Subscription;
 
-  constructor (
+  constructor(
     private clientService: ClientProviderService,
     private tutorialService: TutorialService,
     private eventManager: EventManagerService,
@@ -118,7 +113,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         console.error(err);
         this.loadingData = false;
       },
-      complete: () => {}
+      complete: () => { }
     });
   }
 
@@ -162,18 +157,16 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openVideoModal() {
-    this.videoModalRef = this.modalService.open(this.videoModal, {
+    const videoModalRef = this.modalService.open(TutorialVideoComponent, {
       title: 'Video presentación',
       showCloseButton: false,
       customSize: 'max-w-[727px]',
+    }, {
+      isTutorial: true,
     });
-    this.videoModalRef.onClose.subscribe(() => {
+    videoModalRef.onClose.subscribe(() => {
       this.nextTutorialStep();
     });
-  }
-
-  closeVideoModal() {
-    this.videoModalRef?.close();
   }
 
   onCloseDataReminder() {

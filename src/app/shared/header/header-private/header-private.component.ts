@@ -20,7 +20,7 @@ export class HeaderPrivateComponent implements OnInit, OnDestroy {
   public authService = inject(AuthService);
   public user = this.eventManager.userLogged();
 
-  configTutorialVisible = false;
+  configTutorialVisible: boolean = false;
 
   private tutorialSubscription!: Subscription;
 

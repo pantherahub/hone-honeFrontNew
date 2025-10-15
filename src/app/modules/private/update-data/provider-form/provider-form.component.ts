@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { LANGUAGES } from 'src/app/constants/languages';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
+import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
+import { ProviderService } from 'src/app/services/provider/provider.service';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { InputErrorComponent } from 'src/app/shared/components/input-error/input-error.component';
 import { SelectComponent } from 'src/app/shared/components/select/select.component';
@@ -24,6 +26,9 @@ export class ProviderFormComponent {
   @Input() providerFormFields: string[] = [];
   @Input() identificationTypes: any[] = [];
 
+  @Input() validateProviderForm!: (form?: FormGroup) => Promise<boolean>;
+
+  @Output() clearSectionBackendError = new EventEmitter<void>();
   @Output() next = new EventEmitter<void>();
   @Output() save = new EventEmitter<void>();
 
@@ -38,10 +43,15 @@ export class ProviderFormComponent {
     },
   };
 
+  backendError: any = null;
+
   constructor(
     private fb: FormBuilder,
     private alertService: AlertService,
     private eventManager: EventManagerService,
+    private cdr: ChangeDetectorRef,
+    private formUtils: FormUtilsService,
+    private providerService: ProviderService,
   ) { }
 
   get selectedForm(): FormGroup {
@@ -50,27 +60,29 @@ export class ProviderFormComponent {
       : this.form;
   }
 
-  goNext() {
+  controlNeedsAsterisk(controlName: string): boolean {
+    const control = this.selectedForm.get(controlName);
+    if (!control) return false;
+
+    const isRequired = this.formUtils.isControlRequired(control);
+
+    if (control.disabled && control.value != null) {
+      return false;
+    }
+    return isRequired;
+  }
+
+  getLabel(controlName: string, baseLabel: string): string {
+    return this.controlNeedsAsterisk(controlName)
+      ? `* ${baseLabel}`
+      : baseLabel;
+  }
+
+  async goNext() {
     if (!this.isFirstForm) {
       this.next.emit();
       return;
     }
-    this.providerFormFields.forEach(field => {
-      const control = this.form.get(field);
-      control?.markAsTouched();
-      control?.updateValueAndValidity();
-    });
-    const invalidFields = this.providerFormFields.filter(
-      field => this.form.get(field)?.invalid
-    );
-    if (invalidFields.length > 0) {
-      this.alertService.warning(
-        'Datos incompletos',
-        'Por favor completa todos los campos requeridos antes de continuar.'
-      );
-      return;
-    }
-
     this.next.emit();
   }
 
@@ -89,6 +101,8 @@ export class ProviderFormComponent {
     // if (!this.isFirstForm) {
     //   this.enableFields();
     // }
+    // this.tempForm.updateValueAndValidity();
+    // this.cdr.detectChanges();
   }
 
   cancelEdit() {
@@ -98,15 +112,19 @@ export class ProviderFormComponent {
     if (!this.isFirstForm) {
       this.disableFields();
     }
+    this.clearSectionBackendError.emit();
   }
 
-  confirmEdit() {
+  async confirmEdit() {
     if (!this.tempForm) return;
 
     if (this.tempForm.invalid) {
       this.tempForm.markAllAsTouched();
       return;
     }
+
+    const isValid = await this.validateProviderForm(this.tempForm);
+    if (!isValid) return;
 
     this.form.patchValue(this.tempForm.getRawValue());
     this.isEditing = false;

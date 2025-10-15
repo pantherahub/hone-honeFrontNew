@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
-import { ClientProviderService } from 'src/app/services/clients/client-provider.service';
+import { ClientProviderService } from 'src/app/services/client-provider/client-provider.service';
 import { LANGUAGES } from 'src/app/constants/languages';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { format } from 'date-fns';
@@ -22,6 +22,7 @@ import { ContactListComponent } from './contact-list/contact-list.component';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CatalogService } from 'src/app/services/catalog/catalog.service';
+import { ProviderService } from 'src/app/services/provider/provider.service';
 
 @Component({
   selector: 'app-update-data',
@@ -51,6 +52,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
 
   loading: boolean = false;
   backendError: any = null;
+  hasSectionBackendError: boolean = false;
 
   private formSubscription: any;
 
@@ -92,10 +94,12 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
 
   visibleIndex = 0;
 
+  progressPercentage: number = 0;
+
   @ViewChild('stepsContainer') stepsContainer!: ElementRef<HTMLDivElement>;
   @ViewChildren('stepBtn') stepBtns!: QueryList<ElementRef<HTMLDivElement>>;
 
-  constructor (
+  constructor(
     public eventManager: EventManagerService,
     private fb: FormBuilder,
     private formUtils: FormUtilsService,
@@ -106,6 +110,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     private navigationService: NavigationService,
     private alertService: AlertService,
     private catalogService: CatalogService,
+    private providerService: ProviderService,
   ) { }
 
   ngOnInit(): void {
@@ -197,8 +202,8 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     return !this.hasSavedState() || await firstValueFrom(
       this.alertService.confirm(
         '¡Aviso!', 'Tienes cambios pendientes. ¿Deseas salir?', {
-          confirmBtnText: 'Salir',
-          cancelBtnText: 'Cancelar',
+        confirmBtnText: 'Salir',
+        cancelBtnText: 'Cancelar',
       })
     );
   }
@@ -252,7 +257,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
   //   }
   // }
 
-  goToStep(stepKey: string, canEnable: boolean = false, element?: HTMLElement) {
+  async goToStep(stepKey: string, canEnable: boolean = false) {
     const stepIndex = this.steps.findIndex(s => s.key === stepKey);
     const step = this.steps[stepIndex];
     if (!step || step.key === this.activeStep) return;
@@ -260,34 +265,107 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     const currentIndex = this.steps.findIndex(s => s.key === this.activeStep);
     const isGoingBack = stepIndex < currentIndex;
 
-    if (!isGoingBack) {
-      if (this.activeStep === 'provider' && !this.validateProviderForm()) return;
-      if (this.activeStep === 'offices' && !this.validateOffices()) return;
-      if (this.activeStep === 'contacts' && !this.validateContacts()) return;
+    if (!isGoingBack && this.isFirstForm) {
+      let isValid = true;
+
+      if (this.activeStep === 'provider') {
+        isValid = await this.validateProviderForm();
+      } else if (this.activeStep === 'offices') {
+        isValid = this.validateOffices();
+      } else if (this.activeStep === 'contacts') {
+        isValid = this.validateContacts();
+      }
+
+      if (!isValid) {
+        this.disableStepsAfter(this.activeStep);
+        this.updateProgress();
+        return;
+      }
     }
+
+    this.clearSectionBackendError();
 
     if (step.enabled || canEnable) {
       if (canEnable) step.enabled = true;
       this.activeStep = stepKey;
       this.scrollToIndex(stepIndex, true);
     }
+    this.updateProgress();
   }
 
-  private validateProviderForm(): boolean {
-    this.providerFormFields.forEach(field => {
-      const control = this.providerForm.get(field);
+  private disableStepsAfter(currentKey: string) {
+    const currentIndex = this.steps.findIndex(s => s.key === currentKey);
+    if (currentIndex === -1) return;
+
+    this.steps.forEach((s, i) => {
+      if (i > currentIndex) s.enabled = false;
+    });
+  }
+
+  updateProgress(isFinal: boolean = false) {
+    const totalSteps = this.steps.length;
+    if (isFinal) {
+      this.progressPercentage = 100;
+      return;
+    }
+
+    const currentIndex = this.steps.findIndex(s => s.key === this.activeStep);
+    const completedSteps = Math.max(currentIndex, 0);
+    this.progressPercentage = Math.round((completedSteps / totalSteps) * 100);
+  }
+
+  validateProviderForm(form: FormGroup = this.providerForm): Promise<boolean> {
+    const formControlValues: { [key: string]: any } = {};
+
+    this.providerFormFields.forEach((field: string) => {
+      const control = form.get(field);
       control?.markAsTouched();
       control?.updateValueAndValidity();
+      formControlValues[field] = control?.value;
     });
 
-    if (this.providerFormFields.some(f => this.providerForm.get(f)?.invalid)) {
+    if (this.providerFormFields.some(f => form.get(f)?.invalid)) {
       this.alertService.warning(
         '¡Acción requerida!',
         'Por favor completa los datos del prestador antes de continuar.'
       );
-      return false;
+      return Promise.resolve(false);
     }
-    return true;
+
+    this.loading = true;
+    return new Promise((resolve) => {
+      this.providerService.validateTemporalProviderData(formControlValues).subscribe({
+        next: (resp: any) => {
+          this.loading = false;
+          this.clearSectionBackendError();
+          resolve(true);
+        },
+        error: (err) => {
+          this.loading = false;
+          if (err.status == 422) {
+            this.backendError = err.error;
+            this.hasSectionBackendError = true;
+            this.alertService.warning(
+              '¡Acción requerida!',
+              'Por favor ajusta la información del prestador.'
+            );
+          } else {
+            this.alertService.error(
+              '¡Error de validación!',
+              'Algo salió mal.'
+            );
+          }
+          resolve(false);
+        }
+      });
+    });
+  }
+
+  clearSectionBackendError() {
+    if (this.hasSectionBackendError) {
+      this.backendError = null;
+    }
+    this.hasSectionBackendError = false;
   }
 
   private validateOffices(): boolean {
@@ -524,8 +602,8 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     const confirmed = await firstValueFrom(
       this.alertService.confirm(
         '¡Aviso!', 'Se encontraron datos sin guardar de una sesión anterior. ¿Deseas continuar con estos datos?', {
-          confirmBtnText: 'Continuar',
-          cancelBtnText: 'No',
+        confirmBtnText: 'Continuar',
+        cancelBtnText: 'No',
       })
     );
     if (!confirmed) {
@@ -591,7 +669,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
 
   loadProviderData(): void {
     this.loading = true;
-    this.clientProviderService.getTemporalProviderData(this.user.id).subscribe({
+    this.providerService.getTemporalProviderData(this.user.id).subscribe({
       next: (res: any) => {
         this.loading = false;
         const user = this.user;
@@ -820,8 +898,8 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
 
     const serviceMethod = (args: any) =>
       this.isFirstForm
-        ? this.clientProviderService.sendTemporalProviderForm(args)
-        : this.clientProviderService.updateTemporalProviderForm(args);
+        ? this.providerService.sendTemporalProviderForm(args)
+        : this.providerService.updateTemporalProviderForm(args);
 
     this.loading = true;
 
@@ -837,11 +915,14 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
 
           this.loading = false;
           if (this.isFirstForm) {
-            this.alertService.success('Enviado', 'Actualización enviada.');
+            this.alertService.success(
+              '¡Guardado exitoso!',
+              '¡Bienvenido/a! Toda tu información está registrada.'
+            );
           } else {
             this.alertService.success(
-              '¡Actualización exitosa!',
-              'Tu información se ha actualizado sin problemas.'
+              '¡Guardado exitoso!',
+              'Actualizamos tu perfil correctamente.'
             );
           }
           this.resetForm();
@@ -851,6 +932,9 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
           if (err.status == 422) this.backendError = err.error;
           console.error(err);
           this.alertService.error();
+          if (!this.isFirstForm) {
+            this.resetForm();
+          }
         }
       });
     }, 550);

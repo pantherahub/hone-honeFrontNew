@@ -14,6 +14,7 @@ import { SelectComponent } from 'src/app/shared/components/select/select.compone
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { FileDropDirective } from 'src/app/directives/file-drop.directive';
+import { City } from 'src/app/models/city.interface';
 
 
 @Component({
@@ -164,6 +165,8 @@ export class ModalEditDocumentComponent implements OnInit {
 
   hasShownAmountMessage: boolean = false;
 
+  cityLabel = (item: City) => `${item.city}, ${item.department}`;
+
   @ViewChild('dateInput', { static: true }) dateInputRef!: ElementRef;
 
   constructor(
@@ -176,7 +179,6 @@ export class ModalEditDocumentComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // console.log('currentDoc', this.currentDoc);
     this.getTypePolicyProviderOpts();
     this.createForm();
   }

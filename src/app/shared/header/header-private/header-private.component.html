@@ -18,12 +18,11 @@
         (onClose)="nextTutorialStep()">
         <ng-template #triggerTemplate>
           <app-button
-              (click)="navigateToUpdateData()"
-              variant="gray"
-              size="sm"
-              styleType="soft"
-              customClass="leading-4 tutorial-option"
-            >
+            (click)="navigateToUpdateData()"
+            variant="gray"
+            size="sm"
+            styleType="soft"
+            customClass="leading-4">
             <span class="truncate max-w-[50px] sm:hidden">
               {{ getProviderNameInitials(user.name) }}
             </span>
@@ -58,8 +57,8 @@
     alt="Imagen previsualización"
     class="hidden md:block rounded-md"
   />
-  <div class="flex justify-between items-center">
-    <span class="text-base leading-5 md:leading-[18px] font-normal text-main-blue1h">1 de 2</span>
+  <div class="flex justify-between items-center gap-2">
+    <span class="text-base leading-5 md:leading-[18px] font-normal text-main-blue1h whitespace-nowrap">1 de 3</span>
     <div class="flex gap-2">
       <app-button
         (click)="backTutorialStep()"

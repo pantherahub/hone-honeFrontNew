@@ -1,6 +1,7 @@
 export interface City {
-  city: string;
   idCity: number;
+  city: string;
   idDepartament: number;
+  department: string;
   indicative: string;
 }

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 import { CompanyInterface } from 'src/app/models/client.interface';
 import { ShortcutContact } from 'src/app/models/shortcut-contact.interface';
@@ -20,6 +20,7 @@ import { DropdownTriggerDirective } from 'src/app/directives/dropdown-trigger.di
 import { CatalogService } from 'src/app/services/catalog/catalog.service';
 import { ContactDetailComponent } from '../../shared/contact-detail/contact-detail.component';
 import { OfficeDataService } from 'src/app/services/office-data/office-data.service';
+import { City } from 'src/app/models/city.interface';
 
 @Component({
   selector: 'app-office-form',
@@ -69,18 +70,7 @@ export class OfficeFormComponent {
     }
   ];
 
-  customErrorMessagesMap: { [key: string]: any } = {
-    enableCode: {
-      invalidLength: (error: string) => error
-    },
-    enableStartDateCode: {
-      enableDateRange_startDateRequired: 'Este campo es requerido porque tiene una fecha de vencimiento.'
-    },
-    enableEndDateCode: {
-      enableDateRange_endDateRequired: 'Este campo es requerido porque tiene una fecha de expedición.',
-      enableDateRange_invalidDateRange: 'La fecha de vencimiento no puede ser menor a la fecha de expedición.',
-    },
-  };
+  cityLabel = (item: City) => `${item.city}, ${item.department}`;
 
   @ViewChild('addressDrawer', { static: false }) addressDrawer!: AddressFormComponent;
   @ViewChild('scheduleDrawer', { static: false }) scheduleDrawer!: ScheduleFormComponent;
@@ -218,18 +208,6 @@ export class OfficeFormComponent {
           [this.formUtils.url]
         ],
         emailGlosas: [this.office?.emailGlosas || '', [this.formUtils.email]],
-
-        enableCode: [
-          this.office?.enableCode || '',
-          [this.formUtils.numeric, this.enableCodeValidator]
-        ],
-        enableStartDateCode: [
-          this.convertDate(this.office?.enableStartDateCode) || null
-        ],
-        enableEndDateCode: [
-          this.convertDate(this.office?.enableEndDateCode) || null
-        ],
-
         idsCompanies: [this.getIdsCompanies(), [Validators.required]],
 
         updatedSchedules: this.fb.array(this.office?.updatedSchedules ?? []),
@@ -241,16 +219,6 @@ export class OfficeFormComponent {
         deletedContacts: this.fb.array(this.office?.deletedContacts ?? []),
 
         TemporalSchedules: [this.office?.TemporalSchedules] // Save schedules state
-      },
-      {
-        validators: [
-          this.formUtils.validateDateRange(
-            'enableStartDateCode',
-            'enableEndDateCode',
-            'enableDateRange',
-            true
-          )
-        ]
       }
     );
 
@@ -290,30 +258,6 @@ export class OfficeFormComponent {
       this.updateCity(newIdCity);
       previousCityId = newIdCity;
     });
-
-    this.officeForm.get('enableCode')?.valueChanges.subscribe(value => {
-      if (!value) {
-        this.officeForm.patchValue({
-          enableStartDateCode: null,
-          enableEndDateCode: null
-        });
-        this.officeForm.get('enableStartDateCode')?.setErrors(null);
-        this.officeForm.get('enableEndDateCode')?.setErrors(null);
-      }
-    });
-  }
-
-  get enableCode() {
-    return this.officeForm.get('enableCode')?.value;
-  }
-
-  enableCodeValidator(control: AbstractControl) {
-    if (!control || !control.value) return null;
-    const length = control.value.length;
-    if (length < 9 || length > 12) {
-      return { invalidLength: 'Debe tener entre 9 y 12 dígitos.' };
-    }
-    return null;
   }
 
   updateCity(newIdCity: number) {
@@ -732,13 +676,10 @@ export class OfficeFormComponent {
       this.officeForm.get('schedulingLink')?.value?.toLowerCase() || null;
     const emailGlosas =
       this.officeForm.get('emailGlosas')?.value?.toLowerCase() || null;
-    const enableCode =
-      this.officeForm.get('enableCode')?.value?.toLowerCase() || null;
 
     this.officeForm.patchValue({
       schedulingLink: schedulingLink,
       emailGlosas: emailGlosas,
-      enableCode: enableCode,
       idsCompanies: companiesIds
     });
 

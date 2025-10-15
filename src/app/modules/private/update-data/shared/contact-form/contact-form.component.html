@@ -145,7 +145,7 @@
             <div>
               <app-select
                 [items]="cities"
-                bindLabel="city"
+                [bindLabel]="cityLabel"
                 bindValue="idCity"
                 formControlName="idCityExpedition"
                 [searchable]="true"
@@ -252,7 +252,7 @@
                 <div>
                   <app-select
                     [items]="cities"
-                    bindLabel="label"
+                    [bindLabel]="cityLabelWithIndicative"
                     bindValue="idCity"
                     formControlName="idCity"
                     [searchable]="true"

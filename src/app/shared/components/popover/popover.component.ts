@@ -155,18 +155,17 @@ export class PopoverComponent implements OnInit, AfterViewInit, OnChanges, OnDes
       if (this.highlighted) {
         this.overlayStateService.addOverlay();
       }
-      this.popperInstance?.update();
-      if (this.autoScrollOnOpen) {
-        // Slight delay to ensure proper positioning
-        setTimeout(() => {
+      requestAnimationFrame(() => {
+        this.popperInstance?.update();
+
+        if (this.autoScrollOnOpen) {
           popover.scrollIntoView({
             behavior: 'smooth',
             block: 'center',
             inline: 'center',
           });
-        }, 50);
-      }
-      this.popperInstance?.update();
+        }
+      });
     } else {
       if (this.highlighted) {
         this.overlayStateService.removeOverlay();

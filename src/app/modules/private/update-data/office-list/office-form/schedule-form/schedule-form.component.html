@@ -32,6 +32,9 @@
           [control]="scheduleForm.get('scheduleType')"
           [customMessages]="customErrorMessagesMap['scheduleType']"
         />
+        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          Selecciona "Rango" si el horario aplica a varios días seguidos (ej. lunes a viernes), o "Día" si aplica solo a uno.
+        </p>
       </div>
 
       @if (scheduleForm.get('scheduleType')?.value === 'range') {

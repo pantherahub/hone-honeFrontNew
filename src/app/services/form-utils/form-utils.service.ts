@@ -257,5 +257,14 @@ export class FormUtilsService {
     return Number(raw).toLocaleString('es-CO');
   }
 
+  isControlRequired(control: AbstractControl | null): boolean {
+    if (!control || !control.validator) return false;
+
+    const validator = control.validator({} as AbstractControl);
+    if (validator && validator['required']) {
+      return true;
+    }
+    return false;
+  }
 
 }
