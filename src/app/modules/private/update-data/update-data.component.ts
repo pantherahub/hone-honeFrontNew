@@ -61,18 +61,21 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
       key: 'provider',
       label: 'Información del prestador',
       enabled: true,
+      valid: false,
       icon: '/assets/icons/outline/general.svg#briefcase',
     },
     {
       key: 'offices',
       label: 'Sedes de prestación',
       enabled: false,
+      valid: false,
       icon: '/assets/icons/outline/general.svg#map-pin-alt',
     },
     {
       key: 'contacts',
       label: 'Contactos',
       enabled: false,
+      valid: false,
       icon: '/assets/icons/outline/general.svg#phone',
     },
   ];
@@ -268,13 +271,20 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     if (!isGoingBack && this.isFirstForm) {
       let isValid = true;
 
-      if (this.activeStep === 'provider') {
-        isValid = await this.validateProviderForm();
-      } else if (this.activeStep === 'offices') {
-        isValid = this.validateOffices();
-      } else if (this.activeStep === 'contacts') {
-        isValid = this.validateContacts();
+      switch (this.activeStep) {
+        case 'provider':
+          isValid = await this.validateProviderForm();
+          break;
+        case 'offices':
+          isValid = this.validateOffices();
+          break;
+        case 'contacts':
+          isValid = this.validateContacts();
+          break;
       }
+
+      const activeStepObj = this.steps.find(s => s.key === this.activeStep);
+      if (activeStepObj) activeStepObj.valid = isValid;
 
       if (!isValid) {
         this.disableStepsAfter(this.activeStep);
@@ -289,6 +299,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
       if (canEnable) step.enabled = true;
       this.activeStep = stepKey;
       this.scrollToIndex(stepIndex, true);
+      this.saveFormToLocalStorage();
     }
     this.updateProgress();
   }
@@ -302,6 +313,41 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     });
   }
 
+  private async restoreSteps() {
+    this.steps.forEach(s => {
+      s.enabled = false;
+      s.valid = false;
+    });
+    let lastEnableStepIndex = -1;
+
+    for (let i = 0; i < this.steps.length; i++) {
+      const step = this.steps[i];
+      let isValid = true;
+
+      switch (step.key) {
+        case 'provider':
+          isValid = await this.validateProviderForm();
+          break;
+        case 'offices':
+          isValid = this.validateOffices();
+          break;
+        case 'contacts':
+          isValid = this.validateContacts();
+          break;
+      }
+
+      step.enabled = true;
+      step.valid = isValid;
+      lastEnableStepIndex = i;
+      if (!isValid) break;
+    }
+
+    if (lastEnableStepIndex >= 0) {
+      this.activeStep = this.steps[lastEnableStepIndex].key;
+    }
+    this.updateProgress();
+  }
+
   updateProgress(isFinal: boolean = false) {
     const totalSteps = this.steps.length;
     if (isFinal) {
@@ -309,9 +355,15 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
       return;
     }
 
-    const currentIndex = this.steps.findIndex(s => s.key === this.activeStep);
-    const completedSteps = Math.max(currentIndex, 0);
-    this.progressPercentage = Math.round((completedSteps / totalSteps) * 100);
+    // Find the index of the last enabled step
+    // const lastEnabledIndex = this.steps
+    //   .map((s, i) => (s.enabled ? i : -1))
+    //   .filter(i => i !== -1)
+    //   .pop() ?? 0;
+    // this.progressPercentage = Math.round(((lastEnabledIndex) / totalSteps) * 100);
+
+    const completedCount = this.steps.filter(s => s.valid).length;
+    this.progressPercentage = Math.round((completedCount / totalSteps) * 100);
   }
 
   validateProviderForm(form: FormGroup = this.providerForm): Promise<boolean> {
@@ -323,6 +375,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
       control?.updateValueAndValidity();
       formControlValues[field] = control?.value;
     });
+    formControlValues['idProvider'] = this.user.id;
 
     if (this.providerFormFields.some(f => form.get(f)?.invalid)) {
       this.alertService.warning(
@@ -616,14 +669,6 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     const state = JSON.parse(storageState);
     const formState = state.formValue;
 
-    this.activeStep = state.activeStep;
-
-    // Enable all steps up to the activeStep
-    const activeIndex = this.steps.findIndex(s => s.key === this.activeStep);
-    this.steps.forEach((step, index) => {
-      step.enabled = index <= activeIndex;
-    });
-
     this.providerForm.patchValue({
       startTime: formState.startTime,
       email: formState.email,
@@ -660,6 +705,9 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     }
 
     this.subscribeOnChange();
+
+    this.activeStep = state.activeStep;
+    this.restoreSteps();
   }
 
   private restoreFormArray(field: string, items: any[]) {
@@ -915,6 +963,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
 
           this.loading = false;
           if (this.isFirstForm) {
+            this.updateProgress(true);
             this.alertService.success(
               '¡Guardado exitoso!',
               '¡Bienvenido/a! Toda tu información está registrada.'
