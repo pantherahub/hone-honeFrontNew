@@ -79,4 +79,17 @@ export class FileValidationService {
     return true;
   }
 
+  setAcceptAttribute(input: HTMLInputElement, allowedExtensions?: string[]) {
+    const extensions = allowedExtensions?.length
+      ? allowedExtensions
+      : Object.keys(this.extensionToMimeType); // Default extensions
+
+    // Mime types for greater compatibility
+    const mimeTypes = extensions
+      .map(ext => this.extensionToMimeType[ext])
+      .filter((type): type is string => !!type);
+
+    input.accept = [...extensions, ...mimeTypes].join(',');
+  }
+
 }
