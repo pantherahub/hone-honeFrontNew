@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { DocumentType } from 'src/app/models/document-type.interface';
+import { TempProviderDataValidation } from 'src/app/models/temporal-provider.interface';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -21,8 +22,14 @@ export class ProviderService {
     return this.httpClient.get(`${this.url}TemporalProvider/GetOne/Provider/${idProvider}`);
   }
 
-  validateTemporalProviderData(data: any) {
-    return this.httpClient.post(`${this.url}TemporalProvider/ValidateTemporalProvider`, data);
+  validateTemporalProviderDataCreate(data: TempProviderDataValidation) {
+    const url = `${this.url}TemporalProvider/ValidateForCreateTemporalProvider`;
+    return this.httpClient.post(url, data);
+  }
+
+  validateTemporalProviderDataUpdate(data: TempProviderDataValidation) {
+    const url = `${this.url}TemporalProvider/ValidateForUpdateTemporalProvider`;
+    return this.httpClient.put(url, data);
   }
 
   sendTemporalProviderForm(data: any) {

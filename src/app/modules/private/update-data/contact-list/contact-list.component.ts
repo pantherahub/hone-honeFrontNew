@@ -172,6 +172,7 @@ export class ContactListComponent {
     this.existingContacts = [...this.existingContacts];
     this.successToast('Contacto por eliminar.');
 
+    this.contactsChanged.emit(this.existingContacts);
     if (!this.isFirstForm) this.save.emit();
   }
 

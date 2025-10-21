@@ -102,11 +102,14 @@ export class ContactFormComponent implements OnInit {
     this.contact = options?.contact ?? null;
     this.officeIdCity = options?.officeIdCity ?? null;
     this.shortcut = options?.shortcut ?? null;
-
     this.isEditingContact = true;
+
     this.contactForm.reset({
       idAddedTemporal: Date.now().toString(),
     });
+    this.contactForm.get('idOccupationType')?.enable();
+    this.contactForm.get('idOccupation')?.disable({ emitEvent: false });
+
     this.formInitialized = false;
     this.loadContactData();
     this.hasChanges = false;

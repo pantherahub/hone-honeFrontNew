@@ -23,6 +23,7 @@ import { AlertService } from 'src/app/services/alert/alert.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CatalogService } from 'src/app/services/catalog/catalog.service';
 import { ProviderService } from 'src/app/services/provider/provider.service';
+import { TempProviderDataValidation } from 'src/app/models/temporal-provider.interface';
 
 @Component({
   selector: 'app-update-data',
@@ -260,6 +261,19 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
   //   }
   // }
 
+  private async validateStep(stepKey: string): Promise<boolean> {
+    switch (stepKey) {
+      case 'provider':
+        return await this.validateProviderForm();
+      case 'offices':
+        return this.validateOffices();
+      case 'contacts':
+        return this.validateContacts();
+      default:
+        return true;
+    }
+  }
+
   async goToStep(stepKey: string, canEnable: boolean = false) {
     const stepIndex = this.steps.findIndex(s => s.key === stepKey);
     const step = this.steps[stepIndex];
@@ -269,20 +283,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     const isGoingBack = stepIndex < currentIndex;
 
     if (!isGoingBack && this.isFirstForm) {
-      let isValid = true;
-
-      switch (this.activeStep) {
-        case 'provider':
-          isValid = await this.validateProviderForm();
-          break;
-        case 'offices':
-          isValid = this.validateOffices();
-          break;
-        case 'contacts':
-          isValid = this.validateContacts();
-          break;
-      }
-
+      const isValid = await this.validateStep(this.activeStep);
       const activeStepObj = this.steps.find(s => s.key === this.activeStep);
       if (activeStepObj) activeStepObj.valid = isValid;
 
@@ -322,20 +323,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
 
     for (let i = 0; i < this.steps.length; i++) {
       const step = this.steps[i];
-      let isValid = true;
-
-      switch (step.key) {
-        case 'provider':
-          isValid = await this.validateProviderForm();
-          break;
-        case 'offices':
-          isValid = this.validateOffices();
-          break;
-        case 'contacts':
-          isValid = this.validateContacts();
-          break;
-      }
-
+      const isValid = await this.validateStep(step.key);
       step.enabled = true;
       step.valid = isValid;
       lastEnableStepIndex = i;
@@ -346,6 +334,33 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
       this.activeStep = this.steps[lastEnableStepIndex].key;
     }
     this.updateProgress();
+  }
+
+  async revalidateCurrentSection(): Promise<boolean> {
+    const currentIndex = this.steps.findIndex(s => s.key === this.activeStep);
+    if (currentIndex === -1) return false;
+
+    const currentStep = this.steps[currentIndex];
+    const isValid = await this.validateStep(currentStep.key);
+
+    // Updates the status of the active step
+    currentStep.valid = isValid;
+    currentStep.enabled = true;
+
+
+    if (isValid) {
+      // Enables the next step if it exists
+      const nextStep = this.steps[currentIndex + 1];
+      if (nextStep) {
+        nextStep.enabled = true;
+      }
+    } else {
+      // If not valid, disable the following steps
+      this.disableStepsAfter(currentStep.key);
+    }
+
+    this.updateProgress();
+    return isValid;
   }
 
   updateProgress(isFinal: boolean = false) {
@@ -360,15 +375,11 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
   }
 
   validateProviderForm(form: FormGroup = this.providerForm): Promise<boolean> {
-    const formControlValues: { [key: string]: any } = {};
-
     this.providerFormFields.forEach((field: string) => {
       const control = form.get(field);
       control?.markAsTouched();
       control?.updateValueAndValidity();
-      formControlValues[field] = control?.value;
     });
-    formControlValues['idProvider'] = this.user.id;
 
     if (this.providerFormFields.some(f => form.get(f)?.invalid)) {
       this.alertService.warning(
@@ -378,9 +389,20 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
       return Promise.resolve(false);
     }
 
+    const formControlValues: TempProviderDataValidation = {
+      idProvider: this.user?.id,
+      identification: form.get('identification')?.value,
+      email: form.get('email')?.value,
+    };
+
+    const serviceMethod = (args: any) =>
+      this.isFirstForm
+        ? this.providerService.validateTemporalProviderDataCreate(args)
+        : this.providerService.validateTemporalProviderDataUpdate(args);
+
     this.loading = true;
     return new Promise((resolve) => {
-      this.providerService.validateTemporalProviderData(formControlValues).subscribe({
+      serviceMethod(formControlValues).subscribe({
         next: (resp: any) => {
           this.loading = false;
           this.clearSectionBackendError();
@@ -480,11 +502,14 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     return true;
   }
 
-  initializeForm() {
-    const dvValue = this.user.dv != null && this.user.dv !== '' && !isNaN(Number(this.user.dv))
-      ? Number(this.user.dv)
+  getParsedDv(dv: any): number | null {
+    return dv != null && dv !== '' && !isNaN(Number(dv))
+      ? Number(dv)
       : null;
+  }
 
+  initializeForm() {
+    const dvValue = this.getParsedDv(this.user.dv);
     const isValidEmail = this.isValidEmail(this.user.email);
 
     this.providerForm = this.fb.group({
@@ -512,7 +537,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
       ],
       dv: [
         { value: dvValue, disabled: dvValue != null },
-        [this.dvValidator]
+        [this.formUtils.numeric, this.dvValidator]
       ],
       repsEnableCode: [
         { value: this.user.repsEnableCode || '', disabled: !!this.user.repsEnableCode },
@@ -819,10 +844,12 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
 
   onOfficesChanged(updatedList: any[]) {
     this.existingOffices = updatedList;
+    this.revalidateCurrentSection();
   }
 
   onContactsChanged(updatedList: any[]) {
     this.existingContacts = updatedList;
+    this.revalidateCurrentSection();
   }
 
   getGlobalIndex(localIndex: number, currentPage: number, pageSize: number): number {
@@ -879,9 +906,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     this.unsubscribeForm();
     this.removeFormState();
 
-    const dvValue = this.user.dv != null && this.user.dv !== '' && !isNaN(Number(this.user.dv))
-      ? Number(this.user.dv)
-      : null;
+    const dvValue = this.getParsedDv(this.user.dv);
     const isValidEmail = this.isValidEmail(this.user.email);
 
     this.providerForm.reset({
@@ -931,10 +956,12 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
 
     const website = this.providerForm.get('website')?.value?.toLowerCase() || null;
     const email = this.providerForm.get('email')?.value?.toLowerCase() || null;
+    const dvValue = this.getParsedDv(this.providerForm.get('dv')?.value);
     this.providerForm.patchValue({
       email: email,
       website: website,
-      endTime: this.formatDate(new Date())
+      dv: dvValue,
+      endTime: this.formatDate(new Date()),
     });
 
     const serviceMethod = (args: any) =>

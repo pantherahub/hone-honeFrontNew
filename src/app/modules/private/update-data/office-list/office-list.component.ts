@@ -183,6 +183,7 @@ export class OfficeListComponent implements OnInit {
     this.existingOffices = [...this.existingOffices];
     this.successToast('Sede por eliminar.');
 
+    this.officesChanged.emit(this.existingOffices);
     if (!this.isFirstForm) this.save.emit();
   }
 
