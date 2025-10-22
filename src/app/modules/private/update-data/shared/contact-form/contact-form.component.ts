@@ -614,6 +614,11 @@ export class ContactFormComponent implements OnInit {
     phone: any | null = null,
     activeCity: boolean = false
   ): FormGroup {
+    const initialNumberValidator =
+      phone?.type === 'Numeral'
+        ? this.formUtils.numeral
+        : this.formUtils.telephoneNumber;
+
     const phoneGroup = this.fb.group({
       idPhone: [phone?.idPhone || null],
       type: [phone?.type || '', [Validators.required]],
@@ -621,7 +626,7 @@ export class ContactFormComponent implements OnInit {
         phone?.number || '',
         [
           Validators.required,
-          this.formUtils.telephoneNumber,
+          initialNumberValidator,
           this.phoneNumberValidator
         ]
       ],
