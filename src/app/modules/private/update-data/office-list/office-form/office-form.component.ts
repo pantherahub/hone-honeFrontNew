@@ -57,7 +57,7 @@ export class OfficeFormComponent {
   loadingContacts: boolean = false;
 
   user = this.eventManager.userLogged();
-  modelType: string = 'Sede';
+  modelType: 'Prestador' | 'Sede' = 'Sede';
 
   shortcutContacts: ShortcutContact[] = [
     {

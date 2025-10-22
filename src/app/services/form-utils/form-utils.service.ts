@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AbstractControl, FormArray, FormControl, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
-import { isAlphanumeric, isAlphanumericWithSpaces, isEmail, isNumeric, isTelephoneNumber, isUrl } from 'src/app/utils/validation-utils';
+import { isAlphanumeric, isAlphanumericWithSpaces, isEmail, isNumeral, isNumeric, isTelephoneNumber, isUrl } from 'src/app/utils/validation-utils';
 
 @Injectable({
   providedIn: 'root'
@@ -69,11 +69,20 @@ export class FormUtilsService {
 
   /**
    * Telephone number validator.
-   * Allows numbers and #
+   * Allows numbers
    */
   telephoneNumber(control: AbstractControl): ValidationErrors | null {
     if (!control || !control.value) return null;
     return isTelephoneNumber(control.value) ? null : { invalidTelNumber: true };
+  }
+
+  /**
+   * Numeral for telephones validator.
+   * Allows numbers, # and *
+   */
+  numeral(control: AbstractControl): ValidationErrors | null {
+    if (!control || !control.value) return null;
+    return isNumeral(control.value) ? null : { invalidTelNumeral: true };
   }
 
   /**
@@ -215,10 +224,10 @@ export class FormUtilsService {
 
   /**
    * Validates time ranges.
-   * @param startField - The name of the initial date field.
-   * @param endField - The name of the final date field.
+   * @param startField - The name of the initial time field.
+   * @param endField - The name of the final time field.
    * @param errorPrefix - Prefix to identify range in form.
-   * @param bothRequired - If both dates are required when one is filled out.
+   * @param bothRequired - If both times are required when one is filled out.
    */
   validateTimeRange(
     startField: string,

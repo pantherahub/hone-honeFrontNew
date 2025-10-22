@@ -16,7 +16,7 @@ import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.compone
 })
 export class ContactDetailComponent implements OnInit {
 
-  @Input() contactModelType: string = 'Prestador'; // 'Prestador' or 'Sede'
+  @Input() contactModelType: 'Prestador' | 'Sede' = 'Prestador';
   contact: any | null = null;
 
   cities: any[] = [];
@@ -120,6 +120,7 @@ export class ContactDetailComponent implements OnInit {
       case "Whatsapp": return "Wpp";
       case "Celular": return "Cel";
       case "Fijo": return "Fijo";
+      case "Numeral": return "Num";
       default: return type;
     }
   }

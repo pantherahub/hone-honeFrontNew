@@ -188,6 +188,7 @@ export class OfficeDetailComponent implements OnInit {
       case "Whatsapp": return "Wpp";
       case "Celular": return "Cel";
       case "Fijo": return "Fijo";
+      case "Numeral": return "Num";
       default: return type;
     }
   }

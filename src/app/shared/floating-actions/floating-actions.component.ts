@@ -50,6 +50,9 @@ export class FloatingActionsComponent implements OnInit, OnDestroy {
   private tutorialSubscription!: Subscription;
   menuTutorialVisible: boolean = false;
 
+  private currentUrl: string = '';
+  private tutorialStep: number = 1;
+
   constructor(
     private navigationService: NavigationService,
     private tutorialService: TutorialService,
@@ -61,19 +64,18 @@ export class FloatingActionsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.navigationService.getCurrentUrl$().subscribe(
-      currentUrl => {
+      (currentUrl: string | null) => {
         this.clientSelected = this.eventManager.clientSelected();
-        this.optionsVisibility(currentUrl ?? '');
+        this.currentUrl = currentUrl ?? '';
+        this.optionsVisibility();
+        this.showMenuTutorial();
       }
     );
 
     this.tutorialSubscription = this.tutorialService.stepIndex$.subscribe(
       step => {
-        if (!this.tutorialService.isTutorialFinished() && step === 4) {
-          this.showMenuTutorial();
-        } else {
-          this.menuTutorialVisible = false;
-        }
+        this.tutorialStep = step;
+        this.showMenuTutorial();
       }
     );
   }
@@ -83,7 +85,11 @@ export class FloatingActionsComponent implements OnInit, OnDestroy {
   }
 
   showMenuTutorial() {
-    this.menuTutorialVisible = this.authService.isAuthenticated();
+    if (!this.tutorialService.isTutorialFinished() && this.tutorialStep === 4 && this.currentUrl === '/home') {
+      this.menuTutorialVisible = this.authService.isAuthenticated();
+    } else {
+      this.menuTutorialVisible = false;
+    }
   }
 
   backTutorialStep() {
@@ -97,8 +103,8 @@ export class FloatingActionsComponent implements OnInit, OnDestroy {
     }
   }
 
-  optionsVisibility(currentUrl: string) {
-    if (!currentUrl || this.excludedRoutes.includes(currentUrl)) {
+  optionsVisibility() {
+    if (!this.currentUrl || this.excludedRoutes.includes(this.currentUrl)) {
       this.showSupportAction = false;
       this.showTutorialAction = false;
       this.showMeetingAction = false;
@@ -106,12 +112,12 @@ export class FloatingActionsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.showSupportAction = !['/auth-support', '/support'].includes(currentUrl);
-    this.showTutorialAction = currentUrl === '/home';
-    this.showMeetingAction = currentUrl.startsWith('/service')
+    this.showSupportAction = !['/auth-support', '/support'].includes(this.currentUrl);
+    this.showTutorialAction = this.currentUrl === '/home';
+    this.showMeetingAction = this.currentUrl.startsWith('/service')
       && isNonEmptyObject(this.clientSelected)
       && !!this.customerScheduling.get(this.clientSelected.idClientHoneSolutions);
-    this.showTutorialVideoAction = this.authService.isAuthenticated() && currentUrl !== '/home';
+    this.showTutorialVideoAction = this.authService.isAuthenticated() && this.currentUrl !== '/home';
   }
 
   onSupport() {

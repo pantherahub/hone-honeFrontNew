@@ -134,12 +134,13 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-  * Redirecciona a la lista de documentos por cargar del cliente seleccionado
+  * Redirect to client services module
   */
   changeOptionClient(item: any, activeTutorialStep: boolean = false) {
-    if (activeTutorialStep) this.nextTutorialStep();
     this.eventManager.setClient(item);
-    this.router.navigateByUrl(`/service/documentation`);
+    this.router.navigateByUrl(`/service/documentation`).then(() => {
+      if (activeTutorialStep) this.nextTutorialStep();
+    });
   }
 
 

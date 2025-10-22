@@ -32,7 +32,7 @@ import { TooltipComponent } from 'src/app/shared/components/tooltip/tooltip.comp
 })
 export class ContactFormComponent implements OnInit {
   @Input() contact: any | null = null;
-  @Input() contactModelType: string = 'Prestador'; // 'Prestador' or 'Sede'
+  @Input() contactModelType: 'Prestador' | 'Sede' = 'Prestador';
   @Input() officeIdCity: number | null = null;
   @Input() shortcut: any | null = null; // Shortcut in creation to add default values
   @Output() onClose = new EventEmitter<any>();
@@ -46,7 +46,7 @@ export class ContactFormComponent implements OnInit {
   contactOccupations: any[] = [];
   identificationTypes: any[] = [];
   cities: any[] = [];
-  phoneNumberTypes: string[] = ['Celular', 'Fijo', 'Whatsapp'];
+  phoneNumberTypes: string[] = ['Celular', 'Fijo', 'Whatsapp', 'Numeral'];
 
   identificationEnabled: boolean = false;
 
@@ -639,20 +639,32 @@ export class ContactFormComponent implements OnInit {
       ?.valueChanges.pipe(distinctUntilChanged())
       .subscribe(value => {
         const idCityControl = phoneGroup.get('idCity');
+        const numberControl = phoneGroup.get('number');
         let idCity = null;
+
+        // Set city field validators
         if (value === 'Fijo') {
-          if (idCityControl?.value) return;
-          idCity = this.officeIdCity || null;
-          if (this.contactModelType === 'Prestador' && !this.officeIdCity) {
-            idCityControl?.setValidators([Validators.required]);
+          if (!idCityControl?.value) {
+            idCity = this.officeIdCity || null;
+            if (this.contactModelType === 'Prestador' && !this.officeIdCity) {
+              idCityControl?.setValidators([Validators.required]);
+            }
           }
         } else {
           idCityControl?.clearValidators();
         }
-        phoneGroup.patchValue({ idCity });
+        if (!idCityControl?.value) phoneGroup.patchValue({ idCity });
+
+        // Set number field validators
+        const baseNumberValidators = [Validators.required, this.phoneNumberValidator];
+        const dynamicValidator =
+          value === 'Numeral'
+            ? this.formUtils.numeral
+            : this.formUtils.telephoneNumber;
+        numberControl?.setValidators([...baseNumberValidators, dynamicValidator]);
 
         // Validate number
-        phoneGroup.get('number')?.updateValueAndValidity();
+        numberControl?.updateValueAndValidity();
       });
     return phoneGroup;
   }
@@ -686,8 +698,11 @@ export class ContactFormComponent implements OnInit {
     if ((type === 'Celular' || type === 'Whatsapp') && number.length !== 10) {
       return { invalidLength: 'Debe ser de 10 dígitos.' };
     }
-    if (type === 'Fijo' && (number.length < 6 || number.length > 15)) {
-      return { invalidLength: 'Debe tener entre 6 y 15 dígitos.' };
+    if (type === 'Fijo' && number.length !== 7) {
+      return { invalidLength: 'Debe ser de 7 dígitos.' };
+    }
+    if (type === 'Numeral' && number.length > 4) {
+      return { invalidLength: 'Debe ser máximo de 4 dígitos.' };
     }
     return null;
   }

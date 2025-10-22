@@ -271,6 +271,11 @@
                   [control]="control.get('number')"
                   [customMessages]="customErrorMessagesMap['phoneNumber']"
                 />
+                @if (isFijoPhone(control)) {
+                  <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    El indicativo se toma del campo superior, no lo escribas manualmente.
+                  </p>
+                }
               </div>
               <div>
                 <app-text-input

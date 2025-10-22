@@ -15,6 +15,7 @@ export const GLOBAL_ERROR_MESSAGES: { [key: string]: (error?: any) => string } =
   invalidAlphanumeric: () => `Debe ser alfanumérico.`,
   invalidAlphanumWithSpaces: () => `Debe ser alfanumérico.`,
   invalidTelNumber: () => `Ingresa un número válido.`,
+  invalidTelNumeral: () => `Ingresa un numeral válido.`,
   invalidUrl: () => `Ingresa una url válida.`,
   invalidEmail: () => `Ingresa un correo válido.`,
 
