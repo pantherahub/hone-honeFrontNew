@@ -157,7 +157,7 @@ export class FormUtilsService {
   validateDateRange(
     startField: string,
     endField: string,
-    errorPrefix: string,
+    errorPrefix: string = '',
     bothRequired: boolean = false,
     untilToday: boolean = false,
   ) {
@@ -166,23 +166,6 @@ export class FormUtilsService {
       const endDateControl = formGroup.get(endField);
 
       if (!startDateControl || !endDateControl) return null;
-
-      // Const to clear errors
-      const cleanErrors = (control: AbstractControl, prefix: string) => {
-        const currentErrors = control.errors || {};
-        Object.keys(currentErrors)
-          .filter(key => key.startsWith(prefix))
-          .forEach(key => delete currentErrors[key]);
-
-        control.setErrors(Object.keys(currentErrors).length ? currentErrors : null);
-      };
-
-      // Const to set errors
-      const setError = (control: AbstractControl, errorKey: string) => {
-        const currentErrors = control.errors || {};
-        currentErrors[errorKey] = true;
-        control.setErrors(currentErrors);
-      };
 
       const parseDate = (value: any) => (value ? new Date(value + "T00:00:00") : null);
       const startDate = parseDate(startDateControl.value);
@@ -194,36 +177,93 @@ export class FormUtilsService {
       const prefix = errorPrefix ? `${errorPrefix}_` : '';
 
       // Clear previous errors
-      cleanErrors(startDateControl, prefix);
-      cleanErrors(endDateControl, prefix);
+      this.cleanErrors(startDateControl, prefix);
+      this.cleanErrors(endDateControl, prefix);
 
       let hasError = false;
 
       if (untilToday) {
         if (startDate && startDate > today) {
-          setError(startDateControl, `${prefix}invalidStartDate`);
+          this.setError(startDateControl, `${prefix}invalidStartDate`);
           hasError = true;
         }
         if (endDate && endDate > today) {
-          setError(endDateControl, `${prefix}invalidEndDate`);
+          this.setError(endDateControl, `${prefix}invalidEndDate`);
           hasError = true;
         }
       }
 
       if (bothRequired) {
         if (!startDate && endDate) {
-          setError(startDateControl, `${prefix}startDateRequired`);
+          this.setError(startDateControl, `${prefix}startDateRequired`);
           hasError = true;
         }
         if (startDate && !endDate) {
-          setError(endDateControl, `${prefix}endDateRequired`);
+          this.setError(endDateControl, `${prefix}endDateRequired`);
           hasError = true;
         }
       }
 
       if (startDate && endDate && endDate < startDate) {
-        setError(endDateControl, `${prefix}invalidDateRange`);
+        this.setError(endDateControl, `${prefix}invalidDateRange`);
         hasError = true;
+      }
+
+      return hasError ? {} : null;
+    };
+  }
+
+  /**
+   * Validates time ranges.
+   * @param startField - The name of the initial date field.
+   * @param endField - The name of the final date field.
+   * @param errorPrefix - Prefix to identify range in form.
+   * @param bothRequired - If both dates are required when one is filled out.
+   */
+  validateTimeRange(
+    startField: string,
+    endField: string,
+    errorPrefix: string = '',
+    bothRequired: boolean = false,
+  ) {
+    return (formGroup: AbstractControl): ValidationErrors | null => {
+      const startTimeControl = formGroup.get(startField);
+      const endTimeControl = formGroup.get(endField);
+
+      if (!startTimeControl || !endTimeControl) return null;
+
+      const startTime = startTimeControl.value;
+      const endTime = endTimeControl.value;
+
+      const prefix = errorPrefix ? `${errorPrefix}_` : '';
+
+      // Clear previous errors
+      this.cleanErrors(startTimeControl, prefix);
+      this.cleanErrors(endTimeControl, prefix);
+
+      let hasError = false;
+
+      if (bothRequired) {
+        if (!startTime && endTime) {
+          this.setError(startTimeControl, `${prefix}startTimeRequired`);
+          hasError = true;
+        }
+        if (startTime && !endTime) {
+          this.setError(endTimeControl, `${prefix}endTimeRequired`);
+          hasError = true;
+        }
+      }
+
+      if (startTime && endTime) {
+        const [startHour, startMinute] = startTime.split(':').map(Number);
+        const [endHour, endMinute] = endTime.split(':').map(Number);
+        const startTotal = startHour * 60 + startMinute;
+        const endTotal = endHour * 60 + endMinute;
+
+        if (startTotal > endTotal) {
+          this.setError(endTimeControl, `${prefix}invalidTimeRange`);
+          hasError = true;
+        }
       }
 
       return hasError ? {} : null;
@@ -266,5 +306,20 @@ export class FormUtilsService {
     }
     return false;
   }
+
+  cleanErrors(control: AbstractControl, prefix: string) {
+    const currentErrors = control.errors || {};
+    Object.keys(currentErrors)
+      .filter(key => key.startsWith(prefix))
+      .forEach(key => delete currentErrors[key]);
+
+    control.setErrors(Object.keys(currentErrors).length ? currentErrors : null);
+  };
+
+  setError(control: AbstractControl, errorKey: string) {
+    const currentErrors = control.errors || {};
+    currentErrors[errorKey] = true;
+    control.setErrors(currentErrors);
+  };
 
 }

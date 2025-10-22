@@ -179,6 +179,9 @@ export class SupportTicketComponent implements OnInit {
             variant: 'success',
             message: 'Tu PQRS ha sido enviada exitosamente. Estaremos revisando tu caso pronto.',
           });
+          this.ticketForm.reset({
+            identification: this.isLogged() ? this.user.identificacion || '' : '',
+          });
         },
         error: (error: any) => {
           this.loading = false;

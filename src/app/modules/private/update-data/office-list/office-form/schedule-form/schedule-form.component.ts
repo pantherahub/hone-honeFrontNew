@@ -130,6 +130,7 @@ export class ScheduleFormComponent implements OnInit {
     }, {
       validators: [
         this.scheduleValidator(this.existingSchedules, this.getDaysRange.bind(this)),
+        this.formUtils.validateTimeRange('startTime', 'endTime')
       ]
     });
 

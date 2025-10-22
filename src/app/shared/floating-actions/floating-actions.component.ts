@@ -91,8 +91,10 @@ export class FloatingActionsComponent implements OnInit, OnDestroy {
     this.tutorialService.backStep();
   }
   nextTutorialStep() {
-    this.menuTutorialVisible = false;
-    this.tutorialService.nextStep();
+    if (this.menuTutorialVisible) {
+      this.menuTutorialVisible = false;
+      this.tutorialService.nextStep();
+    }
   }
 
   optionsVisibility(currentUrl: string) {
@@ -114,6 +116,7 @@ export class FloatingActionsComponent implements OnInit, OnDestroy {
 
   onSupport() {
     if (this.authService.isAuthenticated()) {
+      this.nextTutorialStep();
       this.router.navigate(['/support']);
       return;
     }
@@ -126,6 +129,7 @@ export class FloatingActionsComponent implements OnInit, OnDestroy {
 
   onMeeting() {
     if (!isNonEmptyObject(this.clientSelected)) return;
+    this.nextTutorialStep();
 
     const clientId: number = this.clientSelected.idClientHoneSolutions;
     const scheduling = this.customerScheduling.get(clientId);
@@ -139,6 +143,7 @@ export class FloatingActionsComponent implements OnInit, OnDestroy {
   }
 
   onTutorialVideo() {
+    this.nextTutorialStep();
     this.modalService.open(TutorialVideoComponent, {
       title: 'Video presentación',
       customSize: 'max-w-[727px]',

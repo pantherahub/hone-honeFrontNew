@@ -89,6 +89,7 @@ export class OfficeFormComponent {
   ) { }
 
   ngOnInit(): void {
+    this.office = JSON.parse(JSON.stringify(this.office));
     this.getCities();
 
     this.initializeForm();

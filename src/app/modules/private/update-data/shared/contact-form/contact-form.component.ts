@@ -99,9 +99,13 @@ export class ContactFormComponent implements OnInit {
     officeIdCity?: number | null;
     shortcut?: any | null;
   }) {
-    this.contact = options?.contact ?? null;
+    this.contact = options?.contact
+      ? JSON.parse(JSON.stringify(options.contact))
+      : null;
     this.officeIdCity = options?.officeIdCity ?? null;
-    this.shortcut = options?.shortcut ?? null;
+    this.shortcut = options?.shortcut
+      ? JSON.parse(JSON.stringify(options.shortcut))
+      : null;
     this.isEditingContact = true;
 
     this.contactForm.reset({

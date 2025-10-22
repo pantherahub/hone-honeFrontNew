@@ -88,8 +88,8 @@ export class OfficeListComponent implements OnInit {
       );
       if (!confirmed) return;
     }
-    this.isEditingOffice = true;
     this.selectedOfficeIndex = index;
+    this.isEditingOffice = true;
     this.eventManager.startEditingProvider();
   }
 
