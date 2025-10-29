@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, TemplateRef, Type, ViewChild, ViewContainerRef } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild, ViewContainerRef } from '@angular/core';
 import { ButtonComponent } from '../button/button.component';
+import { OverlayStateService } from 'src/app/services/overlay-state/overlay-state.service';
 
 /**
  * Note for rendering methods: Do not open a template modal (by tag/selector) within one opened by service, because the second will be below.
@@ -51,7 +52,10 @@ export class ModalComponent implements OnInit, AfterViewInit {
   @Input() afterViewInitCallback?: (vcr: ViewContainerRef) => void;
   hasDynamicViewLoaded = false;
 
-  constructor(private cdr: ChangeDetectorRef) { }
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private overlayStateService: OverlayStateService,
+  ) { }
 
   ngOnInit(): void {
     if (!this.closable) {
@@ -75,7 +79,7 @@ export class ModalComponent implements OnInit, AfterViewInit {
     ModalComponent.stack.push(this);
     this.modalEl.nativeElement.classList.remove('hidden');
     if (this.isBackdropVisible) {
-      document.body.classList.add('overflow-hidden');
+      this.overlayStateService.addOverlay();
     }
   }
 
@@ -101,7 +105,7 @@ export class ModalComponent implements OnInit, AfterViewInit {
       this.modalEl.nativeElement.classList.add('hidden');
 
       if (ModalComponent.stack.length === 0 && this.isBackdropVisible) {
-        document.body.classList.remove('overflow-hidden');
+        this.overlayStateService.removeOverlay();
       }
       this.onClose.emit(returnData);
     }, this.closingDuration);

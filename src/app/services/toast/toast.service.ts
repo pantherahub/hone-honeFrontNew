@@ -1,5 +1,5 @@
 import { ApplicationRef, ComponentRef, createComponent, EmbeddedViewRef, Injectable, Injector } from '@angular/core';
-import { ReplaySubject, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { Toast } from 'src/app/models/toast.interface';
 import { ToastContainerComponent } from 'src/app/shared/alerts/toast-container/toast-container.component';
 
@@ -49,15 +49,16 @@ export class ToastService {
     });
   }
 
-  // 3000
-  show(type: Toast['type'], message: string, duration = 3000) {
+  show(options: Partial<Toast>) {
     this.ensureContainerExists(() => {
-      this.toastSubject.next({
+      const toast: Toast = {
         id: ++this.counter,
-        type,
-        message,
-        duration
-      });
+        type: options.type ?? 'info',
+        message: options.message ?? '',
+        duration: options.duration ?? 3000,
+        color: options.color
+      };
+      this.toastSubject.next(toast);
     });
   }
 
@@ -65,20 +66,20 @@ export class ToastService {
     this.clearSubject.next();
   }
 
-  success(msg: string, duration?: number) {
-    this.show('success', msg, duration);
+  success(message: string, options: Partial<Toast> = {}) {
+    this.show({ type: 'success', message, ...options });
   }
 
-  error(msg: string, duration?: number) {
-    this.show('error', msg, duration);
+  error(message: string, options: Partial<Toast> = {}) {
+    this.show({ type: 'danger', message, ...options });
   }
 
-  info(msg: string, duration?: number) {
-    this.show('info', msg, duration);
+  info(message: string, options: Partial<Toast> = {}) {
+    this.show({ type: 'info', message, ...options });
   }
 
-  warning(msg: string, duration?: number) {
-    this.show('warning', msg, duration);
+  warning(message: string, options: Partial<Toast> = {}) {
+    this.show({ type: 'warning', message, ...options });
   }
 
 }

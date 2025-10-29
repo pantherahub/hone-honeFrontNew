@@ -1,6 +1,6 @@
 import { TemplateRef } from "@angular/core";
 
-export type AlertVariant = 'info' | 'success' | 'error' | 'warning';
+export type AlertVariant = 'info' | 'success' | 'danger' | 'warning';
 
 export interface AlertOptions {
   title: string;
@@ -13,7 +13,7 @@ export interface AlertOptions {
   loading?: boolean;
 
   iconVariant?: AlertVariant;
-  cancelBtnText?: string;
+  cancelBtnText?: string | null;
   confirmBtnText?: string;
   confirmBtnVariant?: 'primary' | 'gray' | 'red' | 'green';
   confirmBtnStyle?: 'solid' | 'soft' | 'ghost';

@@ -1,28 +1,92 @@
-<div class="fixed sm:w-auto left-0 right-0 bottom-6 sm:left-auto sm:bottom-12 sm:right-12 px-4 sm:px-0 z-30 flex flex-wrap sm:flex-col sm:justify-end gap-2">
+<div class="fixed sm:w-auto left-0 right-0 bottom-6 sm:left-auto sm:bottom-12 sm:right-12 px-4 sm:px-0 z-30">
+  <app-popover
+    [title]="'¿Necesitas ayuda?'"
+    [text]="'Accede a ayuda y al recorrido en un click.'"
+    [placement]="'left-end'"
+    [triggerType]="'manual'"
+    [highlighted]="true"
+    [(visible)]="menuTutorialVisible"
+    [contentTemplate]="popoverContent"
+    extraPopoverClass="w-[330px] md:w-[487px] max-w-[100vw]"
+    customTriggerClass="before:rounded-2xl"
+    [autoScrollOnOpen]="true"
+    (onClose)="nextTutorialStep()">
 
-  @if (showSupportAction) {
-    <app-button variant="white" size="md" styleType="solid" class="flex-1 sm:flex-auto min-w-[193px] sm:min-w-0" customClass="ms-auto w-full sm:w-auto flex justify-center" (onClick)="onSupport()">
-      Soporte
-      <svg width="20" height="20">
-        <use xlink:href="/assets/icons/outline/e-commerce.svg#user-headset" />
-      </svg>
-    </app-button>
-  }
-  @if (showMeetingAction) {
-    <app-button variant="white" size="md" styleType="solid" class="flex-1 sm:flex-auto min-w-[193px] sm:min-w-0" customClass="ms-auto w-full sm:w-auto flex justify-center" (onClick)="onMeeting()">
-      Agendar reunión
-      <svg width="20" height="20">
-        <use xlink:href="/assets/icons/outline/general.svg#calendar-week" />
-      </svg>
-    </app-button>
-  }
-  @if (showTutorialAction) {
-    <app-button variant="white" size="md" styleType="solid" class="flex-1 sm:flex-auto min-w-[193px] sm:min-w-0" customClass="ms-auto w-full sm:w-auto flex justify-center" (onClick)="onTutorial()">
-      Visita guiada
-      <svg width="20" height="20">
-        <use xlink:href="/assets/icons/outline/media.svg#clapperboard-play" />
-      </svg>
-    </app-button>
-  }
+    <ng-template #triggerTemplate>
+      <div class="flex flex-wrap sm:flex-col sm:justify-end gap-2">
+        @if (showSupportAction) {
+          <app-button variant="white" size="md" styleType="solid" class="flex-1 sm:flex-auto min-w-[193px] sm:min-w-0" customClass="ms-auto w-full sm:w-auto flex justify-center" (onClick)="onSupport()">
+            Soporte
+            <svg width="20" height="20">
+              <use xlink:href="/assets/icons/outline/e-commerce.svg#user-headset" />
+            </svg>
+          </app-button>
+        }
+        @if (showMeetingAction) {
+          <app-button variant="white" size="md" styleType="solid" class="flex-1 sm:flex-auto min-w-[193px] sm:min-w-0" customClass="ms-auto w-full sm:w-auto flex justify-center" (onClick)="onMeeting()">
+            Agendar reunión
+            <svg width="20" height="20">
+              <use xlink:href="/assets/icons/outline/general.svg#calendar-week" />
+            </svg>
+          </app-button>
+        }
+        @if (showTutorialAction) {
+          <app-button variant="white" size="md" styleType="solid" class="flex-1 sm:flex-auto min-w-[193px] sm:min-w-0" customClass="ms-auto w-full sm:w-auto flex justify-center" (onClick)="onTutorial()">
+            Visita guiada
+            <svg width="20" height="20">
+              <use xlink:href="/assets/icons/outline/media.svg#clapperboard-play" />
+            </svg>
+          </app-button>
+        }
+        @if (showTutorialVideoAction) {
+          <app-button variant="white" size="md" styleType="solid" class="flex-1 sm:flex-auto min-w-[193px] sm:min-w-0" customClass="ms-auto w-full sm:w-auto flex justify-center" (onClick)="onTutorialVideo()">
+            Video tutorial
+            <svg width="20" height="20">
+              <use xlink:href="/assets/icons/outline/media.svg#clapperboard-play" />
+            </svg>
+          </app-button>
+        }
+      </div>
+    </ng-template>
 
+  </app-popover>
 </div>
+
+
+<!-- Tutorial popover content -->
+<ng-template #popoverContent>
+  <div class="flex justify-between items-center gap-2">
+    <span class="text-base leading-5 md:leading-[18px] font-normal text-main-blue1h whitespace-nowrap">
+      3 de 3
+    </span>
+    <div class="flex gap-2">
+      <app-button
+        (click)="backTutorialStep()"
+        variant="primary"
+        styleType="ghost"
+        size="md"
+        class="hidden md:block"
+        customClass="leading-4">
+        Atrás
+      </app-button>
+      <app-button
+        (click)="nextTutorialStep()"
+        variant="primary"
+        styleType="solid"
+        size="md"
+        class="hidden md:block"
+        customClass="leading-4">
+        Entendido
+      </app-button>
+      <app-button
+        (click)="nextTutorialStep()"
+        variant="primary"
+        styleType="solid"
+        size="sm"
+        class="block md:hidden"
+        customClass="leading-4">
+        Entendido
+      </app-button>
+    </div>
+  </div>
+</ng-template>

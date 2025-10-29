@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { AbstractControl, FormArray, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
-import { isAlphanumeric, isAlphanumericWithSpaces, isEmail, isNumeric, isTelephoneNumber, isUrl } from 'src/app/utils/validation-utils';
+import { AbstractControl, FormArray, FormControl, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { isAlphanumeric, isAlphanumericWithSpaces, isEmail, isNumeral, isNumeric, isTelephoneNumber, isUrl } from 'src/app/utils/validation-utils';
 
 @Injectable({
   providedIn: 'root'
@@ -69,11 +69,20 @@ export class FormUtilsService {
 
   /**
    * Telephone number validator.
-   * Allows numbers and #
+   * Allows numbers
    */
   telephoneNumber(control: AbstractControl): ValidationErrors | null {
     if (!control || !control.value) return null;
     return isTelephoneNumber(control.value) ? null : { invalidTelNumber: true };
+  }
+
+  /**
+   * Numeral for telephones validator.
+   * Allows numbers, # and *
+   */
+  numeral(control: AbstractControl): ValidationErrors | null {
+    if (!control || !control.value) return null;
+    return isNumeral(control.value) ? null : { invalidTelNumeral: true };
   }
 
   /**
@@ -127,6 +136,25 @@ export class FormUtilsService {
     }
   }
 
+  cloneAbstractControl(control: AbstractControl): AbstractControl {
+    if (control instanceof FormGroup) {
+      const group = new FormGroup({});
+      Object.keys(control.controls).forEach(key => {
+        group.addControl(key, this.cloneAbstractControl(control.controls[key]));
+      });
+      return group;
+    } else if (control instanceof FormArray) {
+      const array = new FormArray<AbstractControl>([]);
+      control.controls.forEach(c => {
+        array.push(this.cloneAbstractControl(c))
+      });
+      return array;
+    } else if (control instanceof FormControl) {
+      return new FormControl(control.value);
+    }
+    throw new Error('Unsupported control type');
+  }
+
   /**
    * Validates date ranges.
    * @param startField - The name of the initial date field.
@@ -138,7 +166,7 @@ export class FormUtilsService {
   validateDateRange(
     startField: string,
     endField: string,
-    errorPrefix: string,
+    errorPrefix: string = '',
     bothRequired: boolean = false,
     untilToday: boolean = false,
   ) {
@@ -147,23 +175,6 @@ export class FormUtilsService {
       const endDateControl = formGroup.get(endField);
 
       if (!startDateControl || !endDateControl) return null;
-
-      // Const to clear errors
-      const cleanErrors = (control: AbstractControl, prefix: string) => {
-        const currentErrors = control.errors || {};
-        Object.keys(currentErrors)
-          .filter(key => key.startsWith(prefix))
-          .forEach(key => delete currentErrors[key]);
-
-        control.setErrors(Object.keys(currentErrors).length ? currentErrors : null);
-      };
-
-      // Const to set errors
-      const setError = (control: AbstractControl, errorKey: string) => {
-        const currentErrors = control.errors || {};
-        currentErrors[errorKey] = true;
-        control.setErrors(currentErrors);
-      };
 
       const parseDate = (value: any) => (value ? new Date(value + "T00:00:00") : null);
       const startDate = parseDate(startDateControl.value);
@@ -175,36 +186,93 @@ export class FormUtilsService {
       const prefix = errorPrefix ? `${errorPrefix}_` : '';
 
       // Clear previous errors
-      cleanErrors(startDateControl, prefix);
-      cleanErrors(endDateControl, prefix);
+      this.cleanErrors(startDateControl, prefix);
+      this.cleanErrors(endDateControl, prefix);
 
       let hasError = false;
 
       if (untilToday) {
         if (startDate && startDate > today) {
-          setError(startDateControl, `${prefix}invalidStartDate`);
+          this.setError(startDateControl, `${prefix}invalidStartDate`);
           hasError = true;
         }
         if (endDate && endDate > today) {
-          setError(endDateControl, `${prefix}invalidEndDate`);
+          this.setError(endDateControl, `${prefix}invalidEndDate`);
           hasError = true;
         }
       }
 
       if (bothRequired) {
         if (!startDate && endDate) {
-          setError(startDateControl, `${prefix}startDateRequired`);
+          this.setError(startDateControl, `${prefix}startDateRequired`);
           hasError = true;
         }
         if (startDate && !endDate) {
-          setError(endDateControl, `${prefix}endDateRequired`);
+          this.setError(endDateControl, `${prefix}endDateRequired`);
           hasError = true;
         }
       }
 
       if (startDate && endDate && endDate < startDate) {
-        setError(endDateControl, `${prefix}invalidDateRange`);
+        this.setError(endDateControl, `${prefix}invalidDateRange`);
         hasError = true;
+      }
+
+      return hasError ? {} : null;
+    };
+  }
+
+  /**
+   * Validates time ranges.
+   * @param startField - The name of the initial time field.
+   * @param endField - The name of the final time field.
+   * @param errorPrefix - Prefix to identify range in form.
+   * @param bothRequired - If both times are required when one is filled out.
+   */
+  validateTimeRange(
+    startField: string,
+    endField: string,
+    errorPrefix: string = '',
+    bothRequired: boolean = false,
+  ) {
+    return (formGroup: AbstractControl): ValidationErrors | null => {
+      const startTimeControl = formGroup.get(startField);
+      const endTimeControl = formGroup.get(endField);
+
+      if (!startTimeControl || !endTimeControl) return null;
+
+      const startTime = startTimeControl.value;
+      const endTime = endTimeControl.value;
+
+      const prefix = errorPrefix ? `${errorPrefix}_` : '';
+
+      // Clear previous errors
+      this.cleanErrors(startTimeControl, prefix);
+      this.cleanErrors(endTimeControl, prefix);
+
+      let hasError = false;
+
+      if (bothRequired) {
+        if (!startTime && endTime) {
+          this.setError(startTimeControl, `${prefix}startTimeRequired`);
+          hasError = true;
+        }
+        if (startTime && !endTime) {
+          this.setError(endTimeControl, `${prefix}endTimeRequired`);
+          hasError = true;
+        }
+      }
+
+      if (startTime && endTime) {
+        const [startHour, startMinute] = startTime.split(':').map(Number);
+        const [endHour, endMinute] = endTime.split(':').map(Number);
+        const startTotal = startHour * 60 + startMinute;
+        const endTotal = endHour * 60 + endMinute;
+
+        if (startTotal > endTotal) {
+          this.setError(endTimeControl, `${prefix}invalidTimeRange`);
+          hasError = true;
+        }
       }
 
       return hasError ? {} : null;
@@ -238,5 +306,29 @@ export class FormUtilsService {
     return Number(raw).toLocaleString('es-CO');
   }
 
+  isControlRequired(control: AbstractControl | null): boolean {
+    if (!control || !control.validator) return false;
+
+    const validator = control.validator({} as AbstractControl);
+    if (validator && validator['required']) {
+      return true;
+    }
+    return false;
+  }
+
+  cleanErrors(control: AbstractControl, prefix: string) {
+    const currentErrors = control.errors || {};
+    Object.keys(currentErrors)
+      .filter(key => key.startsWith(prefix))
+      .forEach(key => delete currentErrors[key]);
+
+    control.setErrors(Object.keys(currentErrors).length ? currentErrors : null);
+  };
+
+  setError(control: AbstractControl, errorKey: string) {
+    const currentErrors = control.errors || {};
+    currentErrors[errorKey] = true;
+    control.setErrors(currentErrors);
+  };
 
 }

@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { CommonModule } from '@angular/common';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
 
-import { FormGroup, Validators, FormBuilder } from '@angular/forms';
+import { FormGroup, Validators, FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { RecaptchaModule } from 'ng-recaptcha';
 import { environment } from 'src/environments/environment';
 import { TutorialService } from 'src/app/services/tutorial/tutorial.service';
@@ -18,7 +17,7 @@ import { AlertService } from 'src/app/services/alert/alert.service';
 @Component({
    selector: 'app-login',
    standalone: true,
-   imports: [ NgZorroModule, CommonModule, RecaptchaModule, TextInputComponent, InputErrorComponent, ButtonComponent ],
+   imports: [ CommonModule, ReactiveFormsModule, RecaptchaModule, TextInputComponent, InputErrorComponent, ButtonComponent ],
 
    templateUrl: './login.component.html',
    styleUrl: './login.component.scss'

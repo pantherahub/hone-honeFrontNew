@@ -1,7 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { NgxDocViewerModule } from 'ngx-doc-viewer';
 import { CommonModule } from '@angular/common';
-import { NgZorroModule } from '../../../ng-zorro.module';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { ModalComponent } from '../../components/modal/modal.component';
 import { ButtonComponent } from '../../components/button/button.component';
@@ -9,7 +8,7 @@ import { ButtonComponent } from '../../components/button/button.component';
 @Component({
   selector: 'app-file-viewer',
   standalone: true,
-  imports: [CommonModule, NgZorroModule, NgxDocViewerModule, PipesModule, ButtonComponent],
+  imports: [CommonModule, NgxDocViewerModule, PipesModule, ButtonComponent],
   templateUrl: './file-viewer.component.html',
   styleUrl: './file-viewer.component.scss'
 })

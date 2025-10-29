@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { OverlayStateService } from 'src/app/services/overlay-state/overlay-state.service';
 
 @Component({
   selector: 'app-drawer',
@@ -14,6 +15,7 @@ export class DrawerComponent implements OnInit, OnDestroy {
   @Input() size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' = 'md';
   @Input() customSize?: string;
   @Input() onMobileFull: boolean = true;
+  @Input() hasCustomContent: boolean = false;
   @Input() hasFooter: boolean = false;
   @Input() isBackdropVisible: boolean = true;
 
@@ -28,7 +30,12 @@ export class DrawerComponent implements OnInit, OnDestroy {
   isMobile: boolean = window.innerWidth < 640;
   isOpen: boolean = false;
 
-  constructor(private cdr: ChangeDetectorRef) { }
+  hasInitialized = false;
+
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private overlayStateService: OverlayStateService,
+  ) { }
 
   ngOnInit(): void {
     if (!this.closable) {
@@ -36,14 +43,12 @@ export class DrawerComponent implements OnInit, OnDestroy {
       this.closeOnEscape = false;
       this.showCloseButton = false;
     }
-
-    if (this.isOpen && this.isBackdropVisible) {
-      document.body.classList.add('overflow-hidden');
-    }
   }
 
   ngOnDestroy(): void {
-    document.body.classList.remove('overflow-hidden');
+    if (this.isOpen && this.isBackdropVisible) {
+      this.overlayStateService.removeOverlay();
+    }
   }
 
   @HostListener('window:resize')
@@ -64,21 +69,26 @@ export class DrawerComponent implements OnInit, OnDestroy {
   }
 
   open() {
+    if (this.isOpen) return;
     this.isOpen = true;
+    if (!this.hasInitialized) this.hasInitialized = true;
     this.cdr.detectChanges();
+
     if (this.isBackdropVisible) {
-      document.body.classList.add('overflow-hidden');
+      this.overlayStateService.addOverlay();
     }
   }
 
   async close(returnData?: any) {
+    if (!this.isOpen) return;
+
     if (this.beforeClose) {
       const result = await this.beforeClose();
       if (!result) return;
     }
     this.isOpen = false;
     if (this.isBackdropVisible) {
-      document.body.classList.remove('overflow-hidden');
+      this.overlayStateService.removeOverlay();
     }
     this.onClose.emit(returnData);
   }

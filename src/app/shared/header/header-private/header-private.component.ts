@@ -20,7 +20,7 @@ export class HeaderPrivateComponent implements OnInit, OnDestroy {
   public authService = inject(AuthService);
   public user = this.eventManager.userLogged();
 
-  configTutorialVisible = false;
+  configTutorialVisible: boolean = false;
 
   private tutorialSubscription!: Subscription;
 
@@ -54,17 +54,18 @@ export class HeaderPrivateComponent implements OnInit, OnDestroy {
     this.tutorialService.backStep();
   }
 
-  nextTutorialStep() {
-    this.configTutorialVisible = false;
-    this.tutorialService.nextStep();
-    if (!this.user.withData || this.user.rejected) {
+  nextTutorialStep(redirect: boolean = false) {
+    if (this.configTutorialVisible) {
+      this.configTutorialVisible = false;
+      this.tutorialService.nextStep();
+    }
+    if (redirect || !this.user.withData || this.user.rejected) {
       this.router.navigate(['/update-data']);
     }
   }
 
   navigateToUpdateData() {
-    this.nextTutorialStep();
-    this.router.navigate(['/update-data']);
+    this.nextTutorialStep(true);
   }
 
   /**

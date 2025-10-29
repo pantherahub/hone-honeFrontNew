@@ -1,0 +1,175 @@
+<app-drawer
+  #officeDrawer
+  placement="right"
+  size="xl"
+  (onClose)="onClose()">
+  <ng-container drawer-header>
+    <h2 class="text-lg font-black leading-5 text-main-blue1h">
+      Información de sede
+    </h2>
+  </ng-container>
+
+  @if (office) {
+    <div class="flex flex-col gap-6">
+
+      <div class="grid sm:grid-cols-2 gap-6">
+        <div class="flex flex-col gap-2.5 text-sm leading-4">
+          <span class="font-semibold text-gray-900">Ciudad</span>
+          <span class="text-gray-500">
+            {{ office.cityName || office.TemporalAddress?.City?.city || '' }}
+          </span>
+        </div>
+        <div class="flex flex-col gap-2.5 text-sm leading-4">
+          <span class="font-semibold text-gray-900">Dirección de atención de usurarios</span>
+          <span class="text-gray-500">
+            {{ office.address?.formattedAddress || '' }}
+          </span>
+        </div>
+        <div class="flex flex-col gap-2.5 text-sm leading-4">
+          <span class="font-semibold text-gray-900">Nombre</span>
+          <span class="text-gray-500">
+            {{ office.name }}
+          </span>
+        </div>
+        @if (office.schedulingLink) {
+          <div class="flex flex-col gap-2.5 text-sm leading-4">
+            <span class="font-semibold text-gray-900">Link de agendamiento</span>
+            <span class="text-gray-500">
+              {{ office.schedulingLink }}
+            </span>
+          </div>
+        }
+        @if (office.emailGlosas) {
+          <div class="flex flex-col gap-2.5 text-sm leading-4">
+            <span class="font-semibold text-gray-900">Correo glosas</span>
+            <span class="text-gray-500">
+              {{ office.emailGlosas }}
+            </span>
+          </div>
+        }
+        <div class="flex flex-col gap-2.5 text-sm leading-4">
+          <span class="font-semibold text-gray-900">Compañías con convenio</span>
+          <div class="flex gap-1 flex-wrap">
+            @for (companyName of getCompanyNames(); track $index) {
+              <span class="flex items-center gap-1 bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded text-xs font-semibold leading-[14px]">
+                {{ companyName }}
+              </span>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-4 p-4 rounded-xl bg-gray-50 ring-[1px] ring-inset ring-gray-200">
+        <span class="text-sm font-semibold leading-4 text-gray-900">
+          Horarios de atención
+        </span>
+        <div class="xs:ps-3 flex gap-4 max-w-full">
+          <div class="hidden xs:block w-[3px] rounded-3xl bg-gray-200"></div>
+          <div class="flex-1 flex flex-col gap-2.5 max-w-full">
+            @for (schedule of existingSchedules; track $index) {
+              <div class="p-4 flex flex-col sm:flex-row sm:items-center gap-2 rounded-md ring-[1px] ring-inset ring-gray-200 bg-white">
+                <div class="flex-1 flex items-center gap-2">
+                  <div class="mb-auto rounded-lg p-3 bg-blue1h-50 text-main-blue1h">
+                    <svg width="20" height="20">
+                      <use xlink:href="/assets/icons/outline/general.svg#clock" />
+                    </svg>
+                  </div>
+                  <div class="flex-1 grid md:grid-cols-3 gap-2 text-sm leading-4">
+                    <span class="font-semibold text-gray-900">
+                      {{ schedule.schedule || '' }}
+                    </span>
+                    <span class="text-gray-500">
+                      {{ schedule.startTime + ' - ' + schedule.endTime || '' }}
+                    </span>
+                    <span class="text-gray-500">
+                      {{ schedule.type || '' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-4 p-4 rounded-xl bg-gray-50 ring-[1px] ring-inset ring-gray-200">
+        <span class="text-sm font-semibold leading-4 text-gray-900">
+          Información de contacto
+        </span>
+        <div class="xs:ps-3 flex gap-4 max-w-full">
+          <div class="hidden xs:block w-[3px] rounded-3xl bg-gray-200"></div>
+          <div class="flex-1 flex flex-col gap-2.5 max-w-full">
+
+            @for (contact of existingContacts; track $index) {
+              <div class="p-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0 rounded-md ring-[1px] ring-inset ring-gray-200 bg-white">
+                <div class="flex items-center gap-2">
+                  <div class="mb-auto rounded-lg p-3 bg-blue1h-50 text-main-blue1h">
+                    <svg width="20" height="20">
+                      <use xlink:href="/assets/icons/outline/user.svg#address-book" />
+                    </svg>
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <div class="flex flex-wrap items-center gap-1 text-sm leading-4">
+                      <span class="font-semibold text-gray-900">
+                        Tipo
+                      </span>
+                      <span class="text-gray-500">
+                        {{ getOccTypeById(contact.idOccupationType)?.type || '' }}
+                      </span>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-1 text-sm leading-4">
+                      <span class="font-semibold text-gray-900">
+                        {{ contact.idOccupationType === 1 ? 'Área' : 'Cargo' }}
+                      </span>
+                      <span class="text-gray-500">
+                        {{ contact.occupationName || contact.OccupationForOffice?.occupation || '' }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                @if (contact.Phones?.length || contact.Emails?.length) {
+                  <div class="flex flex-col gap-2 sm:ml-12">
+                    @if (contact.Emails?.length) {
+                      <div class="flex flex-wrap items-center gap-1">
+                        <span class="text-sm font-semibold leading-4 text-gray-900">
+                          Correo
+                        </span>
+                        <div class="flex gap-1 flex-wrap min-w-0">
+                          @for (email of contact.Emails; track $index) {
+                            <div class="flex items-center bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded text-xs font-semibold leading-[14px] max-w-[210px] overflow-hidden">
+                              <span class="block truncate w-full" [title]="email.email">
+                                {{ email.email }}
+                              </span>
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    }
+                    @if (contact.Phones?.length) {
+                      <div class="flex flex-wrap items-center gap-1">
+                        <span class="text-sm font-semibold leading-4 text-gray-900">
+                          Teléfono
+                        </span>
+                        <div class="flex gap-1 flex-wrap min-w-0">
+                          @for (phone of contact.Phones; track $index) {
+                            <div class="flex items-center bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded text-xs font-semibold leading-[14px] max-w-[210px] overflow-hidden">
+                              <span class="block truncate w-full" [title]="getCompletePhone(phone)">
+                                {{ getCompletePhone(phone) }}
+                              </span>
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  }
+</app-drawer>

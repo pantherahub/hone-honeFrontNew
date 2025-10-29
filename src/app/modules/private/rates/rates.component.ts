@@ -105,8 +105,8 @@ export class RatesComponent implements OnInit {
 
       if (!rateForm?.file) {
         this.alertService.warning(
-          '¡Aviso!',
-          'Debe seleccionar un documento.',
+          '¡Acción requerida!',
+          'Debes seleccionar un documento.',
         );
         resolve(false);
       }

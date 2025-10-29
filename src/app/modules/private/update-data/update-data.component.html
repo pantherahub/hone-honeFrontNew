@@ -1,262 +1,212 @@
 @if (loading) {
-  <div class="loading-overlay fixed">
-    <nz-spin [nzSize]="'large'" nzTip="Cargando..."></nz-spin>
+  <div class="absolute inset-0 z-50 bg-gray-50/60 flex items-center justify-center">
+    <svg class="w-7 h-7 text-main-blue1h animate-spin fill-gray-200">
+      <use xlink:href="/assets/icons/extras/animations.svg#spin" />
+    </svg>
   </div>
 }
 
-<nz-row nzJustify="center" class="pb-20">
-  <nz-col [nzSpan]="24" [nzMd]="20" [nzLg]="16" [nzXXl]="12">
-    <div class="update-data">
-      <div class="update-data__header flex flex-col gap-2">
-        <button class="flex gap-1 items-center w-fit" nz-button nzType="primary" type="button" (click)="goBack()">
-          <svg width="20" height="20">
-            <use xlink:href="/assets/icons/outline/arrows.svg#arrow-left" />
-          </svg>
-          <span>Volver</span>
-        </button>
-        <h2 class="update-data__header__title text-center my-4">Información prestador</h2>
+<div class="flex justify-center mx-4">
+  <div class="max-w-screen-md w-full pt-10 pb-28 sm:pb-20 md:pt-6 flex flex-col gap-3">
+
+    <app-button
+      (onClick)="goBack()"
+      variant="primary"
+      styleType="ghost"
+      size="sm"
+      customClass="leading-4">
+      <svg width="16" height="16">
+        <use xlink:href="/assets/icons/outline/arrows.svg#chevron-left" />
+      </svg>
+      Volver
+    </app-button>
+
+    @if (isFirstForm) {
+      <app-alert
+        variant="info"
+        [closable]="true"
+        [title]="'Para guardar la información y reflejar los cambios, asegúrate de completar todas las secciones del formulario.'"
+        customIconPath="/assets/icons/outline/general.svg#check-circle">
+      </app-alert>
+    } @else {
+      @if (eventManager.isEditingProvider()) {
+        <app-alert
+          variant="info"
+          [closable]="true"
+          [title]="'Confirma que los datos que modificaste estén correctos antes de actualizar la información.'"
+          customIconPath="/assets/icons/outline/general.svg#check-circle">
+        </app-alert>
+      } @else {
+        <app-alert
+          variant="dark"
+          [closable]="true"
+          [title]="'Recuerda mantener la información actualizada para que los datos guardados se reflejen correctamente.'"
+          customIconPath="/assets/icons/outline/general.svg#check-circle">
+        </app-alert>
+      }
+    }
+
+    <div class="flex flex-col gap-6">
+      @if (isFirstForm && !user.withData) {
+        <div>
+          <div class="text-right text-xs font-medium text-gray-500">
+            {{ progressPercentage | number:'1.0-0' }}%
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
+            <div class="bg-main-blue1h h-1.5 rounded-full transition-all duration-300 ease-in-out"
+              [style.width.%]="progressPercentage">
+            </div>
+          </div>
+        </div>
+      }
+
+      <div class="flex flex-col md:flex-row gap-4">
+
+        <!-- Desktop navigation -->
+        <div class="hidden md:flex flex-col gap-4">
+          <div class="flex flex-col gap-1">
+            @for (step of steps; track step.key) {
+              <app-button
+                variant="primary"
+                [styleType]="step.key === activeStep ? 'soft' : 'ghost'"
+                size="sm"
+                customClass="w-full leading-4"
+                [disabled]="!step.enabled"
+                (onClick)="goToStep(step.key)">
+                <svg width="16" height="16">
+                  <use [attr.xlink:href]="step.icon" />
+                </svg>
+                {{ step.label }}
+              </app-button>
+            }
+          </div>
+          <div class="flex flex-col gap-4 p-4 rounded-xl bg-blue3h-100 w-[245px]">
+            <div class="relative w-[161.6px] h-[220px] mx-auto">
+              <img src="assets/img/pqrs/banner.png" alt="Imagen soporte"
+              class="w-full h-full object-cover">
+              <div class="absolute inset-0 bg-gradient-to-t from-blue3h-100 from-[1%] via-blue3h-100/0 to-transparent to-[75%]"></div>
+            </div>
+            <span class="text-sm font-semibold leading-4">
+              Canal de atención para preguntas, sugerencias o reclamos.
+            </span>
+            <app-button
+              [routerLink]="'/support'"
+              variant="primary"
+              styleType="solid"
+              size="md"
+              customClass="w-full flex justify-center leading-4">
+              Ir al canal
+            </app-button>
+          </div>
+        </div>
+
+        <!-- Mobile navigation -->
+        <div class="flex gap-2 md:hidden h-8">
+          @if (!atStart) {
+            <app-button
+              variant="primary"
+              styleType="ghost"
+              size="sm"
+              (onClick)="scrollStep('left')"
+              customClass="h-full !p-2">
+              <svg width="24" height="24">
+                <use xlink:href="/assets/icons/outline/arrows.svg#chevron-double-left" />
+              </svg>
+            </app-button>
+          }
+
+          <!-- Scrollable container on mobile -->
+          <div #stepsContainer
+            class="flex-1 flex gap-1 overflow-x-auto scrollbar-hide scroll-smooth whitespace-nowrap rounded-xl min-w-0">
+            @for (step of steps; track step.key) {
+              <div>
+                <app-button
+                  variant="primary"
+                  [styleType]="step.key === activeStep ? 'soft' : 'ghost'"
+                  size="sm"
+                  customClass="flex-shrink-0 min-w-[120px] leading-4"
+                  [disabled]="!step.enabled"
+                  (onClick)="goToStep(step.key, false)">
+                  <svg width="16" height="16">
+                    <use [attr.xlink:href]="step.icon" />
+                  </svg>
+                  {{ step.label }}
+                </app-button>
+              </div>
+            }
+          </div>
+
+          @if (!atEnd) {
+            <app-button
+              variant="primary"
+              styleType="ghost"
+              size="sm"
+              (onClick)="scrollStep('right')"
+              customClass="h-full !p-2">
+              <svg width="24" height="24">
+                <use xlink:href="/assets/icons/outline/arrows.svg#chevron-double-right" />
+              </svg>
+            </app-button>
+          }
+        </div>
+
+        <div class="flex-1 min-w-0 flex flex-col gap-4">
+          @switch (activeStep) {
+            @case ('provider') {
+              <app-provider-form
+                [isFirstForm]="isFirstForm"
+                [form]="providerForm"
+                [providerFormFields]="providerFormFields"
+                [identificationTypes]="identificationTypes"
+                [validateProviderForm]="validateProviderForm.bind(this)"
+                (clearSectionBackendError)="clearSectionBackendError()"
+                (next)="goToStep('offices', true)"
+                (save)="onSubmit()">
+              </app-provider-form>
+            }
+            @case ('offices') {
+              <app-office-list
+                [isFirstForm]="isFirstForm"
+                [providerCompanies]="providerCompanies"
+                [createdOffices]="createdOffices"
+                [updatedOffices]="updatedOffices"
+                [deletedOffices]="deletedOffices"
+                [existingOffices]="existingOffices"
+                (officesChanged)="onOfficesChanged($event)"
+                (prev)="goToStep('provider')"
+                (next)="goToStep('contacts', true)"
+                (save)="onSubmit()">
+              </app-office-list>
+            }
+            @case ('contacts') {
+              <app-contact-list
+                [isFirstForm]="isFirstForm"
+                [createdContacts]="createdContacts"
+                [updatedContacts]="updatedContacts"
+                [deletedContacts]="deletedContacts"
+                [existingContacts]="existingContacts"
+                (contactsChanged)="onContactsChanged($event)"
+                (prev)="goToStep('offices')"
+                (save)="onSubmit()">
+              </app-contact-list>
+            }
+          }
+
+          <app-backend-errors
+            [error]="backendError"
+            [grouped]="false">
+          </app-backend-errors>
+        </div>
       </div>
-
-      <form nz-form nzLayout="vertical" [formGroup]="providerForm" (ngSubmit)="onSubmit()">
-        <div class="update-data__body">
-
-          <div class="container-alerts">
-            <nz-alert
-              nzType="warning"
-              nzCloseable
-              [nzMessage]="alertDescription"
-            ></nz-alert>
-            <ng-template #alertDescription>
-              Asegúrate de hacer el envío de todo el formulario para ver reflejados los cambios.
-              <a (click)="scrollToFooter()" class="text-blue-600 hover:underline cursor-pointer">Ir al botón de envío</a>.
-            </ng-template>
-          </div>
-
-          <div nz-row [nzGutter]="16">
-            <nz-col [nzSpan]="24" [nzSm]="12">
-              <nz-form-item nz-row>
-                <nz-form-label [nzRequired]="true" nzFor="name">Nombre o razón social</nz-form-label>
-                <nz-form-control [nzErrorTip]="nameErrorTip">
-                  <ng-template #nameErrorTip>
-                    <p *ngIf="providerForm.controls['name'].hasError('required')">El campo es requerido.</p>
-                  </ng-template>
-                  <input nz-input id="name" formControlName="name" placeholder="Nombre" />
-                </nz-form-control>
-              </nz-form-item>
-            </nz-col>
-
-            <nz-col [nzSpan]="24" [nzSm]="12">
-              <nz-form-item>
-                <nz-form-label [nzRequired]="true" nzFor="email">
-                  Correo electrónico del prestador
-                  <div
-                    nz-tooltip
-                    [nzTooltipTitle]="emailTooltip"
-                    nzTooltipPlacement="top"
-                    nzTooltipOverlayClassName="large-tooltip-custom">
-                    <i nz-icon nzType="info-circle" nzTheme="fill" class="info-icon"></i>
-                  </div>
-                  <ng-template #emailTooltip>
-                    @for (msg of emailInfoMessage; track $index) {
-                      <p>{{ msg }}</p>
-                    }
-                  </ng-template>
-                </nz-form-label>
-                <nz-form-control [nzErrorTip]="emailErrorTip">
-                  <ng-template #emailErrorTip>
-                    @if (providerForm.controls['email'].hasError('required')) {
-                      <p>El campo es requerido.</p>
-                    } @else if (providerForm.controls['email'].hasError('invalidEmail')) {
-                      <p>Ingresa un correo válido.</p>
-                    }
-                  </ng-template>
-                  <input nz-input id="email" formControlName="email" placeholder="Correo" />
-                </nz-form-control>
-              </nz-form-item>
-            </nz-col>
-
-            <nz-col [nzSpan]="24" [nzSm]="12">
-              <nz-form-item>
-                <nz-form-label [nzRequired]="true" nzFor="idTypeDocument">Tipo de identificación</nz-form-label>
-                <nz-form-control nzErrorTip="El campo es requerido.">
-                  <nz-select
-                    id="idTypeDocument"
-                    formControlName="idTypeDocument"
-                    nzPlaceHolder="Seleccionar"
-                  >
-                    <nz-option *ngFor="let type of identificationTypes" [nzValue]="type.idTypeDocument" [nzLabel]="type.typeDocument"></nz-option>
-                  </nz-select>
-                </nz-form-control>
-              </nz-form-item>
-            </nz-col>
-
-            <nz-col [nzSpan]="24" [nzSm]="12">
-              <nz-form-item>
-                <nz-form-label [nzRequired]="true" nzFor="identification">Identificación</nz-form-label>
-                <nz-form-control [nzErrorTip]="identificationErrorTip">
-                  <ng-template #identificationErrorTip>
-                    @if (providerForm.controls['identification'].hasError('required')) {
-                      <p>El campo es requerido.</p>
-                    } @else if (providerForm.controls['identification'].hasError('invalidNumber')) {
-                      <p>Ingresa un valor válido.</p>
-                    }
-                  </ng-template>
-                  <input nz-input id="identification" formControlName="identification" placeholder="Identificación" type="text" />
-                </nz-form-control>
-              </nz-form-item>
-            </nz-col>
-
-            <nz-col *ngIf="providerForm.get('idTypeDocument')?.value !== 6" [nzSpan]="24" [nzSm]="12">
-              <nz-form-item>
-                <nz-form-label nzFor="dv">Dígito de verificación</nz-form-label>
-                <nz-form-control [nzErrorTip]="dvErrorTip">
-                  <ng-template #dvErrorTip>
-                    @if (providerForm.controls['dv'].hasError('invalidDigit')) {
-                      <p>{{ providerForm.controls['dv'].errors?.['invalidDigit'] }}</p>
-                    }
-                  </ng-template>
-                  <input nz-input id="dv" formControlName="dv" placeholder="Dígito" type="number" min="0" max="9" />
-                </nz-form-control>
-              </nz-form-item>
-            </nz-col>
-
-            <nz-col [nzSpan]="24" [nzSm]="12">
-              <nz-form-item>
-                <nz-form-label [nzRequired]="true" nzFor="repsEnableCode">Código habilitación REPS</nz-form-label>
-                <nz-form-control [nzErrorTip]="repsEnableCodeErrorTip">
-                  <ng-template #repsEnableCodeErrorTip>
-                    @if (providerForm.controls['repsEnableCode'].hasError('required')) {
-                      El campo es requerido.
-                    } @else if (providerForm.controls['repsEnableCode'].hasError('invalidNumber')) {
-                      Solo se permiten números.
-                    }
-                  </ng-template>
-                  <input nz-input id="repsEnableCode" formControlName="repsEnableCode" placeholder="Código" />
-                </nz-form-control>
-              </nz-form-item>
-            </nz-col>
-
-            <nz-col [nzSpan]="24" [nzSm]="12">
-              <nz-form-item>
-                <nz-form-label [nzRequired]="true" nzFor="languages">Idiomas de prestación de servicio</nz-form-label>
-                <nz-form-control [nzErrorTip]="languagesErrorTip">
-                  <ng-template #languagesErrorTip>
-                    <p *ngIf="providerForm.controls['languages'].hasError('required')">El campo es requerido.</p>
-                  </ng-template>
-                  <nz-select
-                    nzMode="multiple"
-                    [nzMaxTagCount]="3"
-                    nzAllowClear
-                    [nzMaxTagPlaceholder]="langTagPlaceHolder"
-                    formControlName="languages"
-                    nzPlaceHolder="Seleccionar"
-                  >
-                    <nz-option *ngFor="let lang of languages" [nzLabel]="lang.name" [nzValue]="lang.code"></nz-option>
-                  </nz-select>
-                  <ng-template #langTagPlaceHolder let-selectedList>{{ selectedList.length }} más...</ng-template>
-                </nz-form-control>
-              </nz-form-item>
-            </nz-col>
-
-            <nz-col [nzSpan]="24" [nzSm]="12">
-              <nz-form-item>
-                <nz-form-label nzFor="website">Sitio o página web</nz-form-label>
-                <nz-form-control [nzErrorTip]="websiteErrorTip">
-                  <ng-template #websiteErrorTip>
-                    <p *ngIf="providerForm.controls['website'].hasError('invalidUrl')">Ingresa una url válida.</p>
-                  </ng-template>
-                  <input nz-input id="website" formControlName="website" placeholder="Web" />
-                </nz-form-control>
-              </nz-form-item>
-            </nz-col>
-
-          </div>
-
-          <div>
-            <div class="table-head">
-              <h3 class="table-head__title">Sedes de prestación de servicio</h3>
-              <button nz-button nzType="primary" type="button" (click)="openOfficeModal()">Agregar sede</button>
-            </div>
-
-            <!-- Table -->
-            <div class="responsive-table">
-              <nz-table #officeTable [nzData]="existingOffices" [nzPageSize]="officePageSize" [nzPageIndex]="officePage" (nzPageIndexChange)="officePage = $event" class="provider-table">
-                <thead>
-                  <tr>
-                    <th>Nombre</th>
-                    <th>Ciudad</th>
-                    <th>Dirección</th>
-                    <th nzWidth="100px">Acción</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let data of officeTable.data; let i = index">
-                    <td>{{ data.name }}</td>
-                    <td>{{ data.cityName || data.TemporalAddress?.City?.city || '' }}</td>
-                    <td class="truncate max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap">{{ data.address?.formattedAddress || '' }}</td>
-                    <td class="provider-table__action">
-                      <button nz-button nzType="primary" type="button" (click)="openOfficeModal(getGlobalIndex(i, officePage, officePageSize))" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
-                      <button nz-button nzDanger nzType="primary" type="button" (click)="deleteOffice(getGlobalIndex(i, officePage, officePageSize))" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button>
-                    </td>
-                  </tr>
-                </tbody>
-              </nz-table>
-            </div>
-          </div>
-
-          <div>
-            <div class="table-head">
-              <h3 class="table-head__title">Contactos</h3>
-              <button nz-button nzType="primary" type="button" (click)="openContactModal()">Agregar contacto</button>
-            </div>
-
-            <!-- Table -->
-             <div class="responsive-table">
-               <nz-table #contactTable [nzData]="existingContacts" [nzPageSize]="contactPageSize" [nzPageIndex]="contactPage" (nzPageIndexChange)="contactPage = $event" class="provider-table">
-                 <thead>
-                   <tr>
-                     <th>Área / Cargo</th>
-                     <th>Nombre</th>
-                     <th nzWidth="100px">Acción</th>
-                   </tr>
-                 </thead>
-                 <tbody>
-                   <tr *ngFor="let data of contactTable.data; let i = index">
-                     <td>{{ data.occupationName || data.OccupationForProvider?.occupation || '' }}</td>
-                     <td>{{ data.name || 'N/A' }}</td>
-                     <td class="provider-table__action">
-                        <button nz-button nzType="primary" type="button" (click)="openContactModal(getGlobalIndex(i, contactPage, contactPageSize))" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
-                        <button nz-button nzDanger nzType="primary" type="button" (click)="deleteContact(getGlobalIndex(i, contactPage, contactPageSize))" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button>
-                     </td>
-                   </tr>
-                 </tbody>
-               </nz-table>
-             </div>
-          </div>
-
-        </div>
-
-        <app-backend-errors [error]="backendError"></app-backend-errors>
-
-        <div class="update-data__footer">
-          <button #footerButton class="btn-primary bg-green-500 hover:bg-green-500/80" type="submit" [disabled]="loading">Actualizar datos</button>
-        </div>
-      </form>
-
     </div>
-  </nz-col>
-</nz-row>
 
 
-<button
-  [ngClass]="{
-    'opacity-100 pointer-events-auto': showFloatingButton,
-    'opacity-0 pointer-events-none': !showFloatingButton
-  }"
-  class="fixed bottom-[6rem] right-6 lg:right-10 z-50 bg-blue-600 text-white rounded-full p-3 shadow-lg hover:bg-blue-700 transition-opacity duration-500 ease-in-out"
-  (click)="scrollToFooter()"
->
-  <svg width="20" height="20">
-    <use xlink:href="/assets/icons/outline/arrows.svg#angle-down" />
-  </svg>
-</button>
+  </div>
+</div>
+
+
+<!-- <button nz-button nzType="primary" type="button" (click)="openOfficeModal(getGlobalIndex(i, officePage, officePageSize))" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
+<button nz-button nzDanger nzType="primary" type="button" (click)="deleteOffice(getGlobalIndex(i, officePage, officePageSize))" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button> -->
+
+<!-- <button nz-button nzType="primary" type="button" (click)="openContactModal(getGlobalIndex(i, contactPage, contactPageSize))" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
+<button nz-button nzDanger nzType="primary" type="button" (click)="deleteContact(getGlobalIndex(i, contactPage, contactPageSize))" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button> -->

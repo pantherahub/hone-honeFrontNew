@@ -1,7 +1,6 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { NgZorroModule } from '../../../../ng-zorro.module';
 import { CommonModule } from '@angular/common';
-import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { DocumentsCrudService } from '../../../../services/documents/documents-crud.service';
 import { EventManagerService } from '../../../../services/events-manager/event-manager.service';
 import { FileSelectDirective } from 'src/app/directives/file-select.directive';
@@ -15,14 +14,15 @@ import { SelectComponent } from 'src/app/shared/components/select/select.compone
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { FileDropDirective } from 'src/app/directives/file-drop.directive';
+import { City } from 'src/app/models/city.interface';
 
 
 @Component({
   selector: 'app-modal-edit-document',
   standalone: true,
   imports: [
-    NgZorroModule,
     CommonModule,
+    ReactiveFormsModule,
     PipesModule,
     FileSelectDirective,
     FileDropDirective,
@@ -165,6 +165,8 @@ export class ModalEditDocumentComponent implements OnInit {
 
   hasShownAmountMessage: boolean = false;
 
+  cityLabel = (item: City) => `${item.city}, ${item.department}`;
+
   @ViewChild('dateInput', { static: true }) dateInputRef!: ElementRef;
 
   constructor(
@@ -177,7 +179,6 @@ export class ModalEditDocumentComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // console.log('currentDoc', this.currentDoc);
     this.getTypePolicyProviderOpts();
     this.createForm();
   }
@@ -512,9 +513,9 @@ export class ModalEditDocumentComponent implements OnInit {
       this.alertService
         .confirm(
           '¡IMPORTANTE!',
-          'Debe leer la información anterior sobre los valores de la póliza para evitar devoluciones y retrasos en la gestión documental.',
+          'Debes leer la información anterior sobre los valores de la póliza para evitar devoluciones y retrasos en la gestión documental.',
           {
-            iconVariant: 'error',
+            iconVariant: 'danger',
             confirmBtnVariant: 'red',
             cancelBtnText: 'Volver a revisar',
             confirmBtnText: 'Ya leí la información'
@@ -578,8 +579,8 @@ export class ModalEditDocumentComponent implements OnInit {
     if (this.documentForm.invalid) return;
     else if (!this.loadedFile && (this.isNew || this.currentDoc.documentStatus === 'VENCIDO')) {
       this.alertService.warning(
-        '¡Aviso!',
-        'Debe seleccionar un documento.',
+        '¡Acción requerida!',
+        'Debes seleccionar un documento.',
       );
       return;
     }

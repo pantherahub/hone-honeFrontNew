@@ -62,10 +62,7 @@ export class AuthService {
    // Esta funcion valida fecha de expiracion del token, para dar acceso al sistema
    public isAuthenticated (): boolean {
       const token = this.getStorageToken();
-      if (token) {
-        if (!this.isTokenValid(token)) {
-          return false;
-        }
+      if (token && this.isTokenValid(token)) {
         return true;
       }
       return false;

@@ -22,7 +22,7 @@ export class AlertModalComponent {
   @Input() loading: boolean = false;
   @Input() showConfirmBtn: boolean = false;
   @Input() confirmBtnText: string = 'Aceptar';
-  @Input() cancelBtnText: string = 'Cancelar';
+  @Input() cancelBtnText: string | null = 'Cancelar';
   @Input() iconVariant?: AlertVariant;
   @Input() confirmBtnVariant?: 'primary' | 'gray' | 'red' | 'green';
   @Input() confirmBtnStyle?: 'solid' | 'soft' | 'ghost';
@@ -36,7 +36,7 @@ export class AlertModalComponent {
 
   get iconClasses(): string {
     const variants = {
-      error: 'bg-red-100 text-main-red',
+      danger: 'bg-red-100 text-main-red',
       success: 'bg-green-100 text-blue2h-500',
       warning: 'bg-yellow-100 text-yellow-600',
       info: 'bg-blue-100 text-main-blue1h',
@@ -49,7 +49,7 @@ export class AlertModalComponent {
     if (this.loading) return '/assets/icons/extras/animations.svg#spin';
     else if (this.customIconPath) return this.customIconPath;
     return {
-      error: '/assets/icons/outline/general.svg#close',
+      danger: '/assets/icons/outline/general.svg#close',
       success: '/assets/icons/outline/general.svg#check',
       warning: '/assets/icons/outline/general.svg#exclamation-circle',
       info: '/assets/icons/outline/general.svg#info-circle',
@@ -61,7 +61,7 @@ export class AlertModalComponent {
       info: 'primary',
       success: 'green',
       warning: 'gray',
-      error: 'red'
+      danger: 'red'
     }[this.variant] as 'primary' | 'gray' | 'red' | 'green');
   }
 
@@ -70,7 +70,7 @@ export class AlertModalComponent {
       info: 'solid',
       success: 'solid',
       warning: 'solid',
-      error: 'soft'
+      danger: 'soft'
     }[this.variant] as 'solid' | 'soft' | 'ghost');
   }
 
