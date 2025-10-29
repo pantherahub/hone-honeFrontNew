@@ -9,11 +9,19 @@ import { CommonModule } from '@angular/common';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { TutorialService } from 'src/app/services/tutorial/tutorial.service';
 import { Subscription } from 'rxjs';
+import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
+import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
+import { NavigationService } from 'src/app/services/navigation/navigation.service';
+import { PopoverComponent } from 'src/app/shared/components/popover/popover.component';
+import { ModalService } from 'src/app/services/modal/modal.service';
+import { ModalRef } from 'src/app/models/modal.interface';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [ NgZorroModule, CommonModule, RouterModule ],
+  imports: [ NgZorroModule, CommonModule, RouterModule, TextInputComponent, ButtonComponent, ModalComponent, PopoverComponent ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -31,7 +39,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   clientTutorialVisible: boolean = false;
 
-  @ViewChild('videoModalTemplate', { static: false }) videoModalTemplate!: TemplateRef<any>;
+  videoUrl = `${environment.s3AssetsHost}Hone+Solutions+Lissom+2025+1080p+Hi.mp4`;
+  videoModalRef: ModalRef | null = null;
+  @ViewChild('videoModal') videoModal!: TemplateRef<any>;
+
+  @ViewChild('reminderModal') reminderModal!: ModalComponent;
+
   private tutorialSubscription!: Subscription;
 
   constructor (
@@ -39,19 +52,29 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     private tutorialService: TutorialService,
     private eventManager: EventManagerService,
     private router: Router,
-    private modal: NzModalService,
-  ) {
-    localStorage.removeItem('clientSelected');
-    this.eventManager.clientSelected.set({});
-  }
+    private navigationService: NavigationService,
+    private modalService: ModalService,
+  ) { }
 
   ngOnInit(): void {
+    this.eventManager.clearClient();
+
+    this.setDefaultViewMode();
     this.getClientList();
   }
 
   ngAfterViewInit(): void {
+    if (this.user.withData) {
+      const backRoute = this.navigationService.getBackRoute();
+      // If the user has just logged in, show the reminder
+      if (backRoute === '/login' || this.user.rejected) {
+        this.tutorialService.finishTutorial();
+        this.reminderModal.open();
+      }
+    }
+
     this.tutorialSubscription = this.tutorialService.stepIndex$.subscribe(step => {
-      if (!this.tutorialService.isTutorialFinished()) {
+      if (!this.tutorialService.isTutorialFinished() && !this.reminderModal.isOpen) {
         this.startTutorial(step);
       }
     });
@@ -63,15 +86,34 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  private isMobileView(): boolean {
+    return window.innerWidth < 640; // sm breakpoint
+  }
+
+  private setDefaultViewMode() {
+    const saved = this.eventManager.viewMode();
+    if (saved) {
+      this.viewMode = saved; // User preference
+    } else {
+      this.viewMode = this.isMobileView()
+        ? 'list'
+        : 'grid';
+    }
+  }
+
   /**
-  * Obtiene la lista de clientes del prestador que inicia sesión
+  * Gets the list of clients of the provider who logs in
   */
   getClientList() {
     this.loadingData = true;
     this.clientService.getClientListByProviderId(this.user.id).subscribe({
-      next: (res: any) => {
-        this.clientList = res.filter((client: any) => client.idClientHoneSolutions !== 10);
+      next: (res: ClientInterface[]) => {
+        this.clientList = [...res];
         this.applyFilter();
+
+        if (!this.eventManager.viewMode() && this.clientList.length > 6) {
+          this.viewMode = 'list';
+        }
         this.loadingData = false;
       },
       error: (err: any) => {
@@ -84,6 +126,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   setView(mode: 'grid' | 'list') {
     this.viewMode = mode;
+    this.eventManager.setViewMode(mode);
   }
 
   applyFilter() {
@@ -97,19 +140,13 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
-  clearSearch() {
-    this.searchQuery = '';
-    this.applyFilter();
-  }
-
   /**
   * Redirecciona a la lista de documentos por cargar del cliente seleccionado
   */
   changeOptionClient(item: any, activeTutorialStep: boolean = false) {
     if (activeTutorialStep) this.nextTutorialStep();
-    localStorage.setItem('clientSelected', JSON.stringify(item));
-    this.eventManager.getDataClient();
-    this.router.navigateByUrl(`/cargar-documentos/${item.idClientHoneSolutions}`);
+    this.eventManager.setClient(item);
+    this.router.navigateByUrl(`/service/documentation`);
   }
 
 
@@ -118,18 +155,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   startTutorial(step: number) {
     if (step === 1) {
       this.clientTutorialVisible = false;
-      const modalRef = this.modal.create({
-        nzTitle: 'VIDEO TUTORIAL',
-        nzContent: this.videoModalTemplate,
-        nzFooter: null,
-        nzCentered: true,
-        nzWidth: '900px',
-        nzStyle: { 'max-width': '90%' },
-        nzClassName: 'video-modal'
-      });
-      modalRef.afterClose.subscribe((result: any) => {
-        this.tutorialService.nextStep();
-      });
+      this.openVideoModal();
     } else if (step === 3) {
       this.clientTutorialVisible = true;
     } else {
@@ -137,12 +163,35 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  openVideoModal() {
+    this.videoModalRef = this.modalService.open(this.videoModal, {
+      title: 'Video presentación',
+      showCloseButton: false,
+      customSize: 'max-w-[727px]',
+    });
+    this.videoModalRef.onClose.subscribe(() => {
+      this.nextTutorialStep();
+    });
+  }
+
+  closeVideoModal() {
+    this.videoModalRef?.close();
+  }
+
+  onCloseDataReminder() {
+    if (this.user.rejected) {
+      this.router.navigate(['/update-data']);
+    }
+  }
+
+  backTutorialStep() {
+    this.clientTutorialVisible = false;
+    this.tutorialService.backStep();
+  }
+
   nextTutorialStep() {
     this.clientTutorialVisible = false;
     this.tutorialService.nextStep();
   }
 
-  resetTutorial() {
-    this.tutorialService.resetTutorial();
-  }
 }

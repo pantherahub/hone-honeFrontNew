@@ -1,181 +1,267 @@
-<div class="container py-4 md:py-16 flex flex-col gap-8">
-
-  <div class="py-8 pl-6 md:pl-60 pr-8 rounded-xl bg-blue2h-100 relative">
-    <img src="assets/img/home-welcome.png" alt="Imagen decorativa"
-    class="hidden md:block absolute bottom-0 left-[27px]">
-
-    <div class="flex flex-col gap-4 text-gray-950">
-      <div class="flex flex-col gap-0.5 text-xl/6 font-extrabold">
-        <span>Estimado Prestador {{ user.name }}</span>
-        <span>¡Bienvenido(a) a tu Portal Transaccional de Actualización de Documentos!</span>
-      </div>
-      <div class="text-lg/5">
-        Hemos identificado que cuentas con convenios activos con las siguientes compañías aliadas. Para actualizar tu documentación, solo haz clic en el logo de la empresa correspondiente.
-      </div>
-      <div class="flex rounded-xl gap-2 py-2.5 px-4 bg-blue2h-50">
-        <div class="py-2">
-          <svg width="20" height="20" class="text-gray-950">
-            <use xlink:href="/assets/icons/layout.svg#lock" />
-          </svg>
+<div class="flex justify-center mx-4">
+  <div class="max-w-screen-xl w-full pt-10 pb-20 md:pt-6 flex flex-col gap-9">
+    <div class="rounded-xl bg-blue2h-100">
+      <div class="w-full max-w-[821px] mx-auto flex">
+        <div class="hidden md:block px-4 pt-4 flex-shrink-0">
+          <img
+            src="assets/img/home/welcome.webp"
+            alt="Imagen decorativa"
+            width="183" height="220"
+          />
         </div>
-        <div class="flex flex-wrap gap-1.5 py-2 text-base/5">
-          <span class="font-extrabold">Tu información está segura:</span>
-          Hone Solutions opera a nivel nacional, garantizando la protección de tus datos conforme a la normativa vigente.
+
+        <div class="flex flex-col justify-center gap-4 p-4 md:ps-0">
+          <div class="flex flex-col gap-2 text-xl">
+            <span class="font-semibold leading-[22px]">
+              Estimado Prestador {{ user.name }}
+            </span>
+            <span class="font-black leading-[22px]">
+              ¡Bienvenido(a) a tu Portal Transaccional de Gestión de Información y Documentos!
+            </span>
+          </div>
+          <div class="flex rounded-lg gap-2 py-2.5 px-4 bg-blue2h-50 text-blue2h-950">
+            <div class="py-2">
+              <svg width="20" height="20">
+                <use xlink:href="/assets/icons/outline/general.svg#lock" />
+              </svg>
+            </div>
+            <div class="text-base font-normal leading-[18px] py-2">
+              Garantizamos la protección de tus datos.
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="flex flex-col gap-4">
-    <div class="flex justify-between gap-5">
-
-      <div class="flex items-center gap-2 pt-3 pb-2.5 px-3 w-[364px] bg-gray-0 border border-gray-300 focus-within:border-blue-500 rounded-lg">
-        <div class="text-gray-500">
-          <svg width="18" height="18">
-            <use xlink:href="/assets/icons/layout.svg#search" width="18" height="18" />
-          </svg>
-        </div>
-        <input
-          type="text"
+    <div class="flex flex-col gap-4">
+      <div class="flex justify-between gap-2">
+        <app-text-input
+          [id]="'clientSearcher'"
           [(ngModel)]="searchQuery"
-          (input)="applyFilter()"
-          class="bg-transparent outline-none w-full text-sm leading-4 font-semibold text-gray-500"
-          placeholder="Buscar"
-        />
-        <button *ngIf="searchQuery" (click)="clearSearch()" class="text-gray-500 hover:text-gray-700">
-          <svg width="18" height="18">
-            <use xlink:href="/assets/icons/alert.svg#close" width="18" height="18" />
-          </svg>
-        </button>
+          label="Buscar"
+          [searcher]="true"
+          [clearable]="true"
+          (onInput)="applyFilter()"
+          class="w-full max-w-[364px]"
+        >
+        </app-text-input>
+
+        <div class="flex gap-2 items-center md:items-start">
+          <app-button
+            variant="primary"
+            size="xs"
+            [styleType]="viewMode === 'grid' ? 'solid' : 'ghost'"
+            customClass="!p-1"
+            (click)="setView('grid')">
+            <svg width="24" height="24">
+              <use xlink:href="/assets/icons/outline/general.svg#grid" />
+            </svg>
+          </app-button>
+          <app-button
+            variant="primary"
+            size="xs"
+            [styleType]="viewMode === 'list' ? 'solid' : 'ghost'"
+            customClass="!p-1"
+            (click)="setView('list')">
+            <svg width="24" height="24">
+              <use xlink:href="/assets/icons/outline/text.svg#list" />
+            </svg>
+          </app-button>
+        </div>
       </div>
 
+      <p class="text-base font-normal text-main-blue1h leading-[18px]">
+        Tienes convenios activos con las siguientes compañías. Haz clic en
+        alguna para cargar o actualizar tu información.
+      </p>
 
-      <div class="flex gap-2">
-        <button type="button" (click)="setView('grid')"
-          class="p-2.5 rounded-full transition duration-200"
+      <ng-template #clientCardTemplate let-item>
+        <div
+          (click)="changeOptionClient(item, clientTutorialVisible)"
+          class="flex p-4 rounded-lg cursor-pointer bg-gray-100 text-main-blue1h hover:bg-gray-100 hover:ring-[1px] hover:ring-inset hover:ring-blue1h-600 hover:shadow-[0px_16px_44px_0px_#0D0F1C1A] transition-shadow"
           [ngClass]="{
-            'bg-blue1h-700 text-gray-0': viewMode === 'grid',
-            'text-gray-700 hover:bg-gray-100': viewMode !== 'grid'
+            'flex-col gap-3': viewMode === 'grid',
+            'h-[98.95px] items-center gap-4': viewMode === 'list',
           }">
-          <svg width="20" height="20">
-            <use xlink:href="/assets/icons/layout.svg#grid" />
+          <div
+            class="overflow-hidden bg-gray-0 rounded-lg"
+            [ngClass]="{
+              'p-3.5 h-[300px] xs:h-[149.13px] sm:h-[167.03px]': viewMode === 'grid',
+              'p-2 w-[67.3px] h-[67.3px] flex justify-center items-center': viewMode === 'list',
+            }">
+            <img
+              [src]="item.url ? item.url : defaultImageUrl"
+              alt="Logo cliente"
+              [ngClass]="{
+                'w-full h-full object-contain': viewMode === 'grid',
+                'w-full object-cover': viewMode === 'list',
+              }" />
+          </div>
+          <div class="text-base leading-[18px] font-semibold"
+            [ngClass]="{
+              'text-center': viewMode === 'grid'
+            }">
+            {{ item.clientHoneSolutions }}
+          </div>
+        </div>
+      </ng-template>
+
+      @if (loadingData) {
+        <div class="flex items-center gap-3 text-main-blue1h text-base">
+          <svg class="w-5 h-5 text-current animate-spin fill-gray-200">
+            <use xlink:href="/assets/icons/extras/animations.svg#spin" />
           </svg>
-        </button>
-        <button type="button" (click)="setView('list')"
-          class="p-2.5 rounded-full transition duration-200 "
-          [ngClass]="{
-            'bg-blue1h-700 text-gray-0': viewMode === 'list',
-            'text-gray-700 hover:bg-gray-100': viewMode !== 'list'
-          }">
-          <svg width="20" height="20">
-            <use xlink:href="/assets/icons/layout.svg#list" />
-          </svg>
-        </button>
-      </div>
+          Cargando datos...
+        </div>
+      } @else {
+        <div class="gap-4" [ngClass]="{
+          'grid  grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6': viewMode === 'grid',
+          'flex flex-col': viewMode === 'list',
+        }">
+          @for (item of filteredClients; track item.idClientHoneSolutions; let i = $index) {
+            @if (i === 0) {
+              <app-popover
+                [title]="'Aseguradoras asociadas'"
+                [text]="'Cada una solicita información y documentos específicos.'"
+                [placement]="'right'"
+                [triggerType]="'manual'"
+                [highlighted]="true"
+                [(visible)]="clientTutorialVisible"
+                [contentTemplate]="popoverContent"
+                customTriggerClass="w-full"
+                extraPopoverClass="max-w-[330px] md:max-w-[487px]"
+                [autoScrollOnOpen]="true"
+                (onClose)="nextTutorialStep()"
+              >
+                <ng-template #triggerTemplate>
+                  <ng-container *ngTemplateOutlet="clientCardTemplate; context: { $implicit: item }"></ng-container>
+                </ng-template>
+              </app-popover>
+            } @else {
+              <ng-container *ngTemplateOutlet="clientCardTemplate; context: { $implicit: item }"></ng-container>
+            }
+          }
+        </div>
+      }
     </div>
-
-    @if (loadingData) {
-      <div class="centerContent">
-        <nz-spin nzSimple [nzSize]="'large'" nzTip="Cargando datos..."></nz-spin>
-      </div>
-    } @else if (viewMode === 'grid') {
-      <div class="grid gap-4 grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-        @for (item of filteredClients; track item.idClientHoneSolutions; let i = $index) {
-          <div [ngClass]="{ 'tutorial-option-container': i === 0, 'active-tutorial': i === 0 && clientTutorialVisible }">
-            <div (click)="changeOptionClient(item, i === 0 ? clientTutorialVisible : false)" class="h-[410px] xs:h-[218.3px] flex flex-col gap-3 p-4 rounded-lg cursor-pointer bg-gray-50 text-black border-2 border-transparent hover:bg-gray-100 hover:border-gray-0 hover:shadow-[0px_16px_44px_0px_#0D0F1C1A] transition-shadow"
-              [ngClass]="{ 'tutorial-option': i === 0 }"
-              nz-popover
-              [nzPopoverContent]="i === 0 ? popoverContent : undefined"
-              [nzPopoverVisible]="i === 0 ? clientTutorialVisible : false"
-              [nzPopoverTrigger]="null"
-
-              [nzPopoverPlacement]="['bottomLeft', 'topLeft']"
-              nzPopoverOverlayClassName="tutorial-popover tutorial-popover__home-client">
-              <div class="p-3.5 h-[346px] xs:h-[185.264px] overflow-hidden bg-gray-0">
-                <img class="w-full h-full object-contain" [src]="item.url ? item.url : defaultImageUrl" alt="">
-              </div>
-              <div class="text-base/5 font-semibold text-center">
-                {{ item.clientHoneSolutions }}
-              </div>
-            </div>
-          </div>
-        }
-      </div>
-    } @else if (viewMode === 'list') {
-      <div class="flex flex-col gap-4">
-        @for (item of filteredClients; track item.idClientHoneSolutions; let i = $index) {
-          <div class="tutorial-option-container" [ngClass]="{ 'active-tutorial': i === 0 && clientTutorialVisible }">
-            <div (click)="changeOptionClient(item, i === 0 ? clientTutorialVisible : false)" class="h-[98.95px] flex items-center gap-4 p-4 rounded-lg cursor-pointer bg-gray-50 text-black border-2 border-transparent hover:bg-gray-100 hover:border-gray-0 hover:shadow-[0px_16px_44px_0px_#0D0F1C1A] transition-shadow"
-              [ngClass]="{ 'tutorial-option': i === 0 }"
-              nz-popover
-              [nzPopoverContent]="i === 0 ? popoverContent : undefined"
-              [nzPopoverVisible]="i === 0 ? clientTutorialVisible : false"
-              [nzPopoverTrigger]="null"
-              nzPopoverPlacement="bottomLeft"
-              [nzPopoverPlacement]="['bottomLeft', 'topLeft']"
-              nzPopoverOverlayClassName="tutorial-popover tutorial-popover__home-client">
-              <div class="p-2 w-[67.3px] overflow-hidden bg-gray-0">
-                <img class="w-full h-full object-cover" [src]="item.url ? item.url : defaultImageUrl" alt="">
-              </div>
-              <div class="text-base/5 font-semibold">
-                {{ item.clientHoneSolutions }}
-              </div>
-            </div>
-          </div>
-        }
-      </div>
-    }
   </div>
-
 </div>
 
 
-<button class="animation-testing fixed bottom-4 right-4 md:bottom-10 md:right-10 bg-gray-0 hover:bg-gray-100 py-3 px-4 rounded-full md:rounded-[2.5rem] flex gap-2 shadow-lg
-transition-all animated-border" (click)="resetTutorial()">
-  <span class="hidden md:block text-base/4 font-bold text-gray-900">Ver visita guiada</span>
-  <div class="text-gray-700  animate-bounce">
-    <svg width="18" height="18">
-      <use xlink:href="/assets/icons/layout.svg#question-circle" width="18" height="18" />
-    </svg>
-  </div>
-</button>
-
-
 <!-- Tutorial video modal -->
-<ng-template #videoModalTemplate let-modal>
-  <div class="video-load">
-    <div class="video-container">
-        <iframe src="https://www.youtube.com/embed/HNnISS31dPs" frameborder="0"
-            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen></iframe>
-    </div>
+<ng-template #videoModal>
+  <div class="max-h-[391.47px] bg-gray-50">
+    <video
+      #tutorialVideo
+      class="h-full w-full"
+      controls
+      preload="metadata"
+      playsinline
+      disablePictureInPicture
+    >
+      <source [src]="videoUrl" type="video/mp4" />
+      Tu navegador no soporta reproducción de video.
+    </video>
   </div>
+  <app-button (onClick)="closeVideoModal()" variant="primary" size="xl" styleType="solid" customClass="w-full flex justify-center">
+    Iniciar recorrido
+    <svg width="24" height="24">
+      <use xlink:href="/assets/icons/outline/arrows.svg#arrow-right" />
+    </svg>
+  </app-button>
 </ng-template>
 
 
 <!-- Tutorial popover content -->
 <ng-template #popoverContent>
-  <div class="tutorial-popover__content flex flex-col gap-6">
-    <div class="flex flex-col gap-2.5 text-base/5 text-black">
-      <div class="flex justify-between items-center">
-        <h5 class="font-bold">Completa la documentación</h5>
-
-        <button type="button" class="p-2 rounded-[2.5rem] bg-gray-0 hover:bg-gray-100" (click)="nextTutorialStep()">
-          <svg width="16" height="16">
-            <use xlink:href="/assets/icons/alert.svg#close" width="16" height="16" />
-          </svg>
-        </button>
-      </div>
-      <div class="font-regular">Cada aseguradora exige la documentación actualizada para completar el proceso, para ello se debe hacer clic en el logo.</div>
+  <img src="assets/img/home/guide2.webp"
+    alt="Imagen previsualización"
+    class="hidden md:block rounded-md"
+  />
+  <div class="flex justify-between items-center">
+    <span class="text-base leading-5 md:leading-[18px] font-normal text-main-blue1h">2 de 2</span>
+    <div class="flex gap-2 md:hidden">
+      <app-button
+        (click)="backTutorialStep()"
+        variant="primary"
+        styleType="ghost"
+        size="sm"
+        customClass="leading-4">
+        Atrás
+      </app-button>
+      <app-button
+        (click)="nextTutorialStep()"
+        variant="primary"
+        styleType="solid"
+        size="sm"
+        customClass="leading-4">
+        Entendido
+      </app-button>
     </div>
-    <div class="flex justify-between items-center">
-      <span class="text-base/5 font-regular text-black">2 de 2</span>
-      <button type="button" class="py-2.5 px-5 rounded-[2.5rem] bg-main-blue1h hover:bg-blue1h-800 text-gray-0 text-base/5 font-bold" (click)="nextTutorialStep()">Entendido</button>
+    <div class="hidden md:flex gap-2">
+      <app-button
+        (click)="backTutorialStep()"
+        variant="primary"
+        styleType="ghost"
+        size="md"
+        customClass="leading-4">
+        Atrás
+      </app-button>
+      <app-button
+        (click)="nextTutorialStep()"
+        variant="primary"
+        styleType="solid"
+        size="md"
+        customClass="leading-4">
+        Entendido
+      </app-button>
     </div>
   </div>
 </ng-template>
 
-<!-- Popover overlay -->
-@if (clientTutorialVisible && filteredClients.length) {
-  <div class="tutorial-popover-overlay" (click)="nextTutorialStep()"></div>
-}
+
+<app-modal #reminderModal
+  [customSize]="'max-w-[454px]'"
+  [position]="'bottom-right'"
+  [isBackdropVisible]="false"
+  [closingDuration]="300"
+  (onClose)="onCloseDataReminder()"
+  [customModalClass]="[
+    'md:me-12 md:mb-12 ring-[1px] ring-inset ring-gray-200 md:pt-3 md:pb-[18px]',
+    !reminderModal.closing ? 'animate-toast-in' : 'animate-toast-out',
+  ]">
+
+  <div class="flex flex-col gap-1">
+    <div class="flex items-center justify-between">
+      <h3 class="text-base font-semibold leading-[18px] text-main-blue1h dark:text-white">
+        Mantén tus datos al día
+      </h3>
+      <app-button (click)="reminderModal.close()" variant="primary" size="sm" styleType="ghost" class="md:hidden">
+        <svg width="16" height="16">
+          <use xlink:href="/assets/icons/outline/general.svg#close" />
+        </svg>
+      </app-button>
+    </div>
+
+    <p class="text-main-blue1h text-base font-normal leading-[18px]">
+      Así aseguras tu visibilidad en los directorios médicos.
+    </p>
+  </div>
+
+  <img src="assets/img/home/reminder.webp"
+    alt="Imagen decorativa"
+    class="rounded-lg"
+  />
+  <div class="md:hidden flex justify-end gap-2">
+    <app-button (onClick)="reminderModal.close()" variant="gray" size="sm" styleType="soft" customClass="leading-4">
+      Cerrar
+    </app-button>
+    <app-button [routerLink]="'/update-data'" variant="primary" size="sm" styleType="solid" customClass="leading-4">
+      Actualizar
+    </app-button>
+  </div>
+
+  <app-button (onClick)="reminderModal.close()" variant="primary" size="md" styleType="solid" customClass="leading-4 ms-auto" class="hidden md:block">
+    Entendido
+  </app-button>
+</app-modal>

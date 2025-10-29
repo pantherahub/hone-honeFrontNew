@@ -11,21 +11,14 @@ export interface ClientInterface {
    email?: string;
 }
 
-export interface PercentInterface {
-   uploaded?: number;
-   expired?: number;
-   remaining?: number;
-   total?: number;
-}
-
 export interface DocumentInterface {
    idProvider?: string;
-   NameDocument?: string;
+   typeDocument?: string;
    UrlDocument?: string;
    nameDocument?: string;
    idTypeProvider?: number;
    // idDocument?: number;
-   idTypeDocuments?: number;
+   idDocumentType?: number;
    idClientHoneSolutions?: number;
    dateAdd?: string;
    expirationDate?: string;

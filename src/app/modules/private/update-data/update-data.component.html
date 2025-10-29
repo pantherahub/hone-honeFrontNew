@@ -4,13 +4,13 @@
   </div>
 }
 
-<nz-row nzJustify="center">
+<nz-row nzJustify="center" class="pb-20">
   <nz-col [nzSpan]="24" [nzMd]="20" [nzLg]="16" [nzXXl]="12">
     <div class="update-data">
       <div class="update-data__header flex flex-col gap-2">
         <button class="flex gap-1 items-center w-fit" nz-button nzType="primary" type="button" (click)="goBack()">
           <svg width="20" height="20">
-            <use xlink:href="/assets/icons/layout.svg#arrow-left" />
+            <use xlink:href="/assets/icons/outline/arrows.svg#arrow-left" />
           </svg>
           <span>Volver</span>
         </button>
@@ -253,10 +253,10 @@
     'opacity-100 pointer-events-auto': showFloatingButton,
     'opacity-0 pointer-events-none': !showFloatingButton
   }"
-  class="fixed bottom-6 right-6 lg:bottom-10 lg:right-10 z-50 bg-blue-600 text-white rounded-full p-3 shadow-lg hover:bg-blue-700 transition-opacity duration-500 ease-in-out"
+  class="fixed bottom-[6rem] right-6 lg:right-10 z-50 bg-blue-600 text-white rounded-full p-3 shadow-lg hover:bg-blue-700 transition-opacity duration-500 ease-in-out"
   (click)="scrollToFooter()"
 >
   <svg width="20" height="20">
-    <use xlink:href="/assets/icons/layout.svg#angle-down" />
+    <use xlink:href="/assets/icons/outline/arrows.svg#angle-down" />
   </svg>
 </button>

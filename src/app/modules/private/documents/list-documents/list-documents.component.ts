@@ -1,26 +1,29 @@
-import { Component, OnInit, effect } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { NgZorroModule } from '../../../../ng-zorro.module';
 import { EventManagerService } from '../../../../services/events-manager/event-manager.service';
 import { DocumentsCrudService } from '../../../../services/documents/documents-crud.service';
-import { PercentInterface } from '../../../../models/client.interface';
-import { RemainingDocumentsComponent } from '../remaining-documents/remaining-documents.component';
-import { ExpiredDocumentsComponent } from '../expired-documents/expired-documents.component';
-import { UploadedDocumentsComponent } from '../uploaded-documents/uploaded-documents.component';
+import { DocumentInterface } from '../../../../models/client.interface';
 import { Router } from '@angular/router';
-import { ContactTicketComponent } from '../../../../shared/modals/contact-ticket/contact-ticket.component';
-import { NzModalService } from 'ng-zorro-antd/modal';
-import { ContactsProviderComponent } from '../../../../shared/modals/contacts-provider/contacts-provider.component';
-import { ContactsProviderServicesService } from '../../../../services/contacts-provider/contacts-provider.services.service';
-import { AssistanceProvidersComponent } from '../../../../shared/forms/assistance-forms/assistance-providers/assistance-providers.component';
-import { ProviderAssistanceComponent } from '../../../../shared/modals/provider-assistance/provider-assistance.component';
 import { FeedbackFivestarsComponent } from 'src/app/shared/modals/feedback-fivestars/feedback-fivestars.component';
-import { AlertService } from 'src/app/services/alerts/alert.service';
+import { AlertService } from 'src/app/services/alert/alert.service';
+import { ModalService } from 'src/app/services/modal/modal.service';
+import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import ApexCharts, { ApexOptions } from 'apexcharts';
+import { PipesModule } from 'src/app/pipes/pipes.module';
+import { FileViewerComponent } from 'src/app/shared/modals/file-viewer/file-viewer.component';
+import { CommonModule } from '@angular/common';
+import { TooltipComponent } from 'src/app/shared/components/tooltip/tooltip.component';
+import { ModalEditDocumentComponent } from '../modal-edit-document/modal-edit-document.component';
+import { DocumentConfig, DownloadService } from 'src/app/services/download/download.service';
+import { ToastService } from 'src/app/services/toast/toast.service';
 import { CitiesService } from 'src/app/services/cities/cities.service';
+import { CompliancePercentInterface, PercentInterface } from 'src/app/models/doc-percent.interface';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-list-documents',
   standalone: true,
-  imports: [NgZorroModule, RemainingDocumentsComponent, ExpiredDocumentsComponent, UploadedDocumentsComponent, AssistanceProvidersComponent],
+  imports: [NgZorroModule, CommonModule, PipesModule, ButtonComponent, TooltipComponent],
   templateUrl: './list-documents.component.html',
   styleUrl: './list-documents.component.scss'
 })
@@ -28,55 +31,160 @@ export class ListDocumentsComponent implements OnInit {
 
   user = this.eventManager.userLogged();
   clientSelected: any = this.eventManager.clientSelected();
-  loadingData: boolean = false;
+  loadingPercent: boolean = false;
+  loadingDocs: boolean = false;
   loadManualDownload: boolean = false;
-  hiddenCard: boolean = false;
-  contactsOfProviders: any = [];
-  citiesList: any[] = [];
 
-  percentData: PercentInterface = {};
+  percentData: CompliancePercentInterface | undefined;
+  docList: any[] = [];
+  citiesList: any[] = [];
   feedbackModalShown = false;
   dataformAlertShown = false;
+
+  chart!: ApexCharts;
+  @ViewChild('donutChart', { static: false }) chartElement!: ElementRef;
+
+  statusConfig: Record<string, { bg: string; text: string; icon: string; label: string }> = {
+    'PENDIENTE': { bg: 'bg-yellow-100', text: 'text-yellow-800', icon: 'clock', label: 'Pendiente' },
+    'AL DIA': { bg: 'bg-green-100', text: 'text-green-800', icon: 'check', label: 'Cargado' },
+    'VENCIDO': { bg: 'bg-red-100', text: 'text-red-800', icon: 'close', label: 'Vencido' }
+  };
+
+  private downloadConfigs: Record<string, DocumentConfig> = {
+    '8-9': {
+      files: [
+        { url: `${environment.s3AssetsHost}docs-prestadores-axa-gestion-preventiva.zip`, name: 'Documentos para diligenciar axa gestión preventiva.zip' }
+      ],
+      displayName: 'Documentos obligatorios a diligenciar',
+    },
+    '8-*': {
+      files: [
+        { url: `${environment.s3AssetsHost}docs-prestadores-axa.zip`, name: 'Documentos para diligenciar axa.zip' },
+      ],
+      displayName: 'Documentos obligatorios a diligenciar',
+    },
+    '13-7': {
+      files: [
+        { url: `${environment.s3AssetsHost}carta_mipres.pdf`, name: 'Carta_Mipres.pdf' }
+      ],
+      displayName: 'Carta Mipres a diligenciar',
+    }
+  };
 
   constructor(
     private eventManager: EventManagerService,
     private documentService: DocumentsCrudService,
     private router: Router,
-    private modalService: NzModalService,
-    private contactProvider: ContactsProviderServicesService,
+    private modalService: ModalService,
     private alertService: AlertService,
+    private downloadService: DownloadService,
+    private toastService: ToastService,
     private citiesService: CitiesService,
-  ) {
-    effect(
-      () => {
-        const shouldCallApi = this.eventManager.getPercentApi();
-        if (shouldCallApi) {
-          this.getDocumentPercent();
-          // Reset to avoid double querying with ngOnInit when re-rendering the component
-          this.eventManager.getPercentApi.set(0);
-        }
-      }, { allowSignalWrites: true }
-    );
-
-    if (this.clientSelected.idTypeProvider == 7) {
-        this.hiddenCard = true;
-    }
-  }
+  ) { }
 
   ngOnInit(): void {
     this.getCities();
     this.getDocumentPercent();
-    this.getContactsByIDProvider(this.clientSelected.idProvider);
+    this.getDocuments();
   }
 
+  setupChart(): void {
+    const chartOptions = this.getChartOptions();
+    this.chart = new ApexCharts(
+      this.chartElement.nativeElement,
+      chartOptions
+    );
+    this.chart.render();
+  }
 
-  /**
-  * Cambia el titulo de la pagina de autogestion por el nombre que obtenga del tab seleccionado
-  * inicialmente el titulo es MI PERFIL
-  * recibe un arreglo de eventos, en el cual esta el index y la informacion del tab
-  * @params event: any
-  */
-  tabChange(event: any) { }
+  getColor(variable: string): string {
+    return getComputedStyle(document.documentElement).getPropertyValue(variable).trim();
+  }
+
+  getChartOptions(): ApexOptions {
+    const {
+      remaining = 100,
+      uploaded = 0,
+      expired = 0,
+    } = this.percentData ?? {};
+
+    return {
+      series: [uploaded, remaining, expired],
+      colors: [
+        this.getColor('--color-green-500'),
+        this.getColor('--color-yellow-400'),
+        this.getColor('--color-red-500')
+      ],
+      chart: {
+        height: 162,
+        width: 162,
+        type: 'donut'
+      },
+      stroke: {
+        colors: ['transparent'],
+      },
+      plotOptions: {
+        pie: {
+          expandOnClick: false,
+          donut: {
+            size: '75%',
+            labels: {
+              show: true,
+              name: {
+                show: true,
+                offsetY: 20,
+                fontFamily: 'Montserrat, sans-serif',
+                fontSize: '14px'
+              },
+              value: {
+                show: true,
+                offsetY: -20,
+                fontFamily: 'Montserrat, sans-serif',
+                fontWeight: 600,
+                fontSize: '16px',
+                color: '#1e293b',
+                formatter: function (value: string): string {
+                  return value + '%';
+                }
+              },
+            }
+          }
+        }
+      },
+      labels: ['Cargados', 'Pendientes', 'Vencidos'],
+      dataLabels: {
+        enabled: false
+      },
+      states: {
+        hover: {
+          filter: {
+            type: 'lighten',
+          }
+        },
+        active: {
+          filter: {
+            type: 'none',
+          }
+        }
+      },
+      legend: {
+        show: false,
+      },
+      tooltip: {
+        enabled: false,
+      },
+    };
+  }
+
+  highlightSeries(label: string): void {
+    if (!this.chart) return;
+    this.chart.toggleSeries(label);
+    this.chart.highlightSeries(label);
+  }
+  clearHighlight(): void {
+    if (!this.chart) return;
+    this.chart.resetSeries();
+  }
 
   getCities() {
     this.citiesService.getCities().subscribe({
@@ -93,70 +201,62 @@ export class ListDocumentsComponent implements OnInit {
    * Obtiene desde un api el porcentaje de documentos cargado, sin cargas y vencidos
    */
   getDocumentPercent() {
-    this.loadingData = true;
-    const { idProvider, idTypeProvider, idClientHoneSolutions } = this.clientSelected;
-    this.documentService.getPercentDocuments(idProvider, idTypeProvider, idClientHoneSolutions).subscribe({
+    this.loadingPercent = true;
+    const { idProvider, idClientHoneSolutions } = this.clientSelected;
+    this.documentService.getPercentDocuments(idProvider, idClientHoneSolutions).subscribe({
       next: (res: any) => {
-        this.percentData = res;
-        this.loadingData = false;
+        const percentDataTypes = res.data as PercentInterface;
+        this.percentData = percentDataTypes?.compliance;
+        this.loadingPercent = false;
+        if (this.chart) {
+          this.chart.updateSeries([
+            this.percentData?.uploaded ?? 0,
+            this.percentData?.remaining ?? 0,
+            this.percentData?.expired ?? 0
+          ]);
+        } else {
+          this.setupChart();
+        }
 
-        if (this.percentData.uploaded && this.user.doesNeedSurvey && !this.feedbackModalShown) {
+        if (this.percentData?.uploaded && this.user.doesNeedSurvey && !this.feedbackModalShown) {
           this.open5starsFeedback();
         } else {
           this.showDataformAlert();
         }
       },
       error: (error: any) => {
-        this.loadingData = false;
+        this.loadingPercent = false;
       },
-      complete: () => { }
     });
   }
 
-  /**
-   * Retorna los contactos por prestador y abre el modal para actualizar y cerrar,
-   * y se hace el llamando de this.getContactsByIDProvider(this.clientSelected.idProvider); en el  ngOnInit() para que funcione
-   */
-  getContactsByIDProvider(idProvider: any) {
-    const client = this.clientSelected.idClientHoneSolutions === 4;
-    this.contactProvider.getContactById(idProvider).subscribe((data: any) => {
-      this.contactsOfProviders = data.contacts;
-      const contactWithOccupation15 = this.contactsOfProviders.find((contact: any) => contact.idOccupation === 15);
-      if (contactWithOccupation15) {
-        if (client) {
-          this.openContactsProvider();
-        }
-      } else {
-        if (client) {
-          this.openContactsProvider();
-        }
-      }
+  getDocuments() {
+    this.loadingDocs = true;
+    const { idProvider, idClientHoneSolutions } = this.clientSelected;
+    this.documentService.getDocuments(idProvider, idClientHoneSolutions).subscribe({
+      next: (res: any) => {
+        this.docList = res.data;
+        this.loadingDocs = false;
+      },
+      error: (error: any) => {
+        this.loadingDocs = false;
+      },
     });
   }
 
   open5starsFeedback(): void {
     this.feedbackModalShown = true;
-    const feedbackModalRef = this.modalService.create<FeedbackFivestarsComponent, any>({
-      nzContent: FeedbackFivestarsComponent,
-      nzTitle: 'Nos gustaría conocer tu opinión',
-      nzCentered: true,
-      nzFooter: null,
-      nzClosable: false,
-      nzMaskClosable: false, // Overlay
-      nzKeyboard: false, // Esc
-      nzWidth: '600px',
-      nzStyle: { 'max-width': '90%' },
-      nzClassName: 'video-modal',
+    const modal = this.modalService.open(FeedbackFivestarsComponent, {
+      title: 'Nos gustaría conocer tu opinión',
+      closable: false,
+      customSize: 'max-w-[600px] !gap-2',
     });
-
-    feedbackModalRef.afterClose.subscribe((result) => {
+    modal.onClose.subscribe((result) => {
       if (result?.submitted) {
-        const alertRef = this.alertService.success(
+        this.alertService.success(
           '¡Gracias por tu feedback!',
           'Tu opinión nos ayuda a mejorar.',
-          { nzMaskClosable: true }
-        );
-        alertRef.afterClose.subscribe(() => {
+        ).subscribe(() => {
           this.showDataformAlert();
         });
       } else {
@@ -170,21 +270,16 @@ export class ListDocumentsComponent implements OnInit {
       return;
     }
     this.dataformAlertShown = true;
-    const modalRef = this.modalService.warning({
-      nzTitle: 'Atención',
-      nzContent: this.user.withData
+    this.alertService.showAlert({
+      title: '¡Atención!',
+      message: this.user.withData
         ? 'Tu información no concuerda con lo guardado en base de datos, por favor revisa nuevamente el formulario.'
         : 'Recuerda actualizar tus datos garantizando así el cumplimiento total de tu gestión contractual.',
-      nzClosable: false,
-      nzKeyboard: false,
-      nzMaskClosable: true,
-      nzOnOk: () => {
-        modalRef.close();
-        this.navigateTo('/update-data');
-      },
-      nzOnCancel: () => {
-        this.navigateTo('/update-data');
-      }
+      closable: false,
+      showConfirmBtn: true,
+      confirmBtnText: 'Entendido',
+    }).subscribe(() => {
+      this.navigateTo('/update-data');
     });
   }
 
@@ -192,72 +287,91 @@ export class ListDocumentsComponent implements OnInit {
     this.router.navigate([url]);
   }
 
-  /**
-   * Valida el tipo de prestador y descarga un paquete de documentos
-   */
-  downloadDocuments() {
-    if (this.clientSelected.idTypeProvider == 3 || this.clientSelected.idTypeProvider == 6) {
-      this.saveAs(
-        `assets/documents-provider/A.Persona-Juridica.zip`,
-        `A. Documentos para diligenciar Persona Juridica.zip`
-      );
-      this.saveAs(
-        `assets/documents-provider/B.Persona-Juridica.zip`,
-        `B. Documentos solo lectura Persona Juridica.zip`
-      );
-    } else {
-      this.saveAs(
-        `assets/documents-provider/A.Persona-Natural.zip`,
-        `A. Documentos para diligenciar  Persona Natural.zip`
-      );
-      this.saveAs(
-        `assets/documents-provider/B.Persona-Natural.zip`,
-        `B. Documentos solo lectura Persona  Natural.zip`
-      );
+  viewFile(doc: DocumentInterface) {
+    if (doc.UrlDocument) {
+      this.modalService.open(FileViewerComponent, {
+        closable: true,
+        customSize: 'max-w-[800px] !gap-2',
+      }, {
+        currentItem: doc,
+      });
     }
   }
 
-  /**
-   * Valida el tipo de prestador y descarga un paquete de documentos
-   */
-  downloadDocumentsAxa() {
-    if (this.clientSelected.idTypeProvider == 9) {
-      this.saveAs(
-        `assets/documents-provider/documentos-axa-gestion-preventiva.zip`,
-        `Documentos para diligenciar axa gestión preventiva.zip`
-      );
+  deleteDocument(doc: any) {
+    const { idDocumentsProvider } = doc;
+    if (!this.clientSelected?.idProvider || !idDocumentsProvider) {
+      this.toastService.error('Algo salió mal.');
       return;
     }
-    this.saveAs(
-      `assets/documents-provider/documentos-axa.zip`,
-      `Documentos para diligenciar axa.zip`
-    );
+
+    this.alertService.confirmDelete(
+      '¿Estas seguro de eliminar el documento?',
+      'En caso de eliminar el documento se perderá y no podrá recuperarse'
+    ).subscribe((confirmed: boolean) => {
+      if (!confirmed) return;
+      this.loadingDocs = true;
+      this.documentService.deleteDocument(this.clientSelected.idProvider, idDocumentsProvider).subscribe({
+        next: (res: any) => {
+          this.loadingDocs = false;
+          this.getDocumentPercent();
+          this.getDocuments();
+          this.alertService.success(
+            '¡Documento eliminado!',
+            'El documento se eliminó correctamente.'
+          );
+        },
+        error: (error: any) => {
+          this.loadingDocs = false;
+          this.alertService.error(
+            'Error',
+            'Lo sentimos, no se pudo eliminar el documento.'
+          );
+        },
+      });
+    });
   }
 
-  /**
-   * Descargar para Axa manuales de prestadores de Servicios de Salud
-   */
-  downloadAxaProviderManual() {
-    if (this.loadManualDownload) return;
-    const documents = [
-      {
-        url: 'https://honesolutions.blob.core.windows.net/documents/PresentacionInduccionSostenibilidad2025.pdf',
-        name: 'Presentación inducción y sostenibilidad 2025.pdf'
-      },
-      {
-        url: 'https://honesolutions.blob.core.windows.net/documents/Manual_Portal_de_Prestadores_Salud_VF_2.pdf',
-        name: 'Manual Portal de Prestadores Salud VF 2.pdf'
-      },
-      {
-        url: 'https://honesolutions.blob.core.windows.net/documents/AXA_Manual_Radicacion_Digital_Salud_1.30.25_(2275+2284).pdf',
-        name: 'AXA Manual Radicacion Digital Salud 1.30.25 (2275+2284).pdf'
-      },
-    ];
+  editDocumentModal(item: any, isNew: boolean = true): void {
+    let docModalInputs: any = {
+      currentDoc: item,
+      citiesList: this.citiesList,
+    };
+    if (isNew) docModalInputs["isNew"] = true;
 
-    let downloadsInProgress = documents.length;
+    const modal = this.modalService.open(ModalEditDocumentComponent, {
+      title: isNew ? 'Agregar documento' : 'Actualizar información',
+      customSize: 'max-w-[600px]',
+    }, {
+      ...docModalInputs,
+    })
+    modal.onClose.subscribe((result) => {
+      if (result?.response) {
+        this.getDocumentPercent();
+        this.getDocuments();
+      }
+    });
+  }
+
+  getCurrentDownloadConfig(): DocumentConfig | null {
+    const clientId = this.clientSelected?.idClientHoneSolutions;
+    const providerType = this.clientSelected?.idTypeProvider;
+    if (!clientId || !providerType) return null;
+
+    const keyExact = `${clientId}-${providerType}`;
+    const keyWildcard = `${clientId}-*`;
+
+    return this.downloadConfigs[keyExact] || this.downloadConfigs[keyWildcard] || null;
+  }
+
+  downloadClientDocs() {
+    const config = this.getCurrentDownloadConfig();
+    if (!config) return;
+
+    let downloadsInProgress = config.files.length;
     this.loadManualDownload = true;
-    documents.forEach(doc => {
-      this.saveAs(doc.url, doc.name, () => {
+    config.files.forEach(doc => {
+      this.downloadService.saveFile(doc.url, doc.name, () => {
         downloadsInProgress--;
         if (downloadsInProgress === 0) {
           this.loadManualDownload = false;
@@ -266,160 +380,4 @@ export class ListDocumentsComponent implements OnInit {
     });
   }
 
-  /**
-   * Valida el tipo de prestador y descarga un paquete de documentos de mundial de seguros
-   */
-  downloadDocumentsMundialSeguros() {
-    this.saveAs(`assets/documents-provider/SARLAFT.zip`, `Documentos para diligenciar SARLAFT.zip`);
-  }
-
-  /**
-   * Valida el tipo de prestador y descarga un paquete de documentos de mundial de seguros
-   */
-  downloadDocumentsMundialSegurosInformative() {
-    this.saveAs(`assets/documents-provider/documentos-informativos-seguros-mundial.zip`, `Documentos informativos documentos-informativos-seguros-mundial.zip`);
-  }
-
-
-  /**
-   * Descarga Excel de BMI
-   */
-  downloadExcelFareBmi() {
-    if (this.clientSelected.idTypeProvider == 7) {
-      this.saveAs(`assets/documents-provider/excel-bmi/Anexo_Tarifas_2024.xlsx`, `Anexo_Tarifas_2024.xlsx`);
-    }
-  }
-  /**
-   * Descarga Excel de BMI
-   */
-  downloadDocumentsBmi() { }
-
-  /**
-   * Descarga Documentos de Sura
-   */
-  downloadDocumentsSura() {
-    // Natural person
-    if (this.clientSelected.idTypeProvider == 7) {
-      this.saveAs(`assets/documents-provider/CartaMipres.pdf`, `Carta_Mipres.pdf`);
-    }
-  }
-
-  /**
-   * Recibe la url de donde se toman los documentos locales y los descarga
-   * @param url - ruta de los assets/container a descargar
-   * @param name - nombre del archivo que se muestra en la descarga
-   * @param onComplete - callback opcional para cuando se complete la descarga
-   */
-  saveAs(url: any, name: any, onComplete?: () => void) {
-    if (url.startsWith('http')) {
-      fetch(url)
-        .then(response => {
-          if (!response.ok) throw new Error('Error al descargar el archivo');
-          return response.blob();
-        })
-        .then(blob => {
-          const blobUrl = window.URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = blobUrl;
-          link.download = name;
-          document.body.appendChild(link);
-          link.click();
-          link.remove();
-          window.URL.revokeObjectURL(blobUrl);
-        })
-        .catch(error => console.error('Error descargando el archivo:', error))
-        .finally(() => {
-          if (onComplete) onComplete();
-        });
-      return;
-    }
-
-    const link = document.createElement('a');
-    link.setAttribute('type', 'hidden');
-    link.href = url;
-    link.download = name;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    if (onComplete) onComplete();
-  }
-
-  /**
-   * Abre una ventana modal para solicitar ticket
-   */
-  openTicketModal(): void {
-    const modal = this.modalService.create<ContactTicketComponent, any>({
-      nzContent: ContactTicketComponent,
-      nzCentered: true,
-      nzClosable: true,
-      // nzFooter: null
-      nzMaskClosable: false, // Para evitar que se cierre al hacer clic fuera del modal
-    });
-    const instance = modal.getContentComponent();
-
-    // instance.message = message;
-
-    // Return a result when opened
-    modal.afterOpen.subscribe(() => { });
-    // Return a result when closed
-    modal.afterClose.subscribe((result: any) => {
-      if (result) {
-      }
-    });
-  }
-
-  /**
-   * Abre una ventana modal para actualizar el nombre del representante legal,
-   * donde se puede abrir mediante funcion del mismo modal de contacts-provider
-   * y tambien se abre por defecto o automaticamente cuando elija allianz
-   */
-  openContactsProvider() {
-    const modal = this.modalService.create<ContactsProviderComponent, any>({
-      nzContent: ContactsProviderComponent,
-      nzCentered: true,
-      nzClosable: false, //en false para ocultar la X del modal y que no pueda cerrarlo
-      // nzFooter: null
-      nzMaskClosable: false, // Para evitar que se cierre al hacer clic fuera del modal
-      nzOnOk: () => console.log('OK'),
-      nzOnCancel: () => console.log('Cancelar') // Maneja el evento de cancelación
-    });
-    const instance = modal.getContentComponent();
-
-    // instance.message = message;
-
-    // Return a result when opened
-    modal.afterOpen.subscribe(() => { });
-    // Return a result when closed
-    modal.afterClose.subscribe((result: any) => {
-      if (result) {
-      }
-    });
-  }
-  /**
-   * Abre una ventana modal para actualizar el nombre del representante legal,
-   * donde se puede abrir mediante funcion del mismo modal de contacts-provider
-   * y tambien se abre por defecto o automaticamente cuando elija allianz
-   */
-  openModalProviderAssistance() {
-    const modal = this.modalService.create<ProviderAssistanceComponent, any>({
-      nzContent: ProviderAssistanceComponent,
-      nzCentered: true,
-      nzClosable: true, //en false para ocultar la X del modal y que no pueda cerrarlo
-      // nzFooter: null
-      nzMaskClosable: false, // Para evitar que se cierre al hacer clic fuera del modal
-      nzOnOk: () => console.log('OK'),
-      nzOnCancel: () => console.log('Cancelar') // Maneja el evento de cancelación
-    });
-    const instance = modal.getContentComponent();
-
-    // instance.message = message;
-
-    // Return a result when opened
-    modal.afterOpen.subscribe(() => { });
-    // Return a result when closed
-    modal.afterClose.subscribe((result: any) => {
-      if (result) {
-      }
-    });
-  }
 }

@@ -40,7 +40,10 @@
 							"src/theme.less",
 							"src/styles.scss"
 						],
-						"scripts": []
+						"scripts": [
+              "node_modules/flowbite/dist/flowbite.min.js",
+              "node_modules/flowbite-datepicker/dist/js/datepicker-full.min.js"
+            ]
 					},
 					"configurations": {
 						"production": {

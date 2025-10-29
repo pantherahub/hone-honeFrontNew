@@ -1,0 +1,64 @@
+<header class="h-[96px] md:h-[104px] bg-gray-50 flex justify-center border-b">
+  <div class="w-full flex items-center justify-between max-w-screen-2xl py-3 px-4 2xl:py-4 2xl:px-5">
+
+    <a routerLink="/login">
+      <img class="h-[72px] cursor-pointer" src="assets/img/logo-hone.png" alt="Logo">
+    </a>
+
+    <nav class="hidden md:block">
+      <ul class="flex gap-2 list-none">
+          <li>
+            <app-button variant="gray" styleType="ghost" size="sm" customClass="leading-4" [href]="'https://www.hone-solutions.com/nosotros'">
+              Nosotros
+            </app-button>
+          </li>
+          <li>
+            <app-button variant="gray" styleType="ghost" size="sm" customClass="leading-4" [href]="'https://www.hone-solutions.com/services'">
+              Nuestros servicios
+            </app-button>
+          </li>
+          <li>
+            <app-button variant="gray" styleType="ghost" size="sm" customClass="leading-4" [href]="'#'">
+              Lissom
+            </app-button>
+          </li>
+      </ul>
+    </nav>
+
+    <!-- Menu button on mobile -->
+    <app-button
+      variant="gray"
+      size="xs"
+      styleType="ghost"
+      class="md:hidden"
+      (onClick)="toggleMenu()">
+      <svg width="16" height="16">
+        <use xlink:href="/assets/icons/outline/general.svg#bars" />
+      </svg>
+    </app-button>
+
+  </div>
+</header>
+
+<!-- Side menu in mobile -->
+@if (menuOpen) {
+  <div class="overlay" (click)="toggleMenu()"></div>
+}
+<nav class="sidebar" [ngClass]="{'sidebar-open': menuOpen}" [attr.aria-hidden]="!menuOpen">
+  <div class="px-5 py-4">
+    <app-button
+      variant="gray"
+      size="xs"
+      styleType="ghost"
+      (onClick)="toggleMenu()">
+      <svg width="16" height="16">
+        <use xlink:href="/assets/icons/outline/general.svg#close" />
+      </svg>
+    </app-button>
+  </div>
+  <ul class="flex flex-col text-center p-5">
+      <li class="py-3 border-b"><a href="https://www.hone-solutions.com/nosotros">Nosotros</a></li>
+      <li class="py-3 border-b"><a href="https://www.hone-solutions.com/services">Nuestros servicios</a></li>
+      <li class="py-3"><a href="#">Lissom</a></li>
+  </ul>
+</nav>

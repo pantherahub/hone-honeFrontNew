@@ -1,20 +1,20 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { NgxDocViewerModule } from 'ngx-doc-viewer';
 import { CommonModule } from '@angular/common';
 import { NgZorroModule } from '../../../ng-zorro.module';
 import { PipesModule } from 'src/app/pipes/pipes.module';
+import { ModalComponent } from '../../components/modal/modal.component';
+import { ButtonComponent } from '../../components/button/button.component';
 
 @Component({
   selector: 'app-file-viewer',
   standalone: true,
-  imports: [CommonModule, NgZorroModule, NgxDocViewerModule, PipesModule],
+  imports: [CommonModule, NgZorroModule, NgxDocViewerModule, PipesModule, ButtonComponent],
   templateUrl: './file-viewer.component.html',
   styleUrl: './file-viewer.component.scss'
 })
-export class FileViewerComponent {
-  @Input() visible: boolean = false;
+export class FileViewerComponent implements OnInit {
   @Input() currentItem: any = null;
-  @Output() close = new EventEmitter<void>();
 
   isImage: boolean = false;
   previewFile: string = '';
@@ -24,8 +24,12 @@ export class FileViewerComponent {
   maxRetries: number = 3;
   typeImageExtension = ['jpg', 'jpeg', 'webp', 'gif', 'tiff', 'tif', 'bmp', 'raw', 'png', 'jfif'];
 
-  ngOnChanges() {
-    if (this.visible && this.currentItem) {
+  constructor(
+    private modalRef: ModalComponent,
+  ) { }
+
+  ngOnInit(): void {
+    if (this.currentItem) {
       this.retryAttempts = 0;
       this.previewFile = this.currentItem?.UrlDocument || '';
       const extension = this.getExtension(this.previewFile);
@@ -42,11 +46,10 @@ export class FileViewerComponent {
   }
 
   closeModal() {
-    this.visible = false;
     this.loadingPdf = false;
     this.stopDocTimer();
     this.retryAttempts = 0;
-    this.close.emit();
+    this.modalRef.close();
   }
 
   startRetryTimer() {

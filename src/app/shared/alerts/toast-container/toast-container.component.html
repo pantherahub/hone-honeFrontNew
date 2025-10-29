@@ -1,0 +1,8 @@
+<div class="fixed top-0 right-0 pt-24 pb-12 px-6 flex flex-col gap-[10px] z-[60] w-[326px] pointer-events-none">
+  @for (toast of toasts; track toast.id) {
+    <app-toast
+      [toast]="toast"
+      (dismiss)="remove(toast.id)"
+    ></app-toast>
+  }
+</div>
