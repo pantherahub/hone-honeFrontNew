@@ -8,7 +8,6 @@ import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service
 import { InputErrorComponent } from '../components/input-error/input-error.component';
 import { Router } from '@angular/router';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
-import { NzModalService } from 'ng-zorro-antd/modal';
 import { sanitizeString } from 'src/app/utils/string-utils';
 import { AuthService } from 'src/app/services/auth.service';
 import { REGEX_PATTERNS } from 'src/app/constants/regex-patterns';
@@ -37,7 +36,6 @@ export class SupportTicketComponent implements OnInit {
     private formUtils: FormUtilsService,
     private router: Router,
     private eventManager: EventManagerService,
-    private modalService: NzModalService,
     private authService: AuthService,
     private ticketService: TicketsService,
     private toastService: ToastService,
@@ -65,10 +63,7 @@ export class SupportTicketComponent implements OnInit {
         this.isLogged() ? this.user.identificacion || '' : '',
         [Validators.required, this.formUtils.numeric]
       ],
-      email: [
-        this.isLogged() ? this.user.email || '' : '',
-        [Validators.required]
-      ],
+      email: ['', [Validators.required]],
       phone: ['', [Validators.required, Validators.pattern(REGEX_PATTERNS.telNumberWithIndicative)]],
       address: ['', this.isLogged() ? [] : [Validators.required]],
       observation: ['', [Validators.required]]
@@ -183,6 +178,9 @@ export class SupportTicketComponent implements OnInit {
             title: '¡Solicitud recibida!',
             variant: 'success',
             message: 'Tu PQRS ha sido enviada exitosamente. Estaremos revisando tu caso pronto.',
+          });
+          this.ticketForm.reset({
+            identification: this.isLogged() ? this.user.identificacion || '' : '',
           });
         },
         error: (error: any) => {

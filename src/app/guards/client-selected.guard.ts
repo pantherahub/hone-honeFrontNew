@@ -1,7 +1,7 @@
 import { CanActivateFn, Router } from '@angular/router';
 import { EventManagerService } from '../services/events-manager/event-manager.service';
 import { inject } from '@angular/core';
-import { ClientProviderService } from '../services/clients/client-provider.service';
+import { ClientProviderService } from '../services/client-provider/client-provider.service';
 import { catchError, map, of } from 'rxjs';
 
 export const clientSelectedGuard: CanActivateFn = (route, state) => {

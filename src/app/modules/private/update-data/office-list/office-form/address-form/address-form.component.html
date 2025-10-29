@@ -1,0 +1,220 @@
+<form [formGroup]="addressForm" (ngSubmit)="onSubmit()">
+  <app-drawer
+    #addressDrawer
+    placement="right"
+    size="xl"
+    (onClose)="onDrawerClose($event)"
+    [hasFooter]="true">
+    <ng-container drawer-header>
+      <h2 class="text-lg font-black leading-5 text-main-blue1h">
+        Dirección de atención de usuarios
+      </h2>
+    </ng-container>
+
+    <div class="grid grid-cols-12 gap-2 p-4 bg-gray-50 rounded-xl ring-[1px] ring-inset ring-gray-200">
+      <div class="col-span-12 sm:col-span-6">
+        <app-select
+          [items]="viaOptions"
+          formControlName="typeOfRoad"
+          placeholder="* Tipo de vía"
+          [clearable]="true">
+        </app-select>
+        <app-input-error [control]="addressForm.get('typeOfRoad')" />
+      </div>
+      <div class="col-span-12 sm:col-span-6">
+        <app-text-input
+          [id]="'roadName'"
+          label="* Nombre/número de vía"
+          formControlName="roadName"
+        />
+        <app-input-error
+          [control]="addressForm.get('roadName')"
+          [customMessages]="customErrorMessagesMap['roadName']"
+        />
+      </div>
+      <div class="col-span-12 sm:col-span-6">
+        <app-select
+          [items]="lettersWithBis"
+          formControlName="roadMainComplement"
+          placeholder="Letra/Bis"
+          [clearable]="true">
+        </app-select>
+        <app-input-error [control]="addressForm.get('roadMainComplement')" />
+      </div>
+      <div class="col-span-12 sm:col-span-6">
+        <app-select
+          [items]="allNumberComplementOptions"
+          formControlName="roadSecondaryComplement"
+          placeholder="Complemento vía"
+          [clearable]="true">
+        </app-select>
+        <app-input-error [control]="addressForm.get('roadSecondaryComplement')" />
+      </div>
+
+      <div class="col-span-12 grid grid-cols-12 gap-2">
+        <div class="col-span-12"
+          [class]="addressForm.get('mainNumberComplement')?.value === otherOption ? 'sm:col-span-4' : 'sm:col-span-6'">
+          <app-text-input
+            [id]="'mainNumber'"
+            label="* # Número"
+            formControlName="mainNumber"
+          />
+          <app-input-error
+            [control]="addressForm.get('mainNumber')"
+            [customMessages]="customErrorMessagesMap['mainNumber']"
+          />
+        </div>
+        <div class="col-span-12"
+          [class]="addressForm.get('mainNumberComplement')?.value === otherOption ? 'sm:col-span-4' : 'sm:col-span-6'">
+          <app-select
+            [items]="getListWithOther(lettersWithBis)"
+            formControlName="mainNumberComplement"
+            placeholder="Complemento"
+            [clearable]="true">
+          </app-select>
+          <app-input-error [control]="addressForm.get('mainNumberComplement')" />
+          @if (addressForm.get('mainNumberComplement')?.value !== otherOption) {
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Selecciona "Otro valor" para digitar un complemento distinto.
+            </p>
+          }
+        </div>
+        @if (addressForm.get('mainNumberComplement')?.value === otherOption) {
+          <div class="col-span-12 sm:col-span-4">
+            <app-text-input
+              [id]="'customMainNumberCompl'"
+              label="Complemento"
+              formControlName="customMainNumberCompl"
+              maxlength="15"
+            />
+            <app-input-error [control]="addressForm.get('customMainNumberCompl')" />
+          </div>
+        }
+      </div>
+
+      <div class="col-span-12 grid grid-cols-12 gap-2">
+        <div class="col-span-12"
+          [class]="addressForm.get('secondaryNumberComplement')?.value === otherOption ? 'sm:col-span-4' : 'sm:col-span-6'">
+          <app-text-input
+            [id]="'secondaryNumber'"
+            label="* - 2do número"
+            formControlName="secondaryNumber"
+          />
+          <app-input-error
+            [control]="addressForm.get('secondaryNumber')"
+            [customMessages]="customErrorMessagesMap['secondaryNumber']"
+          />
+        </div>
+        <div class="col-span-12"
+          [class]="addressForm.get('secondaryNumberComplement')?.value === otherOption ? 'sm:col-span-4' : 'sm:col-span-6'">
+          <app-select
+            [items]="getListWithOther(allNumberComplementOptions)"
+            formControlName="secondaryNumberComplement"
+            placeholder="Complemento"
+            [clearable]="true">
+          </app-select>
+          <app-input-error [control]="addressForm.get('secondaryNumberComplement')" />
+          @if (addressForm.get('secondaryNumberComplement')?.value !== otherOption) {
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Selecciona "Otro valor" para digitar un complemento distinto.
+            </p>
+          }
+        </div>
+        @if (addressForm.get('secondaryNumberComplement')?.value === otherOption) {
+          <div class="col-span-12 sm:col-span-4">
+            <app-text-input
+              [id]="'customSecNumberCompl'"
+              label="Complemento"
+              formControlName="customSecNumberCompl"
+              maxlength="15"
+            />
+            <app-input-error [control]="addressForm.get('customSecNumberCompl')" />
+          </div>
+        }
+      </div>
+
+      <div class="col-span-12">
+        <app-text-input
+          [id]="'neighborhood'"
+          label="* Barrio"
+          formControlName="neighborhood"
+        />
+        <app-input-error [control]="addressForm.get('neighborhood')" />
+      </div>
+
+      <div class="col-span-12"
+        [ngClass]="{ 'sm:col-span-6': addressForm.get('addressMainComplement')?.value }">
+        <app-select
+          [items]="addressMainComplementOptions"
+          formControlName="addressMainComplement"
+          placeholder="Complemento de dirección"
+          [clearable]="true">
+        </app-select>
+        <app-input-error [control]="addressForm.get('addressMainComplement')" />
+      </div>
+      @if (addressForm.get('addressMainComplement')?.value) {
+        <div class="col-span-12 sm:col-span-6">
+          <app-text-input
+            [id]="'addressMainNameComplement'"
+            label="* Número o nombre"
+            formControlName="addressMainNameComplement"
+          />
+          <app-input-error [control]="addressForm.get('addressMainNameComplement')" />
+        </div>
+      }
+
+      <div class="col-span-12"
+        [ngClass]="{ 'sm:col-span-6': addressForm.get('addressSecondaryComplement')?.value }">
+        <app-select
+          [items]="addressSecondaryComplementOptions"
+          formControlName="addressSecondaryComplement"
+          placeholder="2do complemento de dirección"
+          [clearable]="true">
+        </app-select>
+        <app-input-error [control]="addressForm.get('addressSecondaryComplement')" />
+      </div>
+      @if (addressForm.get('addressSecondaryComplement')?.value) {
+        <div class="col-span-12 sm:col-span-6">
+          <app-text-input
+            [id]="'addressSecondaryNameComplement'"
+            label="* Número o nombre"
+            formControlName="addressSecondaryNameComplement"
+          />
+          <app-input-error [control]="addressForm.get('addressSecondaryNameComplement')" />
+        </div>
+      }
+
+      <div class="col-span-12">
+        <app-text-input
+          [id]="'formattedAddress'"
+          label="Dirección Formateada"
+          [value]="formattedAddress"
+          [disabled]="true"
+        />
+      </div>
+    </div>
+
+    <ng-container drawer-footer>
+      <div class="flex flex-col-reverse sm:flex-row gap-4">
+        <app-button
+          (onClick)="close()"
+          variant="gray"
+          styleType="soft"
+          size="lg"
+          class="flex-1"
+          customClass="leading-[18px] w-full flex justify-center">
+          Cancelar
+        </app-button>
+        <app-button
+          [type]="'submit'"
+          variant="primary"
+          styleType="solid"
+          size="lg"
+          class="flex-1"
+          customClass="leading-[18px] w-full flex justify-center">
+          Guardar
+        </app-button>
+      </div>
+    </ng-container>
+  </app-drawer>
+</form>

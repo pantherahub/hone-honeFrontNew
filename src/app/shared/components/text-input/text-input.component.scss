@@ -1,15 +1,18 @@
-// input:-webkit-autofill {
-//   box-shadow: 0 0 0 1000px white inset !important;
-//   -webkit-box-shadow: 0 0 0 1000px white inset !important;
-//   // -webkit-text-fill-color: var(--color-gray-900) !important;
-//   transition: background-color 5000s ease-in-out 0s;
-// }
+input:-webkit-autofill,
+textarea:-webkit-autofill {
+  -webkit-text-fill-color: var(--color-gray-500);
+  //   box-shadow: 0 0 0 1000px white inset !important;
+  //   -webkit-box-shadow: 0 0 0 1000px white inset !important;
+  //   transition: background-color 5000s ease-in-out 0s;
+  &:focus {
+    -webkit-text-fill-color: var(--color-gray-900);
+  }
+}
 
 // .dark input:-webkit-autofill {
 //   box-shadow: 0 0 0 1000px #111827 inset !important; /* gray-900 */
 //   // -webkit-text-fill-color: white !important;
 // }
-
 
 // input:-webkit-autofill ~ label {
 //   @apply scale-75 -translate-y-4 top-2;

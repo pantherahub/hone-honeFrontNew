@@ -8,7 +8,7 @@ import {
   createComponent,
 } from '@angular/core';
 import { NavigationStart, Router } from '@angular/router';
-import { filter, Observable, Subject, Subscription, take } from 'rxjs';
+import { filter, Subject, Subscription, take } from 'rxjs';
 import { ModalRef } from 'src/app/models/modal.interface';
 import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
 

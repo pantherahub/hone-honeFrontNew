@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, EventEmitter, forwardRef, HostListener, Injector, Input, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, forwardRef, HostListener, Injector, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, NgControl } from '@angular/forms';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { CheckboxComponent } from '../checkbox/checkbox.component';
@@ -18,7 +18,7 @@ import { CheckboxComponent } from '../checkbox/checkbox.component';
     }
   ]
 })
-export class SelectComponent implements ControlValueAccessor {
+export class SelectComponent implements ControlValueAccessor, OnInit {
 
   @Input() items: any[] = [];
   @Input() multiple: boolean = false;
@@ -28,7 +28,7 @@ export class SelectComponent implements ControlValueAccessor {
   @Input() searchable: boolean = false;
   @Input() selected: any = null;
   @Input() invalid: boolean = false;
-  @Input() bindLabel?: string;
+  @Input() bindLabel?: string | ((item: any) => string);
   @Input() bindValue?: string;
   @Input() maxVisibleSelected?: number;
 
@@ -70,6 +70,7 @@ export class SelectComponent implements ControlValueAccessor {
   }
 
   closeDropdown() {
+    if (this.isOpen) this.onTouched();
     this.isOpen = false;
     this.isDropdownInDOM = false;
     this.clearSearch();
@@ -112,10 +113,20 @@ export class SelectComponent implements ControlValueAccessor {
     });
   }
 
+  private normalizeString(str: string): string {
+    return str
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toLowerCase();
+  }
+
   get filteredItems() {
     if (!this.searchable || !this.searchTerm.trim()) return this.items;
+    const term = this.normalizeString(this.searchTerm);
     return this.items.filter(i =>
-      this.getItemLabel(i).toLowerCase().includes(this.searchTerm.toLowerCase())
+      this.normalizeString(this.getItemLabel(i)).includes(term)
     );
   }
 
@@ -123,8 +134,19 @@ export class SelectComponent implements ControlValueAccessor {
     this.searchTerm = '';
   }
 
-  getItemLabel(item: any): string {
-    if (this.bindLabel) {
+  getItemLabel(itemOrValue: any): string {
+    let item = itemOrValue;
+
+    if (this.bindValue && (typeof itemOrValue !== 'object')) {
+      item = this.items.find(i => this.areEqual(this.getItemValue(i), itemOrValue));
+    }
+
+    if (typeof this.bindLabel === 'function') {
+      return this.bindLabel(item) ?? '';
+    }
+
+    // ✅ Si bindLabel es string (propiedad)
+    if (typeof this.bindLabel === 'string') {
       return item?.[this.bindLabel] ?? '';
     }
 
@@ -190,8 +212,8 @@ export class SelectComponent implements ControlValueAccessor {
     this.clearSearch();
   }
 
-  removeItem(item: any) {
-    const value = this.getItemValue(item);
+  removeItem(itemOrValue: any) {
+    const value = this.getItemValue(itemOrValue) ?? itemOrValue;
     this.selected = this.selected.filter((s: any) => !this.areEqual(s, value));
     this.onChange(this.selected);
     this.selectedChange.emit(this.selected);
