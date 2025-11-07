@@ -15,6 +15,7 @@ import { PipesModule } from 'src/app/pipes/pipes.module';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { FileDropDirective } from 'src/app/directives/file-drop.directive';
 import { City } from 'src/app/models/city.interface';
+import { AlertComponent } from 'src/app/shared/components/alert/alert.component';
 
 
 @Component({
@@ -29,7 +30,8 @@ import { City } from 'src/app/models/city.interface';
     TextInputComponent,
     InputErrorComponent,
     ButtonComponent,
-    SelectComponent
+    SelectComponent,
+    AlertComponent,
   ],
   templateUrl: './modal-edit-document.component.html',
   styleUrl: './modal-edit-document.component.scss'
