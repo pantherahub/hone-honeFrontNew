@@ -104,7 +104,7 @@ export class ModalComponent implements OnInit, AfterViewInit {
 
       this.modalEl.nativeElement.classList.add('hidden');
 
-      if (ModalComponent.stack.length === 0 && this.isBackdropVisible) {
+      if (this.isBackdropVisible) {
         this.overlayStateService.removeOverlay();
       }
       this.onClose.emit(returnData);
@@ -113,7 +113,8 @@ export class ModalComponent implements OnInit, AfterViewInit {
   }
 
   @HostListener('document:keydown.escape', ['$event'])
-  handleEscape(event: KeyboardEvent) {
+  handleEscape(event: Event) {
+    const keyboardEvent = event as KeyboardEvent;
     const isTopModal = ModalComponent.stack[ModalComponent.stack.length - 1] === this;
     if (this.isOpen && this.closeOnEscape && isTopModal) {
       this.close();
