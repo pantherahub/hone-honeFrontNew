@@ -15,6 +15,7 @@ export const GLOBAL_ERROR_MESSAGES: { [key: string]: (error?: any) => string } =
   invalidAlphanumeric: () => `Debe ser alfanumérico.`,
   invalidAlphanumWithSpaces: () => `Debe ser alfanumérico.`,
   invalidTelNumber: () => `Ingresa un número válido.`,
+  invalidTelNumeral: () => `Ingresa un numeral válido.`,
   invalidUrl: () => `Ingresa una url válida.`,
   invalidEmail: () => `Ingresa un correo válido.`,
 
@@ -24,4 +25,9 @@ export const GLOBAL_ERROR_MESSAGES: { [key: string]: (error?: any) => string } =
   invalidStartDate: () => `La fecha no puede ser posterior a hoy.`,
   invalidEndDate: () => `La fecha no puede ser posterior a hoy.`,
   invalidDateRange: () => `La fecha de fin no puede ser menor a la fecha de inicio.`,
+
+  // Time range
+  startTimeRequired: () => `Este campo es requerido.`,
+  endTimeRequired: () => `Este campo es requerido.`,
+  invalidTimeRange: () => `La hora de fin no puede ser menor a la hora de inicio.`,
 };

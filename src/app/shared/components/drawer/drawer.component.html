@@ -8,7 +8,10 @@
 
 <!-- Drawer -->
 <div role="dialog" aria-modal="true"
-  class="fixed bg-white shadow-lg transition-transform duration-300 ease-in-out z-50 max-w-full max-h-full flex flex-col"
+  class="fixed bg-white shadow-lg ease-in-out z-50 max-w-full max-h-full flex flex-col"
+  [ngClass]="{
+    'transition-transform duration-300': hasInitialized
+  }"
   [class]="drawerClasses">
 
   <!-- Handle bar for mobile -->
@@ -20,7 +23,7 @@
   }
 
   @if (showCloseButton) {
-    <button (click)="close()" class="hidden sm:inline-flex absolute top-3 end-3 text-gray-500 bg-transparent hover:text-gray-950 rounded-lg text-sm items-center justify-center p-0.5"
+    <button (click)="close()" type="button" class="hidden sm:inline-flex absolute top-3 end-3 text-gray-500 bg-transparent hover:text-gray-950 rounded-lg text-sm items-center justify-center p-0.5"
       [ngClass]="{
         'inline-flex': !onMobileFull,
         'hidden sm:inline-flex': onMobileFull,
@@ -41,9 +44,13 @@
   </div>
 
   <!-- Content -->
-  <div class="p-6 overflow-y-auto flex-1">
-    <ng-content></ng-content>
-  </div>
+  @if (!hasCustomContent) {
+    <div class="p-6 overflow-y-auto flex-1">
+      <ng-content></ng-content>
+    </div>
+  }
+
+  <ng-content select="[drawer-custom-content]"></ng-content>
 
   <!-- Footer -->
   <div class="border-t p-6 shadow-2xl" [class.hidden]="!hasFooter">

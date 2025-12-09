@@ -1,0 +1,119 @@
+<app-drawer
+  #contactDrawer
+  placement="right"
+  size="xl"
+  (onClose)="onClose()">
+  <ng-container drawer-header>
+    <h2 class="text-lg font-black leading-5 text-main-blue1h">
+      Información de contacto
+    </h2>
+  </ng-container>
+
+  @if (contact) {
+    <div class="flex flex-col gap-6">
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="flex flex-col gap-2.5 text-sm leading-4">
+          <span class="font-semibold text-gray-900">Tipo</span>
+          <span class="text-gray-500">
+            {{ getOccTypeById(contact.idOccupationType)?.type || '' }}
+          </span>
+        </div>
+        <div class="flex flex-col gap-2.5 text-sm leading-4">
+          <span class="font-semibold text-gray-900">
+            {{ contact.idOccupationType === 1 ? 'Área' : 'Cargo' }}
+          </span>
+          <span class="text-gray-500">
+            {{ getOccupationName() }}
+          </span>
+        </div>
+        @if (contact.name) {
+          <div class="flex flex-col gap-2.5 text-sm leading-4">
+            <span class="font-semibold text-gray-900">Nombre</span>
+            <span class="text-gray-500">
+              {{ contact.name }}
+            </span>
+          </div>
+        }
+        @if (contact.idTypeDocument && contact.identification && contact.expeditionDate && contact.idCityExpedition) {
+          <div class="flex flex-col gap-2.5 text-sm leading-4">
+            <span class="font-semibold text-gray-900">Tipo de identificación</span>
+            <span class="text-gray-500">
+              {{ getDocTypeById(contact.idTypeDocument)?.typeDocument || '' }}
+            </span>
+          </div>
+          <div class="flex flex-col gap-2.5 text-sm leading-4">
+            <span class="font-semibold text-gray-900">Identificación</span>
+            <span class="text-gray-500">
+              {{ contact.identification }}
+            </span>
+          </div>
+          <div class="flex flex-col gap-2.5 text-sm leading-4">
+            <span class="font-semibold text-gray-900">Fecha de expedición</span>
+            <span class="text-gray-500">
+              {{ contact.expeditionDate | date: 'mediumDate' }}
+            </span>
+          </div>
+          <div class="flex flex-col gap-2.5 text-sm leading-4">
+            <span class="font-semibold text-gray-900">Ciudad de expedición</span>
+            <span class="text-gray-500">
+              {{ getCityById(contact.idCityExpedition)?.city || '' }}
+            </span>
+          </div>
+        }
+      </div>
+
+      @if (contact.Phones?.length || contact.Emails?.length) {
+        <div class="flex flex-col gap-4 p-4 rounded-xl bg-gray-50 ring-[1px] ring-inset ring-gray-200">
+          <span class="text-sm font-semibold leading-4 text-gray-900">
+            Contacto
+          </span>
+          <div class="p-4 flex flex-col sm:flex-row sm:items-center gap-2 rounded-md ring-[1px] ring-inset ring-gray-200 bg-white">
+            <div class="flex items-center gap-2">
+              <div class="mb-auto rounded-lg p-3 bg-blue1h-50 text-main-blue1h">
+                <svg width="20" height="20">
+                  <use xlink:href="/assets/icons/outline/user.svg#address-book" />
+                </svg>
+              </div>
+              <div class="flex flex-col gap-2 min-w-0">
+                @if (contact.Phones?.length) {
+                  <div class="flex flex-wrap gap-1">
+                    <span class="text-sm font-semibold leading-4 text-gray-900">
+                      Teléfono
+                    </span>
+                    <div class="flex gap-1 flex-wrap min-w-0">
+                      @for (phone of contact.Phones; track $index) {
+                        <div class="flex items-center bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded text-xs font-semibold leading-[14px] max-w-[210px] overflow-hidden">
+                          <span class="block truncate w-full" [title]="getCompletePhone(phone)">
+                            {{ getCompletePhone(phone) }}
+                          </span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+                @if (contact.Emails?.length) {
+                  <div class="flex flex-wrap gap-1">
+                    <span class="text-sm font-semibold leading-4 text-gray-900">
+                      Correo
+                    </span>
+                    <div class="flex gap-1 flex-wrap min-w-0">
+                      @for (email of contact.Emails; track $index) {
+                        <div class="flex items-center bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded text-xs font-semibold leading-[14px] max-w-[210px] overflow-hidden">
+                          <span class="block truncate w-full" [title]="email.email">
+                            {{ email.email }}
+                          </span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+          </div>
+        </div>
+      }
+
+    </div>
+  }
+</app-drawer>

@@ -108,11 +108,6 @@ export class RateManagementComponent implements OnInit, OnChanges {
     this.isOpenChange.emit(this.isOpen);
   }
 
-  onDrawerOpenChange(open: boolean) {
-    this.isOpen = open;
-    this.isOpenChange.emit(this.isOpen);
-  }
-
   onDrawerClose() {
     this.rateForm.reset();
     this.isOpen = false;

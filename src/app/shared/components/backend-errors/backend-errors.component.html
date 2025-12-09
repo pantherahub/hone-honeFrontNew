@@ -1,9 +1,25 @@
-<nz-alert *ngIf="error?.error?.details" nzType="error" [nzDescription]="descriptionTemplate">
-  <ng-template #descriptionTemplate>
-    <ul class="backend-error-list">
-      <li *ngFor="let detail of error.error.details">
-        {{ detail.message }}
-      </li>
-    </ul>
-  </ng-template>
-</nz-alert>
+@if (error?.error?.details) {
+  @if (grouped) {
+    <div role="alert" class="flex items-center p-4 rounded-lg bg-red-100 text-red-700">
+      <div class="flex flex-col gap-1.5">
+        @for (detail of error.error.details; track $index) {
+          <div class="flex gap-3">
+            <svg width="16" height="16">
+              <use xlink:href="/assets/icons/outline/general.svg#exclamation-circle" />
+            </svg>
+
+            <div class="flex-1 text-sm font-semibold leading-4">
+              {{ detail.message }}
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  } @else {
+    <div class="flex flex-col gap-2">
+      @for (detail of error.error.details; track $index) {
+        <app-alert variant="danger" [title]="detail.message"></app-alert>
+      }
+    </div>
+  }
+}

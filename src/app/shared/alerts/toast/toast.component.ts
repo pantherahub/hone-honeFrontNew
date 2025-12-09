@@ -18,14 +18,14 @@ export class ToastComponent implements OnInit {
 
   iconMap = {
     success: 'general.svg#check',
-    error: 'general.svg#close-circle',
-    info: 'general.svg#info',
+    danger: 'general.svg#close-circle',
+    info: 'general.svg#info-circle',
     warning: 'general.svg#warning'
   };
 
   colorMap = {
     success: 'bg-green-100 text-green-700',
-    error: 'bg-red-100 text-red-700',
+    danger: 'bg-red-100 text-red-700',
     info: 'bg-blue1h-100 text-blue-700',
     warning: 'bg-yellow-100 text-yellow-700'
   };
@@ -34,6 +34,13 @@ export class ToastComponent implements OnInit {
     if (this.toast.duration) {
       setTimeout(() => this.close(), this.toast.duration);
     }
+  }
+
+  getToastColor() {
+    if (this.toast.color) {
+      return this.colorMap[this.toast.color];
+    }
+    return this.colorMap[this.toast.type];
   }
 
   close(): void {

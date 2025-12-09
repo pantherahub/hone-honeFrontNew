@@ -18,18 +18,20 @@
       (input)="handleInput($event)"
       (blur)="onTouched()"
       (focus)="handleFocus($event)"
+      (click)="handleClick($event)"
       [attr.rows]="rows"
       [attr.minlength]="minlength"
       [attr.maxlength]="maxlength"
-      class="resize-y min-h-24 block px-2.5 pb-2 pt-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border-1 appearance-none dark:text-white focus:outline-none focus:ring-0 peer autofill:shadow-[inset_0_0_0_1000px_white]
+      class="resize-y min-h-24 block px-2.5 pb-2 pt-2.5 w-full text-sm text-gray-500 focus:text-gray-900 bg-white rounded-lg border-1 appearance-none dark:text-white focus:outline-none focus:ring-0 peer autofill:shadow-[inset_0_0_0_1000px_white]
       disabled:bg-gray-100 disabled:text-gray-400 dark:disabled:bg-gray-800 dark:disabled:text-gray-500 disabled:cursor-not-allowed"
       [ngClass]="{
-        'border-gray-300 dark:border-gray-600 focus:border-blue-600 dark:focus:border-blue-500':
+        'border-gray-300 dark:border-gray-600 focus:border-blue1h-600':
           !showError,
         'bg-red-50 border-red-600 dark:border-red-500 focus:border-red-600 dark:focus:border-red-500':
           showError,
       }"
-    ></textarea>
+      [class]="customInputClass">
+    </textarea>
   } @else {
     <input
       #inputRef
@@ -42,38 +44,46 @@
       (input)="handleInput($event)"
       (blur)="onTouched()"
       (focus)="handleFocus($event)"
+      (click)="handleClick($event)"
       [attr.minlength]="type === 'text' ? minlength : null"
       [attr.maxlength]="type === 'text' ? maxlength : null"
       [attr.min]="type === 'number' ? min : null"
       [attr.max]="type === 'number' ? max : null"
       [attr.autocomplete]="type === 'date' ? 'off' : autocomplete"
-      [readonly]="type === 'date'"
-      class="block px-2.5 pb-2 pt-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border-1 appearance-none dark:text-white focus:outline-none focus:ring-0 peer autofill:shadow-[inset_0_0_0_1000px_white]
-      disabled:bg-gray-100 disabled:text-gray-400 dark:disabled:bg-gray-800 dark:disabled:text-gray-500 disabled:cursor-not-allowed"
+      [readonly]="readonly"
+      class="block px-2.5 pb-2 pt-2.5 w-full text-sm text-gray-500 focus:text-gray-900 bg-white rounded-lg border appearance-none dark:text-white focus:outline-none focus:ring-0 peer autofill:shadow-[inset_0_0_0_1000px_white]
+      disabled:text-gray-400 dark:disabled:bg-gray-800 disabled:cursor-not-allowed"
       [ngClass]="{
-        'border-gray-300 dark:border-gray-600 focus:border-blue-600 dark:focus:border-blue-500':
+        'border-gray-300 dark:border-gray-600 focus:border-blue1h-600':
           !showError,
         'bg-red-50 border-red-600 dark:border-red-500 focus:border-red-600 dark:focus:border-red-500':
           showError,
-        'pe-10': !disabled && ((type === 'password' && togglePassword) || type === 'time' || (clearable && value)),
+        'pe-10': !disabled && ((type === 'password' && togglePassword) || (clearable && value)),
         'ps-10': searcher,
       }"
+      [class]="customInputClass"
     />
   }
 
   <label
     [attr.for]="id"
-    class="absolute text-sm duration-300 transform ms-3 -translate-y-4 scale-75 top-1.5 z-10 origin-[0] px-1 peer-focus:px-1 peer-placeholder-shown:scale-100 peer-placeholder-shown:px-0 peer-focus:ms-3 peer-autofill:ms-3 peer-focus:top-1.5 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1 peer-autofill:scale-75 peer-autofill:-translate-y-4 peer-autofill:top-1.5"
+    class="absolute text-sm duration-300 transform ms-3 -translate-y-4 scale-75 top-1.5 z-10 origin-[0] px-1 peer-placeholder-shown:scale-100 peer-placeholder-shown:px-0 peer-autofill:ms-3 start-1 peer-autofill:scale-75 peer-autofill:-translate-y-4 peer-autofill:top-1.5 pointer-events-none bg-white"
     [ngClass]="{
-      'bg-white dark:bg-gray-900': !disabled,
-      'bg-gray-100 dark:bg-gray-800 cursor-not-allowed': disabled,
-      'text-gray-500 dark:text-gray-400 peer-focus:text-blue-600 peer-focus:dark:text-blue-500': !showError,
+      'peer-focus:px-1 peer-focus:ms-3 peer-focus:top-1.5 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:font-semibold':
+      !readonly || value,
+
+      'text-gray-500 dark:text-gray-400 peer-focus:text-blue1h-600': !showError && !disabled,
       'text-red-600 dark:text-red-500': showError,
+
+      'dark:bg-gray-900': !disabled,
+      'text-gray-400 dark:bg-gray-800 cursor-not-allowed': disabled,
+
       'peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2': !isTextarea,
       'peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-3': isTextarea,
+
       'peer-placeholder-shown:ms-8': searcher,
     }"
-  >
+    [class]="customLabelClass">
     {{ label }}
   </label>
 
@@ -82,8 +92,7 @@
       type="button"
       class="absolute inset-y-0 end-0 flex items-center px-3 top-0.5 text-sm text-gray-500 dark:text-gray-300"
       (click)="showPassword = !showPassword"
-      tabindex="-1"
-    >
+      tabindex="-1">
       @if (!showPassword) {
         <svg [attr.width]="iconSize" [attr.height]="iconSize">
           <use xlink:href="/assets/icons/outline/general.svg#eye" />

@@ -1,0 +1,171 @@
+<div [formGroup]="selectedForm" class="flex flex-col gap-4">
+  <div class="flex flex-col gap-2 text-main-blue1h">
+    <div class="flex gap-2 justify-between sm:items-center"
+      [ngClass]="{ 'flex-col sm:flex-row': !isFirstForm && isEditing }">
+      <h2 class="text-lg font-semibold leading-5">
+        Información del prestador
+      </h2>
+      @if (!isFirstForm) {
+        @if (isEditing) {
+          <div class="flex gap-2 w-full sm:w-auto">
+            <app-button
+              (onClick)="confirmEdit()"
+              variant="primary"
+              styleType="solid"
+              size="xs"
+              class="flex-1"
+              customClass="w-full flex justify-center">
+              Guardar
+            </app-button>
+            <app-button
+              (onClick)="cancelEdit()"
+              variant="primary"
+              styleType="soft"
+              size="xs"
+              class="flex-1"
+              customClass="w-full flex justify-center">
+              Cancelar
+            </app-button>
+          </div>
+        } @else {
+          <app-button
+            (onClick)="startEdit()"
+            variant="primary"
+            styleType="soft"
+            size="xs"
+            class="hidden sm:block">
+            <svg width="16" height="16">
+              <use xlink:href="/assets/icons/outline/general.svg#edit" />
+            </svg>
+            Editar
+          </app-button>
+        }
+      }
+    </div>
+    @if (isFirstForm || !isEditing) {
+      <p class="text-sm leading-4">
+        Diligencia los campos solicitados para identificar y contactar al prestador de manera adecuada.
+      </p>
+    }
+    @if (!isFirstForm && !isEditing) {
+      <app-button
+        (onClick)="startEdit()"
+        variant="primary"
+        styleType="soft"
+        size="xs"
+        class="block sm:hidden"
+        customClass="w-full flex justify-center">
+        <svg width="16" height="16">
+          <use xlink:href="/assets/icons/outline/general.svg#edit" />
+        </svg>
+        Editar
+      </app-button>
+    }
+  </div>
+
+  <div class="flex flex-col gap-2 p-4 rounded-xl bg-gray-100">
+    <div>
+      <app-text-input
+        [id]="'name'"
+        [label]="getLabel('name', 'Nombre o razón social')"
+        formControlName="name"
+      />
+      <app-input-error [control]="selectedForm.get('name')" />
+    </div>
+    <div>
+      <app-text-input
+        [id]="'email'"
+        [label]="getLabel('email', 'Correo electrónico')"
+        formControlName="email"
+      />
+      <app-input-error [control]="selectedForm.get('email')" />
+      @if ((isFirstForm && !selectedForm.get('email')?.disabled) || isEditing) {
+        <a (click)="openEmailInfo()"
+          class="mt-1 inline-flex gap-1 items-center text-xs text-blue-600 dark:text-blue-500 hover:underline">
+          <svg width="16" height="16">
+            <use xlink:href="/assets/icons/outline/general.svg#info-circle" />
+          </svg>
+          <span>Información importante</span>
+        </a>
+      }
+    </div>
+    <div>
+      <app-select
+        [items]="identificationTypes"
+        bindLabel="typeDocument"
+        bindValue="idTypeDocument"
+        formControlName="idTypeDocument"
+        [placeholder]="getLabel('idTypeDocument', 'Tipo de identificación')">
+      </app-select>
+      <app-input-error [control]="selectedForm.get('idTypeDocument')" />
+    </div>
+    <div>
+      <app-text-input
+        [id]="'identification'"
+        [label]="getLabel('identification', 'Número de identificación')"
+        formControlName="identification"
+      />
+      <app-input-error [control]="selectedForm.get('identification')" />
+    </div>
+    @if (selectedForm.get('idTypeDocument')?.value !== 6) {
+      <div>
+        <app-text-input
+          [id]="'dv'"
+          label="Dígito de verificación"
+          formControlName="dv"
+          [type]="'number'"
+          min="0" max="9"
+        />
+        <app-input-error
+          [control]="selectedForm.get('dv')"
+          [customMessages]="customErrorMessagesMap['dv']"
+        />
+      </div>
+    }
+    <div>
+      <app-text-input
+        [id]="'repsEnableCode'"
+        [label]="getLabel('repsEnableCode', 'Código habilitación REPS')"
+        formControlName="repsEnableCode"
+      />
+      <app-input-error [control]="selectedForm.get('repsEnableCode')" />
+    </div>
+    <div>
+      <app-select
+        [multiple]="true"
+        [searchable]="true"
+        [maxVisibleSelected]="3"
+        [items]="languageList"
+        bindLabel="name"
+        bindValue="code"
+        formControlName="languages"
+        placeholder="* Idiomas de prestación de servicio"
+        [clearable]="true">
+      </app-select>
+      <app-input-error [control]="selectedForm.get('languages')" />
+    </div>
+    <div>
+      <app-text-input
+        [id]="'website'"
+        label="Sitio o página web"
+        formControlName="website"
+      />
+      <app-input-error [control]="selectedForm.get('website')" />
+    </div>
+  </div>
+
+  @if (!isEditing) {
+    <div>
+      <app-button
+        (onClick)="goNext()"
+        variant="primary"
+        styleType="solid"
+        size="md">
+        Siguiente
+        <svg width="20" height="20">
+          <use xlink:href="/assets/icons/outline/arrows.svg#chevron-right" />
+        </svg>
+      </app-button>
+    </div>
+  }
+</div>
