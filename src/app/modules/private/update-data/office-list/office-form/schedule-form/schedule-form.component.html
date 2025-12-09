@@ -1,0 +1,123 @@
+@if (loading) {
+  <div class="absolute inset-0 z-50 bg-gray-50/60 flex items-center justify-center">
+    <svg class="w-7 h-7 text-main-blue1h animate-spin fill-gray-200">
+      <use xlink:href="/assets/icons/extras/animations.svg#spin" />
+    </svg>
+  </div>
+}
+
+<form [formGroup]="scheduleForm" (ngSubmit)="onSubmit()">
+  <app-drawer
+    #scheduleDrawer
+    placement="right"
+    size="xl"
+    (onClose)="onDrawerClose($event)"
+    [hasFooter]="true">
+    <ng-container drawer-header>
+      <h2 class="text-lg font-black leading-5 text-main-blue1h">
+        Horarios de atención
+      </h2>
+    </ng-container>
+
+    <div class="grid grid-cols-12 gap-2 p-4 bg-gray-50 rounded-xl ring-[1px] ring-inset ring-gray-200">
+      <div class="col-span-12">
+        <app-select
+          [items]="scheduleTypeMap"
+          bindLabel="label"
+          bindValue="value"
+          formControlName="scheduleType"
+          placeholder="* Tipo de horario">
+        </app-select>
+        <app-input-error
+          [control]="scheduleForm.get('scheduleType')"
+          [customMessages]="customErrorMessagesMap['scheduleType']"
+        />
+        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          Selecciona "Rango" si el horario aplica a varios días seguidos (ej. lunes a viernes), o "Día" si aplica solo a uno.
+        </p>
+      </div>
+
+      @if (scheduleForm.get('scheduleType')?.value === 'range') {
+        <div class="col-span-12 sm:col-span-6">
+          <app-select
+            [items]="dayOptionsStart"
+            formControlName="startDayRange"
+            placeholder="* Día de inicio">
+          </app-select>
+          <app-input-error [control]="scheduleForm.get('startDayRange')" />
+        </div>
+        <div class="col-span-12 sm:col-span-6">
+          <app-select
+            [items]="availableEndDays"
+            formControlName="endDayRange"
+            placeholder="* Día de fin">
+          </app-select>
+          <app-input-error [control]="scheduleForm.get('endDayRange')" />
+        </div>
+      } @else if (scheduleForm.get('scheduleType')?.value === 'day') {
+        <div class="col-span-12">
+          <app-select
+            [items]="dayOptionsWithFestivos"
+            formControlName="day"
+            placeholder="* Seleccionar día">
+          </app-select>
+          <app-input-error [control]="scheduleForm.get('day')" />
+        </div>
+      }
+
+      <div class="col-span-12">
+        <app-select
+          [items]="dayType"
+          formControlName="type"
+          placeholder="* Jornada">
+        </app-select>
+        <app-input-error
+          [control]="scheduleForm.get('type')"
+          [customMessages]="customErrorMessagesMap['type']"
+        />
+      </div>
+
+      <div class="col-span-12 sm:col-span-6">
+        <app-text-input
+          [id]="'startTime'"
+          label="* Hora de inicio"
+          [type]="'time'"
+          formControlName="startTime"
+        />
+        <app-input-error [control]="scheduleForm.get('startTime')" />
+      </div>
+      <div class="col-span-12 sm:col-span-6">
+        <app-text-input
+          [id]="'endTime'"
+          label="* Hora de fin"
+          [type]="'time'"
+          formControlName="endTime"
+        />
+        <app-input-error [control]="scheduleForm.get('endTime')" />
+      </div>
+    </div>
+
+    <ng-container drawer-footer>
+      <div class="flex flex-col-reverse sm:flex-row gap-4">
+        <app-button
+          (onClick)="close()"
+          variant="gray"
+          styleType="soft"
+          size="lg"
+          class="flex-1"
+          customClass="leading-[18px] w-full flex justify-center">
+          Cancelar
+        </app-button>
+        <app-button
+          [type]="'submit'"
+          variant="primary"
+          styleType="solid"
+          size="lg"
+          class="flex-1"
+          customClass="leading-[18px] w-full flex justify-center">
+          Guardar
+        </app-button>
+      </div>
+    </ng-container>
+  </app-drawer>
+</form>

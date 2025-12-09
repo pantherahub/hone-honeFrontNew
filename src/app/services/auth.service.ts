@@ -10,6 +10,7 @@ import { AuthUserState } from '../models/user-state.interface';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { TwoFactorAuthContentComponent } from '../modules/public/two-factor-auth/two-factor-auth-content/two-factor-auth-content.component';
 import { ValidatePasswordContentComponent } from '../modules/private/user/validate-password/validate-password-content/validate-password-content.component';
+import { decodeJwtPayload } from '../utils/string-utils';
 
 @Injectable({
    providedIn: 'root'
@@ -80,6 +81,10 @@ export class AuthService {
 
   isAuthenticated(): boolean {
     const token = this.getAccessToken();
+    // if (token && this.isTokenValid(token)) {
+    //   return true;
+    // }
+    // return false;
     return !!token;
   }
 
@@ -203,6 +208,16 @@ export class AuthService {
   }
   removeTemporalLoginData() {
     localStorage.removeItem(this.TEMP_LOGIN_DATA_KEY);
+  }
+
+  isTokenValid(token: string): boolean {
+    try {
+      const payload = decodeJwtPayload(token);
+      let now = Math.floor(Date.now() / 1000); // in secs
+      return payload.exp > now;
+    } catch (e) {
+      return false;
+    }
   }
 
   clearLocalStorage() {

@@ -44,7 +44,7 @@ export interface UserState {
 }
 
 export interface AuthUserState {
-  id?: number;
+  id?: number; // idProvider
   email?: string;
   name?: string;
   withData?: boolean;

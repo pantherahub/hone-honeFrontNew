@@ -38,11 +38,11 @@
             <app-text-input [id]="'identification'" formControlName="identification" label="Identificación del prestador" />
             <app-input-error [control]="ticketForm.get('identification')" />
           </div>
-          <div>
-            <app-text-input [id]="'email'" formControlName="email" label="Correo electrónico" />
-            <app-input-error [control]="ticketForm.get('email')" />
-          </div>
         }
+        <div>
+          <app-text-input [id]="'email'" formControlName="email" label="Correo electrónico" />
+          <app-input-error [control]="ticketForm.get('email')" />
+        </div>
         <div>
           <app-text-input [id]="'phone'" formControlName="phone" label="Celular" />
           <app-input-error [control]="ticketForm.get('phone')" />

@@ -52,7 +52,7 @@ export class FileValidationService {
         title: '¡Error!',
         messageHTML: `Archivo no permitido.<br>
           Formatos permitidos: ${allowedExt.join(', ')}`,
-        variant: 'error',
+        variant: 'danger',
       });
       return false;
     }
@@ -71,12 +71,25 @@ export class FileValidationService {
         messageHTML: `El archivo excede el tamaño máximo de ${maxSizeMB}MB.<br>
           Puedes usar este compresor para reducir su tamaño: <a href="https://www.wecompress.com/es/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">
           ir al compresor</a>.`,
-        variant: 'error',
+        variant: 'danger',
       });
       return false;
     }
 
     return true;
+  }
+
+  setAcceptAttribute(input: HTMLInputElement, allowedExtensions?: string[]) {
+    const extensions = allowedExtensions?.length
+      ? allowedExtensions
+      : Object.keys(this.extensionToMimeType); // Default extensions
+
+    // Mime types for greater compatibility
+    const mimeTypes = extensions
+      .map(ext => this.extensionToMimeType[ext])
+      .filter((type): type is string => !!type);
+
+    input.accept = [...extensions, ...mimeTypes].join(',');
   }
 
 }

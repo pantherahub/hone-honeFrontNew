@@ -1,17 +1,18 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { NgZorroModule } from 'src/app/ng-zorro.module';
+import { AlertComponent } from '../alert/alert.component';
 
 @Component({
   selector: 'app-backend-errors',
   standalone: true,
-  imports: [NgZorroModule, CommonModule],
+  imports: [CommonModule, AlertComponent],
   templateUrl: './backend-errors.component.html',
   styleUrl: './backend-errors.component.scss'
 })
 export class BackendErrorsComponent {
 
   @Input() error: any = null;
+  @Input() grouped: boolean = true;
 
   constructor() { }
 

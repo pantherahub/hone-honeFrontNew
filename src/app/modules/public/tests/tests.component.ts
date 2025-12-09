@@ -11,9 +11,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ModalService } from 'src/app/services/modal/modal.service';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { Router } from '@angular/router';
-import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { PopoverComponent } from 'src/app/shared/components/popover/popover.component';
 import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.component';
+import { AlertComponent } from 'src/app/shared/components/alert/alert.component';
 
 @Component({
   selector: 'app-tests',
@@ -30,6 +30,7 @@ import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.compone
     ButtonComponent,
     PopoverComponent,
     DrawerComponent,
+    AlertComponent,
   ],
   templateUrl: './tests.component.html',
   styleUrl: './tests.component.scss'
@@ -46,13 +47,13 @@ export class TestsComponent implements OnInit, AfterViewInit {
   popoverVisible: boolean = false;
 
   @ViewChild('testDrawer', { static: false }) testDrawer!: DrawerComponent;
+  @ViewChild('test2Drawer', { static: false }) test2Drawer!: DrawerComponent;
 
   constructor (
     private toastService: ToastService,
     private modalService: ModalService,
     private alertService: AlertService,
     private router: Router,
-    private notificationService: NzNotificationService,
   ) { }
 
   navigateTo(url: string): void {
@@ -91,6 +92,13 @@ export class TestsComponent implements OnInit, AfterViewInit {
   }
   closeTestDrawer() {
     this.testDrawer.close();
+  }
+
+  openTest2Drawer() {
+    this.test2Drawer.open();
+  }
+  closeTest2Drawer() {
+    this.test2Drawer.close();
   }
 
   openModalComponentByTag() {

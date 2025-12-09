@@ -12,6 +12,8 @@ export class EventManagerService {
   clientSelected = signal<ClientInterface>({});
   viewMode = signal<'grid' | 'list' | null>(null);
 
+  isEditingProvider = signal<boolean>(false);
+
   private readonly viewModeKey = 'clientViewMode';
   private readonly userKey = 'userLogged';
   private readonly clientKey = 'clientSelected';
@@ -70,6 +72,14 @@ export class EventManagerService {
   clearViewMode() {
     this.viewMode.set(null);
     localStorage.removeItem(this.viewModeKey);
+  }
+
+  // Status of a form update in the update-data module
+  startEditingProvider() {
+    this.isEditingProvider.set(true);
+  }
+  stopEditingProvider() {
+    this.isEditingProvider.set(false);
   }
 
 }

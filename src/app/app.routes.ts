@@ -56,11 +56,11 @@ export const routes: Routes = [
     path: 'page-not-found',
     component: PageNotFoundComponent
   },
-  // Delete after tests
-  {
-    path: 'test',
-    component: TestsComponent
-  },
+  // Tests
+  // {
+  //   path: 'test',
+  //   component: TestsComponent
+  // },
 
   {
     path: 'forgot-password',

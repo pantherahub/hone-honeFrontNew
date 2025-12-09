@@ -13,19 +13,16 @@
         [highlighted]="true"
         [(visible)]="configTutorialVisible"
         [contentTemplate]="popoverContent"
-        extraPopoverClass="max-w-[380px]"
+        extraPopoverClass="max-w-[330px] md:max-w-[486px]"
         [autoScrollOnOpen]="true"
-        (onClose)="nextTutorialStep()"
-      >
-        <!-- extraPopoverClass="max-w-[330px] md:max-w-[486px]" -->
+        (onClose)="nextTutorialStep()">
         <ng-template #triggerTemplate>
           <app-button
-              (click)="navigateToUpdateData()"
-              variant="gray"
-              size="sm"
-              styleType="soft"
-              customClass="leading-4 tutorial-option"
-            >
+            (click)="navigateToUpdateData()"
+            variant="gray"
+            size="sm"
+            styleType="soft"
+            customClass="leading-4">
             <span class="truncate max-w-[50px] sm:hidden">
               {{ getProviderNameInitials(user.name) }}
             </span>
@@ -86,8 +83,7 @@
         variant="primary"
         size="sm"
         styleType="ghost"
-        customClass="leading-4"
-      >
+        customClass="leading-4">
         <svg width="16" height="16">
           <use xlink:href="/assets/icons/outline/arrows.svg#arrow-left-to-bracket" />
         </svg>
@@ -99,12 +95,12 @@
 
 <!-- Tutorial popover content -->
 <ng-template #popoverContent>
-  <!-- <img src="assets/img/home/guide1.webp"
+  <img src="assets/img/home/guide1.webp"
     alt="Imagen previsualización"
     class="hidden md:block rounded-md"
-  /> -->
-  <div class="flex justify-between items-center">
-    <span class="text-base leading-5 md:leading-[18px] font-normal text-main-blue1h">1 de 2</span>
+  />
+  <div class="flex justify-between items-center gap-2">
+    <span class="text-base leading-5 md:leading-[18px] font-normal text-main-blue1h whitespace-nowrap">1 de 3</span>
     <div class="flex gap-2">
       <app-button
         (click)="backTutorialStep()"

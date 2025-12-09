@@ -1,10 +1,19 @@
 <form [formGroup]="documentForm" (ngSubmit)="submitRequest()" class="flex flex-col gap-5">
 
-  <p class="text-sm font-normal leading-4 text-gray-600">
-    Formulario para la {{ isNew ? 'carga' : 'actualización' }} del documento:
-    <b>{{ (currentDoc?.typeDocument | formatNameDoc:currentDoc?.idDocumentType)
-      || 'No especifica' }}</b>.
-  </p>
+  <div class="flex flex-col gap-3">
+    <p class="text-sm font-normal leading-4 text-gray-600">
+      Formulario para la {{ isNew ? 'carga' : 'actualización' }} del documento:
+      <b>{{ (currentDoc?.typeDocument | formatNameDoc:currentDoc?.idDocumentType)
+        || 'No especifica' }}</b>.
+    </p>
+
+    @if (currentDoc.idDocumentType == 131) {
+      <app-alert
+        variant="dark"
+        [title]="'Pregrado y posgrado, con convalidación en caso de estudios en el exterior.'">
+      </app-alert>
+    }
+  </div>
 
   <div class="flex flex-col gap-4">
 
@@ -269,12 +278,25 @@
       </div>
     }
 
+    <!-- Campo Aseguradora emisora de la poliza -->
+    @if (isFieldRequiredForDocumentType('policyCompany')) {
+      <div>
+        <app-select
+          [items]="policyCompanies"
+          formControlName="policyCompany"
+          placeholder="Aseguradora emisora"
+        >
+        </app-select>
+        <app-input-error [control]="documentForm.get('policyCompany')" />
+      </div>
+    }
+
     <!-- Campo Ciudad -->
     @if (isFieldRequiredForDocumentType('idCity')) {
       <div>
         <app-select
           [items]="citiesList"
-          bindLabel="city"
+          [bindLabel]="cityLabel"
           bindValue="idCity"
           [searchable]="true"
           formControlName="idCity"

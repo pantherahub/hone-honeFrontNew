@@ -49,7 +49,7 @@
           (click)="close(true)">
           {{ confirmBtnText }}
         </app-button>
-        @if (isConfirmation) {
+        @if (isConfirmation && cancelBtnText) {
           <app-button
             variant="gray"
             styleType="soft"

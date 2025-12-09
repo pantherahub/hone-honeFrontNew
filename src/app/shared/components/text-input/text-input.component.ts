@@ -25,6 +25,7 @@ export class TextInputComponent implements ControlValueAccessor, OnInit, AfterVi
   @Input() type: string = 'text';
   @Input() placeholder: string = ' ';
   @Input() disabled: boolean = false;
+  @Input() readonly: boolean = false;
   @Input() clearable: boolean = false;
   @Input() searcher: boolean = false;
   @Input() isTextarea: boolean = false;
@@ -34,8 +35,8 @@ export class TextInputComponent implements ControlValueAccessor, OnInit, AfterVi
   @Input() invalid: boolean = false;
   @Input() togglePassword: boolean = false;
   @Input() iconSize: string = '18';
-  @Output() onInput = new EventEmitter<any>();
-  @Output() onFocus = new EventEmitter<FocusEvent>();
+  @Input() customInputClass: string = '';
+  @Input() customLabelClass: string = '';
 
   @Input() rows?: string;
   @Input() maxlength?: string;
@@ -43,6 +44,12 @@ export class TextInputComponent implements ControlValueAccessor, OnInit, AfterVi
   @Input() max?: string;
   @Input() min?: string;
   @Input() autocomplete?: string;
+  @Input() minDate: string | Date | null = null; // 'yyyy-mm-dd'
+  @Input() maxDate: string | Date | null = null; // 'yyyy-mm-dd'
+
+  @Output() onInput = new EventEmitter<any>();
+  @Output() onFocus = new EventEmitter<FocusEvent>();
+  @Output() onClick = new EventEmitter<MouseEvent>();
 
   onChange: any = () => {};
   onTouched: any = () => { };
@@ -63,6 +70,10 @@ export class TextInputComponent implements ControlValueAccessor, OnInit, AfterVi
     this.ngControl = this.injector.get(NgControl, { optional: true, self: true });
     if (this.ngControl) {
       this.ngControl.valueAccessor = this;
+    }
+
+    if (this.type === 'date') {
+      this.readonly = true;
     }
   }
 
@@ -108,6 +119,10 @@ export class TextInputComponent implements ControlValueAccessor, OnInit, AfterVi
     this.onFocus.emit(event);
   }
 
+  handleClick(event: MouseEvent) {
+    this.onClick.emit(event);
+  }
+
   get actualInputType(): string {
     if (this.type === 'password' && this.togglePassword) {
       return this.showPassword ? 'text' : 'password';
@@ -134,6 +149,8 @@ export class TextInputComponent implements ControlValueAccessor, OnInit, AfterVi
       todayHighlight: true,
       autoSelectToday: true,
       clearBtn: true,
+      minDate: this.minDate ?? null,
+      maxDate: this.maxDate ?? null,
     });
 
     document.addEventListener('mousedown', (e) => {
@@ -187,6 +204,15 @@ export class TextInputComponent implements ControlValueAccessor, OnInit, AfterVi
             this.onTouched();
           });
         }
+
+        // Close popup when clicking outside
+        document.addEventListener('mousedown', (e) => {
+          if (datepickerPopup &&
+              !datepickerPopup.contains(e.target as Node) &&
+              !this.inputRef.nativeElement.contains(e.target as Node)) {
+            this.dpInstance?.hide();
+          }
+        });
       });
 
     }, 100);

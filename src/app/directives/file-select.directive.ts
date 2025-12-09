@@ -18,12 +18,7 @@ export class FileSelectDirective implements OnInit {
 
   ngOnInit() {
     const input = this.el.nativeElement as HTMLInputElement;
-
-    // Set accept attribute
-    const allowedExt = this.allowedExtensions?.length
-      ? this.allowedExtensions
-      : Object.keys(this.validator.extensionToMimeType); // Default extensions
-    input.accept = (allowedExt).join(',');
+    this.validator.setAcceptAttribute(input, this.allowedExtensions);
   }
 
   @HostListener('change', ['$event'])
