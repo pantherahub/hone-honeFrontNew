@@ -33,10 +33,4 @@ export class DocumentsCrudService {
     return this.httpClient.delete(url);
   }
 
-  downloadFile(filename: string) {
-    return this.httpClient.get( 'http://localhost:4200/' + filename, {
-      responseType: 'arraybuffer'
-    });
-  }
-
 }

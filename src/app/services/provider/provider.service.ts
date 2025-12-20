@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { DocumentType } from 'src/app/models/document-type.interface';
-import { TempProviderDataValidation } from 'src/app/models/temporal-provider.interface';
+import { DocumentType } from 'src/app/interfaces/document-type.interface';
+import { TempProviderDataValidation } from 'src/app/interfaces/temporal-provider.interface';
 import { environment } from 'src/environments/environment';
 
 @Injectable({

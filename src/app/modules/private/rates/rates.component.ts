@@ -7,7 +7,8 @@ import { AlertService } from 'src/app/services/alert/alert.service';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 import { RateService } from 'src/app/services/rate/rate.service';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
-import { RateFormData, RateManagementComponent } from './rate-management/rate-management.component';
+import { RateManagementComponent } from './rate-management/rate-management.component';
+import { BadgeConfig } from 'src/app/types/badge-config.type';
 
 @Component({
   selector: 'app-rates',
@@ -24,11 +25,30 @@ export class RatesComponent implements OnInit {
   loadingRates: boolean = false;
   rateList: any[] = [];
 
-  statusConfig: Record<string, { bg: string; text: string; icon?: string; label: string }> = {
-    'APROBADO': { bg: 'bg-green-100', text: 'text-green-800', icon: 'check', label: 'Aprobado' },
-    'RECHAZADO': { bg: 'bg-red-100', text: 'text-red-800', icon: 'close', label: 'Rechazado' },
-    'EN PROCESO': { bg: 'bg-yellow-100', text: 'text-yellow-800', icon: 'clock', label: 'En proceso' },
-    'PENDIENTE POR CARGAR': { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Pendiente por cargar' },
+  statusConfig: Record<string, BadgeConfig> = {
+    'APROBADO': {
+      bgClass: 'bg-green-100',
+      textClass: 'text-green-800',
+      icon: 'check',
+      label: 'Aprobado'
+    },
+    'RECHAZADO': {
+      bgClass: 'bg-red-100',
+      textClass: 'text-red-800',
+      icon: 'close',
+      label: 'Rechazado'
+    },
+    'EN PROCESO': {
+      bgClass: 'bg-yellow-100',
+      textClass: 'text-yellow-800',
+      icon: 'clock',
+      label: 'En proceso'
+    },
+    'PENDIENTE POR CARGAR': {
+      bgClass: 'bg-blue-100',
+      textClass: 'text-blue-800',
+      label: 'Pendiente por cargar'
+    },
   };
 
   selectedRate: any = null;
@@ -63,6 +83,11 @@ export class RatesComponent implements OnInit {
     });
   }
 
+  getRateStatus(rate: any): string {
+    if (!rate) return 'PENDIENTE POR CARGAR';
+    return rate.rateStatus;
+  }
+
   triggerFileTableInput(index: number) {
     this.fileTableInputs.toArray()[index].nativeElement.value = '';
     this.fileTableInputs.toArray()[index].nativeElement.click();
@@ -72,13 +97,12 @@ export class RatesComponent implements OnInit {
     const file = uploadedFile as File;
     if (!file) return;
 
-    if (rate.currentRate.rateStatus === 'PENDIENTE POR CARGAR') {
+    if (this.getRateStatus(rate.currentRate) === 'PENDIENTE POR CARGAR') {
       if (this.isRateDrawerOpen) return;
       this.initialFile = file;
       this.openRateDetail(rate);
     } else {
-      const data = { file };
-      this.onSubmitRate(data, rate);
+      this.onSubmitRate(file, rate);
     }
   }
 
@@ -98,41 +122,34 @@ export class RatesComponent implements OnInit {
     this.initialFile = null;
   }
 
-  onSubmitRate = async (rateForm: RateFormData, rate?: any): Promise<boolean> => {
-    return new Promise((resolve) => {
-      const targetRate = rate ?? this.selectedRate;
-      if (!targetRate) resolve(false);
+  onSubmitRate(file: File, rate: any) {
+    if (!file || !rate) return;
 
-      if (!rateForm?.file) {
-        this.alertService.warning(
-          '¡Acción requerida!',
-          'Debes seleccionar un documento.',
-        );
-        resolve(false);
-      }
-
-      const reqData = new FormData();
-      reqData.append('archivo', rateForm.file, rateForm.file.name);
-      if (rateForm.observations) reqData.append('observations', rateForm.observations);
-
-      resolve(true);
-      // this.serviceMethod(formData).subscribe({
-      //   next: (res) => {
-      //     resolve(true);
-      //   },
-      //   error: (err) => {
-      //     resolve(false);
-      //   }
-      // });
-    });
+    const reqData = new FormData();
+    reqData.append('archivo', file, file.name);
+    // this.rateService.uploadRate(formData).subscribe({
+    //   next: (res) => {
+    //   },
+    //   error: (err) => {
+    //     console.error(err);
+    //   }
+    // });
   }
 
-  deleteRate() {
+  deleteRate(rate: any) {
     this.alertService.confirmDelete(
       '¿Estas seguro de eliminar la tarifa?',
       'En caso de eliminar la tarifa se perderá y no podrá recuperarse'
     ).subscribe((confirmed: boolean) => {
       if (!confirmed) return;
+
+      // this.rateService.deleteRate(formData).subscribe({
+      //   next: (res) => {
+      //   },
+      //   error: (err) => {
+      //     console.error(err);
+      //   }
+      // });
       this.alertService.success(
         '¡Tarifa eliminada!',
         'La tarifa se eliminó correctamente.'

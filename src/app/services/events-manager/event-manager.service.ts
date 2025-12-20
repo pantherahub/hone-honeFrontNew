@@ -1,9 +1,9 @@
 import { Injectable, signal } from '@angular/core';
-import { UserInterface } from '../../models/user.interface';
-import { ClientInterface } from 'src/app/models/client.interface';
+import { UserInterface } from '../../interfaces/user.interface';
+import { ClientInterface } from 'src/app/interfaces/client.interface';
 
 @Injectable({
-   providedIn: 'root'
+  providedIn: 'root'
 })
 export class EventManagerService {
 

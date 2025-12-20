@@ -8,7 +8,7 @@ import { firstValueFrom } from 'rxjs';
 import { OfficeFormComponent } from './office-form/office-form.component';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { OfficeDetailComponent } from './office-detail/office-detail.component';
-import { CompanyInterface } from 'src/app/models/client.interface';
+import { CompanyInterface } from 'src/app/interfaces/client.interface';
 import { ClientProviderService } from 'src/app/services/client-provider/client-provider.service';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 

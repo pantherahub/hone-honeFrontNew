@@ -2,7 +2,7 @@ import { Component, Input, TemplateRef } from '@angular/core';
 import { ModalComponent } from '../../components/modal/modal.component';
 import { CommonModule } from '@angular/common';
 import { ButtonComponent } from '../../components/button/button.component';
-import { AlertVariant } from 'src/app/models/alert.interface';
+import { AlertVariant } from 'src/app/interfaces/alert.interface';
 
 @Component({
   selector: 'app-alert-modal',

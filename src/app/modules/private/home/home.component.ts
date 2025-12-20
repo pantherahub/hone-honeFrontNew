@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ClientInterface } from '../../../models/client.interface';
+import { ClientInterface } from '../../../interfaces/client.interface';
 import { ClientProviderService } from '../../../services/client-provider/client-provider.service';
 import { EventManagerService } from '../../../services/events-manager/event-manager.service';
 import { Router, RouterModule } from '@angular/router';

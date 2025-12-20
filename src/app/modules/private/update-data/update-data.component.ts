@@ -13,7 +13,7 @@ import { CanComponentDeactivate } from 'src/app/guards/can-deactivate.interface'
 import { Router, RouterModule } from '@angular/router';
 import { NavigationService } from 'src/app/services/navigation/navigation.service';
 import { isEmail } from 'src/app/utils/validation-utils';
-import { ClientInterface } from 'src/app/models/client.interface';
+import { ClientInterface } from 'src/app/interfaces/client.interface';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { AlertComponent } from 'src/app/shared/components/alert/alert.component';
 import { ProviderFormComponent } from './provider-form/provider-form.component';
@@ -23,7 +23,7 @@ import { AlertService } from 'src/app/services/alert/alert.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CatalogService } from 'src/app/services/catalog/catalog.service';
 import { ProviderService } from 'src/app/services/provider/provider.service';
-import { TempProviderDataValidation } from 'src/app/models/temporal-provider.interface';
+import { TempProviderDataValidation } from 'src/app/interfaces/temporal-provider.interface';
 
 @Component({
   selector: 'app-update-data',

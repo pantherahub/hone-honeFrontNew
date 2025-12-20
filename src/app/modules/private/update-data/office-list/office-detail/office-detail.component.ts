@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { City } from 'src/app/models/city.interface';
-import { CompanyInterface } from 'src/app/models/client.interface';
+import { City } from 'src/app/interfaces/city.interface';
+import { CompanyInterface } from 'src/app/interfaces/client.interface';
 import { CatalogService } from 'src/app/services/catalog/catalog.service';
 import { ContactsProviderService } from 'src/app/services/contacts-provider/contacts-provider.service';
 import { OfficeDataService } from 'src/app/services/office-data/office-data.service';
