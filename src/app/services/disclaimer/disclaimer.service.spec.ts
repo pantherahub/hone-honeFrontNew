@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { DocumentService } from './documents-crud.service';
+import { DisclaimerService } from './disclaimer.service';
 
-describe('DocumentService', () => {
-  let service: DocumentService;
+describe('DisclaimerService', () => {
+  let service: DisclaimerService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(DocumentService);
+    service = TestBed.inject(DisclaimerService);
   });
 
   it('should be created', () => {

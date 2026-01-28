@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { EventManagerService } from '../../../../services/events-manager/event-manager.service';
-import { DocumentsCrudService } from '../../../../services/documents/documents-crud.service';
+import { DocumentService } from '../../../../services/documents/documents-crud.service';
 import { DocumentInterface } from '../../../../models/client.interface';
 import { Router } from '@angular/router';
 import { FeedbackFivestarsComponent } from 'src/app/shared/modals/feedback-fivestars/feedback-fivestars.component';
@@ -18,6 +18,9 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { CompliancePercentInterface, PercentInterface } from 'src/app/models/doc-percent.interface';
 import { environment } from 'src/environments/environment';
 import { CatalogService } from 'src/app/services/catalog/catalog.service';
+import { DisclaimerFormComponent } from 'src/app/shared/modals/disclaimer-form/disclaimer-form.component';
+import { DisclaimerService } from 'src/app/services/disclaimer/disclaimer.service';
+import { Disclaimer } from 'src/app/models/disclaimer.interface';
 
 @Component({
   selector: 'app-list-documents',
@@ -37,7 +40,10 @@ export class ListDocumentsComponent implements OnInit {
   percentData: CompliancePercentInterface | undefined;
   docList: any[] = [];
   citiesList: any[] = [];
+  providerDisclaimer: Disclaimer | null = null;
+
   feedbackModalShown = false;
+  disclaimerModalShown = false;
   dataformAlertShown = false;
 
   chart!: ApexCharts;
@@ -72,17 +78,19 @@ export class ListDocumentsComponent implements OnInit {
 
   constructor(
     private eventManager: EventManagerService,
-    private documentService: DocumentsCrudService,
+    private documentService: DocumentService,
     private router: Router,
     private modalService: ModalService,
     private alertService: AlertService,
     private downloadService: DownloadService,
     private toastService: ToastService,
     private catalogService: CatalogService,
+    private disclaimerService: DisclaimerService,
   ) { }
 
   ngOnInit(): void {
     this.getCities();
+    this.getProviderDisclaimer();
     this.getDocumentPercent();
     this.getDocuments();
   }
@@ -196,10 +204,30 @@ export class ListDocumentsComponent implements OnInit {
     });
   }
 
+  getProviderDisclaimer() {
+    const { idProvider, idClientHoneSolutions } = this.clientSelected;
+    this.disclaimerService.getDisclaimer(
+      'Documentos', idProvider, idClientHoneSolutions
+    ).subscribe({
+      next: (resp: any) => {
+        const data = resp?.data;
+        if (!data?.canRespond || !data?.disclaimer) {
+          this.providerDisclaimer = null;
+          return;
+        }
+        this.providerDisclaimer = data.disclaimer;
+      },
+      error: (err: any) => {
+        console.error(err);
+      }
+    });
+  }
+
   /**
    * Obtiene desde un api el porcentaje de documentos cargado, sin cargas y vencidos
    */
   getDocumentPercent() {
+    console.log("Calculando porcentaje");
     this.loadingPercent = true;
     const { idProvider, idClientHoneSolutions } = this.clientSelected;
     this.documentService.getPercentDocuments(idProvider, idClientHoneSolutions).subscribe({
@@ -217,11 +245,7 @@ export class ListDocumentsComponent implements OnInit {
           this.setupChart();
         }
 
-        if (this.percentData?.uploaded && this.user.doesNeedSurvey && !this.feedbackModalShown) {
-          this.open5starsFeedback();
-        } else {
-          this.showDataformAlert();
-        }
+        this.startInitialModalsFlow();
       },
       error: (error: any) => {
         this.loadingPercent = false;
@@ -243,7 +267,28 @@ export class ListDocumentsComponent implements OnInit {
     });
   }
 
-  open5starsFeedback(): void {
+  /**
+   * Entry point of the initial modal flow
+   *
+   * Sequential modal steps:
+   * 1. Feedback
+   * 2. Disclaimer
+   * 3. Dataform alert
+  */
+  private startInitialModalsFlow(): void {
+    if (
+      this.percentData?.uploaded &&
+      this.user.doesNeedSurvey &&
+      !this.feedbackModalShown
+    ) {
+      this.open5starsFeedback();
+      return;
+    }
+
+    this.openDisclaimerOrContinue();
+  }
+
+  private open5starsFeedback(): void {
     this.feedbackModalShown = true;
     const modal = this.modalService.open(FeedbackFivestarsComponent, {
       title: 'Nos gustaría conocer tu opinión',
@@ -256,15 +301,35 @@ export class ListDocumentsComponent implements OnInit {
           '¡Gracias por tu feedback!',
           'Tu opinión nos ayuda a mejorar.',
         ).subscribe(() => {
-          this.showDataformAlert();
+          this.openDisclaimerOrContinue();
         });
       } else {
-        this.showDataformAlert();
+        this.openDisclaimerOrContinue();
       }
     });
   }
 
-  showDataformAlert(): void {
+  private openDisclaimerOrContinue(): void {
+    if (this.providerDisclaimer && this.percentData?.uploaded === 100 && !this.disclaimerModalShown) {
+      this.disclaimerModalShown = true;
+      const modal = this.modalService.open(DisclaimerFormComponent, {
+        title: 'Confirmación requerida',
+        closable: false,
+        customSize: 'max-w-[450px] !gap-2',
+      }, {
+        disclaimer: this.providerDisclaimer,
+      });
+
+      modal.onClose.subscribe(() => {
+        this.showDataformAlert();
+      });
+      return;
+    }
+
+    this.showDataformAlert();
+  }
+
+  private showDataformAlert(): void {
     if (this.dataformAlertShown || (this.user.withData && !this.user.rejected)) {
       return;
     }
@@ -287,14 +352,20 @@ export class ListDocumentsComponent implements OnInit {
   }
 
   viewFile(doc: DocumentInterface) {
-    if (doc.UrlDocument) {
-      this.modalService.open(FileViewerComponent, {
-        closable: true,
-        customSize: 'max-w-[800px] !gap-2',
-      }, {
-        currentItem: doc,
-      });
-    }
+    if (!doc.UrlDocument) return;
+
+    const title = this.documentService.formatDocumentName(
+      doc.typeDocument,
+      doc.idDocumentType
+    );
+
+    this.modalService.open(FileViewerComponent, {
+      closable: true,
+      customSize: 'max-w-[800px] !gap-2',
+    }, {
+      title,
+      url: doc.UrlDocument,
+    });
   }
 
   deleteDocument(doc: any) {
