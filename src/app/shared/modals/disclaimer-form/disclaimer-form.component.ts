@@ -72,6 +72,7 @@ export class DisclaimerFormComponent implements OnInit {
 
     this.disclaimerService.sendDisclaimerResponse(reqData).subscribe({
       next: (res: any) => {
+        this.toastService.success('Enviado exitosamente.');
         this.modalRef.close({ submitted: true });
       },
       error: (error: any) => {
