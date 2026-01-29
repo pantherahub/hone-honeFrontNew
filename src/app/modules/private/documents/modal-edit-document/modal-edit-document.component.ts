@@ -317,7 +317,8 @@ export class ModalEditDocumentComponent implements OnInit {
     const typeDoc = this.currentDoc;
 
     if (typeDoc.currentYear) {
-      if (selectedDate.getFullYear() !== currentYear || selectedDate > today) {
+      const minDate = new Date(currentYear - 1, 11, 1); // 1 de diciembre
+      if (selectedDate < minDate || selectedDate > today) {
         return { dateExpeditionInvalid: 'Debe ser del año inmediatamente presente.' };
       }
     } else if (typeDoc.lastMonth !== null) {
