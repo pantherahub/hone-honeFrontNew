@@ -1,0 +1,56 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="feedback-container space-y-4">
+
+  <div class="mt-3 flex flex-col gap-2.5">
+    <label class="text-sm font-semibold text-gray-900 leading-4">
+      {{ disclaimer.message }}
+      @if (disclaimer.fileUrl) {
+        <a (click)="viewFile()"
+          class="inline-flex gap-1 items-center text-xs text-blue-600 dark:text-blue-500 hover:underline">
+          <span>Ver documento</span>
+        </a>
+      }
+    </label>
+    <div class="flex space-x-4">
+      <label class="flex items-center gap-2 cursor-pointer text-sm leading-4 text-gray-900">
+        <app-radio name="isApproved" formControlName="isApproved" [value]="true"></app-radio>
+        Sí
+      </label>
+      <label class="flex items-center gap-2 cursor-pointer text-sm leading-4 text-gray-900">
+        <app-radio name="isApproved" formControlName="isApproved" [value]="false"></app-radio>
+        No
+      </label>
+    </div>
+    <app-input-error [control]="form.get('isApproved')" />
+  </div>
+
+  @if (disclaimer.withObservations) {
+    <div class="flex flex-col gap-2.5">
+      <label class="text-sm font-semibold text-gray-900 leading-4">
+        Observaciones
+      </label>
+      <app-text-input [id]="'observations'" formControlName="observations" label="Comentarios" [isTextarea]="true" maxlength="500" />
+    </div>
+  }
+
+  <div class="flex justify-end gap-2">
+    @if (enableCloseModal) {
+      <app-button
+        (click)="closeModal()"
+        variant="gray"
+        styleType="soft"
+        size="md"
+        customClass="leading-4">
+        Cancelar
+      </app-button>
+    }
+    <app-button
+      [type]="'submit'"
+      variant="primary"
+      styleType="solid"
+      size="md"
+      customClass="leading-4">
+      Enviar
+    </app-button>
+  </div>
+
+</form>
