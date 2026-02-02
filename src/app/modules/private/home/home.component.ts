@@ -2,7 +2,7 @@ import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular
 import { ClientInterface } from '../../../models/client.interface';
 import { ClientProviderService } from '../../../services/client-provider/client-provider.service';
 import { EventManagerService } from '../../../services/events-manager/event-manager.service';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TutorialService } from 'src/app/services/tutorial/tutorial.service';
 import { catchError, EMPTY, finalize, Observable, ReplaySubject, Subject, takeUntil, tap } from 'rxjs';
@@ -55,6 +55,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     private navigationService: NavigationService,
     private modalService: ModalService,
     private disclaimerService: DisclaimerService,
+    private route: ActivatedRoute,
   ) { }
 
   ngOnInit(): void {
@@ -129,8 +130,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     const idProvider = this.user?.id;
     if (!idProvider) return EMPTY;
 
+    const disclaimerKey = this.route.snapshot.data['disclaimerKey'];
     return this.disclaimerService
-      .getDisclaimer('Inicio', idProvider)
+      .getDisclaimer(disclaimerKey, idProvider)
       .pipe(
         tap((resp: any) => {
           const data = resp?.data;

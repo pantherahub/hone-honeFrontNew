@@ -2,7 +2,7 @@ import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } fr
 import { EventManagerService } from '../../../../services/events-manager/event-manager.service';
 import { DocumentService } from '../../../../services/documents/documents-crud.service';
 import { DocumentInterface } from '../../../../models/client.interface';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FeedbackFivestarsComponent } from 'src/app/shared/modals/feedback-fivestars/feedback-fivestars.component';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { ModalService } from 'src/app/services/modal/modal.service';
@@ -92,6 +92,7 @@ export class ListDocumentsComponent implements OnInit, AfterViewInit, OnDestroy 
     private toastService: ToastService,
     private catalogService: CatalogService,
     private disclaimerService: DisclaimerService,
+    private route: ActivatedRoute,
   ) { }
 
   ngOnInit(): void {
@@ -152,9 +153,10 @@ export class ListDocumentsComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private getProviderDisclaimer$(): Observable<void> {
     const { idProvider, idClientHoneSolutions } = this.clientSelected;
+    const disclaimerKey = this.route.snapshot.data['disclaimerKey'];
 
     return this.disclaimerService
-      .getDisclaimer('Documentos', idProvider, idClientHoneSolutions)
+      .getDisclaimer(disclaimerKey, idProvider, idClientHoneSolutions)
       .pipe(
         tap((resp: any) => {
           const data = resp?.data;

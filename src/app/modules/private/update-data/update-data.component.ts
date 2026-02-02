@@ -10,7 +10,7 @@ import { BackendErrorsComponent } from 'src/app/shared/components/backend-errors
 import { catchError, debounceTime, EMPTY, finalize, firstValueFrom, fromEvent, Observable, tap } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
 import { CanComponentDeactivate } from 'src/app/guards/can-deactivate.interface';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { NavigationService } from 'src/app/services/navigation/navigation.service';
 import { isEmail } from 'src/app/utils/validation-utils';
 import { ClientInterface } from 'src/app/models/client.interface';
@@ -122,6 +122,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     private providerService: ProviderService,
     private disclaimerService: DisclaimerService,
     private modalService: ModalService,
+    private route: ActivatedRoute,
   ) { }
 
   ngOnInit(): void {
@@ -275,8 +276,9 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     const idProvider = this.user?.id;
     if (!idProvider) return EMPTY;
 
+    const disclaimerKey = this.route.snapshot.data['disclaimerKey'];
     return this.disclaimerService
-      .getDisclaimer('Actualizacion de Datos', idProvider)
+      .getDisclaimer(disclaimerKey, idProvider)
       .pipe(
         tap((resp: any) => {
           const data = resp?.data;
