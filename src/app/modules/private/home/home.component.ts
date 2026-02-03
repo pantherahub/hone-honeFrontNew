@@ -5,7 +5,7 @@ import { EventManagerService } from '../../../services/events-manager/event-mana
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TutorialService } from 'src/app/services/tutorial/tutorial.service';
-import { catchError, EMPTY, finalize, Observable, ReplaySubject, Subject, takeUntil, tap } from 'rxjs';
+import { catchError, finalize, Observable, of, ReplaySubject, Subject, takeUntil, tap } from 'rxjs';
 import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
@@ -128,7 +128,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private getProviderDisclaimer$(): Observable<void> {
     const idProvider = this.user?.id;
-    if (!idProvider) return EMPTY;
+    if (!idProvider) return of(void 0);
 
     const disclaimerKey = this.route.snapshot.data['disclaimerKey'];
     return this.disclaimerService
@@ -144,7 +144,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         catchError(err => {
           console.error(err);
           this.providerDisclaimer = null;
-          return EMPTY;
+          return of(void 0);
         })
       );
   }

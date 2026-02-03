@@ -168,7 +168,7 @@ export class ListDocumentsComponent implements OnInit, AfterViewInit, OnDestroy 
         catchError(err => {
           console.error(err);
           this.providerDisclaimer = null;
-          return EMPTY;
+          return of(void 0);
         })
       );
   }

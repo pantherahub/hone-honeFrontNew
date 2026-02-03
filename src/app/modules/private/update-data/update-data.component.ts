@@ -7,7 +7,7 @@ import { LANGUAGES } from 'src/app/constants/languages';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { format } from 'date-fns';
 import { BackendErrorsComponent } from 'src/app/shared/components/backend-errors/backend-errors.component';
-import { catchError, debounceTime, EMPTY, finalize, firstValueFrom, fromEvent, Observable, tap } from 'rxjs';
+import { catchError, debounceTime, finalize, firstValueFrom, fromEvent, Observable, of, tap } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
 import { CanComponentDeactivate } from 'src/app/guards/can-deactivate.interface';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -274,7 +274,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
 
   private getProviderDisclaimer$(): Observable<void> {
     const idProvider = this.user?.id;
-    if (!idProvider) return EMPTY;
+    if (!idProvider) return of(void 0);
 
     const disclaimerKey = this.route.snapshot.data['disclaimerKey'];
     return this.disclaimerService
@@ -290,7 +290,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
         catchError(err => {
           console.error(err);
           this.providerDisclaimer = null;
-          return EMPTY;
+          return of(void 0);
         })
       );
   }
