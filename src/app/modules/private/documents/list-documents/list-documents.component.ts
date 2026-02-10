@@ -1,8 +1,8 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
-import { DocumentsCrudService } from 'src/app/services/documents/documents-crud.service';
 import { DocumentInterface } from 'src/app/interfaces/client.interface';
-import { Router } from '@angular/router';
+import { DocumentService } from 'src/app/services/documents/documents-crud.service';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FeedbackFivestarsComponent } from 'src/app/shared/modals/feedback-fivestars/feedback-fivestars.component';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { ModalService } from 'src/app/services/modal/modal.service';
@@ -19,6 +19,10 @@ import { CompliancePercentInterface, PercentInterface } from 'src/app/interfaces
 import { environment } from 'src/environments/environment';
 import { CatalogService } from 'src/app/services/catalog/catalog.service';
 import { BadgeConfig } from 'src/app/types/badge-config.type';
+import { DisclaimerFormComponent } from 'src/app/shared/modals/disclaimer-form/disclaimer-form.component';
+import { DisclaimerService } from 'src/app/services/disclaimer/disclaimer.service';
+import { Disclaimer } from 'src/app/interfaces/disclaimer.interface';
+import { catchError, EMPTY, finalize, map, Observable, of, ReplaySubject, Subject, switchMap, takeUntil, tap } from 'rxjs';
 
 @Component({
   selector: 'app-list-documents',
@@ -27,10 +31,12 @@ import { BadgeConfig } from 'src/app/types/badge-config.type';
   templateUrl: './list-documents.component.html',
   styleUrl: './list-documents.component.scss'
 })
-export class ListDocumentsComponent implements OnInit {
+export class ListDocumentsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   user = this.eventManager.userLogged();
   clientSelected: any = this.eventManager.clientSelected();
+
+  loading: boolean = false;
   loadingPercent: boolean = false;
   loadingDocs: boolean = false;
   loadManualDownload: boolean = false;
@@ -38,7 +44,10 @@ export class ListDocumentsComponent implements OnInit {
   percentData: CompliancePercentInterface | undefined;
   docList: any[] = [];
   citiesList: any[] = [];
+  providerDisclaimer: Disclaimer | null = null;
+
   feedbackModalShown = false;
+  disclaimerModalShown = false;
   dataformAlertShown = false;
 
   chart!: ApexCharts;
@@ -86,19 +95,139 @@ export class ListDocumentsComponent implements OnInit {
     }
   };
 
+  private destroy$ = new Subject<void>();
+  private disclaimerReady$ = new ReplaySubject<void>(1);
+
   constructor(
     private eventManager: EventManagerService,
-    private documentService: DocumentsCrudService,
+    private documentService: DocumentService,
     private router: Router,
     private modalService: ModalService,
     private alertService: AlertService,
     private downloadService: DownloadService,
     private toastService: ToastService,
     private catalogService: CatalogService,
+    private disclaimerService: DisclaimerService,
+    private route: ActivatedRoute,
   ) { }
 
   ngOnInit(): void {
     this.getCities();
+    this.getDocuments();
+
+    this.loading = true;
+    this.getProviderDisclaimer$()
+      .pipe(
+        switchMap(() => this.getDocumentPercent$()),
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.loading = false;
+        })
+      )
+      .subscribe(() => {
+        this.disclaimerReady$.next();
+      });
+  }
+
+  ngAfterViewInit(): void {
+    this.disclaimerReady$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.startInitialModalsFlow();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  getCities() {
+    this.catalogService.getCities().subscribe({
+      next: (resp: any[]) => {
+        this.citiesList = resp;
+      },
+      error: (err: any) => {
+        console.error(err);
+      }
+    });
+  }
+
+  getDocuments() {
+    this.loadingDocs = true;
+    const { idProvider, idClientHoneSolutions } = this.clientSelected;
+    this.documentService.getDocuments(idProvider, idClientHoneSolutions).subscribe({
+      next: (res: any) => {
+        this.docList = res.data;
+        this.loadingDocs = false;
+      },
+      error: (error: any) => {
+        this.loadingDocs = false;
+      },
+    });
+  }
+
+  private getProviderDisclaimer$(): Observable<void> {
+    const { idProvider, idClientHoneSolutions } = this.clientSelected;
+    const disclaimerKey = this.route.snapshot.data['disclaimerKey'];
+
+    return this.disclaimerService
+      .getDisclaimer(disclaimerKey, idProvider, idClientHoneSolutions)
+      .pipe(
+        tap((resp: any) => {
+          const data = resp?.data;
+          this.providerDisclaimer =
+            data?.canRespond && data?.disclaimer
+              ? data.disclaimer
+              : null;
+        }),
+        catchError(err => {
+          console.error(err);
+          this.providerDisclaimer = null;
+          return of(void 0);
+        })
+      );
+  }
+
+  getDocumentPercent$(): Observable<PercentInterface | null> {
+    this.loadingPercent = true;
+
+    const { idProvider, idClientHoneSolutions } = this.clientSelected;
+
+    return this.documentService
+      .getPercentDocuments(idProvider, idClientHoneSolutions)
+      .pipe(
+        map((res: any) => res.data as PercentInterface),
+
+        // Efectos visuales / preparación
+        tap((percentDataTypes: PercentInterface) => {
+          this.percentData = percentDataTypes?.compliance;
+
+          if (this.chart) {
+            this.chart.updateSeries([
+              this.percentData?.uploaded ?? 0,
+              this.percentData?.remaining ?? 0,
+              this.percentData?.expired ?? 0
+            ]);
+          } else {
+            this.setupChart();
+          }
+        }),
+
+        finalize(() => {
+          this.loadingPercent = false;
+        })
+      );
+  }
+
+  getDocumentPercent(): void {
+    this.loading = true;
+    this.getDocumentPercent$()
+      .pipe(finalize(() => this.loading = false))
+      .subscribe(() => this.startInitialModalsFlow());
+  }
+
+  reloadDocuments(): void {
     this.getDocumentPercent();
     this.getDocuments();
   }
@@ -111,11 +240,9 @@ export class ListDocumentsComponent implements OnInit {
     );
     this.chart.render();
   }
-
   getColor(variable: string): string {
     return getComputedStyle(document.documentElement).getPropertyValue(variable).trim();
   }
-
   getChartOptions(): ApexOptions {
     const {
       remaining = 100,
@@ -190,7 +317,6 @@ export class ListDocumentsComponent implements OnInit {
       },
     };
   }
-
   highlightSeries(label: string): void {
     if (!this.chart) return;
     this.chart.toggleSeries(label);
@@ -201,65 +327,28 @@ export class ListDocumentsComponent implements OnInit {
     this.chart.resetSeries();
   }
 
-  getCities() {
-    this.catalogService.getCities().subscribe({
-      next: (resp: any[]) => {
-        this.citiesList = resp;
-      },
-      error: (err: any) => {
-        console.error(err);
-      }
-    });
-  }
-
   /**
-   * Obtiene desde un api el porcentaje de documentos cargado, sin cargas y vencidos
-   */
-  getDocumentPercent() {
-    this.loadingPercent = true;
-    const { idProvider, idClientHoneSolutions } = this.clientSelected;
-    this.documentService.getPercentDocuments(idProvider, idClientHoneSolutions).subscribe({
-      next: (res: any) => {
-        const percentDataTypes = res.data as PercentInterface;
-        this.percentData = percentDataTypes?.compliance;
-        this.loadingPercent = false;
-        if (this.chart) {
-          this.chart.updateSeries([
-            this.percentData?.uploaded ?? 0,
-            this.percentData?.remaining ?? 0,
-            this.percentData?.expired ?? 0
-          ]);
-        } else {
-          this.setupChart();
-        }
+   * Entry point of the initial modal flow
+   *
+   * Sequential modal steps:
+   * 1. Feedback
+   * 2. Disclaimer
+   * 3. Dataform alert
+  */
+  private startInitialModalsFlow(): void {
+    if (
+      this.percentData?.uploaded &&
+      this.user.doesNeedSurvey &&
+      !this.feedbackModalShown
+    ) {
+      this.open5starsFeedback();
+      return;
+    }
 
-        if (this.percentData?.uploaded && this.user.doesNeedSurvey && !this.feedbackModalShown) {
-          this.open5starsFeedback();
-        } else {
-          this.showDataformAlert();
-        }
-      },
-      error: (error: any) => {
-        this.loadingPercent = false;
-      },
-    });
+    this.openDisclaimerOrContinue();
   }
 
-  getDocuments() {
-    this.loadingDocs = true;
-    const { idProvider, idClientHoneSolutions } = this.clientSelected;
-    this.documentService.getDocuments(idProvider, idClientHoneSolutions).subscribe({
-      next: (res: any) => {
-        this.docList = res.data;
-        this.loadingDocs = false;
-      },
-      error: (error: any) => {
-        this.loadingDocs = false;
-      },
-    });
-  }
-
-  open5starsFeedback(): void {
+  private open5starsFeedback(): void {
     this.feedbackModalShown = true;
     const modal = this.modalService.open(FeedbackFivestarsComponent, {
       title: 'Nos gustaría conocer tu opinión',
@@ -272,15 +361,35 @@ export class ListDocumentsComponent implements OnInit {
           '¡Gracias por tu feedback!',
           'Tu opinión nos ayuda a mejorar.',
         ).subscribe(() => {
-          this.showDataformAlert();
+          this.openDisclaimerOrContinue();
         });
       } else {
-        this.showDataformAlert();
+        this.openDisclaimerOrContinue();
       }
     });
   }
 
-  showDataformAlert(): void {
+  private openDisclaimerOrContinue(): void {
+    if (this.providerDisclaimer && this.percentData?.uploaded === 100 && !this.disclaimerModalShown) {
+      this.disclaimerModalShown = true;
+      const modal = this.modalService.open(DisclaimerFormComponent, {
+        title: 'Confirmación requerida',
+        closable: false,
+        customSize: 'max-w-[450px] !gap-2',
+      }, {
+        disclaimer: this.providerDisclaimer,
+      });
+
+      modal.onClose.subscribe(() => {
+        this.showDataformAlert();
+      });
+      return;
+    }
+
+    this.showDataformAlert();
+  }
+
+  private showDataformAlert(): void {
     if (this.dataformAlertShown || (this.user.withData && !this.user.rejected)) {
       return;
     }
@@ -303,14 +412,20 @@ export class ListDocumentsComponent implements OnInit {
   }
 
   viewFile(doc: DocumentInterface) {
-    if (doc.UrlDocument) {
-      this.modalService.open(FileViewerComponent, {
-        closable: true,
-        customSize: 'max-w-[800px] !gap-2',
-      }, {
-        currentItem: doc,
-      });
-    }
+    if (!doc.UrlDocument) return;
+
+    const title = this.documentService.formatDocumentName(
+      doc.typeDocument,
+      doc.idDocumentType
+    );
+
+    this.modalService.open(FileViewerComponent, {
+      closable: true,
+      customSize: 'max-w-[800px] !gap-2',
+    }, {
+      title,
+      url: doc.UrlDocument,
+    });
   }
 
   deleteDocument(doc: any) {
@@ -329,8 +444,7 @@ export class ListDocumentsComponent implements OnInit {
       this.documentService.deleteDocument(this.clientSelected.idProvider, idDocumentsProvider).subscribe({
         next: (res: any) => {
           this.loadingDocs = false;
-          this.getDocumentPercent();
-          this.getDocuments();
+          this.reloadDocuments();
           this.alertService.success(
             '¡Documento eliminado!',
             'El documento se eliminó correctamente.'
@@ -362,8 +476,7 @@ export class ListDocumentsComponent implements OnInit {
     })
     modal.onClose.subscribe((result) => {
       if (result?.response) {
-        this.getDocumentPercent();
-        this.getDocuments();
+        this.reloadDocuments();
       }
     });
   }

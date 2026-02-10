@@ -7,10 +7,10 @@ import { LANGUAGES } from 'src/app/constants/languages';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { format } from 'date-fns';
 import { BackendErrorsComponent } from 'src/app/shared/components/backend-errors/backend-errors.component';
-import { debounceTime, firstValueFrom, fromEvent } from 'rxjs';
+import { catchError, debounceTime, finalize, firstValueFrom, fromEvent, Observable, of, tap } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
 import { CanComponentDeactivate } from 'src/app/guards/can-deactivate.interface';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { NavigationService } from 'src/app/services/navigation/navigation.service';
 import { isEmail } from 'src/app/utils/validation-utils';
 import { ClientInterface } from 'src/app/interfaces/client.interface';
@@ -24,6 +24,10 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { CatalogService } from 'src/app/services/catalog/catalog.service';
 import { ProviderService } from 'src/app/services/provider/provider.service';
 import { TempProviderDataValidation } from 'src/app/interfaces/temporal-provider.interface';
+import { DisclaimerService } from 'src/app/services/disclaimer/disclaimer.service';
+import { Disclaimer } from 'src/app/interfaces/disclaimer.interface';
+import { ModalService } from 'src/app/services/modal/modal.service';
+import { DisclaimerFormComponent } from 'src/app/shared/modals/disclaimer-form/disclaimer-form.component';
 
 @Component({
   selector: 'app-update-data',
@@ -41,6 +45,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
   languages: any[] = LANGUAGES;
   identificationTypes: any[] = [];
   providerCompanies: any[] = [];
+  providerDisclaimer: Disclaimer | null = null;
 
   existingOffices: any[] = [];
   existingContacts: any[] = [];
@@ -115,6 +120,9 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     private alertService: AlertService,
     private catalogService: CatalogService,
     private providerService: ProviderService,
+    private disclaimerService: DisclaimerService,
+    private modalService: ModalService,
+    private route: ActivatedRoute,
   ) { }
 
   ngOnInit(): void {
@@ -125,7 +133,12 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
 
     this.getCompanies();
 
-    this.loadFormData();
+    this.loading = true;
+    this.getProviderDisclaimer$()
+      .pipe(finalize(() => this.loading = false))
+      .subscribe(() => {
+        this.startInitialFlow();
+      });
   }
 
   ngAfterViewInit(): void {
@@ -136,6 +149,32 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     fromEvent(container, 'scroll')
       .pipe(debounceTime(200))
       .subscribe(() => this.updateArrows(false));
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribeForm();
+  }
+
+  async canDeactivate(): Promise<boolean> {
+    return !this.hasSavedState() || await firstValueFrom(
+      this.alertService.confirm(
+        '¡Aviso!', 'Tienes cambios pendientes. ¿Deseas salir?', {
+        confirmBtnText: 'Salir',
+        cancelBtnText: 'Cancelar',
+      })
+    );
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  handleUnload($event: BeforeUnloadEvent): void {
+    if (this.hasSavedState()) {
+      $event.preventDefault();
+    }
+  }
+
+  @HostListener('window:resize')
+  onResize() {
+    this.updateArrows();
   }
 
   private scrollToIndex(index: number, useDelay = true) {
@@ -198,30 +237,76 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     }
   }
 
-  ngOnDestroy(): void {
-    this.unsubscribeForm();
+  getIdentificationTypes() {
+    this.catalogService.getDocTypes().subscribe({
+      next: (res: any) => {
+        this.identificationTypes = res;
+      },
+      error: (err: any) => {
+        console.error(err);
+      }
+    });
   }
 
-  async canDeactivate(): Promise<boolean> {
-    return !this.hasSavedState() || await firstValueFrom(
-      this.alertService.confirm(
-        '¡Aviso!', 'Tienes cambios pendientes. ¿Deseas salir?', {
-        confirmBtnText: 'Salir',
-        cancelBtnText: 'Cancelar',
-      })
-    );
+  getCompanies() {
+    this.loading = true;
+    this.clientProviderService.getClientListByProviderId(this.user.id).subscribe({
+      next: (res: ClientInterface[]) => {
+        const clientList = res;
+        const clientsIds = clientList.map((client: any) => client.idClientHoneSolutions);
+        this.getProviderCompanies(clientsIds);
+      },
+      error: (err: any) => {
+        console.error(err);
+        this.loading = false;
+      },
+    });
   }
 
-  @HostListener('window:beforeunload', ['$event'])
-  handleUnload($event: BeforeUnloadEvent): void {
-    if (this.hasSavedState()) {
-      $event.preventDefault();
+  private startInitialFlow(): void {
+    if (this.providerDisclaimer) {
+      this.openProviderDisclaimer();
+      return;
     }
+
+    this.loadFormData();
   }
 
-  @HostListener('window:resize')
-  onResize() {
-    this.updateArrows();
+  private getProviderDisclaimer$(): Observable<void> {
+    const idProvider = this.user?.id;
+    if (!idProvider) return of(void 0);
+
+    const disclaimerKey = this.route.snapshot.data['disclaimerKey'];
+    return this.disclaimerService
+      .getDisclaimer(disclaimerKey, idProvider)
+      .pipe(
+        tap((resp: any) => {
+          const data = resp?.data;
+          this.providerDisclaimer =
+            data?.canRespond && data?.disclaimer
+              ? data.disclaimer
+              : null;
+        }),
+        catchError(err => {
+          console.error(err);
+          this.providerDisclaimer = null;
+          return of(void 0);
+        })
+      );
+  }
+
+  private openProviderDisclaimer(): void {
+    if (!this.providerDisclaimer) return;
+    const modal = this.modalService.open(DisclaimerFormComponent, {
+      title: 'Confirmación requerida',
+      closable: false,
+    }, {
+      disclaimer: this.providerDisclaimer,
+    });
+
+    modal.onClose.subscribe(() => {
+      this.loadFormData();
+    });
   }
 
   subscribeOnChange() {
@@ -591,32 +676,6 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
   isValidEmail(email: string | undefined): boolean {
     if (!email || typeof email != 'string') return false;
     return isEmail(email || '');
-  }
-
-  getIdentificationTypes() {
-    this.catalogService.getDocTypes().subscribe({
-      next: (res: any) => {
-        this.identificationTypes = res;
-      },
-      error: (err: any) => {
-        console.error(err);
-      }
-    });
-  }
-
-  getCompanies() {
-    this.loading = true;
-    this.clientProviderService.getClientListByProviderId(this.user.id).subscribe({
-      next: (res: ClientInterface[]) => {
-        const clientList = res;
-        const clientsIds = clientList.map((client: any) => client.idClientHoneSolutions);
-        this.getProviderCompanies(clientsIds);
-      },
-      error: (err: any) => {
-        console.error(err);
-        this.loading = false;
-      },
-    });
   }
 
   getProviderCompanies(clientsIds: number[]) {

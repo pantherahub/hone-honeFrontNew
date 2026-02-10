@@ -14,8 +14,8 @@ export const serviceAccessGuard: CanActivateFn = (route, state) => {
     return false;
   }
 
-
-  const serviceKey = route.routeConfig?.path;
+  const serviceKey = route.data?.['serviceKey'];
+  if (!serviceKey) return false;
 
   const allowedServices = clientServicesConfig[clientId] ?? defaultServices;
 
