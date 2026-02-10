@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { DropdownTriggerDirective } from 'src/app/directives/dropdown-trigger.directive';
 import { FileSelectDirective } from 'src/app/directives/file-select.directive';
 import { PipesModule } from 'src/app/pipes/pipes.module';
@@ -9,6 +9,12 @@ import { RateService } from 'src/app/services/rate/rate.service';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { RateManagementComponent } from './rate-management/rate-management.component';
 import { BadgeConfig } from 'src/app/types/badge-config.type';
+import { catchError, finalize, Observable, of, ReplaySubject, Subject, takeUntil, tap } from 'rxjs';
+import { DisclaimerService } from 'src/app/services/disclaimer/disclaimer.service';
+import { ActivatedRoute } from '@angular/router';
+import { Disclaimer } from 'src/app/interfaces/disclaimer.interface';
+import { ModalService } from 'src/app/services/modal/modal.service';
+import { DisclaimerFormComponent } from 'src/app/shared/modals/disclaimer-form/disclaimer-form.component';
 
 @Component({
   selector: 'app-rates',
@@ -17,10 +23,13 @@ import { BadgeConfig } from 'src/app/types/badge-config.type';
   templateUrl: './rates.component.html',
   styleUrl: './rates.component.scss'
 })
-export class RatesComponent implements OnInit {
+export class RatesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   user = this.eventManager.userLogged();
   clientSelected: any = this.eventManager.clientSelected();
+  loading: boolean = false;
+
+  providerDisclaimer: Disclaimer | null = null;
 
   loadingRates: boolean = false;
   rateList: any[] = [];
@@ -57,16 +66,42 @@ export class RatesComponent implements OnInit {
 
   isSmall: boolean = window.innerWidth < 640;
 
+  private destroy$ = new Subject<void>();
+  private disclaimerReady$ = new ReplaySubject<void>(1);
+
   @ViewChildren('fileTableInput') fileTableInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
   constructor(
     private eventManager: EventManagerService,
     private alertService: AlertService,
     private rateService: RateService,
+    private disclaimerService: DisclaimerService,
+    private route: ActivatedRoute,
+    private modalService: ModalService,
   ) { }
 
   ngOnInit(): void {
     this.getRates();
+
+    this.loading = true;
+    this.getProviderDisclaimer$()
+      .pipe(finalize(() => this.loading = false))
+      .subscribe(() => {
+        this.disclaimerReady$.next();
+      });
+  }
+
+  ngAfterViewInit(): void {
+    this.disclaimerReady$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.openDisclaimer();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   getRates() {
@@ -80,6 +115,40 @@ export class RatesComponent implements OnInit {
       error: (error: any) => {
         this.loadingRates = false;
       },
+    });
+  }
+
+  private getProviderDisclaimer$(): Observable<void> {
+    const { idProvider, idClientHoneSolutions } = this.clientSelected;
+    const disclaimerKey = this.route.snapshot.data['disclaimerKey'];
+
+    return this.disclaimerService
+      .getDisclaimer(disclaimerKey, idProvider, idClientHoneSolutions)
+      .pipe(
+        tap((resp: any) => {
+          const data = resp?.data;
+          this.providerDisclaimer =
+            data?.canRespond && data?.disclaimer
+              ? data.disclaimer
+              : null;
+        }),
+        catchError(err => {
+          console.error(err);
+          this.providerDisclaimer = null;
+          return of(void 0);
+        })
+      );
+  }
+
+  private openDisclaimer(): void {
+    if (!this.providerDisclaimer) return;
+
+    this.modalService.open(DisclaimerFormComponent, {
+      title: 'Confirmación requerida',
+      closable: false,
+      customSize: 'max-w-[450px] !gap-2',
+    }, {
+      disclaimer: this.providerDisclaimer,
     });
   }
 
