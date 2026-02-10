@@ -21,12 +21,13 @@ import { CatalogService } from 'src/app/services/catalog/catalog.service';
 import { DisclaimerFormComponent } from 'src/app/shared/modals/disclaimer-form/disclaimer-form.component';
 import { DisclaimerService } from 'src/app/services/disclaimer/disclaimer.service';
 import { Disclaimer } from 'src/app/models/disclaimer.interface';
-import { catchError, EMPTY, finalize, map, Observable, of, ReplaySubject, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { catchError, finalize, map, Observable, of, ReplaySubject, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { PopoverComponent } from 'src/app/shared/components/popover/popover.component';
 
 @Component({
   selector: 'app-list-documents',
   standalone: true,
-  imports: [CommonModule, PipesModule, ButtonComponent, TooltipComponent],
+  imports: [CommonModule, PipesModule, ButtonComponent, TooltipComponent, PopoverComponent],
   templateUrl: './list-documents.component.html',
   styleUrl: './list-documents.component.scss'
 })
@@ -45,9 +46,10 @@ export class ListDocumentsComponent implements OnInit, AfterViewInit, OnDestroy 
   citiesList: any[] = [];
   providerDisclaimer: Disclaimer | null = null;
 
-  feedbackModalShown = false;
-  disclaimerModalShown = false;
-  dataformAlertShown = false;
+  feedbackModalShown: boolean = false;
+  disclaimerModalShown: boolean = false;
+  dataformAlertShown: boolean = false;
+  formatsBtnPopoverVisible: boolean = false;
 
   chart!: ApexCharts;
   @ViewChild('donutChart', { static: false }) chartElement!: ElementRef;
@@ -375,6 +377,7 @@ export class ListDocumentsComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private showDataformAlert(): void {
     if (this.dataformAlertShown || (this.user.withData && !this.user.rejected)) {
+      this.showFormatsBtnPopover();
       return;
     }
     this.dataformAlertShown = true;
@@ -389,6 +392,14 @@ export class ListDocumentsComponent implements OnInit, AfterViewInit, OnDestroy 
     }).subscribe(() => {
       this.navigateTo('/update-data');
     });
+  }
+
+  showFormatsBtnPopover() {
+    if (!this.getCurrentDownloadConfig()) return;
+    this.formatsBtnPopoverVisible = true;
+  }
+  closeFormatsBtnPopover() {
+    this.formatsBtnPopoverVisible = false;
   }
 
   navigateTo(url: string): void {
@@ -477,6 +488,7 @@ export class ListDocumentsComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   downloadClientDocs() {
+    this.formatsBtnPopoverVisible = false;
     const config = this.getCurrentDownloadConfig();
     if (!config) return;
 

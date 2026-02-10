@@ -39,6 +39,14 @@ export class HeaderPrivateComponent implements OnInit, OnDestroy {
         }
       }
     );
+
+    const scale = localStorage.getItem('font-scale') || '100';
+    document.documentElement.style.fontSize = `${scale}%`;
+  }
+
+  setFontScale(percent: number) {
+    document.documentElement.style.fontSize = `${percent}%`;
+    localStorage.setItem('font-scale', percent.toString());
   }
 
   ngOnDestroy(): void {

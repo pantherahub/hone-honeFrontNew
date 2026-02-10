@@ -15,7 +15,7 @@
       styleType="ghost"
       size="sm"
       customClass="leading-4">
-      <svg width="16" height="16">
+      <svg class="w-4 h-4">
         <use xlink:href="/assets/icons/outline/arrows.svg#chevron-left" />
       </svg>
       Volver
@@ -73,7 +73,7 @@
                 customClass="w-full leading-4"
                 [disabled]="!step.enabled"
                 (onClick)="goToStep(step.key)">
-                <svg width="16" height="16">
+                <svg class="w-4 h-4">
                   <use [attr.xlink:href]="step.icon" />
                 </svg>
                 {{ step.label }}
@@ -109,7 +109,7 @@
               size="sm"
               (onClick)="scrollStep('left')"
               customClass="h-full !p-2">
-              <svg width="24" height="24">
+              <svg class="w-6 h-6">
                 <use xlink:href="/assets/icons/outline/arrows.svg#chevron-double-left" />
               </svg>
             </app-button>
@@ -127,7 +127,7 @@
                   customClass="flex-shrink-0 min-w-[120px] leading-4"
                   [disabled]="!step.enabled"
                   (onClick)="goToStep(step.key, false)">
-                  <svg width="16" height="16">
+                  <svg class="w-4 h-4">
                     <use [attr.xlink:href]="step.icon" />
                   </svg>
                   {{ step.label }}
@@ -143,7 +143,7 @@
               size="sm"
               (onClick)="scrollStep('right')"
               customClass="h-full !p-2">
-              <svg width="24" height="24">
+              <svg class="w-6 h-6">
                 <use xlink:href="/assets/icons/outline/arrows.svg#chevron-double-right" />
               </svg>
             </app-button>

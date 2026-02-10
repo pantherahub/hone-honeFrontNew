@@ -94,6 +94,7 @@ export const routes: Routes = [
           //   component: RatesComponent,
           //   canActivate: [serviceAccessGuard],
           //   data: {
+          //     disclaimerKey: 'Tarifas',
           //     serviceKey: SERVICES_CONFIG.rates.key
           //   },
           // },

@@ -34,7 +34,7 @@
             styleType="soft"
             size="xs"
             class="hidden sm:block">
-            <svg width="16" height="16">
+            <svg class="w-4 h-4">
               <use xlink:href="/assets/icons/outline/general.svg#edit" />
             </svg>
             Editar
@@ -55,7 +55,7 @@
         size="xs"
         class="block sm:hidden"
         customClass="w-full flex justify-center">
-        <svg width="16" height="16">
+        <svg class="w-4 h-4">
           <use xlink:href="/assets/icons/outline/general.svg#edit" />
         </svg>
         Editar
@@ -82,7 +82,7 @@
       @if ((isFirstForm && !selectedForm.get('email')?.disabled) || isEditing) {
         <a (click)="openEmailInfo()"
           class="mt-1 inline-flex gap-1 items-center text-xs text-blue-600 dark:text-blue-500 hover:underline">
-          <svg width="16" height="16">
+          <svg class="w-4 h-4">
             <use xlink:href="/assets/icons/outline/general.svg#info-circle" />
           </svg>
           <span>Información importante</span>
@@ -162,7 +162,7 @@
         styleType="solid"
         size="md">
         Siguiente
-        <svg width="20" height="20">
+        <svg class="w-5 h-5">
           <use xlink:href="/assets/icons/outline/arrows.svg#chevron-right" />
         </svg>
       </app-button>

@@ -29,7 +29,7 @@
           </div>
           <div class="flex rounded-lg gap-2 py-2.5 px-4 bg-blue2h-50 text-blue2h-950">
             <div class="py-2">
-              <svg width="20" height="20">
+              <svg class="w-5 h-5">
                 <use xlink:href="/assets/icons/outline/general.svg#lock" />
               </svg>
             </div>
@@ -61,7 +61,7 @@
             [styleType]="viewMode === 'grid' ? 'solid' : 'ghost'"
             customClass="!p-1"
             (click)="setView('grid')">
-            <svg width="24" height="24">
+            <svg class="w-6 h-6">
               <use xlink:href="/assets/icons/outline/general.svg#grid" />
             </svg>
           </app-button>
@@ -71,7 +71,7 @@
             [styleType]="viewMode === 'list' ? 'solid' : 'ghost'"
             customClass="!p-1"
             (click)="setView('list')">
-            <svg width="24" height="24">
+            <svg class="w-6 h-6">
               <use xlink:href="/assets/icons/outline/text.svg#list" />
             </svg>
           </app-button>
@@ -221,7 +221,7 @@
         Mantén tus datos al día
       </h3>
       <app-button (click)="reminderModal.close()" variant="primary" size="sm" styleType="ghost" class="md:hidden">
-        <svg width="16" height="16">
+        <svg class="w-4 h-4">
           <use xlink:href="/assets/icons/outline/general.svg#close" />
         </svg>
       </app-button>
