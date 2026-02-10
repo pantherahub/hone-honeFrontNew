@@ -225,7 +225,7 @@ export class PopoverComponent implements OnInit, AfterViewInit, OnChanges, OnDes
   }
 
   @HostListener('document:keydown.escape', ['$event'])
-  handleEscape(event: KeyboardEvent) {
+  handleEscape(event: Event) {
     if (this.visible && this.closeOnEscape) this.close();
   }
 

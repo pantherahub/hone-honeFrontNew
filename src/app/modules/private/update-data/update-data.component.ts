@@ -29,6 +29,7 @@ import { Disclaimer } from 'src/app/models/disclaimer.interface';
 import { ModalService } from 'src/app/services/modal/modal.service';
 import { DisclaimerFormComponent } from 'src/app/shared/modals/disclaimer-form/disclaimer-form.component';
 import { LoaderComponent } from 'src/app/shared/components/loader/loader.component';
+import { LoadingCounter } from 'src/app/helpers/loading-counter';
 
 @Component({
   selector: 'app-update-data',
@@ -57,7 +58,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
   contactPage: number = 1;
   contactPageSize: number = 5;
 
-  loading: boolean = false;
+  loadingState = new LoadingCounter();
   backendError: any = null;
   hasSectionBackendError: boolean = false;
 
@@ -134,9 +135,9 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
 
     this.getCompanies();
 
-    this.loading = true;
+    this.loadingState.start();
     this.getProviderDisclaimer$()
-      .pipe(finalize(() => this.loading = false))
+      .pipe(finalize(() => this.loadingState.stop()))
       .subscribe(() => {
         this.startInitialFlow();
       });
@@ -250,7 +251,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
   }
 
   getCompanies() {
-    this.loading = true;
+    this.loadingState.start();
     this.clientProviderService.getClientListByProviderId(this.user.id).subscribe({
       next: (res: ClientInterface[]) => {
         const clientList = res;
@@ -259,7 +260,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
       },
       error: (err: any) => {
         console.error(err);
-        this.loading = false;
+        this.loadingState.stop();
       },
     });
   }
@@ -486,16 +487,16 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
         ? this.providerService.validateTemporalProviderDataCreate(args)
         : this.providerService.validateTemporalProviderDataUpdate(args);
 
-    this.loading = true;
+    this.loadingState.start();
     return new Promise((resolve) => {
       serviceMethod(formControlValues).subscribe({
         next: (resp: any) => {
-          this.loading = false;
+          this.loadingState.stop();
           this.clearSectionBackendError();
           resolve(true);
         },
         error: (err) => {
-          this.loading = false;
+          this.loadingState.stop();
           if (err.status == 422) {
             this.backendError = err.error;
             this.hasSectionBackendError = true;
@@ -683,11 +684,11 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     this.clientProviderService.getCompaniesByIdClients({ clientsIds }).subscribe({
       next: (res: any) => {
         this.providerCompanies = res.data;
-        this.loading = false;
+        this.loadingState.stop();
       },
       error: (err: any) => {
         console.error(err);
-        this.loading = false;
+        this.loadingState.stop();
       }
     });
   }
@@ -794,10 +795,10 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
   }
 
   loadProviderData(): void {
-    this.loading = true;
+    this.loadingState.start();
     this.providerService.getTemporalProviderData(this.user.id).subscribe({
       next: (res: any) => {
-        this.loading = false;
+        this.loadingState.stop();
         const user = this.user;
 
         const data = res.data;
@@ -875,7 +876,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
         }
       },
       error: (err: any) => {
-        this.loading = false;
+        this.loadingState.stop();
         console.error(err);
         this.toastService.error('Algo salió mal.');
       }
@@ -1029,7 +1030,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
         ? this.providerService.sendTemporalProviderForm(args)
         : this.providerService.updateTemporalProviderForm(args);
 
-    this.loading = true;
+    this.loadingState.start();
 
     setTimeout(() => {
       serviceMethod(this.providerForm.getRawValue()).subscribe({
@@ -1041,7 +1042,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
           }
           this.authService.saveUserLogged(user);
 
-          this.loading = false;
+          this.loadingState.stop();
           if (this.isFirstForm) {
             this.updateProgress(true);
             this.alertService.success(
@@ -1057,7 +1058,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
           this.resetForm();
         },
         error: (err: any) => {
-          this.loading = false;
+          this.loadingState.stop();
           if (err.status == 422) this.backendError = err.error;
           console.error(err);
           this.alertService.error();
