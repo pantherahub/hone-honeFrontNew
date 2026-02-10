@@ -12,13 +12,11 @@
 
   <!-- min-h-72 -->
   <div class="relative min-h-[60vh]">
-    @if (loadingPdf) {
-      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-        <svg class="w-7 h-7 text-main-blue1h animate-spin fill-gray-200">
-          <use xlink:href="/assets/icons/extras/animations.svg#spin" />
-        </svg>
-      </div>
-    }
+    <app-loader
+      [visible]="loadingPdf"
+      [fullscreen]="false"
+      [overlay]="false"
+    />
 
     @if (isImage) {
       <img [src]="previewFile" class="w-full" />

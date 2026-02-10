@@ -31,7 +31,7 @@ export type ServiceConfig = (typeof SERVICES_CONFIG)[ServiceKey];
 // Order in which services appear in the navigation UI
 export const SERVICES_ORDER: readonly ServiceKey[] = [
   'documentation',
-  'rates',
+  // 'rates',
   // 'billing',
   // 'rips',
 ];

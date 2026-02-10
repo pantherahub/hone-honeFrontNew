@@ -1,10 +1,4 @@
-@if (loading) {
-  <div class="absolute inset-0 z-50 bg-gray-50/60 flex items-center justify-center">
-    <svg class="w-7 h-7 text-main-blue1h animate-spin fill-gray-200">
-      <use xlink:href="/assets/icons/extras/animations.svg#spin" />
-    </svg>
-  </div>
-}
+<app-loader [visible]="loading" />
 
 <div class="flex justify-center mx-4">
   <div class="max-w-screen-md w-full pt-10 pb-28 sm:pb-20 md:pt-6 flex flex-col gap-3">
@@ -203,10 +197,3 @@
 
   </div>
 </div>
-
-
-<!-- <button nz-button nzType="primary" type="button" (click)="openOfficeModal(getGlobalIndex(i, officePage, officePageSize))" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
-<button nz-button nzDanger nzType="primary" type="button" (click)="deleteOffice(getGlobalIndex(i, officePage, officePageSize))" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button> -->
-
-<!-- <button nz-button nzType="primary" type="button" (click)="openContactModal(getGlobalIndex(i, contactPage, contactPageSize))" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
-<button nz-button nzDanger nzType="primary" type="button" (click)="deleteContact(getGlobalIndex(i, contactPage, contactPageSize))" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button> -->

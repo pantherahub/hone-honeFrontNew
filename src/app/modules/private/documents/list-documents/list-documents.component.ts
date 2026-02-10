@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { EventManagerService } from '../../../../services/events-manager/event-manager.service';
-import { DocumentService } from '../../../../services/documents/documents-crud.service';
-import { DocumentInterface } from '../../../../models/client.interface';
+import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
+import { DocumentService } from 'src/app/services/documents/documents.service';
+import { DocumentInterface } from 'src/app/models/client.interface';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FeedbackFivestarsComponent } from 'src/app/shared/modals/feedback-fivestars/feedback-fivestars.component';
 import { AlertService } from 'src/app/services/alert/alert.service';
@@ -23,11 +23,12 @@ import { DisclaimerService } from 'src/app/services/disclaimer/disclaimer.servic
 import { Disclaimer } from 'src/app/models/disclaimer.interface';
 import { catchError, finalize, map, Observable, of, ReplaySubject, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { PopoverComponent } from 'src/app/shared/components/popover/popover.component';
+import { LoaderComponent } from 'src/app/shared/components/loader/loader.component';
 
 @Component({
   selector: 'app-list-documents',
   standalone: true,
-  imports: [CommonModule, PipesModule, ButtonComponent, TooltipComponent, PopoverComponent],
+  imports: [CommonModule, PipesModule, ButtonComponent, TooltipComponent, PopoverComponent, LoaderComponent],
   templateUrl: './list-documents.component.html',
   styleUrl: './list-documents.component.scss'
 })

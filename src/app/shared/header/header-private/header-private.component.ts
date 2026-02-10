@@ -1,6 +1,6 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { EventManagerService } from '../../../services/events-manager/event-manager.service';
-import { AuthService } from '../../../services/auth.service';
+import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
+import { AuthService } from 'src/app/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { TutorialService } from 'src/app/services/tutorial/tutorial.service';

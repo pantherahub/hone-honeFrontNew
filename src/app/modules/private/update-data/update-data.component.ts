@@ -28,11 +28,12 @@ import { DisclaimerService } from 'src/app/services/disclaimer/disclaimer.servic
 import { Disclaimer } from 'src/app/models/disclaimer.interface';
 import { ModalService } from 'src/app/services/modal/modal.service';
 import { DisclaimerFormComponent } from 'src/app/shared/modals/disclaimer-form/disclaimer-form.component';
+import { LoaderComponent } from 'src/app/shared/components/loader/loader.component';
 
 @Component({
   selector: 'app-update-data',
   standalone: true,
-  imports: [CommonModule, BackendErrorsComponent, ButtonComponent, AlertComponent, RouterModule, ProviderFormComponent, OfficeListComponent, ContactListComponent],
+  imports: [CommonModule, BackendErrorsComponent, ButtonComponent, AlertComponent, RouterModule, ProviderFormComponent, OfficeListComponent, ContactListComponent, LoaderComponent],
   templateUrl: './update-data.component.html',
   styleUrl: './update-data.component.scss'
 })
