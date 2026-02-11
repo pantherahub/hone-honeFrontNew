@@ -12,22 +12,19 @@ import { ButtonComponent } from '../../components/button/button.component';
 export class AccessibilityControlsComponent implements OnInit {
 
   isOpen: boolean = false;
-  isMobile = false;
+  isMobile: boolean = false;
 
-  // Lógica de escala
-  readonly MIN_SCALE_LEVEL = 0; // 100%
-  readonly MAX_SCALE_LEVEL = 2; // 120%
-  readonly SCALE_STEP = 10;     // Aumentos de 10%
-  currentScaleLevel = 0;        // Nivel actual (0, 1 o 2)
+  // Font scaling logic
+  readonly MIN_SCALE_LEVEL: number = 0; // 100%
+  readonly MAX_SCALE_LEVEL: number = 2; // 120%
+  readonly SCALE_STEP: number = 10;     // 10% increases
+  currentScaleLevel: number = 0;        // Current level (0, 1 or 2)
 
   @ViewChild('menuContainer') menuContainer!: ElementRef<HTMLDivElement>;
 
   ngOnInit(): void {
     this.checkScreenSize();
     this.loadInitialScale();
-
-    // const scale = localStorage.getItem('font-scale') || '100';
-    // document.documentElement.style.fontSize = `${scale}%`;
   }
 
   @HostListener('window:resize')
@@ -58,15 +55,15 @@ export class AccessibilityControlsComponent implements OnInit {
 
     if (savedScale) {
       const parsed = parseInt(savedScale, 10);
-      // Validamos que sea un número y esté dentro del rango permitido (100 - 120)
+      // Verify that it is within the allowed range (100 - 120)
       if (!isNaN(parsed) && parsed >= 100 && parsed <= 120) {
         scalePercent = parsed;
       } else if (parsed > 120) {
-        scalePercent = 120; // Si el usuario puso 500% en el storage, lo limitamos
+        scalePercent = 120;
       }
     }
 
-    // Calculamos el nivel actual basado en el porcentaje
+    // Calculate the current level based on the percentage
     this.currentScaleLevel = (scalePercent - 100) / this.SCALE_STEP;
     this.applyFontScale(scalePercent);
   }
@@ -86,11 +83,6 @@ export class AccessibilityControlsComponent implements OnInit {
   private applyFontScale(percent: number) {
     document.documentElement.style.fontSize = `${percent}%`;
   }
-
-  // setFontScale(percent: number) {
-  //   document.documentElement.style.fontSize = `${percent}%`;
-  //   localStorage.setItem('font-scale', percent.toString());
-  // }
 
   toggleMenu() {
     if (this.isMobile) {
