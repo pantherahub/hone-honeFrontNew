@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ButtonComponent } from '../components/button/button.component';
+import { ButtonComponent } from '../../components/button/button.component';
 import { NavigationService } from 'src/app/services/navigation/navigation.service';
 import { TutorialService } from 'src/app/services/tutorial/tutorial.service';
 import { Router } from '@angular/router';
@@ -8,9 +8,9 @@ import { EventManagerService } from 'src/app/services/events-manager/event-manag
 import { isNonEmptyObject } from 'src/app/utils/validation-utils';
 import { AuthService } from 'src/app/services/auth.service';
 import { ModalService } from 'src/app/services/modal/modal.service';
-import { TutorialVideoComponent } from '../modals/tutorial-video/tutorial-video.component';
+import { TutorialVideoComponent } from '../../modals/tutorial-video/tutorial-video.component';
 import { Subscription } from 'rxjs';
-import { PopoverComponent } from '../components/popover/popover.component';
+import { PopoverComponent } from '../../components/popover/popover.component';
 
 interface CustomerSchedulingData {
   clientHoneSolutions: string;

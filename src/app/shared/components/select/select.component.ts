@@ -234,7 +234,7 @@ export class SelectComponent implements ControlValueAccessor, OnInit {
     const target = event.target;
 
     if (
-      target instanceof HTMLElement &&
+      target instanceof Node &&
       !this.dropdownRef?.nativeElement.contains(target)
     ) {
       this.closeDropdown();

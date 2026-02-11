@@ -1,0 +1,124 @@
+<!-- <div class="flex gap-1">
+  <app-button (click)="setFontScale(90)">A-</app-button>
+  <app-button (click)="setFontScale(100)">A</app-button>
+  <app-button (click)="setFontScale(110)">A+</app-button>
+</div> -->
+
+<!-- fixed right-0 top-1/2 -translate-y-1/2 z-50 flex flex-col items-end -->
+<!-- fixed left-auto right-0 top-[368px] bottom-auto sm:w-auto sm:top-auto sm:bottom-[411px] z-30 -->
+<!-- sm:top-[523px] sm:top-1/2 sm:-translate-y-1/2 -->
+
+
+
+<!--
+(mouseleave)="isOpen = false"
+
+border-y border-l border-blue-700 border-r-0
+
+ring-[0.1px] ring-inset ring-blue-700
+ring-[1px] ring-blue-700
+
+ring-1 ring-inset ring-blue-700
+-->
+
+
+
+<!-- <div #menuContainer class="fixed left-auto right-0 top-[368px] bottom-auto sm:w-auto sm:top-1/2 z-30">
+  <div
+    (mouseenter)="handleMouseEnter()"
+    (mouseleave)="handleMouseLeave()"
+    (click)="toggleMenu(); $event.stopPropagation()"
+    [ngClass]="{
+      'h-[9.125rem]': isOpen,
+      'h-[3.125rem]': !isOpen,
+    }"
+    class="w-[3.25rem] bg-gray-100 shadow-[inset_1px_1px_0_0_theme(colors.blue.700),inset_0_-1px_0_0_theme(colors.blue.700)] rounded-l-lg overflow-hidden transition-all duration-300 ease-in-out flex flex-col"
+  >
+
+    <div class="min-h-[3.125rem] w-full bg-blue-700 flex items-center justify-center p-1">
+      <svg class="w-11 h-[2.625rem] text-white">
+        <use xlink:href="/assets/icons/extras/customs.svg#font-scale" />
+      </svg>
+    </div>
+
+    <div
+      [class.opacity-100]="isOpen"
+      [class.opacity-0]="!isOpen"
+      class="flex-1 flex flex-col items-center justify-center transition-opacity duration-300 p-1"
+    >
+      <app-button
+        (click)="setFontScale(100); $event.stopPropagation()"
+        variant="gray"
+        styleType="ghost"
+        size="md"
+        customClass="!p-2.5"
+      >
+        <svg class="w-6 h-6">
+          <use xlink:href="/assets/icons/extras/customs.svg#positive-font" />
+        </svg>
+      </app-button>
+      <app-button
+        (click)="setFontScale(110); $event.stopPropagation()"
+        variant="gray"
+        styleType="ghost"
+        size="md"
+        customClass="!p-2.5"
+      >
+        <svg class="w-6 h-6">
+          <use xlink:href="/assets/icons/extras/customs.svg#negative-font" />
+        </svg>
+      </app-button>
+    </div>
+
+  </div>
+</div> -->
+
+
+
+<div #menuContainer class="fixed left-auto right-0 top-[368px] sm:top-1/2 z-30">
+  <div
+    (mouseenter)="handleMouseEnter()"
+    (mouseleave)="handleMouseLeave()"
+    (click)="toggleMenu(); $event.stopPropagation()"
+    class="w-[3.25rem] bg-gray-100 shadow-[inset_1px_1px_0_0_theme(colors.blue.700),inset_0_-1px_0_0_theme(colors.blue.700)] rounded-l-lg overflow-hidden flex flex-col"
+  >
+    <div class="h-[3.125rem] w-full bg-blue-700 flex items-center justify-center p-1 shrink-0 relative z-10
+      transition-colors duration-300 hover:bg-blue-600">
+      <svg class="w-11 h-[2.625rem] text-white">
+        <use xlink:href="/assets/icons/extras/customs.svg#font-scale" />
+      </svg>
+    </div>
+
+    <div
+      [ngClass]="{
+        'max-h-[10rem] opacity-100 p-1': isOpen,
+        'max-h-0 opacity-0 p-0': !isOpen
+      }"
+      class="flex flex-col items-center justify-center transition-all duration-300 ease-in-out"
+    >
+      <app-button
+        (onClick)="setFontScale(false); $event.stopPropagation()"
+        [disabled]="currentScaleLevel <= MIN_SCALE_LEVEL"
+        variant="gray"
+        styleType="ghost"
+        customClass="!p-2.5"
+      >
+        <svg class="w-6 h-6">
+          <use xlink:href="/assets/icons/extras/customs.svg#negative-font" />
+        </svg>
+      </app-button>
+
+      <app-button
+        (onClick)="setFontScale(true); $event.stopPropagation()"
+        [disabled]="currentScaleLevel >= MAX_SCALE_LEVEL"
+        variant="gray"
+        styleType="ghost"
+        customClass="!p-2.5"
+      >
+        <svg class="w-6 h-6">
+          <use xlink:href="/assets/icons/extras/customs.svg#positive-font" />
+        </svg>
+      </app-button>
+    </div>
+  </div>
+</div>

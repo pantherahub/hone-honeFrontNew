@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { HeaderPublicComponent } from 'src/app/shared/header/header-public/header-public.component';
+import { HeaderPublicComponent } from 'src/app/shared/layout/header-public/header-public.component';
 
 @Component({
   selector: 'app-public-layout',
