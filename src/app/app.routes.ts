@@ -16,6 +16,7 @@ import { ServiceLayoutComponent } from './layouts/service-layout/service-layout.
 import { clientSelectedGuard } from './guards/client-selected.guard';
 import { RatesComponent } from './modules/private/rates/rates.component';
 import { serviceAccessGuard } from './guards/service-access.guard';
+import { SERVICES_CONFIG } from './config/client-services.config';
 
 export const routes: Routes = [
   //   PUBLIC ROUTES
@@ -57,7 +58,10 @@ export const routes: Routes = [
     children: [
       {
         path: 'home',
-        component: HomeComponent
+        component: HomeComponent,
+        data: {
+          disclaimerKey: 'Inicio',
+        },
       },
       {
         path: 'support',
@@ -66,7 +70,10 @@ export const routes: Routes = [
       {
         path: 'update-data',
         component: UpdateDataComponent,
-        canDeactivate: [canDeactivateGuard]
+        canDeactivate: [canDeactivateGuard],
+        data: {
+          disclaimerKey: 'Actualizacion de Datos',
+        },
       },
       {
         path: 'service',
@@ -77,11 +84,18 @@ export const routes: Routes = [
             path: 'documentation',
             component: ListDocumentsComponent,
             canActivate: [serviceAccessGuard],
+            data: {
+              disclaimerKey: 'Documentos',
+              serviceKey: SERVICES_CONFIG.documentation.key,
+            },
           },
           // {
           //   path: 'rates',
           //   component: RatesComponent,
           //   canActivate: [serviceAccessGuard],
+          //   data: {
+          //     serviceKey: SERVICES_CONFIG.rates.key
+          //   },
           // },
         ],
       }
