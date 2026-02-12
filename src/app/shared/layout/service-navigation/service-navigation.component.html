@@ -1,36 +1,9 @@
-<nav class="flex flex-col gap-4 mb-9" aria-label="Breadcrumb">
+<nav class="flex flex-col gap-4 mb-9">
 
-  <div class="flex">
-    <ol class="inline-flex items-center gap-3">
-      <li class="inline-flex items-center gap-3 text-gray-500">
-        <a routerLink="/home" class="inline-flex items-center cursor-pointer">
-          <svg class="w-6 h-6">
-            <use xlink:href="/assets/icons/outline/general.svg#home" />
-          </svg>
-        </a>
-        <svg class="w-4 h-4">
-          <use xlink:href="/assets/icons/outline/arrows.svg#chevron-right" />
-        </svg>
-      </li>
-      <li>
-        <div class="flex items-center gap-3 text-gray-500">
-          <span class="text-sm font-semibold leading-4">
-            {{ clientSelected.clientHoneSolutions }}
-          </span>
-          <svg class="w-4 h-4">
-            <use xlink:href="/assets/icons/outline/arrows.svg#chevron-right" />
-          </svg>
-        </div>
-      </li>
-      <li aria-current="page">
-        <div class="flex items-center text-gray-800">
-          <span class="text-sm font-semibold leading-4">
-            {{ currentLabel }}
-          </span>
-        </div>
-      </li>
-    </ol>
-  </div>
+  <app-breadcrumb
+    [options]="breadcrumbSteps()"
+    [showFirstOptionSeparated]="true">
+  </app-breadcrumb>
 
   @if (serviceRoutes.length > 1) {
     <div class="max-w-full w-fit overflow-x-auto scrollbar-hide bg-gray-200 rounded-lg p-1">
@@ -38,11 +11,11 @@
         @for (option of serviceRoutes; track $index) {
           <li>
             <a #link [routerLink]="option.path"
-              [attr.aria-current]="option.label === currentLabel ? 'page' : null"
+              [attr.aria-current]="option.label === currentLabel() ? 'page' : null"
               class="inline-block py-1.5 px-3 rounded text-sm font-semibold leading-4 transition-shadow"
               [ngClass]="{
-                'bg-white text-main-blue1h shadow-[0px_1px_2px_0px_#0000000D]': option.label === currentLabel,
-                'text-gray-500': option.label !== currentLabel,
+                'bg-white text-main-blue1h shadow-[0px_1px_2px_0px_#0000000D]': option.label === currentLabel(),
+                'text-gray-500': option.label !== currentLabel(),
               }">
               {{ option.tab }}
             </a>

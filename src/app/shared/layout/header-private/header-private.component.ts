@@ -4,7 +4,7 @@ import { AuthService } from 'src/app/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { TutorialService } from 'src/app/services/tutorial/tutorial.service';
-import { Subscription } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { ButtonComponent } from '../../components/button/button.component';
 import { PopoverComponent } from '../../components/popover/popover.component';
 
@@ -22,7 +22,7 @@ export class HeaderPrivateComponent implements OnInit, OnDestroy {
 
   configTutorialVisible: boolean = false;
 
-  private tutorialSubscription!: Subscription;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private tutorialService: TutorialService,
@@ -30,19 +30,20 @@ export class HeaderPrivateComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.tutorialSubscription = this.tutorialService.stepIndex$.subscribe(
-      step => {
+    this.tutorialService.stepIndex$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(step => {
         if (!this.tutorialService.isTutorialFinished() && step === 2) {
           this.showConfigTutorial();
         } else {
           this.configTutorialVisible = false;
         }
-      }
-    );
+      });
   }
 
   ngOnDestroy(): void {
-    this.tutorialSubscription.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   showConfigTutorial() {

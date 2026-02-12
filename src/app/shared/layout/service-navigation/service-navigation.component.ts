@@ -1,16 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, computed, ElementRef, OnDestroy, OnInit, QueryList, signal, ViewChildren } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { SERVICES_CONFIG, SERVICES_ORDER } from 'src/app/config/client-services.config';
 import { clientServicesConfig, defaultServices } from 'src/app/config/service-navigation.config';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 import { NavigationService } from 'src/app/services/navigation/navigation.service';
+import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb.component';
+import { BreadcrumbOption } from 'src/app/models/breadcrump';
 
 @Component({
   selector: 'app-service-navigation',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, BreadcrumbComponent],
   templateUrl: './service-navigation.component.html',
   styleUrl: './service-navigation.component.scss'
 })
@@ -19,9 +21,21 @@ export class ServiceNavigationComponent implements OnInit, AfterViewInit, OnDest
   clientSelected: any = this.eventManager.clientSelected();
 
   serviceRoutes: any[] = [];
+  currentLabel = signal<string>('');
 
-  currentLabel: string = '';
-  private sub!: Subscription;
+  // It is recalculated when the used signals (clientSelected, currentLabel) change.
+  breadcrumbSteps = computed<BreadcrumbOption[]>(() => [
+    {
+      label: 'Home',
+      routerLink: '/home',
+      iconHref: '/assets/icons/outline/general.svg#home',
+      iconOnlyAsLabel: true,
+    },
+    { label: this.clientSelected?.clientHoneSolutions?.toUpperCase() || 'ASEGURADORA' },
+    { label: this.currentLabel() }
+  ]);
+
+  private destroy$ = new Subject<void>();
 
   @ViewChildren('link') links!: QueryList<ElementRef<HTMLAnchorElement>>;
 
@@ -33,10 +47,12 @@ export class ServiceNavigationComponent implements OnInit, AfterViewInit, OnDest
   ngOnInit(): void {
     this.loadRoutes();
 
-    this.navigationService.getCurrentUrl$().subscribe(url => {
-      this.clientSelected = this.eventManager.clientSelected();
-      this.setCurrentLabel(url ?? '');
-    });
+    this.navigationService.getCurrentUrl$()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(url => {
+        this.clientSelected = this.eventManager.clientSelected();
+        this.setCurrentLabel(url ?? '');
+      });
   }
 
   ngAfterViewInit(): void {
@@ -44,7 +60,8 @@ export class ServiceNavigationComponent implements OnInit, AfterViewInit, OnDest
   }
 
   ngOnDestroy(): void {
-    this.sub?.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private loadRoutes(): void {
@@ -58,7 +75,7 @@ export class ServiceNavigationComponent implements OnInit, AfterViewInit, OnDest
 
   setCurrentLabel(currentUrl: string): void {
     const found = this.serviceRoutes.find(r => r.path === currentUrl);
-    this.currentLabel = found ? found.label : '';
+    this.currentLabel.set(found ? found.label : '');
     setTimeout(() => this.scrollToActive());
   }
 
