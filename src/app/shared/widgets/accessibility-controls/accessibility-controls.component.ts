@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { ButtonComponent } from '../../components/button/button.component';
+import { StorageKey } from 'src/app/enums/storage-key.enum';
 
 @Component({
   selector: 'app-accessibility-controls',
@@ -10,6 +11,8 @@ import { ButtonComponent } from '../../components/button/button.component';
   styleUrl: './accessibility-controls.component.scss'
 })
 export class AccessibilityControlsComponent implements OnInit {
+
+  private readonly STORAGE_KEY = StorageKey.FontScale;
 
   isOpen: boolean = false;
   isMobile: boolean = false;
@@ -50,7 +53,7 @@ export class AccessibilityControlsComponent implements OnInit {
   }
 
   private loadInitialScale() {
-    const savedScale = localStorage.getItem('font-scale');
+    const savedScale = localStorage.getItem(this.STORAGE_KEY);
     let scalePercent = 100;
 
     if (savedScale) {
@@ -77,7 +80,7 @@ export class AccessibilityControlsComponent implements OnInit {
 
     const newPercent = 100 + (this.currentScaleLevel * this.SCALE_STEP);
     this.applyFontScale(newPercent);
-    localStorage.setItem('font-scale', newPercent.toString());
+    localStorage.setItem(this.STORAGE_KEY, newPercent.toString());
   }
 
   private applyFontScale(percent: number) {

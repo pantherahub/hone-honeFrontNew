@@ -7,6 +7,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { EventManagerService } from './events-manager/event-manager.service';
 import { decodeJwtPayload } from '../utils/string-utils';
+import { StorageKey } from '../enums/storage-key.enum';
 
 @Injectable({
    providedIn: 'root'
@@ -84,9 +85,9 @@ export class AuthService {
     this.eventManager.clearUser();
     this.eventManager.clearClient();
 
-    localStorage.removeItem('formState');
-    localStorage.removeItem('tutorialStep');
-    localStorage.removeItem('tutorialFinished');
+    localStorage.removeItem(StorageKey.UpdateDataFormState);
+    localStorage.removeItem(StorageKey.TutorialStep);
+    localStorage.removeItem(StorageKey.TutorialFinished);
   }
 
    // Llamar esta funcion en cualquier lado, para limpiar cache y cerrar sesión

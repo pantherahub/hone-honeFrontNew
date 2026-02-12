@@ -30,6 +30,7 @@ import { ModalService } from 'src/app/services/modal/modal.service';
 import { DisclaimerFormComponent } from 'src/app/shared/modals/disclaimer-form/disclaimer-form.component';
 import { LoaderComponent } from 'src/app/shared/components/loader/loader.component';
 import { LoadingCounter } from 'src/app/helpers/loading-counter';
+import { StorageKey } from 'src/app/enums/storage-key.enum';
 
 @Component({
   selector: 'app-update-data',
@@ -43,6 +44,8 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
   user = this.eventManager.userLogged();
   providerForm!: FormGroup;
   isFirstForm: boolean = true;
+
+  private readonly FORM_STORAGE_KEY = StorageKey.UpdateDataFormState;
 
   languages: any[] = LANGUAGES;
   identificationTypes: any[] = [];
@@ -714,13 +717,13 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
       existingContacts: this.existingContacts,
       activeStep: this.activeStep,
     };
-    localStorage.setItem('formState', JSON.stringify(newState));
+    localStorage.setItem(this.FORM_STORAGE_KEY, JSON.stringify(newState));
   }
   removeFormState() {
-    localStorage.removeItem('formState');
+    localStorage.removeItem(this.FORM_STORAGE_KEY);
   }
   hasSavedState(): boolean {
-    const savedState = localStorage.getItem('formState');
+    const savedState = localStorage.getItem(this.FORM_STORAGE_KEY);
     if (savedState) {
       return true;
     }
@@ -743,7 +746,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
       return;
     }
 
-    const storageState = localStorage.getItem('formState');
+    const storageState = localStorage.getItem(this.FORM_STORAGE_KEY);
     if (!storageState) return;
     const state = JSON.parse(storageState);
     const formState = state.formValue;
