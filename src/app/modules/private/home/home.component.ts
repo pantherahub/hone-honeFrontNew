@@ -143,7 +143,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
               : null;
         }),
         catchError(err => {
-          console.error(err);
+          if (err.status !== 404) console.error(err);
           this.providerDisclaimer = null;
           return of(void 0);
         })

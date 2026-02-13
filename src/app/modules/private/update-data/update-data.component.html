@@ -113,7 +113,7 @@
           <div #stepsContainer
             class="flex-1 flex gap-1 overflow-x-auto scrollbar-hide scroll-smooth whitespace-nowrap rounded-xl min-w-0">
             @for (step of steps; track step.key) {
-              <div>
+              <div #stepBtn>
                 <app-button
                   variant="primary"
                   [styleType]="step.key === activeStep ? 'soft' : 'ghost'"
