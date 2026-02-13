@@ -67,7 +67,8 @@
 
   <label
     [attr.for]="id"
-    class="absolute text-sm duration-300 transform ms-3 -translate-y-4 scale-75 top-1.5 z-10 origin-[0] px-1 peer-placeholder-shown:scale-100 peer-placeholder-shown:px-0 peer-autofill:ms-3 start-1 peer-autofill:scale-75 peer-autofill:-translate-y-4 peer-autofill:top-1.5 pointer-events-none bg-white"
+    [attr.title]="label"
+    class="absolute text-sm duration-300 transform ms-3 -translate-y-4 scale-75 top-1.5 z-10 origin-[0] px-1 peer-placeholder-shown:scale-100 peer-placeholder-shown:px-0 peer-autofill:ms-3 start-1 peer-autofill:scale-75 peer-autofill:-translate-y-4 peer-autofill:top-1.5 pointer-events-none bg-white truncate max-w-[calc(100%-3rem)] whitespace-nowrap"
     [ngClass]="{
       'peer-focus:px-1 peer-focus:ms-3 peer-focus:top-1.5 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:font-semibold':
       !readonly || value,
