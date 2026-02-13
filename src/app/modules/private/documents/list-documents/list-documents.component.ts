@@ -47,10 +47,12 @@ export class ListDocumentsComponent implements OnInit, AfterViewInit, OnDestroy 
   citiesList: any[] = [];
   providerDisclaimer: Disclaimer | null = null;
 
+  formatsBtnPopoverVisible: boolean = false;
+
   feedbackModalShown: boolean = false;
   disclaimerModalShown: boolean = false;
   dataformAlertShown: boolean = false;
-  formatsBtnPopoverVisible: boolean = false;
+  formatsBtnPopoverShown: boolean = false;
 
   chart!: ApexCharts;
   @ViewChild('donutChart', { static: false }) chartElement!: ElementRef;
@@ -396,7 +398,8 @@ export class ListDocumentsComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   showFormatsBtnPopover() {
-    if (!this.getCurrentDownloadConfig()) return;
+    if (!this.getCurrentDownloadConfig() || this.formatsBtnPopoverShown) return;
+    this.formatsBtnPopoverShown = true;
     this.formatsBtnPopoverVisible = true;
   }
   closeFormatsBtnPopover() {
