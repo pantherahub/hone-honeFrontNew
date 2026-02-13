@@ -183,9 +183,12 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
   }
 
   private scrollToIndex(index: number, useDelay = true) {
-    this.visibleIndex = index;
+    if (!this.steps.length) return;
 
-    const target = this.stepBtns.toArray()[index]?.nativeElement;
+    const sanitizedIndex = Math.max(0, Math.min(index, this.steps.length - 1));
+    this.visibleIndex = sanitizedIndex;
+
+    const target = this.stepBtns.toArray()[this.visibleIndex]?.nativeElement;
     if (target) {
       target.scrollIntoView({
         behavior: 'smooth',
@@ -196,15 +199,15 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
 
     this.atStart = this.visibleIndex === 0;
     this.atEnd = this.visibleIndex === this.steps.length - 1;
-    this.updateArrows(useDelay);
+    // this.updateArrows(useDelay);
   }
 
   scrollStep(direction: 'left' | 'right') {
-    if (this.steps.length === 0) return;
+    if (!this.steps.length) return;
 
-    if (direction === 'right' && this.visibleIndex < this.steps.length - 1) {
+    if (direction === 'right') {
       this.scrollToIndex(this.visibleIndex + 1);
-    } else if (direction === 'left' && this.visibleIndex > 0) {
+    } else if (direction === 'left') {
       this.scrollToIndex(this.visibleIndex - 1);
     }
   }
