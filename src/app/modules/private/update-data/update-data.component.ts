@@ -281,7 +281,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
   }
 
   private getProviderDisclaimer$(): Observable<void> {
-    const idProvider = this.user?.id;
+    const idProvider = this.userState?.id;
     if (!idProvider) return of(void 0);
 
     const disclaimerKey = this.route.snapshot.data['disclaimerKey'];
