@@ -2,6 +2,9 @@ import { Component, forwardRef, Input } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 
+/**
+ * Old date picker input component, from the previous design.
+ */
 @Component({
   selector: 'app-date-picker-input',
   standalone: true,

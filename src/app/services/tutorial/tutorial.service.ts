@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, distinctUntilChanged } from 'rxjs';
+import { StorageKey } from 'src/app/enums/storage-key.enum';
 
 @Injectable({
   providedIn: 'root'
@@ -11,12 +12,15 @@ export class TutorialService {
   stepIndex$ = this.stepIndex.asObservable();
   // stepIndex$ = this.stepIndex.asObservable().pipe(distinctUntilChanged());
 
+  private readonly STEP_STORAGE_KEY = StorageKey.TutorialStep;
+  private readonly FINISHED_STORAGE_KEY = StorageKey.TutorialFinished;
+
   private getStoredStep(): number {
-    return Number(localStorage.getItem('tutorialStep')) || this.INITIAL_STEP;
+    return Number(localStorage.getItem(this.STEP_STORAGE_KEY)) || this.INITIAL_STEP;
   }
 
   private saveStep(step: number) {
-    localStorage.setItem('tutorialStep', step.toString());
+    localStorage.setItem(this.STEP_STORAGE_KEY, step.toString());
   }
 
   setStep(step: number) {
@@ -43,8 +47,8 @@ export class TutorialService {
   }
 
   private clearTutorial() {
-    localStorage.removeItem('tutorialStep');
-    localStorage.removeItem('tutorialFinished');
+    localStorage.removeItem(this.STEP_STORAGE_KEY);
+    localStorage.removeItem(this.FINISHED_STORAGE_KEY);
   }
 
   resetTutorial() {
@@ -53,11 +57,11 @@ export class TutorialService {
   }
 
   finishTutorial() {
-    localStorage.setItem('tutorialFinished', 'true');
+    localStorage.setItem(this.FINISHED_STORAGE_KEY, 'true');
   }
 
   isTutorialFinished(): boolean {
-    return localStorage.getItem('tutorialFinished') === 'true';
+    return localStorage.getItem(this.FINISHED_STORAGE_KEY) === 'true';
   }
 
 }

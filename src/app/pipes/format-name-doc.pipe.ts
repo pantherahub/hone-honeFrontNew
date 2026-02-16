@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { DocumentService } from '../services/documents/documents-crud.service';
+import { DocumentService } from '../services/documents/documents.service';
 
 @Pipe({
   name: 'formatNameDoc',

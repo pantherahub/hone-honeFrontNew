@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { ServiceNavigationComponent } from 'src/app/shared/header/service-navigation/service-navigation.component';
+import { ServiceNavigationComponent } from 'src/app/shared/layout/service-navigation/service-navigation.component';
 
 @Component({
   selector: 'app-service-layout',

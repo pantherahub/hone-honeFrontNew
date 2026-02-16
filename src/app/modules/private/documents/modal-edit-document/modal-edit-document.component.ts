@@ -1,8 +1,8 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
-import { DocumentService } from '../../../../services/documents/documents-crud.service';
-import { EventManagerService } from '../../../../services/events-manager/event-manager.service';
+import { DocumentService } from 'src/app/services/documents/documents.service';
+import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 import { FileSelectDirective } from 'src/app/directives/file-select.directive';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { formatListWithY, pluralize } from 'src/app/utils/string-utils';

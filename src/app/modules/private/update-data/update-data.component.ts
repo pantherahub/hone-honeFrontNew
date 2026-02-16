@@ -28,11 +28,14 @@ import { DisclaimerService } from 'src/app/services/disclaimer/disclaimer.servic
 import { Disclaimer } from 'src/app/interfaces/disclaimer.interface';
 import { ModalService } from 'src/app/services/modal/modal.service';
 import { DisclaimerFormComponent } from 'src/app/shared/modals/disclaimer-form/disclaimer-form.component';
+import { LoaderComponent } from 'src/app/shared/components/loader/loader.component';
+import { LoadingCounter } from 'src/app/helpers/loading-counter';
+import { StorageKey } from 'src/app/enums/storage-key.enum';
 
 @Component({
   selector: 'app-update-data',
   standalone: true,
-  imports: [CommonModule, BackendErrorsComponent, ButtonComponent, AlertComponent, RouterModule, ProviderFormComponent, OfficeListComponent, ContactListComponent],
+  imports: [CommonModule, BackendErrorsComponent, ButtonComponent, AlertComponent, RouterModule, ProviderFormComponent, OfficeListComponent, ContactListComponent, LoaderComponent],
   templateUrl: './update-data.component.html',
   styleUrl: './update-data.component.scss'
 })
@@ -41,6 +44,8 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
   user = this.eventManager.userLogged();
   providerForm!: FormGroup;
   isFirstForm: boolean = true;
+
+  private readonly FORM_STORAGE_KEY = StorageKey.UpdateDataFormState;
 
   languages: any[] = LANGUAGES;
   identificationTypes: any[] = [];
@@ -56,7 +61,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
   contactPage: number = 1;
   contactPageSize: number = 5;
 
-  loading: boolean = false;
+  loadingState = new LoadingCounter();
   backendError: any = null;
   hasSectionBackendError: boolean = false;
 
@@ -133,9 +138,9 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
 
     this.getCompanies();
 
-    this.loading = true;
+    this.loadingState.start();
     this.getProviderDisclaimer$()
-      .pipe(finalize(() => this.loading = false))
+      .pipe(finalize(() => this.loadingState.stop()))
       .subscribe(() => {
         this.startInitialFlow();
       });
@@ -178,9 +183,12 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
   }
 
   private scrollToIndex(index: number, useDelay = true) {
-    this.visibleIndex = index;
+    if (!this.steps.length) return;
 
-    const target = this.stepBtns.toArray()[index]?.nativeElement;
+    const sanitizedIndex = Math.max(0, Math.min(index, this.steps.length - 1));
+    this.visibleIndex = sanitizedIndex;
+
+    const target = this.stepBtns.toArray()[this.visibleIndex]?.nativeElement;
     if (target) {
       target.scrollIntoView({
         behavior: 'smooth',
@@ -191,15 +199,15 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
 
     this.atStart = this.visibleIndex === 0;
     this.atEnd = this.visibleIndex === this.steps.length - 1;
-    this.updateArrows(useDelay);
+    // this.updateArrows(useDelay);
   }
 
   scrollStep(direction: 'left' | 'right') {
-    if (this.steps.length === 0) return;
+    if (!this.steps.length) return;
 
-    if (direction === 'right' && this.visibleIndex < this.steps.length - 1) {
+    if (direction === 'right') {
       this.scrollToIndex(this.visibleIndex + 1);
-    } else if (direction === 'left' && this.visibleIndex > 0) {
+    } else if (direction === 'left') {
       this.scrollToIndex(this.visibleIndex - 1);
     }
   }
@@ -249,7 +257,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
   }
 
   getCompanies() {
-    this.loading = true;
+    this.loadingState.start();
     this.clientProviderService.getClientListByProviderId(this.user.id).subscribe({
       next: (res: ClientInterface[]) => {
         const clientList = res;
@@ -258,7 +266,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
       },
       error: (err: any) => {
         console.error(err);
-        this.loading = false;
+        this.loadingState.stop();
       },
     });
   }
@@ -288,7 +296,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
               : null;
         }),
         catchError(err => {
-          console.error(err);
+          if (err.status !== 404) console.error(err);
           this.providerDisclaimer = null;
           return of(void 0);
         })
@@ -485,16 +493,16 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
         ? this.providerService.validateTemporalProviderDataCreate(args)
         : this.providerService.validateTemporalProviderDataUpdate(args);
 
-    this.loading = true;
+    this.loadingState.start();
     return new Promise((resolve) => {
       serviceMethod(formControlValues).subscribe({
         next: (resp: any) => {
-          this.loading = false;
+          this.loadingState.stop();
           this.clearSectionBackendError();
           resolve(true);
         },
         error: (err) => {
-          this.loading = false;
+          this.loadingState.stop();
           if (err.status == 422) {
             this.backendError = err.error;
             this.hasSectionBackendError = true;
@@ -682,11 +690,11 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     this.clientProviderService.getCompaniesByIdClients({ clientsIds }).subscribe({
       next: (res: any) => {
         this.providerCompanies = res.data;
-        this.loading = false;
+        this.loadingState.stop();
       },
       error: (err: any) => {
         console.error(err);
-        this.loading = false;
+        this.loadingState.stop();
       }
     });
   }
@@ -712,13 +720,13 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
       existingContacts: this.existingContacts,
       activeStep: this.activeStep,
     };
-    localStorage.setItem('formState', JSON.stringify(newState));
+    localStorage.setItem(this.FORM_STORAGE_KEY, JSON.stringify(newState));
   }
   removeFormState() {
-    localStorage.removeItem('formState');
+    localStorage.removeItem(this.FORM_STORAGE_KEY);
   }
   hasSavedState(): boolean {
-    const savedState = localStorage.getItem('formState');
+    const savedState = localStorage.getItem(this.FORM_STORAGE_KEY);
     if (savedState) {
       return true;
     }
@@ -741,7 +749,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
       return;
     }
 
-    const storageState = localStorage.getItem('formState');
+    const storageState = localStorage.getItem(this.FORM_STORAGE_KEY);
     if (!storageState) return;
     const state = JSON.parse(storageState);
     const formState = state.formValue;
@@ -793,10 +801,10 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
   }
 
   loadProviderData(): void {
-    this.loading = true;
+    this.loadingState.start();
     this.providerService.getTemporalProviderData(this.user.id).subscribe({
       next: (res: any) => {
-        this.loading = false;
+        this.loadingState.stop();
         const user = this.user;
 
         const data = res.data;
@@ -874,7 +882,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
         }
       },
       error: (err: any) => {
-        this.loading = false;
+        this.loadingState.stop();
         console.error(err);
         this.toastService.error('Algo salió mal.');
       }
@@ -1028,7 +1036,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
         ? this.providerService.sendTemporalProviderForm(args)
         : this.providerService.updateTemporalProviderForm(args);
 
-    this.loading = true;
+    this.loadingState.start();
 
     setTimeout(() => {
       serviceMethod(this.providerForm.getRawValue()).subscribe({
@@ -1040,7 +1048,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
           }
           this.authService.saveUserLogged(user);
 
-          this.loading = false;
+          this.loadingState.stop();
           if (this.isFirstForm) {
             this.updateProgress(true);
             this.alertService.success(
@@ -1056,7 +1064,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
           this.resetForm();
         },
         error: (err: any) => {
-          this.loading = false;
+          this.loadingState.stop();
           if (err.status == 422) this.backendError = err.error;
           console.error(err);
           this.alertService.error();

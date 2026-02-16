@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ClientInterface } from '../../../interfaces/client.interface';
-import { ClientProviderService } from '../../../services/client-provider/client-provider.service';
-import { EventManagerService } from '../../../services/events-manager/event-manager.service';
+import { ClientInterface } from 'src/app/interfaces/client.interface';
+import { ClientProviderService } from 'src/app/services/client-provider/client-provider.service';
+import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TutorialService } from 'src/app/services/tutorial/tutorial.service';
@@ -17,11 +17,12 @@ import { TutorialVideoComponent } from 'src/app/shared/modals/tutorial-video/tut
 import { DisclaimerService } from 'src/app/services/disclaimer/disclaimer.service';
 import { Disclaimer } from 'src/app/interfaces/disclaimer.interface';
 import { DisclaimerFormComponent } from 'src/app/shared/modals/disclaimer-form/disclaimer-form.component';
+import { LoaderComponent } from 'src/app/shared/components/loader/loader.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [FormsModule, CommonModule, RouterModule, TextInputComponent, ButtonComponent, ModalComponent, PopoverComponent],
+  imports: [FormsModule, CommonModule, RouterModule, TextInputComponent, ButtonComponent, ModalComponent, PopoverComponent, LoaderComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -142,7 +143,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
               : null;
         }),
         catchError(err => {
-          console.error(err);
+          if (err.status !== 404) console.error(err);
           this.providerDisclaimer = null;
           return of(void 0);
         })
