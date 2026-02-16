@@ -1,28 +1,44 @@
-<nav class="flex flex-col gap-4 mb-9">
+<nav class="flex flex-col gap-6 mb-9">
 
   <app-breadcrumb
     [options]="breadcrumbSteps()"
     [showFirstOptionSeparated]="true">
   </app-breadcrumb>
 
-  @if (serviceRoutes.length > 1) {
-    <div class="max-w-full w-fit overflow-x-auto scrollbar-hide bg-gray-200 rounded-lg p-1">
-      <ul class="inline-flex whitespace-nowrap">
-        @for (option of serviceRoutes; track $index) {
-          <li>
-            <a #link [routerLink]="option.path"
-              [attr.aria-current]="option.label === currentLabel() ? 'page' : null"
-              class="inline-block py-1.5 px-3 rounded text-sm font-semibold leading-4 transition-shadow"
-              [ngClass]="{
-                'bg-white text-main-blue1h shadow-[0px_1px_2px_0px_#0000000D]': option.label === currentLabel(),
-                'text-gray-500': option.label !== currentLabel(),
-              }">
-              {{ option.tab }}
-            </a>
-          </li>
-        }
-      </ul>
+  <div class="rounded-xl min-h-[342px] sm:min-h-[228px] bg-white pb-8 ">
+    <div class="rounded-t-xl bg-gray-100 h-[127px]"></div>
+
+    <div class="px-4 sm:px-8 flex flex-col sm:flex-row gap-6 mt-[-61px] sm:items-center">
+      <div class="h-[130px] w-[130px] flex justify-center items-center p-4 bg-white rounded-lg shadow-xl">
+        <img alt="Logo cliente" class="w-full object-cover"
+          [src]="clientSelected ? clientSelected.urlHeader : 'assets/img/logo-hone.png'" />
+      </div>
+
+      <div class="flex flex-col gap-6 sm:gap-9">
+        <h3 class="text-3xl font-black leading-[1.875rem] uppercase">
+          {{ clientSelected.clientHoneSolutions ?? '' }}
+        </h3>
+
+        <nav class="max-w-full w-fit overflow-x-auto scrollbar-hide bg-gray-200 rounded-lg p-1">
+          <ul class="inline-flex whitespace-nowrap">
+            @for (option of serviceRoutes; track $index) {
+              <li>
+                <a #link [routerLink]="option.path"
+                  [attr.aria-current]="option.label === currentLabel() ? 'page' : null"
+                  class="inline-block py-1.5 px-3 rounded text-sm font-semibold leading-4 transition-shadow"
+                  [ngClass]="{
+                    'bg-white text-main-blue1h shadow-[0px_1px_2px_0px_#0000000D]': option.label === currentLabel(),
+                    'text-gray-500': option.label !== currentLabel(),
+                  }">
+                  {{ option.tab }}
+                </a>
+              </li>
+            }
+          </ul>
+        </nav>
+      </div>
     </div>
-  }
+
+  </div>
 
 </nav>
