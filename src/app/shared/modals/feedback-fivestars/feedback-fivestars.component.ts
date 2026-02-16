@@ -47,6 +47,16 @@ export class FeedbackFivestarsComponent {
       phoneNumber: [null]
     });
 
+    this.form.get('rating')?.valueChanges.subscribe((value: number) => {
+      const commentsControl = this.form.get('comments');
+      if (value != null && value < 5) {
+        commentsControl?.setValidators([Validators.required]);
+      } else {
+        commentsControl?.clearValidators();
+      }
+      commentsControl?.updateValueAndValidity();
+    });
+
     this.form.get('canContact')?.valueChanges.subscribe((value: boolean) => {
       const phoneControl = this.form.get('phoneNumber');
       if (value) {

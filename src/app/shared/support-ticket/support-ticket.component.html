@@ -2,7 +2,7 @@
   <div class="max-w-screen-sm w-full pt-10 md:pt-12 pb-20 flex flex-col gap-3">
 
     <app-button (onClick)="goBack()" variant="primary" size="sm" styleType="ghost" customClass="leading-4">
-      <svg width="16" height="16">
+      <svg class="w-4 h-4">
         <use xlink:href="/assets/icons/outline/arrows.svg#chevron-left" />
       </svg>
       Volver
@@ -64,7 +64,7 @@
         </div>
       </div>
 
-      <div class="flex flex-wrap items-center justify-between">
+      <div class="flex flex-wrap items-center justify-between gap-3">
         <app-button
           [type]="'submit'"
           [loading]="loading"
@@ -80,7 +80,7 @@
             [href]="'https://wa.me/+57' + 3104748360"
             target="_blank"
             class="flex gap-2 items-center text-sm text-gray-600 dark:text-gray-400">
-            <svg width="24" height="24">
+            <svg class="w-6 h-6">
               <use xlink:href="/assets/icons/extras/brands.svg#whatsapp" />
             </svg>
             <span>3104748360</span>

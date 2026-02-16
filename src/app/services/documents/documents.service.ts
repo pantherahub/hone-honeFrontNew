@@ -7,6 +7,7 @@ import { environment } from 'src/environments/environment';
    providedIn: 'root'
 })
 export class DocumentService {
+
   public url = environment.url;
   private urlPrefix = 'Documents/Providers';
 
@@ -35,12 +36,6 @@ export class DocumentService {
   public deleteDocument(idProvider: number, idDocument: any): Observable<any> {
     const url = `${this.url}${this.urlPrefix}/Delete/${idProvider}/${idDocument}`;
     return this.httpClient.delete(url);
-  }
-
-  downloadFile(filename: string) {
-    return this.httpClient.get( 'http://localhost:4200/' + filename, {
-      responseType: 'arraybuffer'
-    });
   }
 
   formatDocumentName(name?: string, idDocumentType?: number): string {

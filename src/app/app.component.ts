@@ -3,12 +3,13 @@ import { CommonModule, Location } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { NgZorroModule } from './ng-zorro.module';
 import { initFlowbite } from 'flowbite';
-import { FloatingActionsComponent } from './shared/floating-actions/floating-actions.component';
+import { FloatingActionsComponent } from './shared/widgets/floating-actions/floating-actions.component';
+import { AccessibilityControlsComponent } from './shared/widgets/accessibility-controls/accessibility-controls.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [ CommonModule, RouterOutlet, NgZorroModule, FloatingActionsComponent ],
+  imports: [CommonModule, RouterOutlet, NgZorroModule, FloatingActionsComponent, AccessibilityControlsComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

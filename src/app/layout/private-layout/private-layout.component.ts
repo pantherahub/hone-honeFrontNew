@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { HeaderPrivateComponent } from '../../shared/header/header-private/header-private.component';
+import { HeaderPrivateComponent } from '../../shared/layout/header-private/header-private.component';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 

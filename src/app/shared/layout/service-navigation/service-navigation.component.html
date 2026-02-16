@@ -1,0 +1,28 @@
+<nav class="flex flex-col gap-4 mb-9">
+
+  <app-breadcrumb
+    [options]="breadcrumbSteps()"
+    [showFirstOptionSeparated]="true">
+  </app-breadcrumb>
+
+  @if (serviceRoutes.length > 1) {
+    <div class="max-w-full w-fit overflow-x-auto scrollbar-hide bg-gray-200 rounded-lg p-1">
+      <ul class="inline-flex whitespace-nowrap">
+        @for (option of serviceRoutes; track $index) {
+          <li>
+            <a #link [routerLink]="option.path"
+              [attr.aria-current]="option.label === currentLabel() ? 'page' : null"
+              class="inline-block py-1.5 px-3 rounded text-sm font-semibold leading-4 transition-shadow"
+              [ngClass]="{
+                'bg-white text-main-blue1h shadow-[0px_1px_2px_0px_#0000000D]': option.label === currentLabel(),
+                'text-gray-500': option.label !== currentLabel(),
+              }">
+              {{ option.tab }}
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  }
+
+</nav>

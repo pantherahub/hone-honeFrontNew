@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ButtonComponent } from '../components/button/button.component';
+import { ButtonComponent } from '../../components/button/button.component';
 import { NavigationService } from 'src/app/services/navigation/navigation.service';
 import { TutorialService } from 'src/app/services/tutorial/tutorial.service';
 import { Router } from '@angular/router';
@@ -8,9 +8,9 @@ import { EventManagerService } from 'src/app/services/events-manager/event-manag
 import { isNonEmptyObject } from 'src/app/utils/validation-utils';
 import { AuthService } from 'src/app/services/auth.service';
 import { ModalService } from 'src/app/services/modal/modal.service';
-import { TutorialVideoComponent } from '../modals/tutorial-video/tutorial-video.component';
-import { Subscription } from 'rxjs';
-import { PopoverComponent } from '../components/popover/popover.component';
+import { TutorialVideoComponent } from '../../modals/tutorial-video/tutorial-video.component';
+import { Subject, takeUntil } from 'rxjs';
+import { PopoverComponent } from '../../components/popover/popover.component';
 
 interface CustomerSchedulingData {
   clientHoneSolutions: string;
@@ -47,11 +47,12 @@ export class FloatingActionsComponent implements OnInit, OnDestroy {
     // }],
   ]);
 
-  private tutorialSubscription!: Subscription;
   menuTutorialVisible: boolean = false;
 
   private currentUrl: string = '';
   private tutorialStep: number = 1;
+
+  private destroy$ = new Subject<void>();
 
   constructor(
     private navigationService: NavigationService,
@@ -72,16 +73,17 @@ export class FloatingActionsComponent implements OnInit, OnDestroy {
       }
     );
 
-    this.tutorialSubscription = this.tutorialService.stepIndex$.subscribe(
-      step => {
+    this.tutorialService.stepIndex$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(step => {
         this.tutorialStep = step;
         this.showMenuTutorial();
-      }
-    );
+      });
   }
 
   ngOnDestroy(): void {
-    this.tutorialSubscription.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   showMenuTutorial() {

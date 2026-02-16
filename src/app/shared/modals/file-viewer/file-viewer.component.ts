@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { ModalComponent } from '../../components/modal/modal.component';
 import { ButtonComponent } from '../../components/button/button.component';
+import { LoaderComponent } from '../../components/loader/loader.component';
 
 @Component({
   selector: 'app-file-viewer',
   standalone: true,
-  imports: [CommonModule, NgxDocViewerModule, PipesModule, ButtonComponent],
+  imports: [CommonModule, NgxDocViewerModule, PipesModule, ButtonComponent, LoaderComponent],
   templateUrl: './file-viewer.component.html',
   styleUrl: './file-viewer.component.scss'
 })
