@@ -16,7 +16,7 @@ import { ServiceLayoutComponent } from './layout/service-layout/service-layout.c
 import { clientSelectedGuard } from './guards/client-selected.guard';
 import { RatesComponent } from './modules/private/rates/rates.component';
 import { serviceAccessGuard } from './guards/service-access.guard';
-import { SERVICES_CONFIG } from './config/client-services.config';
+import { SERVICES_CONFIG } from './config/service-navigation.config';
 
 export const routes: Routes = [
   //   PUBLIC ROUTES
@@ -128,4 +128,4 @@ export const routes: Routes = [
   ],
   exports: [RouterModule]
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }
