@@ -4,16 +4,18 @@ import { CommonModule } from '@angular/common';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { ModalComponent } from '../../components/modal/modal.component';
 import { ButtonComponent } from '../../components/button/button.component';
+import { LoaderComponent } from '../../components/loader/loader.component';
 
 @Component({
   selector: 'app-file-viewer',
   standalone: true,
-  imports: [CommonModule, NgxDocViewerModule, PipesModule, ButtonComponent],
+  imports: [CommonModule, NgxDocViewerModule, PipesModule, ButtonComponent, LoaderComponent],
   templateUrl: './file-viewer.component.html',
   styleUrl: './file-viewer.component.scss'
 })
 export class FileViewerComponent implements OnInit {
-  @Input() currentItem: any = null;
+  @Input() title: string = 'Documento';
+  @Input() url: string = '';
 
   isImage: boolean = false;
   previewFile: string = '';
@@ -28,15 +30,13 @@ export class FileViewerComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    if (this.currentItem) {
-      this.retryAttempts = 0;
-      this.previewFile = this.currentItem?.UrlDocument || '';
-      const extension = this.getExtension(this.previewFile);
-      this.isImage = this.typeImageExtension.includes(extension);
-      if (!this.isImage) {
-        this.loadingPdf = true;
-        this.startRetryTimer();
-      }
+    this.retryAttempts = 0;
+    this.previewFile = this.url || '';
+    const extension = this.getExtension(this.previewFile);
+    this.isImage = this.typeImageExtension.includes(extension);
+    if (!this.isImage) {
+      this.loadingPdf = true;
+      this.startRetryTimer();
     }
   }
 

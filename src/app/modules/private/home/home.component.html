@@ -1,3 +1,5 @@
+<app-loader [visible]="loading" />
+
 <div class="flex justify-center mx-4">
   <div class="max-w-screen-xl w-full pt-10 pb-32 sm:pb-20 md:pt-6 flex flex-col gap-9">
     <div class="rounded-xl bg-blue2h-100">
@@ -21,7 +23,7 @@
           </div>
           <div class="flex rounded-lg gap-2 py-2.5 px-4 bg-blue2h-50 text-blue2h-950">
             <div class="py-2">
-              <svg width="20" height="20">
+              <svg class="w-5 h-5">
                 <use xlink:href="/assets/icons/outline/general.svg#lock" />
               </svg>
             </div>
@@ -53,7 +55,7 @@
             [styleType]="viewMode === 'grid' ? 'solid' : 'ghost'"
             customClass="!p-1"
             (click)="setView('grid')">
-            <svg width="24" height="24">
+            <svg class="w-6 h-6">
               <use xlink:href="/assets/icons/outline/general.svg#grid" />
             </svg>
           </app-button>
@@ -63,7 +65,7 @@
             [styleType]="viewMode === 'list' ? 'solid' : 'ghost'"
             customClass="!p-1"
             (click)="setView('list')">
-            <svg width="24" height="24">
+            <svg class="w-6 h-6">
               <use xlink:href="/assets/icons/outline/text.svg#list" />
             </svg>
           </app-button>
@@ -106,7 +108,7 @@
         </div>
       </ng-template>
 
-      @if (loadingData) {
+      @if (loadingClients) {
         <div class="flex items-center gap-3 text-main-blue1h text-base">
           <svg class="w-5 h-5 text-current animate-spin fill-gray-200">
             <use xlink:href="/assets/icons/extras/animations.svg#spin" />
@@ -213,7 +215,7 @@
         Mantén tus datos al día
       </h3>
       <app-button (click)="reminderModal.close()" variant="primary" size="sm" styleType="ghost" class="md:hidden">
-        <svg width="16" height="16">
+        <svg class="w-4 h-4">
           <use xlink:href="/assets/icons/outline/general.svg#close" />
         </svg>
       </app-button>

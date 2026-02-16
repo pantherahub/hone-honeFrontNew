@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { EventManagerService } from '../services/events-manager/event-manager.service';
-import { clientServicesConfig, defaultServices } from '../config/service-navigation.config';
+import { clientServicesConfig, defaultServices } from '../config/client-services.config';
 
 export const serviceAccessGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
@@ -14,8 +14,8 @@ export const serviceAccessGuard: CanActivateFn = (route, state) => {
     return false;
   }
 
-
-  const serviceKey = route.routeConfig?.path;
+  const serviceKey = route.data?.['serviceKey'];
+  if (!serviceKey) return false;
 
   const allowedServices = clientServicesConfig[clientId] ?? defaultServices;
 

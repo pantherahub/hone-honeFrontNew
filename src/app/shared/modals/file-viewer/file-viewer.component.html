@@ -1,10 +1,10 @@
 <div class="flex flex-col gap-4">
   <div class="flex items-center justify-between">
     <h3 class="text-base font-semibold leading-[18px] text-main-blue1h dark:text-white">
-      {{ (currentItem?.typeDocument | formatNameDoc:currentItem?.idDocumentType) || 'No especifica' }}
+      {{ title }}
     </h3>
     <app-button (click)="closeModal()" variant="primary" size="sm" styleType="ghost">
-      <svg width="16" height="16">
+      <svg class="w-4 h-4">
         <use xlink:href="/assets/icons/outline/general.svg#close" />
       </svg>
     </app-button>
@@ -12,13 +12,11 @@
 
   <!-- min-h-72 -->
   <div class="relative min-h-[60vh]">
-    @if (loadingPdf) {
-      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-        <svg class="w-7 h-7 text-main-blue1h animate-spin fill-gray-200">
-          <use xlink:href="/assets/icons/extras/animations.svg#spin" />
-        </svg>
-      </div>
-    }
+    <app-loader
+      [visible]="loadingPdf"
+      [fullscreen]="false"
+      [overlay]="false"
+    />
 
     @if (isImage) {
       <img [src]="previewFile" class="w-full" />
@@ -34,7 +32,7 @@
     }
   </div>
 
-  <div class="flex justify-end gap-2">
+  <div class="flex flex-wrap justify-end gap-2">
     <app-button
       (click)="closeModal()"
       variant="gray"
@@ -48,7 +46,7 @@
       variant="primary"
       styleType="solid"
       size="md"
-      customClass="leading-4">
+      customClass="leading-4 whitespace-nowrap">
       Abrir documento
     </app-button>
   </div>

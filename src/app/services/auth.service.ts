@@ -1,7 +1,7 @@
 import { Injectable, Type } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { environment } from '../../environments/environment';
+import { environment } from 'src/environments/environment';
 import { Observable, of } from 'rxjs';
 import { delay, tap } from 'rxjs/operators';
 import { EventManagerService } from './events-manager/event-manager.service';
@@ -11,6 +11,7 @@ import { NzModalService } from 'ng-zorro-antd/modal';
 import { TwoFactorAuthContentComponent } from '../modules/public/two-factor-auth/two-factor-auth-content/two-factor-auth-content.component';
 import { ValidatePasswordContentComponent } from '../modules/private/user/validate-password/validate-password-content/validate-password-content.component';
 import { decodeJwtPayload } from '../utils/string-utils';
+import { StorageKey } from '../enums/storage-key.enum';
 
 @Injectable({
    providedIn: 'root'
@@ -228,9 +229,10 @@ export class AuthService {
     localStorage.removeItem('requiresEmailVerification');
     localStorage.removeItem('requiresPasswordReset');
     this.eventManager.clearClient();
-    localStorage.removeItem('formState');
-    localStorage.removeItem('tutorialStep');
-    localStorage.removeItem('tutorialFinished');
+
+    localStorage.removeItem(StorageKey.UpdateDataFormState);
+    localStorage.removeItem(StorageKey.TutorialStep);
+    localStorage.removeItem(StorageKey.TutorialFinished);
   }
 
   private clearAuth() {

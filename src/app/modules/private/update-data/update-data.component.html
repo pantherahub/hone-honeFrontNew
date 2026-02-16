@@ -1,10 +1,4 @@
-@if (loading) {
-  <div class="absolute inset-0 z-50 bg-gray-50/60 flex items-center justify-center">
-    <svg class="w-7 h-7 text-main-blue1h animate-spin fill-gray-200">
-      <use xlink:href="/assets/icons/extras/animations.svg#spin" />
-    </svg>
-  </div>
-}
+<app-loader [visible]="loadingState.loading" />
 
 <div class="flex justify-center mx-4">
   <div class="max-w-screen-md w-full pt-10 pb-28 sm:pb-20 md:pt-6 flex flex-col gap-3">
@@ -15,7 +9,7 @@
       styleType="ghost"
       size="sm"
       customClass="leading-4">
-      <svg width="16" height="16">
+      <svg class="w-4 h-4">
         <use xlink:href="/assets/icons/outline/arrows.svg#chevron-left" />
       </svg>
       Volver
@@ -73,7 +67,7 @@
                 customClass="w-full leading-4"
                 [disabled]="!step.enabled"
                 (onClick)="goToStep(step.key)">
-                <svg width="16" height="16">
+                <svg class="w-4 h-4">
                   <use [attr.xlink:href]="step.icon" />
                 </svg>
                 {{ step.label }}
@@ -109,7 +103,7 @@
               size="sm"
               (onClick)="scrollStep('left')"
               customClass="h-full !p-2">
-              <svg width="24" height="24">
+              <svg class="w-6 h-6">
                 <use xlink:href="/assets/icons/outline/arrows.svg#chevron-double-left" />
               </svg>
             </app-button>
@@ -119,7 +113,7 @@
           <div #stepsContainer
             class="flex-1 flex gap-1 overflow-x-auto scrollbar-hide scroll-smooth whitespace-nowrap rounded-xl min-w-0">
             @for (step of steps; track step.key) {
-              <div>
+              <div #stepBtn>
                 <app-button
                   variant="primary"
                   [styleType]="step.key === activeStep ? 'soft' : 'ghost'"
@@ -127,7 +121,7 @@
                   customClass="flex-shrink-0 min-w-[120px] leading-4"
                   [disabled]="!step.enabled"
                   (onClick)="goToStep(step.key, false)">
-                  <svg width="16" height="16">
+                  <svg class="w-4 h-4">
                     <use [attr.xlink:href]="step.icon" />
                   </svg>
                   {{ step.label }}
@@ -143,7 +137,7 @@
               size="sm"
               (onClick)="scrollStep('right')"
               customClass="h-full !p-2">
-              <svg width="24" height="24">
+              <svg class="w-6 h-6">
                 <use xlink:href="/assets/icons/outline/arrows.svg#chevron-double-right" />
               </svg>
             </app-button>
@@ -203,10 +197,3 @@
 
   </div>
 </div>
-
-
-<!-- <button nz-button nzType="primary" type="button" (click)="openOfficeModal(getGlobalIndex(i, officePage, officePageSize))" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
-<button nz-button nzDanger nzType="primary" type="button" (click)="deleteOffice(getGlobalIndex(i, officePage, officePageSize))" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button> -->
-
-<!-- <button nz-button nzType="primary" type="button" (click)="openContactModal(getGlobalIndex(i, contactPage, contactPageSize))" nz-tooltip nzTooltipTitle="Actualizar"><span nz-icon nzType="edit"></span></button>
-<button nz-button nzDanger nzType="primary" type="button" (click)="deleteContact(getGlobalIndex(i, contactPage, contactPageSize))" nz-tooltip nzTooltipTitle="Eliminar"><span nz-icon nzType="delete"></span></button> -->

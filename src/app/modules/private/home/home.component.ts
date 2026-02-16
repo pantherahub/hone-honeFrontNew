@@ -1,11 +1,11 @@
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ClientInterface } from '../../../models/client.interface';
-import { ClientProviderService } from '../../../services/client-provider/client-provider.service';
-import { EventManagerService } from '../../../services/events-manager/event-manager.service';
-import { Router, RouterModule } from '@angular/router';
+import { ClientInterface } from 'src/app/models/client.interface';
+import { ClientProviderService } from 'src/app/services/client-provider/client-provider.service';
+import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TutorialService } from 'src/app/services/tutorial/tutorial.service';
-import { Subscription } from 'rxjs';
+import { catchError, finalize, Observable, of, ReplaySubject, Subject, takeUntil, tap } from 'rxjs';
 import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
@@ -14,11 +14,15 @@ import { PopoverComponent } from 'src/app/shared/components/popover/popover.comp
 import { ModalService } from 'src/app/services/modal/modal.service';
 import { FormsModule } from '@angular/forms';
 import { TutorialVideoComponent } from 'src/app/shared/modals/tutorial-video/tutorial-video.component';
+import { DisclaimerService } from 'src/app/services/disclaimer/disclaimer.service';
+import { Disclaimer } from 'src/app/models/disclaimer.interface';
+import { DisclaimerFormComponent } from 'src/app/shared/modals/disclaimer-form/disclaimer-form.component';
+import { LoaderComponent } from 'src/app/shared/components/loader/loader.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [FormsModule, CommonModule, RouterModule, TextInputComponent, ButtonComponent, ModalComponent, PopoverComponent],
+  imports: [FormsModule, CommonModule, RouterModule, TextInputComponent, ButtonComponent, ModalComponent, PopoverComponent, LoaderComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -28,17 +32,21 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   viewMode: 'grid' | 'list' = 'grid';
   searchQuery: string = '';
 
+  loading: boolean = false;
+  loadingClients: boolean = false;
+
   clientList: ClientInterface[] = [];
   filteredClients: ClientInterface[] = [];
-  loadingData: boolean = false;
+  providerDisclaimer: Disclaimer | null = null;
 
-  defaultImageUrl: string = '../../../../assets/img/no-foto.png';
+  defaultImageUrl: string = 'assets/img/no-foto.png';
 
   clientTutorialVisible: boolean = false;
 
   @ViewChild('reminderModal') reminderModal!: ModalComponent;
 
-  private tutorialSubscription!: Subscription;
+  private destroy$ = new Subject<void>();
+  private disclaimerReady$ = new ReplaySubject<void>(1);
 
   constructor(
     private clientService: ClientProviderService,
@@ -47,6 +55,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     private router: Router,
     private navigationService: NavigationService,
     private modalService: ModalService,
+    private disclaimerService: DisclaimerService,
+    private route: ActivatedRoute,
   ) { }
 
   ngOnInit(): void {
@@ -54,29 +64,29 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.setDefaultViewMode();
     this.getClientList();
+
+    this.loading = true;
+    this.getProviderDisclaimer$()
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => this.loading = false)
+      )
+      .subscribe(() => {
+        this.disclaimerReady$.next();
+      });
   }
 
   ngAfterViewInit(): void {
-    if (this.user.withData) {
-      const backRoute = this.navigationService.getBackRoute();
-      // If the user has just logged in, show the reminder
-      if (backRoute === '/login' || this.user.rejected) {
-        this.tutorialService.finishTutorial();
-        this.reminderModal.open();
-      }
-    }
-
-    this.tutorialSubscription = this.tutorialService.stepIndex$.subscribe(step => {
-      if (!this.tutorialService.isTutorialFinished() && !this.reminderModal.isOpen) {
-        this.startTutorial(step);
-      }
-    });
+    this.disclaimerReady$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.startInitialFlow();
+      });
   }
 
   ngOnDestroy(): void {
-    if (this.tutorialSubscription) {
-      this.tutorialSubscription.unsubscribe();
-    }
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private isMobileView(): boolean {
@@ -98,7 +108,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   * Gets the list of clients of the provider who logs in
   */
   getClientList() {
-    this.loadingData = true;
+    this.loadingClients = true;
     this.clientService.getClientListByProviderId(this.user.id).subscribe({
       next: (res: ClientInterface[]) => {
         this.clientList = [...res];
@@ -107,14 +117,89 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         if (!this.eventManager.viewMode() && this.clientList.length > 6) {
           this.viewMode = 'list';
         }
-        this.loadingData = false;
+        this.loadingClients = false;
       },
       error: (err: any) => {
         console.error(err);
-        this.loadingData = false;
+        this.loadingClients = false;
       },
       complete: () => { }
     });
+  }
+
+  private getProviderDisclaimer$(): Observable<void> {
+    const idProvider = this.user?.id;
+    if (!idProvider) return of(void 0);
+
+    const disclaimerKey = this.route.snapshot.data['disclaimerKey'];
+    return this.disclaimerService
+      .getDisclaimer(disclaimerKey, idProvider)
+      .pipe(
+        tap((resp: any) => {
+          const data = resp?.data;
+          this.providerDisclaimer =
+            data?.canRespond && data?.disclaimer
+              ? data.disclaimer
+              : null;
+        }),
+        catchError(err => {
+          if (err.status !== 404) console.error(err);
+          this.providerDisclaimer = null;
+          return of(void 0);
+        })
+      );
+  }
+
+  private startInitialFlow(): void {
+    if (this.providerDisclaimer) {
+      this.openProviderDisclaimer();
+      return;
+    }
+
+    this.startMainFlow();
+  }
+
+  private openProviderDisclaimer(): void {
+    if (!this.providerDisclaimer) return;
+    const modal = this.modalService.open(DisclaimerFormComponent, {
+      title: 'Confirmación requerida',
+      closable: false,
+    }, {
+      disclaimer: this.providerDisclaimer,
+    });
+
+    modal.onClose.subscribe(() => {
+      this.startMainFlow();
+    });
+  }
+
+  private startMainFlow(): void {
+    this.checkReminder();
+    this.initTutorialListener();
+  }
+
+  private checkReminder(): void {
+    if (!this.user.withData) return;
+
+    // If the user has just logged in, show the reminder
+    const backRoute = this.navigationService.getBackRoute();
+    if (backRoute === '/login' || this.user.rejected) {
+      this.tutorialService.finishTutorial();
+      this.reminderModal.open();
+    }
+  }
+
+  private initTutorialListener(): void {
+    this.tutorialService.stepIndex$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(step => {
+        if (
+          !this.tutorialService.isTutorialFinished() &&
+          !this.reminderModal.isOpen
+        ) {
+          this.startTutorial(step);
+        }
+      });
   }
 
   setView(mode: 'grid' | 'list') {

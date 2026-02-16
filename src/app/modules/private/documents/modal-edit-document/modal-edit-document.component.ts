@@ -1,8 +1,8 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
-import { DocumentsCrudService } from '../../../../services/documents/documents-crud.service';
-import { EventManagerService } from '../../../../services/events-manager/event-manager.service';
+import { DocumentService } from 'src/app/services/documents/documents.service';
+import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 import { FileSelectDirective } from 'src/app/directives/file-select.directive';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { formatListWithY, pluralize } from 'src/app/utils/string-utils';
@@ -174,7 +174,7 @@ export class ModalEditDocumentComponent implements OnInit {
   constructor(
     private modalRef: ModalComponent,
     private formBuilder: FormBuilder,
-    private documentService: DocumentsCrudService,
+    private documentService: DocumentService,
     private eventManager: EventManagerService,
     private alertService: AlertService,
     private formUtils: FormUtilsService
@@ -596,7 +596,7 @@ export class ModalEditDocumentComponent implements OnInit {
       return;
     }
 
-    this.documentService.updateDocuments(this.currentDoc.idDocumentsProvider, fileToUpload)
+    this.documentService.updateDocument(this.currentDoc.idDocumentsProvider, fileToUpload)
       .subscribe({
         next: (res: any) => {
           this.loader = false;
@@ -617,7 +617,7 @@ export class ModalEditDocumentComponent implements OnInit {
   }
 
   saveDocument(fileToUpload: FormData) {
-    this.documentService.uploadDocuments(fileToUpload).subscribe({
+    this.documentService.uploadDocument(fileToUpload).subscribe({
       next: (res: any) => {
         this.loader = false;
         this.alertService.success(

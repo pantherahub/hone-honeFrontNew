@@ -7,10 +7,10 @@ import { LANGUAGES } from 'src/app/constants/languages';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { format } from 'date-fns';
 import { BackendErrorsComponent } from 'src/app/shared/components/backend-errors/backend-errors.component';
-import { debounceTime, firstValueFrom, fromEvent } from 'rxjs';
+import { catchError, debounceTime, finalize, firstValueFrom, fromEvent, Observable, of, tap } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
 import { CanComponentDeactivate } from 'src/app/guards/can-deactivate.interface';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { NavigationService } from 'src/app/services/navigation/navigation.service';
 import { isEmail } from 'src/app/utils/validation-utils';
 import { ClientInterface } from 'src/app/models/client.interface';
@@ -24,11 +24,18 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { CatalogService } from 'src/app/services/catalog/catalog.service';
 import { ProviderService } from 'src/app/services/provider/provider.service';
 import { TempProviderDataValidation } from 'src/app/models/temporal-provider.interface';
+import { DisclaimerService } from 'src/app/services/disclaimer/disclaimer.service';
+import { Disclaimer } from 'src/app/models/disclaimer.interface';
+import { ModalService } from 'src/app/services/modal/modal.service';
+import { DisclaimerFormComponent } from 'src/app/shared/modals/disclaimer-form/disclaimer-form.component';
+import { LoaderComponent } from 'src/app/shared/components/loader/loader.component';
+import { LoadingCounter } from 'src/app/helpers/loading-counter';
+import { StorageKey } from 'src/app/enums/storage-key.enum';
 
 @Component({
   selector: 'app-update-data',
   standalone: true,
-  imports: [CommonModule, BackendErrorsComponent, ButtonComponent, AlertComponent, RouterModule, ProviderFormComponent, OfficeListComponent, ContactListComponent],
+  imports: [CommonModule, BackendErrorsComponent, ButtonComponent, AlertComponent, RouterModule, ProviderFormComponent, OfficeListComponent, ContactListComponent, LoaderComponent],
   templateUrl: './update-data.component.html',
   styleUrl: './update-data.component.scss'
 })
@@ -38,9 +45,12 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
   providerForm!: FormGroup;
   isFirstForm: boolean = true;
 
+  private readonly FORM_STORAGE_KEY = StorageKey.UpdateDataFormState;
+
   languages: any[] = LANGUAGES;
   identificationTypes: any[] = [];
   providerCompanies: any[] = [];
+  providerDisclaimer: Disclaimer | null = null;
 
   existingOffices: any[] = [];
   existingContacts: any[] = [];
@@ -51,7 +61,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
   contactPage: number = 1;
   contactPageSize: number = 5;
 
-  loading: boolean = false;
+  loadingState = new LoadingCounter();
   backendError: any = null;
   hasSectionBackendError: boolean = false;
 
@@ -115,6 +125,9 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     private alertService: AlertService,
     private catalogService: CatalogService,
     private providerService: ProviderService,
+    private disclaimerService: DisclaimerService,
+    private modalService: ModalService,
+    private route: ActivatedRoute,
   ) { }
 
   ngOnInit(): void {
@@ -125,7 +138,12 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
 
     this.getCompanies();
 
-    this.loadFormData();
+    this.loadingState.start();
+    this.getProviderDisclaimer$()
+      .pipe(finalize(() => this.loadingState.stop()))
+      .subscribe(() => {
+        this.startInitialFlow();
+      });
   }
 
   ngAfterViewInit(): void {
@@ -138,10 +156,39 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
       .subscribe(() => this.updateArrows(false));
   }
 
-  private scrollToIndex(index: number, useDelay = true) {
-    this.visibleIndex = index;
+  ngOnDestroy(): void {
+    this.unsubscribeForm();
+  }
 
-    const target = this.stepBtns.toArray()[index]?.nativeElement;
+  async canDeactivate(): Promise<boolean> {
+    return !this.hasSavedState() || await firstValueFrom(
+      this.alertService.confirm(
+        '¡Aviso!', 'Tienes cambios pendientes. ¿Deseas salir?', {
+        confirmBtnText: 'Salir',
+        cancelBtnText: 'Cancelar',
+      })
+    );
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  handleUnload($event: BeforeUnloadEvent): void {
+    if (this.hasSavedState()) {
+      $event.preventDefault();
+    }
+  }
+
+  @HostListener('window:resize')
+  onResize() {
+    this.updateArrows();
+  }
+
+  private scrollToIndex(index: number, useDelay = true) {
+    if (!this.steps.length) return;
+
+    const sanitizedIndex = Math.max(0, Math.min(index, this.steps.length - 1));
+    this.visibleIndex = sanitizedIndex;
+
+    const target = this.stepBtns.toArray()[this.visibleIndex]?.nativeElement;
     if (target) {
       target.scrollIntoView({
         behavior: 'smooth',
@@ -152,15 +199,15 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
 
     this.atStart = this.visibleIndex === 0;
     this.atEnd = this.visibleIndex === this.steps.length - 1;
-    this.updateArrows(useDelay);
+    // this.updateArrows(useDelay);
   }
 
   scrollStep(direction: 'left' | 'right') {
-    if (this.steps.length === 0) return;
+    if (!this.steps.length) return;
 
-    if (direction === 'right' && this.visibleIndex < this.steps.length - 1) {
+    if (direction === 'right') {
       this.scrollToIndex(this.visibleIndex + 1);
-    } else if (direction === 'left' && this.visibleIndex > 0) {
+    } else if (direction === 'left') {
       this.scrollToIndex(this.visibleIndex - 1);
     }
   }
@@ -198,30 +245,76 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     }
   }
 
-  ngOnDestroy(): void {
-    this.unsubscribeForm();
+  getIdentificationTypes() {
+    this.catalogService.getDocTypes().subscribe({
+      next: (res: any) => {
+        this.identificationTypes = res;
+      },
+      error: (err: any) => {
+        console.error(err);
+      }
+    });
   }
 
-  async canDeactivate(): Promise<boolean> {
-    return !this.hasSavedState() || await firstValueFrom(
-      this.alertService.confirm(
-        '¡Aviso!', 'Tienes cambios pendientes. ¿Deseas salir?', {
-        confirmBtnText: 'Salir',
-        cancelBtnText: 'Cancelar',
-      })
-    );
+  getCompanies() {
+    this.loadingState.start();
+    this.clientProviderService.getClientListByProviderId(this.userState.id).subscribe({
+      next: (res: ClientInterface[]) => {
+        const clientList = res;
+        const clientsIds = clientList.map((client: any) => client.idClientHoneSolutions);
+        this.getProviderCompanies(clientsIds);
+      },
+      error: (err: any) => {
+        console.error(err);
+        this.loadingState.stop();
+      },
+    });
   }
 
-  @HostListener('window:beforeunload', ['$event'])
-  handleUnload($event: BeforeUnloadEvent): void {
-    if (this.hasSavedState()) {
-      $event.preventDefault();
+  private startInitialFlow(): void {
+    if (this.providerDisclaimer) {
+      this.openProviderDisclaimer();
+      return;
     }
+
+    this.loadFormData();
   }
 
-  @HostListener('window:resize')
-  onResize() {
-    this.updateArrows();
+  private getProviderDisclaimer$(): Observable<void> {
+    const idProvider = this.user?.id;
+    if (!idProvider) return of(void 0);
+
+    const disclaimerKey = this.route.snapshot.data['disclaimerKey'];
+    return this.disclaimerService
+      .getDisclaimer(disclaimerKey, idProvider)
+      .pipe(
+        tap((resp: any) => {
+          const data = resp?.data;
+          this.providerDisclaimer =
+            data?.canRespond && data?.disclaimer
+              ? data.disclaimer
+              : null;
+        }),
+        catchError(err => {
+          if (err.status !== 404) console.error(err);
+          this.providerDisclaimer = null;
+          return of(void 0);
+        })
+      );
+  }
+
+  private openProviderDisclaimer(): void {
+    if (!this.providerDisclaimer) return;
+    const modal = this.modalService.open(DisclaimerFormComponent, {
+      title: 'Confirmación requerida',
+      closable: false,
+    }, {
+      disclaimer: this.providerDisclaimer,
+    });
+
+    modal.onClose.subscribe(() => {
+      this.loadFormData();
+    });
   }
 
   subscribeOnChange() {
@@ -400,16 +493,16 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
         ? this.providerService.validateTemporalProviderDataCreate(args)
         : this.providerService.validateTemporalProviderDataUpdate(args);
 
-    this.loading = true;
+    this.loadingState.start();
     return new Promise((resolve) => {
       serviceMethod(formControlValues).subscribe({
         next: (resp: any) => {
-          this.loading = false;
+          this.loadingState.stop();
           this.clearSectionBackendError();
           resolve(true);
         },
         error: (err) => {
-          this.loading = false;
+          this.loadingState.stop();
           if (err.status == 422) {
             this.backendError = err.error;
             this.hasSectionBackendError = true;
@@ -593,41 +686,15 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
     return isEmail(email || '');
   }
 
-  getIdentificationTypes() {
-    this.catalogService.getDocTypes().subscribe({
-      next: (res: any) => {
-        this.identificationTypes = res;
-      },
-      error: (err: any) => {
-        console.error(err);
-      }
-    });
-  }
-
-  getCompanies() {
-    this.loading = true;
-    this.clientProviderService.getClientListByProviderId(this.userState.id).subscribe({
-      next: (res: ClientInterface[]) => {
-        const clientList = res;
-        const clientsIds = clientList.map((client: any) => client.idClientHoneSolutions);
-        this.getProviderCompanies(clientsIds);
-      },
-      error: (err: any) => {
-        console.error(err);
-        this.loading = false;
-      },
-    });
-  }
-
   getProviderCompanies(clientsIds: number[]) {
     this.clientProviderService.getCompaniesByIdClients({ clientsIds }).subscribe({
       next: (res: any) => {
         this.providerCompanies = res.data;
-        this.loading = false;
+        this.loadingState.stop();
       },
       error: (err: any) => {
         console.error(err);
-        this.loading = false;
+        this.loadingState.stop();
       }
     });
   }
@@ -653,13 +720,13 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
       existingContacts: this.existingContacts,
       activeStep: this.activeStep,
     };
-    localStorage.setItem('formState', JSON.stringify(newState));
+    localStorage.setItem(this.FORM_STORAGE_KEY, JSON.stringify(newState));
   }
   removeFormState() {
-    localStorage.removeItem('formState');
+    localStorage.removeItem(this.FORM_STORAGE_KEY);
   }
   hasSavedState(): boolean {
-    const savedState = localStorage.getItem('formState');
+    const savedState = localStorage.getItem(this.FORM_STORAGE_KEY);
     if (savedState) {
       return true;
     }
@@ -682,7 +749,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
       return;
     }
 
-    const storageState = localStorage.getItem('formState');
+    const storageState = localStorage.getItem(this.FORM_STORAGE_KEY);
     if (!storageState) return;
     const state = JSON.parse(storageState);
     const formState = state.formValue;
@@ -734,10 +801,10 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
   }
 
   loadProviderData(): void {
-    this.loading = true;
+    this.loadingState.start();
     this.providerService.getTemporalProviderData(this.userState.id).subscribe({
       next: (res: any) => {
-        this.loading = false;
+        this.loadingState.stop();
         const user = this.userState;
 
         const data = res.data;
@@ -815,7 +882,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
         }
       },
       error: (err: any) => {
-        this.loading = false;
+        this.loadingState.stop();
         console.error(err);
         this.toastService.error('Algo salió mal.');
       }
@@ -969,7 +1036,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
         ? this.providerService.sendTemporalProviderForm(args)
         : this.providerService.updateTemporalProviderForm(args);
 
-    this.loading = true;
+    this.loadingState.start();
 
     setTimeout(() => {
       serviceMethod(this.providerForm.getRawValue()).subscribe({
@@ -981,7 +1048,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
           }
           this.authService.saveUserLogged(user);
 
-          this.loading = false;
+          this.loadingState.stop();
           if (this.isFirstForm) {
             this.updateProgress(true);
             this.alertService.success(
@@ -997,7 +1064,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
           this.resetForm();
         },
         error: (err: any) => {
-          this.loading = false;
+          this.loadingState.stop();
           if (err.status == 422) this.backendError = err.error;
           console.error(err);
           this.alertService.error();
