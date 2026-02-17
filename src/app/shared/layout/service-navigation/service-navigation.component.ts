@@ -7,7 +7,7 @@ import { clientServicesConfig, defaultServices } from 'src/app/config/client-ser
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 import { NavigationService } from 'src/app/services/navigation/navigation.service';
 import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb.component';
-import { BreadcrumbOption } from 'src/app/models/breadcrump';
+import { BreadcrumbOption } from 'src/app/interfaces/breadcrump';
 
 @Component({
   selector: 'app-service-navigation',

@@ -3,7 +3,7 @@ import { Component, Input } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ButtonComponent } from '../button/button.component';
 import { DropdownTriggerDirective } from 'src/app/directives/dropdown-trigger.directive';
-import { BreadcrumbOption } from 'src/app/models/breadcrump';
+import { BreadcrumbOption } from 'src/app/interfaces/breadcrump';
 
 @Component({
   selector: 'app-breadcrumb',
