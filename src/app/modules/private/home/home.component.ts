@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ClientInterface } from 'src/app/models/client.interface';
+import { ClientInterface } from 'src/app/interfaces/client.interface';
 import { ClientProviderService } from 'src/app/services/client-provider/client-provider.service';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -15,7 +15,7 @@ import { ModalService } from 'src/app/services/modal/modal.service';
 import { FormsModule } from '@angular/forms';
 import { TutorialVideoComponent } from 'src/app/shared/modals/tutorial-video/tutorial-video.component';
 import { DisclaimerService } from 'src/app/services/disclaimer/disclaimer.service';
-import { Disclaimer } from 'src/app/models/disclaimer.interface';
+import { Disclaimer } from 'src/app/interfaces/disclaimer.interface';
 import { DisclaimerFormComponent } from 'src/app/shared/modals/disclaimer-form/disclaimer-form.component';
 import { LoaderComponent } from 'src/app/shared/components/loader/loader.component';
 

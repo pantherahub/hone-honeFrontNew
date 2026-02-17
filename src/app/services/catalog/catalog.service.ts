@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { catchError, map, Observable, of, shareReplay, startWith } from 'rxjs';
-import { City } from 'src/app/models/city.interface';
-import { DocumentType } from 'src/app/models/document-type.interface';
+import { City } from 'src/app/interfaces/city.interface';
+import { DocumentType } from 'src/app/interfaces/document-type.interface';
 import { CitiesService } from '../cities/cities.service';
 import { ProviderService } from '../provider/provider.service';
 

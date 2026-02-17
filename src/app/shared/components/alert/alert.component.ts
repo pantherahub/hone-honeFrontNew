@@ -1,7 +1,7 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { AlertVariant } from 'src/app/models/alert.interface';
+import { AlertVariant } from 'src/app/interfaces/alert.interface';
 
 @Component({
   selector: 'app-alert',

@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
+import { DocumentInterface } from 'src/app/interfaces/client.interface';
 import { DocumentService } from 'src/app/services/documents/documents.service';
-import { DocumentInterface } from 'src/app/models/client.interface';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FeedbackFivestarsComponent } from 'src/app/shared/modals/feedback-fivestars/feedback-fivestars.component';
 import { AlertService } from 'src/app/services/alert/alert.service';
@@ -15,12 +15,13 @@ import { TooltipComponent } from 'src/app/shared/components/tooltip/tooltip.comp
 import { ModalEditDocumentComponent } from '../modal-edit-document/modal-edit-document.component';
 import { DocumentConfig, DownloadService } from 'src/app/services/download/download.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { CompliancePercentInterface, PercentInterface } from 'src/app/models/doc-percent.interface';
+import { CompliancePercentInterface, PercentInterface } from 'src/app/interfaces/doc-percent.interface';
 import { environment } from 'src/environments/environment';
 import { CatalogService } from 'src/app/services/catalog/catalog.service';
+import { BadgeConfig } from 'src/app/types/badge-config.type';
 import { DisclaimerFormComponent } from 'src/app/shared/modals/disclaimer-form/disclaimer-form.component';
 import { DisclaimerService } from 'src/app/services/disclaimer/disclaimer.service';
-import { Disclaimer } from 'src/app/models/disclaimer.interface';
+import { Disclaimer } from 'src/app/interfaces/disclaimer.interface';
 import { catchError, finalize, map, Observable, of, ReplaySubject, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { PopoverComponent } from 'src/app/shared/components/popover/popover.component';
 import { LoaderComponent } from 'src/app/shared/components/loader/loader.component';
@@ -57,10 +58,25 @@ export class ListDocumentsComponent implements OnInit, AfterViewInit, OnDestroy 
   chart!: ApexCharts;
   @ViewChild('donutChart', { static: false }) chartElement!: ElementRef;
 
-  statusConfig: Record<string, { bg: string; text: string; icon: string; label: string }> = {
-    'PENDIENTE': { bg: 'bg-yellow-100', text: 'text-yellow-800', icon: 'clock', label: 'Pendiente' },
-    'AL DIA': { bg: 'bg-green-100', text: 'text-green-800', icon: 'check', label: 'Cargado' },
-    'VENCIDO': { bg: 'bg-red-100', text: 'text-red-800', icon: 'close', label: 'Vencido' }
+  statusConfig: Record<string, BadgeConfig> = {
+    'PENDIENTE': {
+      bgClass: 'bg-yellow-100',
+      textClass: 'text-yellow-800',
+      icon: 'clock',
+      label: 'Pendiente'
+    },
+    'AL DIA': {
+      bgClass: 'bg-green-100',
+      textClass: 'text-green-800',
+      icon: 'check',
+      label: 'Cargado'
+    },
+    'VENCIDO': {
+      bgClass: 'bg-red-100',
+      textClass: 'text-red-800',
+      icon: 'close',
+      label: 'Vencido'
+    }
   };
 
   private downloadConfigs: Record<string, DocumentConfig> = {

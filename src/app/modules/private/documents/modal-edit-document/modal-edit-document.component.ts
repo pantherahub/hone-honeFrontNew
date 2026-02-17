@@ -14,7 +14,7 @@ import { SelectComponent } from 'src/app/shared/components/select/select.compone
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { FileDropDirective } from 'src/app/directives/file-drop.directive';
-import { City } from 'src/app/models/city.interface';
+import { City } from 'src/app/interfaces/city.interface';
 import { AlertComponent } from 'src/app/shared/components/alert/alert.component';
 
 

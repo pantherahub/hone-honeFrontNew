@@ -1,10 +1,10 @@
 import { Injectable, signal } from '@angular/core';
-import { UserInterface } from 'src/app/models/user.interface';
-import { ClientInterface } from 'src/app/models/client.interface';
+import { UserInterface } from 'src/app/interfaces/user.interface';
+import { ClientInterface } from 'src/app/interfaces/client.interface';
 import { StorageKey } from 'src/app/enums/storage-key.enum';
 
 @Injectable({
-   providedIn: 'root'
+  providedIn: 'root'
 })
 export class EventManagerService {
 

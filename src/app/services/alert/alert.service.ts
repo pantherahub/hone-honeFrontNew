@@ -2,15 +2,15 @@ import { Injectable } from '@angular/core';
 import { AlertModalComponent } from 'src/app/shared/alerts/alert-modal/alert-modal.component';
 import { ModalService } from '../modal/modal.service';
 import { Observable } from 'rxjs';
-import { AlertOptions } from 'src/app/models/alert.interface';
-import { ModalRef } from 'src/app/models/modal.interface';
+import { AlertOptions } from 'src/app/interfaces/alert.interface';
+import { ModalRef } from 'src/app/interfaces/modal.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AlertService {
 
-  constructor(private modalService: ModalService) {}
+  constructor(private modalService: ModalService) { }
 
   showAlert(opts: Partial<AlertOptions>): Observable<boolean | void> {
     const {

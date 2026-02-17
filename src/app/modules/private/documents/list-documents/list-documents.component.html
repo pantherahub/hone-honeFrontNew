@@ -202,7 +202,7 @@
                 </td>
                 <td class="px-4 py-[10.5px]">
                   <div class="inline-flex gap-1 py-1.5 px-3 rounded-full text-sm font-semibold leading-4 whitespace-nowrap"
-                    [ngClass]="[statusConfig[doc.documentStatus].bg, statusConfig[doc.documentStatus].text]">
+                    [ngClass]="[statusConfig[doc.documentStatus].bgClass, statusConfig[doc.documentStatus].textClass]">
                     <svg class="w-4 h-4">
                       <use [attr.xlink:href]="'/assets/icons/outline/general.svg#' + statusConfig[doc.documentStatus].icon" />
                     </svg>

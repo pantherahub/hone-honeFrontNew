@@ -2,7 +2,7 @@
   #rateDrawer
   placement="right"
   size="xl"
-  (onClose)="onDrawerClose()"
+  (onClose)="close()"
   [hasFooter]="showFooter">
   <ng-container drawer-header>
     <h2 class="block sm:hidden text-lg font-black leading-5 text-main-blue1h">
@@ -15,20 +15,22 @@
 
   @if (selectedRate) {
     <form [formGroup]="rateForm" class="flex flex-col gap-6">
-      <div class="flex gap-6">
-        <div class="flex-1 flex flex-col gap-2.5 text-sm leading-4">
-          <span class="font-semibold text-gray-900">Fecha de carga</span>
-          <span class="text-gray-500">
-            {{ selectedRate.currentRate.dateAdd | date: 'mediumDate' }}
-          </span>
+      @if (selectedRate.currentRate) {
+        <div class="flex gap-6">
+          <div class="flex-1 flex flex-col gap-2.5 text-sm leading-4">
+            <span class="font-semibold text-gray-900">Fecha de carga</span>
+            <span class="text-gray-500">
+              {{ selectedRate.currentRate.dateAdd | date: 'mediumDate' }}
+            </span>
+          </div>
+          <div class="flex-1 flex flex-col gap-2.5 text-sm leading-4">
+            <span class="font-semibold text-gray-900">Última modificación</span>
+            <span class="text-gray-500">
+              {{ selectedRate.currentRate.updateAt | date: 'mediumDate' }}
+            </span>
+          </div>
         </div>
-        <div class="flex-1 flex flex-col gap-2.5 text-sm leading-4">
-          <span class="font-semibold text-gray-900">Última modificación</span>
-          <span class="text-gray-500">
-            {{ selectedRate.currentRate.updateAt | date: 'mediumDate' }}
-          </span>
-        </div>
-      </div>
+      }
 
       @if (isProcessing) {
         <div class="flex flex-col gap-2.5 text-sm leading-4">
@@ -200,6 +202,10 @@
             </div>
           </div>
 
+          @if (!isPending) {
+            <app-backend-errors [error]="backendError"></app-backend-errors>
+          }
+
           @if (!isPending && selectedRate.rateHistory) {
             <div class="xs:ps-3 flex gap-4 max-w-full">
               <div class="hidden xs:block w-[3px] rounded-3xl bg-gray-200"></div>
@@ -262,6 +268,8 @@
           <label class="text-sm font-semibold leading-4 text-gray-900">Observaciones</label>
           <app-text-input [id]="'observations'" formControlName="observations" label="Escribe aquí tus observaciones" [isTextarea]="true" />
         </div>
+
+        <app-backend-errors [error]="backendError"></app-backend-errors>
       }
     </form>
   }
@@ -297,14 +305,14 @@
   <div
     class="inline-flex justify-center gap-1 py-1.5 px-3 rounded-full text-sm font-semibold leading-4 whitespace-nowrap"
     [ngClass]="[
-      statusConfig[rate.rateStatus].bg,
-      statusConfig[rate.rateStatus].text
+      statusConfig[getRateStatus(rate)].bgClass,
+      statusConfig[getRateStatus(rate)].textClass
     ]">
-    @if (statusConfig[rate.rateStatus].icon) {
+    @if (statusConfig[getRateStatus(rate)].icon) {
       <svg class="w-4 h-4">
-        <use [attr.xlink:href]="'/assets/icons/outline/general.svg#' + statusConfig[rate.rateStatus].icon" />
+        <use [attr.xlink:href]="'/assets/icons/outline/general.svg#' + statusConfig[getRateStatus(rate)].icon" />
       </svg>
     }
-    {{ statusConfig[rate.rateStatus].label }}
+    {{ statusConfig[getRateStatus(rate)].label }}
   </div>
 </ng-template>

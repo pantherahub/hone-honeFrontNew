@@ -10,7 +10,7 @@ import {
 } from '@angular/forms';
 import { format } from 'date-fns';
 import { distinctUntilChanged, firstValueFrom } from 'rxjs';
-import { City } from 'src/app/models/city.interface';
+import { City } from 'src/app/interfaces/city.interface';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { CatalogService } from 'src/app/services/catalog/catalog.service';
 import { ContactsProviderService } from 'src/app/services/contacts-provider/contacts-provider.service';
@@ -80,7 +80,7 @@ export class ContactFormComponent implements OnInit {
     private alertService: AlertService,
     private catalogService: CatalogService,
     private eventManager: EventManagerService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadContactOccupationTypes();

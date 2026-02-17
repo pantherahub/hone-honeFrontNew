@@ -2,8 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
-import { CompanyInterface } from 'src/app/models/client.interface';
-import { ShortcutContact } from 'src/app/models/shortcut-contact.interface';
+import { CompanyInterface } from 'src/app/interfaces/client.interface';
+import { ShortcutContact } from 'src/app/interfaces/shortcut-contact.interface';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { ContactsProviderService } from 'src/app/services/contacts-provider/contacts-provider.service';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
@@ -20,7 +20,7 @@ import { DropdownTriggerDirective } from 'src/app/directives/dropdown-trigger.di
 import { CatalogService } from 'src/app/services/catalog/catalog.service';
 import { ContactDetailComponent } from '../../shared/contact-detail/contact-detail.component';
 import { OfficeDataService } from 'src/app/services/office-data/office-data.service';
-import { City } from 'src/app/models/city.interface';
+import { City } from 'src/app/interfaces/city.interface';
 
 @Component({
   selector: 'app-office-form',
