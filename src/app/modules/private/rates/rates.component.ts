@@ -69,8 +69,6 @@ export class RatesComponent implements OnInit, AfterViewInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private disclaimerReady$ = new ReplaySubject<void>(1);
 
-  @ViewChildren('fileTableInput') fileTableInputs!: QueryList<ElementRef<HTMLInputElement>>;
-
   constructor(
     private eventManager: EventManagerService,
     private alertService: AlertService,
@@ -157,9 +155,9 @@ export class RatesComponent implements OnInit, AfterViewInit, OnDestroy {
     return rate.rateStatus;
   }
 
-  triggerFileTableInput(index: number) {
-    this.fileTableInputs.toArray()[index].nativeElement.value = '';
-    this.fileTableInputs.toArray()[index].nativeElement.click();
+  triggerFileTableInput(input: HTMLInputElement) {
+    input.value = '';
+    input.click();
   }
 
   uploadRateFile(uploadedFile: any, rate: any) {

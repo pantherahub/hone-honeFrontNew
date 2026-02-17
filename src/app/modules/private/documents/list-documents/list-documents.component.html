@@ -176,6 +176,8 @@
             <th scope="col" class="px-4 py-3 font-semibold">
               Acciones
             </th>
+            <th scope="col" class="px-4 py-3 font-semibold">
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -194,11 +196,22 @@
             @for (doc of docList; track doc.idDocumentType) {
               <!-- min-h-[54px] px-4 -->
               <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
-                <td class="px-4 py-[10.5px] text-sm font-normal text-main-blue1h leading-4 dark:text-white min-w-[320px]">
-                  {{ doc.typeDocument | formatNameDoc:doc.idDocumentType }}
-                  @if (!doc.required) {
-                    <span class="font-semibold">(Opcional)</span>
-                  }
+                <td class="px-4 py-[10.5px] text-sm font-normal text-main-blue1h leading-4 dark:text-white min-w-[320px] flex justify-between items-center gap-2">
+                  <div>
+                    {{ doc.typeDocument | formatNameDoc:doc.idDocumentType }}
+                    @if (!doc.required) {
+                      <span class="font-semibold">(Opcional)</span>
+                    }
+                  </div>
+                  <div class="block sm:hidden">
+                    <ng-container
+                      *ngTemplateOutlet="documentActions; context: {
+                        doc,
+                        id: 'doc-start-drop-' + doc.idDocumentType,
+                        dropPlacement: 'bottom-start'
+                      }">
+                    </ng-container>
+                  </div>
                 </td>
                 <td class="px-4 py-[10.5px]">
                   <div class="inline-flex gap-1 py-1.5 px-3 rounded-full text-sm font-semibold leading-4 whitespace-nowrap"
@@ -239,47 +252,20 @@
                   }
                 </td>
                 <td class="px-4 py-[10.5px] text-left">
-                  <div class="my-auto flex gap-2">
+                  <div class="my-auto flex justify-end gap-2">
                     @switch (doc.documentStatus) {
                       @case ('PENDIENTE') {
                         <app-button
                           (onClick)="editDocumentModal(doc, true)"
                           variant="primary"
                           styleType="solid"
-                          size="xs">
+                          size="xs"
+                          class="grow"
+                          customClass="w-full flex justify-center">
                           <svg class="w-4 h-4">
                             <use xlink:href="/assets/icons/outline/general.svg#upload" />
                           </svg>
                           Cargar
-                        </app-button>
-                      }
-                      @case ('AL DIA') {
-                        <app-button
-                          (onClick)="viewFile(doc)"
-                          variant="gray"
-                          styleType="soft"
-                          size="xs">
-                          <svg class="w-4 h-4">
-                            <use xlink:href="/assets/icons/outline/general.svg#eye" />
-                          </svg>
-                        </app-button>
-                        <app-button
-                          (onClick)="editDocumentModal(doc, false)"
-                          variant="gray"
-                          styleType="soft"
-                          size="xs">
-                          <svg class="w-4 h-4">
-                            <use xlink:href="/assets/icons/outline/arrows.svg#refresh" />
-                          </svg>
-                        </app-button>
-                        <app-button
-                          (onClick)="deleteDocument(doc)"
-                          variant="gray"
-                          styleType="soft"
-                          size="xs">
-                          <svg class="w-4 h-4">
-                            <use xlink:href="/assets/icons/outline/general.svg#trash-bin" />
-                          </svg>
                         </app-button>
                       }
                       @case ('VENCIDO') {
@@ -287,33 +273,28 @@
                           (onClick)="editDocumentModal(doc, false)"
                           variant="primary"
                           styleType="solid"
-                          size="xs">
+                          size="xs"
+                          class="grow"
+                          customClass="w-full">
                           <svg class="w-4 h-4">
                             <use xlink:href="/assets/icons/outline/arrows.svg#refresh" />
                           </svg>
                           Actualizar
                         </app-button>
-                        <app-button
-                          (onClick)="viewFile(doc)"
-                          variant="gray"
-                          styleType="soft"
-                          size="xs">
-                          <svg class="w-4 h-4">
-                            <use xlink:href="/assets/icons/outline/general.svg#eye" />
-                          </svg>
-                        </app-button>
-                        <app-button
-                          (onClick)="deleteDocument(doc)"
-                          variant="gray"
-                          styleType="soft"
-                          size="xs">
-                          <svg class="w-4 h-4">
-                            <use xlink:href="/assets/icons/outline/general.svg#trash-bin" />
-                          </svg>
-                        </app-button>
                       }
                     }
+
                   </div>
+                </td>
+                <td class="px-4 py-[10.5px] text-left">
+                  @if (doc.documentStatus !== 'PENDIENTE') {
+                    <ng-container
+                      *ngTemplateOutlet="documentActions; context: {
+                        doc,
+                        id: 'doc-end-drop-' + doc.idDocumentType
+                      }">
+                    </ng-container>
+                  }
                 </td>
               </tr>
             }
@@ -325,3 +306,59 @@
   </div>
 
 </div>
+
+
+<ng-template #documentActions let-doc="doc" let-id="id" let-placement="dropPlacement">
+  <app-button
+    [appDropdownTrigger]="id"
+    [dropdownPlacement]="placement || 'bottom-end'"
+    variant="gray"
+    styleType="soft"
+    size="xs">
+    <svg class="w-4 h-4">
+      <use xlink:href="/assets/icons/outline/general.svg#dots-horizontal" />
+    </svg>
+  </app-button>
+
+  <div [id]="id" class="z-30 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-[136px] dark:bg-gray-700 dark:divide-gray-600">
+    <ul class="py-1 text-sm text-gray-700 dark:text-gray-200">
+      @if (doc.documentStatus === 'PENDIENTE') {
+        <li>
+          <a (click)="editDocumentModal(doc, true)" data-dropdown-close class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+            <svg class="w-[1.125rem] h-[1.125rem] text-gray-500">
+              <use xlink:href="/assets/icons/outline/general.svg#upload" />
+            </svg>
+            Cargar
+          </a>
+        </li>
+      } @else {
+        <li>
+          <a (click)="viewFile(doc)" data-dropdown-close class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+            <svg class="w-[1.125rem] h-[1.125rem] text-gray-500">
+              <use xlink:href="/assets/icons/outline/general.svg#eye" />
+            </svg>
+            Ver
+          </a>
+        </li>
+        <li>
+          <a (click)="editDocumentModal(doc, false)" data-dropdown-close class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+            <svg class="w-[1.125rem] h-[1.125rem] text-gray-500">
+              <use xlink:href="/assets/icons/outline/arrows.svg#refresh" />
+            </svg>
+            Actualizar
+          </a>
+        </li>
+      }
+    </ul>
+    @if (doc.documentStatus !== 'PENDIENTE') {
+      <div class="py-1">
+        <a (click)="deleteDocument(doc)" data-dropdown-close class="flex items-center gap-3 px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
+          <svg class="w-[1.125rem] h-[1.125rem]">
+            <use xlink:href="/assets/icons/outline/general.svg#trash-bin" />
+          </svg>
+          Eliminar
+        </a>
+      </div>
+    }
+  </div>
+</ng-template>

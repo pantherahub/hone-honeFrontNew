@@ -25,11 +25,12 @@ import { Disclaimer } from 'src/app/interfaces/disclaimer.interface';
 import { catchError, finalize, map, Observable, of, ReplaySubject, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { PopoverComponent } from 'src/app/shared/components/popover/popover.component';
 import { LoaderComponent } from 'src/app/shared/components/loader/loader.component';
+import { DropdownTriggerDirective } from 'src/app/directives/dropdown-trigger.directive';
 
 @Component({
   selector: 'app-list-documents',
   standalone: true,
-  imports: [CommonModule, PipesModule, ButtonComponent, TooltipComponent, PopoverComponent, LoaderComponent],
+  imports: [CommonModule, PipesModule, ButtonComponent, TooltipComponent, PopoverComponent, LoaderComponent, DropdownTriggerDirective],
   templateUrl: './list-documents.component.html',
   styleUrl: './list-documents.component.scss'
 })

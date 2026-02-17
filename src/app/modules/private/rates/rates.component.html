@@ -80,10 +80,7 @@
           <th scope="col" class="px-4 py-3 font-semibold">
             Estado del documento
           </th>
-          <th scope="col" class="px-4 py-3 font-semibold sticky right-0 bg-gray-50 before:content-[''] before:absolute before:top-0 before:bottom-0 before:left-0 before:w-px before:bg-gray-200 sm:before:hidden">
-            <span class="hidden sm:block">
-              Acciones
-            </span>
+          <th scope="col" class="px-4 py-3 font-semibold">
           </th>
         </tr>
       </thead>
@@ -100,10 +97,22 @@
             </td>
           </tr>
         } @else {
-          @for (rate of rateList; track rate.idRateType; let i = $index) {
+          @for (rate of rateList; track rate.idRateType) {
             <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
-              <td class="px-4 py-[10.5px] text-sm font-normal text-main-blue1h leading-4 dark:text-white ">
-                {{ rate.rateName }}
+              <td class="px-4 py-[10.5px] text-sm font-normal text-main-blue1h leading-4 dark:text-white flex justify-between items-center gap-2">
+                <div>
+                  {{ rate.rateName }}
+                </div>
+                <div class="block sm:hidden">
+                  <ng-container
+                    *ngTemplateOutlet="rateActions; context: {
+                      rate,
+                      id: 'rate-start-drop-' + rate.idRateType,
+                      dropPlacement: 'bottom-start',
+                      inputRef: fileTableInput,
+                    }">
+                  </ng-container>
+                </div>
               </td>
               <td class="px-4 py-[10.5px]">
                 <ng-container
@@ -138,7 +147,7 @@
                     </app-button>
                   } @else {
                     <app-button
-                      (onClick)="triggerFileTableInput(i)"
+                      (onClick)="triggerFileTableInput(fileTableInput)"
                       variant="primary"
                       styleType="solid"
                       size="xs">
@@ -166,8 +175,8 @@
                   />
                 </div>
               </td>
-              <td class="px-4 py-[10.5px] text-left sticky right-0 bg-white before:content-[''] before:absolute before:top-0 before:bottom-0 before:left-0 before:w-px before:bg-gray-200 sm:before:hidden">
-                <div class="my-auto flex gap-2">
+              <td class="px-4 py-[10.5px] text-left">
+                <div class="my-auto flex justify-end gap-2">
                   <app-button
                     (onClick)="openRateDetail(rate)"
                     variant="gray"
@@ -180,50 +189,13 @@
                     Abrir
                   </app-button>
 
-                  <app-button
-                    [appDropdownTrigger]="'dropdown-rate-opts-' + i"
-                    dropdownPlacement="bottom-end"
-                    variant="gray"
-                    styleType="soft"
-                    size="xs">
-                    <svg class="w-4 h-4">
-                      <use xlink:href="/assets/icons/outline/general.svg#dots-horizontal" />
-                    </svg>
-                  </app-button>
-                  <div [id]="'dropdown-rate-opts-' + i" class="z-30 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-[136px] dark:bg-gray-700 dark:divide-gray-600">
-                    <ul class="py-1 text-sm text-gray-700 dark:text-gray-200">
-                      <li>
-                        <a (click)="openRateDetail(rate)" data-dropdown-close class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                          <svg class="w-[1.125rem] h-[1.125rem] text-gray-500">
-                            <use xlink:href="/assets/icons/outline/general.svg#close-sidebar" />
-                          </svg>
-                          Abrir
-                        </a>
-                      </li>
-                      @if (rate.currentRate?.rateStatus !== 'EN PROCESO') {
-                        <li>
-                          <a (click)="triggerFileTableInput(i)" data-dropdown-close class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                            <svg class="w-[1.125rem] h-[1.125rem] text-gray-500">
-                              <use xlink:href="/assets/icons/outline/arrows.svg#refresh" />
-                            </svg>
-                            @if (rate.currentRate?.rateStatus === 'APROBADO') {
-                              Actualizar
-                            } @else {
-                              Cargar
-                            }
-                          </a>
-                        </li>
-                      }
-                    </ul>
-                    <div class="py-1">
-                      <a (click)="deleteRate(rate)" data-dropdown-close class="flex items-center gap-3 px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
-                        <svg class="w-[1.125rem] h-[1.125rem]">
-                          <use xlink:href="/assets/icons/outline/general.svg#trash-bin" />
-                        </svg>
-                        Eliminar
-                      </a>
-                    </div>
-                  </div>
+                  <ng-container
+                    *ngTemplateOutlet="rateActions; context: {
+                      rate,
+                      id: 'rate-end-drop-' + rate.idRateType,
+                      inputRef: fileTableInput,
+                    }">
+                  </ng-container>
                 </div>
               </td>
             </tr>
@@ -259,5 +231,55 @@
     }
     {{ statusConfig[getRateStatus(rate)].label }}
   </div>
+</ng-template>
+
+
+<ng-template #rateActions let-rate="rate" let-id="id" let-placement="dropPlacement" let-inputRef="inputRef">
+  <app-button
+    [appDropdownTrigger]="id"
+    [dropdownPlacement]="placement || 'bottom-end'"
+    variant="gray"
+    styleType="soft"
+    size="xs">
+    <svg class="w-4 h-4">
+      <use xlink:href="/assets/icons/outline/general.svg#dots-horizontal" />
+    </svg>
+  </app-button>
+
+  <div [id]="id" class="z-30 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-[136px] dark:bg-gray-700 dark:divide-gray-600">
+    <ul class="py-1 text-sm text-gray-700 dark:text-gray-200">
+      <li>
+        <a (click)="openRateDetail(rate)" data-dropdown-close class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+          <svg class="w-[1.125rem] h-[1.125rem] text-gray-500">
+            <use xlink:href="/assets/icons/outline/general.svg#close-sidebar" />
+          </svg>
+          Abrir
+        </a>
+      </li>
+      @if (rate.currentRate?.rateStatus !== 'EN PROCESO') {
+        <li>
+          <a (click)="triggerFileTableInput(inputRef)" data-dropdown-close class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+            <svg class="w-[1.125rem] h-[1.125rem] text-gray-500">
+              <use xlink:href="/assets/icons/outline/arrows.svg#refresh" />
+            </svg>
+            @if (rate.currentRate?.rateStatus === 'APROBADO') {
+              Actualizar
+            } @else {
+              Cargar
+            }
+          </a>
+        </li>
+      }
+    </ul>
+    <div class="py-1">
+      <a (click)="deleteRate(rate)" data-dropdown-close class="flex items-center gap-3 px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
+        <svg class="w-[1.125rem] h-[1.125rem]">
+          <use xlink:href="/assets/icons/outline/general.svg#trash-bin" />
+        </svg>
+        Eliminar
+      </a>
+    </div>
+  </div>
+
 </ng-template>
 
