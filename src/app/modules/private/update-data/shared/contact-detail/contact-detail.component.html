@@ -82,7 +82,7 @@
                     </span>
                     <div class="flex gap-1 flex-wrap min-w-0">
                       @for (phone of contact.Phones; track $index) {
-                        <div class="flex items-center bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded text-xs font-semibold leading-[14px] max-w-[210px] overflow-hidden">
+                        <div class="flex items-center bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded text-xs font-semibold leading-[0.875rem] max-w-[210px] overflow-hidden">
                           <span class="block truncate w-full" [title]="getCompletePhone(phone)">
                             {{ getCompletePhone(phone) }}
                           </span>
@@ -98,7 +98,7 @@
                     </span>
                     <div class="flex gap-1 flex-wrap min-w-0">
                       @for (email of contact.Emails; track $index) {
-                        <div class="flex items-center bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded text-xs font-semibold leading-[14px] max-w-[210px] overflow-hidden">
+                        <div class="flex items-center bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded text-xs font-semibold leading-[0.875rem] max-w-[210px] overflow-hidden">
                           <span class="block truncate w-full" [title]="email.email">
                             {{ email.email }}
                           </span>

@@ -22,7 +22,7 @@
       } @else {
         <span class="flex flex-wrap gap-2.5">
           @for (item of selected; track $index) {
-            <span class="flex items-center gap-1 bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded text-xs font-semibold leading-[14px]">
+            <span class="flex items-center gap-1 bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded text-xs font-semibold leading-[0.875rem]">
               {{ getItemLabel(item) }}
               @if (!disabled) {
                 <button type="button" class="hover:text-red-600" (click)="removeItem(item); $event.stopPropagation()" tabindex="-1">
