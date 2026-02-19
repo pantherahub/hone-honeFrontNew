@@ -12,7 +12,7 @@ import { PipesModule } from 'src/app/pipes/pipes.module';
 import { FileViewerComponent } from 'src/app/shared/modals/file-viewer/file-viewer.component';
 import { CommonModule } from '@angular/common';
 import { TooltipComponent } from 'src/app/shared/components/tooltip/tooltip.component';
-import { ModalEditDocumentComponent } from '../modal-edit-document/modal-edit-document.component';
+import { ModalEditDocumentComponent } from './modal-edit-document/modal-edit-document.component';
 import { DocumentConfig, DownloadService } from 'src/app/services/download/download.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CompliancePercentInterface, PercentInterface } from 'src/app/interfaces/doc-percent.interface';
@@ -28,13 +28,13 @@ import { LoaderComponent } from 'src/app/shared/components/loader/loader.compone
 import { DropdownTriggerDirective } from 'src/app/directives/dropdown-trigger.directive';
 
 @Component({
-  selector: 'app-list-documents',
+  selector: 'app-documents',
   standalone: true,
   imports: [CommonModule, PipesModule, ButtonComponent, TooltipComponent, PopoverComponent, LoaderComponent, DropdownTriggerDirective],
-  templateUrl: './list-documents.component.html',
-  styleUrl: './list-documents.component.scss'
+  templateUrl: './documents.component.html',
+  styleUrl: './documents.component.scss'
 })
-export class ListDocumentsComponent implements OnInit, AfterViewInit, OnDestroy {
+export class DocumentsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   user = this.eventManager.userLogged();
   clientSelected: any = this.eventManager.clientSelected();

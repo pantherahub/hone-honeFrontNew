@@ -3,7 +3,7 @@ import { HomeComponent } from './modules/private/home/home.component';
 import { LoginComponent } from './modules/public/login/login.component';
 import { authGuard } from './guards/auth.guard';
 import { PageNotFoundComponent } from './modules/public/page-not-found/page-not-found.component';
-import { ListDocumentsComponent } from './modules/private/documents/list-documents/list-documents.component';
+import { DocumentsComponent } from './modules/private/documents/documents.component';
 import { NgModule } from '@angular/core';
 import { PrivateLayoutComponent } from './layout/private-layout/private-layout.component';
 import { UpdateDataComponent } from './modules/private/update-data/update-data.component';
@@ -82,7 +82,7 @@ export const routes: Routes = [
         children: [
           {
             path: 'documentation',
-            component: ListDocumentsComponent,
+            component: DocumentsComponent,
             canActivate: [serviceAccessGuard],
             data: {
               disclaimerKey: 'Documentos',
