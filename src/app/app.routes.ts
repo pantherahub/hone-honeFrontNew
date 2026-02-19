@@ -17,6 +17,7 @@ import { clientSelectedGuard } from './guards/client-selected.guard';
 import { RatesComponent } from './modules/private/rates/rates.component';
 import { serviceAccessGuard } from './guards/service-access.guard';
 import { SERVICES_CONFIG } from './config/service-navigation.config';
+import { ContractsComponent } from './modules/private/contracts/contracts.component';
 
 export const routes: Routes = [
   //   PUBLIC ROUTES
@@ -89,15 +90,24 @@ export const routes: Routes = [
               serviceKey: SERVICES_CONFIG.documentation.key,
             },
           },
-          // {
-          //   path: 'rates',
-          //   component: RatesComponent,
-          //   canActivate: [serviceAccessGuard],
-          //   data: {
-          //     disclaimerKey: 'Tarifas',
-          //     serviceKey: SERVICES_CONFIG.rates.key
-          //   },
-          // },
+          {
+            path: 'rates',
+            component: RatesComponent,
+            canActivate: [serviceAccessGuard],
+            data: {
+              disclaimerKey: 'Tarifas',
+              serviceKey: SERVICES_CONFIG.rates.key
+            },
+          },
+          {
+            path: 'contracts',
+            component: ContractsComponent,
+            canActivate: [serviceAccessGuard],
+            data: {
+              disclaimerKey: 'Contratos',
+              serviceKey: SERVICES_CONFIG.contracts.key
+            },
+          },
         ],
       }
     ]

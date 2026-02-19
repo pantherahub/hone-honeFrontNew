@@ -64,7 +64,7 @@ export class RatesComponent implements OnInit, AfterViewInit, OnDestroy {
   isRateDrawerOpen: boolean = false;
   initialFile: File | null = null;
 
-  isSmall: boolean = window.innerWidth < 640;
+  isMobile: boolean = window.innerWidth < 640;
 
   private destroy$ = new Subject<void>();
   private disclaimerReady$ = new ReplaySubject<void>(1);

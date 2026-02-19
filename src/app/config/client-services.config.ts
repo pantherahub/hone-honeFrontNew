@@ -2,8 +2,8 @@ import { ServiceKey } from "./service-navigation.config";
 
 // Configuring access to services by client
 export const clientServicesConfig: Record<number, ServiceKey[]> = {
-  8: ['documentation'],            // Axa
-  // 8: ['documentation', 'rates'],            // Axa
+  // 8: ['documentation'],            // Axa
+  8: ['documentation', 'rates', 'contracts'],            // Axa
   // 12: ['documentation', 'billing', 'rips'], // BMI
   // 13: ['documentation', 'rates', 'billing', 'rips'], // Sura TEST
 };

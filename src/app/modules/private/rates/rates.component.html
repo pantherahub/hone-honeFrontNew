@@ -20,7 +20,7 @@
 
     <app-button
       appDropdownTrigger="dropdown-formats"
-      [dropdownPlacement]="isSmall ? 'bottom' : 'bottom-end'"
+      [dropdownPlacement]="isMobile ? 'bottom' : 'bottom-end'"
       variant="primary"
       styleType="soft"
       size="md"
@@ -93,6 +93,14 @@
                   <use xlink:href="/assets/icons/extras/animations.svg#spin" />
                 </svg>
                 Cargando...
+              </div>
+            </td>
+          </tr>
+        } @else if (!rateList.length) {
+          <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+            <td colspan="6" class="px-4 h-[54px] text-left">
+              <div class="text-md text-main-blue1h leading-4 flex items-center gap-2">
+                Sin resultados.
               </div>
             </td>
           </tr>
@@ -181,8 +189,7 @@
                     (onClick)="openRateDetail(rate)"
                     variant="gray"
                     styleType="soft"
-                    size="xs"
-                    class="hidden sm:block">
+                    size="xs">
                     <svg class="w-4 h-4">
                       <use xlink:href="/assets/icons/outline/general.svg#close-sidebar" />
                     </svg>
@@ -282,4 +289,3 @@
   </div>
 
 </ng-template>
-
