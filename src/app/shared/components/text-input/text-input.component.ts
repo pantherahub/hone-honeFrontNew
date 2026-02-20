@@ -34,7 +34,7 @@ export class TextInputComponent implements ControlValueAccessor, OnInit, AfterVi
   @Input() value: any = '';
   @Input() invalid: boolean = false;
   @Input() togglePassword: boolean = false;
-  @Input() iconSize: string = '18';
+  @Input() iconSizeClass: string = 'w-[1.125rem] h-[1.125rem]'; // 18px
   @Input() customInputClass: string = '';
   @Input() customLabelClass: string = '';
 

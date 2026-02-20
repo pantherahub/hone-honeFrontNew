@@ -4,7 +4,7 @@ import { ModalComponent } from '../../components/modal/modal.component';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 import { DisclaimerService } from 'src/app/services/disclaimer/disclaimer.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { CreateDisclaimerResponsePayload, Disclaimer } from 'src/app/models/disclaimer.interface';
+import { CreateDisclaimerResponsePayload, Disclaimer } from 'src/app/interfaces/disclaimer.interface';
 import { CommonModule } from '@angular/common';
 import { ButtonComponent } from '../../components/button/button.component';
 import { TextInputComponent } from '../../components/text-input/text-input.component';

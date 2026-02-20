@@ -1,0 +1,84 @@
+<nav aria-label="Breadcrumb" class="flex flex-col">
+  <ol class="inline-flex items-center gap-2 sm:gap-3 flex-wrap">
+
+    @for (option of options; track $index; let isFirst = $first; let isLast = $last) {
+
+      <li
+        class="items-center gap-2 sm:gap-3"
+        [ngClass]="{
+          'inline-flex': (isFirst && showFirstOptionSeparated) || isLast,
+          'hidden': (!isFirst && !isLast) || (!isLast && !showFirstOptionSeparated),
+          'sm:inline-flex': !isLast,
+          'text-gray-800': isLast,
+          'text-gray-500': !isLast,
+        }"
+        [attr.aria-current]="isLast ? 'page' : null">
+
+        @if (option.routerLink && !isLast) {
+          <a [routerLink]="option.routerLink" class="inline-flex items-center cursor-pointer hover:text-gray-700">
+            <ng-container *ngTemplateOutlet="optionContent; context: { $implicit: option }"></ng-container>
+          </a>
+        } @else {
+          <ng-container *ngTemplateOutlet="optionContent; context: { $implicit: option }"></ng-container>
+        }
+
+        @if (!isLast) {
+          <svg class="w-4 h-4">
+            <use xlink:href="/assets/icons/outline/arrows.svg#chevron-right" />
+          </svg>
+        }
+      </li>
+
+      @if (isFirst && middleClickableOptions.length > 0) {
+        <li class="inline-flex sm:hidden items-center gap-2 sm:gap-3 text-gray-500">
+          <app-button
+            [appDropdownTrigger]="dropdownId"
+            dropdownPlacement="bottom-start"
+            variant="gray"
+            styleType="ghost"
+            size="xs"
+            customClass="!p-1">
+            <svg class="w-6 h-6">
+              <use xlink:href="/assets/icons/outline/general.svg#dots-horizontal" />
+            </svg>
+          </app-button>
+
+          <div [id]="dropdownId" class="z-30 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 max-w-[100vw] dark:bg-gray-700 dark:divide-gray-600">
+            <ul class="py-1 text-sm text-gray-700 dark:text-gray-200">
+              @for (midOpt of middleClickableOptions; track $index) {
+                <li>
+                  <a [routerLink]="midOpt.routerLink" data-dropdown-close class="block px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                    {{ midOpt.label }}
+                  </a>
+                </li>
+              }
+            </ul>
+          </div>
+
+          <svg class="w-4 h-4">
+            <use xlink:href="/assets/icons/outline/arrows.svg#chevron-right" />
+          </svg>
+        </li>
+      }
+    }
+  </ol>
+</nav>
+
+
+<ng-template #optionContent let-opt>
+  <div class="flex items-center gap-1">
+    @if (opt.iconHref) {
+      <svg class="w-6 h-6"
+        [ngClass]="{
+          'hidden sm:block': !opt.iconOnlyAsLabel,
+        }">
+        <use [attr.xlink:href]="opt.iconHref" />
+      </svg>
+    }
+    @if (!opt.iconOnlyAsLabel) {
+      <span class="text-sm font-semibold leading-4">
+        {{ opt.label }}
+      </span>
+    }
+  </div>
+</ng-template>

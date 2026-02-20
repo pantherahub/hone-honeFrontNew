@@ -1,19 +1,18 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ClientInterface } from '../../models/client.interface';
-import { environment } from '../../../environments/environment';
+import { ClientInterface } from 'src/app/interfaces/client.interface';
+import { environment } from 'src/environments/environment';
 import { Observable } from 'rxjs';
-import { DocumentType } from 'src/app/models/document-type.interface';
 
 @Injectable({
-   providedIn: 'root'
+  providedIn: 'root'
 })
 export class ClientProviderService {
   public url = environment.url;
 
-  constructor (private httpClient: HttpClient) { }
+  constructor(private httpClient: HttpClient) { }
 
-   // Llama al api para obtener lista de clientes por id prestador
+  // Llama al api para obtener lista de clientes por id prestador
   public getClientListByProviderId(idProvider: any): Observable<ClientInterface[]> {
     const url = `${this.url}getHoneProvider/${idProvider}`;
     return this.httpClient.get<ClientInterface[]>(url);

@@ -3,7 +3,7 @@
   @if (showClose) {
     <div class="flex justify-end">
       <button class="text-gray-400" type="button" (click)="close(false)">
-        <svg width="20" height="20">
+        <svg class="w-5 h-5">
           <use xlink:href="/assets/icons/outline/general.svg#close" />
         </svg>
       </button>
@@ -17,7 +17,7 @@
         iconClasses,
         loading ? '!bg-transparent' : '',
       ]">
-      <svg width="25" height="25" [ngClass]="{ 'text-current animate-spin fill-gray-200': loading }">
+      <svg class="w-[1.5625rem] h-[1.5625rem]" [ngClass]="{ 'text-current animate-spin fill-gray-200': loading }">
         <use [attr.xlink:href]="iconPath" />
       </svg>
     </div>

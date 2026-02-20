@@ -1,7 +1,7 @@
 <div class="relative">
   @if (searcher) {
     <div class="absolute inset-y-0 start-0 flex items-center ps-3 top-0.5 pointer-events-none z-20 text-gray-500 dark:text-gray-400">
-      <svg [attr.width]="iconSize" [attr.height]="iconSize">
+      <svg [class]="iconSizeClass">
         <use xlink:href="/assets/icons/outline/general.svg#search" />
       </svg>
     </div>
@@ -67,7 +67,8 @@
 
   <label
     [attr.for]="id"
-    class="absolute text-sm duration-300 transform ms-3 -translate-y-4 scale-75 top-1.5 z-10 origin-[0] px-1 peer-placeholder-shown:scale-100 peer-placeholder-shown:px-0 peer-autofill:ms-3 start-1 peer-autofill:scale-75 peer-autofill:-translate-y-4 peer-autofill:top-1.5 pointer-events-none bg-white"
+    [attr.title]="label"
+    class="absolute text-sm duration-300 transform ms-3 -translate-y-4 scale-75 top-1.5 z-10 origin-[0] px-1 peer-placeholder-shown:scale-100 peer-placeholder-shown:px-0 peer-autofill:ms-3 start-1 peer-autofill:scale-75 peer-autofill:-translate-y-4 peer-autofill:top-1.5 pointer-events-none bg-white truncate max-w-[calc(100%-3rem)] whitespace-nowrap"
     [ngClass]="{
       'peer-focus:px-1 peer-focus:ms-3 peer-focus:top-1.5 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:font-semibold':
       !readonly || value,
@@ -94,24 +95,24 @@
       (click)="showPassword = !showPassword"
       tabindex="-1">
       @if (!showPassword) {
-        <svg [attr.width]="iconSize" [attr.height]="iconSize">
+        <svg [class]="iconSizeClass">
           <use xlink:href="/assets/icons/outline/general.svg#eye" />
         </svg>
       } @else {
-        <svg [attr.width]="iconSize" [attr.height]="iconSize">
+        <svg [class]="iconSizeClass">
           <use xlink:href="/assets/icons/outline/general.svg#eye-slash" />
         </svg>
       }
     </button>
   } @else if (type === 'date') {
     <div class="absolute inset-y-0 end-0 flex items-center px-3 top-0.5 text-sm text-gray-500 dark:text-gray-300 pointer-events-none">
-      <svg [attr.width]="iconSize" [attr.height]="iconSize">
+      <svg [class]="iconSizeClass">
         <use xlink:href="/assets/icons/outline/general.svg#calendar-week" />
       </svg>
     </div>
   } @else if (type === 'time') {
     <div class="absolute inset-y-0 end-0 flex items-center px-3 top-0.5 text-sm text-gray-500 dark:text-gray-300 pointer-events-none">
-      <svg [attr.width]="iconSize" [attr.height]="iconSize">
+      <svg [class]="iconSizeClass">
         <use xlink:href="/assets/icons/outline/general.svg#clock" />
       </svg>
     </div>
@@ -121,7 +122,7 @@
       (click)="clearValue()"
       class="absolute inset-y-0 end-0 flex items-center px-3 top-0.5 text-sm text-gray-500 dark:text-gray-300"
       tabindex="-1">
-      <svg width="14" height="14">
+      <svg class="w-3.5 h-3.5">
         <use xlink:href="/assets/icons/outline/general.svg#close" />
       </svg>
     </button>

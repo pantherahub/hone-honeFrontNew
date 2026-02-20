@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { CreateDisclaimerResponsePayload, TypeDisclaimer } from 'src/app/models/disclaimer.interface';
+import { CreateDisclaimerResponsePayload, TypeDisclaimer } from 'src/app/interfaces/disclaimer.interface';
 import { environment } from 'src/environments/environment';
 
 @Injectable({

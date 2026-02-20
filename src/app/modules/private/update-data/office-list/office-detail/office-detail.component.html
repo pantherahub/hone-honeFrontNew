@@ -51,7 +51,7 @@
           <span class="font-semibold text-gray-900">Compañías con convenio</span>
           <div class="flex gap-1 flex-wrap">
             @for (companyName of getCompanyNames(); track $index) {
-              <span class="flex items-center gap-1 bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded text-xs font-semibold leading-[14px]">
+              <span class="flex items-center gap-1 bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded text-xs font-semibold leading-[0.875rem]">
                 {{ companyName }}
               </span>
             }
@@ -70,7 +70,7 @@
               <div class="p-4 flex flex-col sm:flex-row sm:items-center gap-2 rounded-md ring-[1px] ring-inset ring-gray-200 bg-white">
                 <div class="flex-1 flex items-center gap-2">
                   <div class="mb-auto rounded-lg p-3 bg-blue1h-50 text-main-blue1h">
-                    <svg width="20" height="20">
+                    <svg class="w-5 h-5">
                       <use xlink:href="/assets/icons/outline/general.svg#clock" />
                     </svg>
                   </div>
@@ -104,7 +104,7 @@
               <div class="p-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0 rounded-md ring-[1px] ring-inset ring-gray-200 bg-white">
                 <div class="flex items-center gap-2">
                   <div class="mb-auto rounded-lg p-3 bg-blue1h-50 text-main-blue1h">
-                    <svg width="20" height="20">
+                    <svg class="w-5 h-5">
                       <use xlink:href="/assets/icons/outline/user.svg#address-book" />
                     </svg>
                   </div>
@@ -136,7 +136,7 @@
                         </span>
                         <div class="flex gap-1 flex-wrap min-w-0">
                           @for (email of contact.Emails; track $index) {
-                            <div class="flex items-center bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded text-xs font-semibold leading-[14px] max-w-[210px] overflow-hidden">
+                            <div class="flex items-center bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded text-xs font-semibold leading-[0.875rem] max-w-[210px] overflow-hidden">
                               <span class="block truncate w-full" [title]="email.email">
                                 {{ email.email }}
                               </span>
@@ -152,7 +152,7 @@
                         </span>
                         <div class="flex gap-1 flex-wrap min-w-0">
                           @for (phone of contact.Phones; track $index) {
-                            <div class="flex items-center bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded text-xs font-semibold leading-[14px] max-w-[210px] overflow-hidden">
+                            <div class="flex items-center bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded text-xs font-semibold leading-[0.875rem] max-w-[210px] overflow-hidden">
                               <span class="block truncate w-full" [title]="getCompletePhone(phone)">
                                 {{ getCompletePhone(phone) }}
                               </span>

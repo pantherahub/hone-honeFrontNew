@@ -1,10 +1,4 @@
-@if (loading) {
-  <div class="absolute inset-0 z-50 bg-gray-50/60 flex items-center justify-center">
-    <svg class="w-7 h-7 text-main-blue1h animate-spin fill-gray-200">
-      <use xlink:href="/assets/icons/extras/animations.svg#spin" />
-    </svg>
-  </div>
-}
+<app-loader [visible]="loading" />
 
 <div class="flex justify-center mx-4">
   <div class="max-w-screen-xl w-full pt-10 pb-32 sm:pb-20 md:pt-6 flex flex-col gap-9">
@@ -20,20 +14,20 @@
 
         <div class="flex flex-col justify-center gap-4 p-4 md:ps-0">
           <div class="flex flex-col gap-2 text-xl">
-            <span class="font-semibold leading-[22px]">
+            <span class="font-semibold leading-[1.375rem]">
               Estimado Prestador {{ user.name }}
             </span>
-            <span class="font-black leading-[22px]">
+            <span class="font-black leading-[1.375rem]">
               ¡Bienvenido(a) a tu Portal Transaccional de Gestión de Información y Documentos!
             </span>
           </div>
           <div class="flex rounded-lg gap-2 py-2.5 px-4 bg-blue2h-50 text-blue2h-950">
             <div class="py-2">
-              <svg width="20" height="20">
+              <svg class="w-5 h-5">
                 <use xlink:href="/assets/icons/outline/general.svg#lock" />
               </svg>
             </div>
-            <div class="text-base font-normal leading-[18px] py-2">
+            <div class="text-base font-normal leading-[1.125rem] py-2">
               Garantizamos la protección de tus datos.
             </div>
           </div>
@@ -61,7 +55,7 @@
             [styleType]="viewMode === 'grid' ? 'solid' : 'ghost'"
             customClass="!p-1"
             (click)="setView('grid')">
-            <svg width="24" height="24">
+            <svg class="w-6 h-6">
               <use xlink:href="/assets/icons/outline/general.svg#grid" />
             </svg>
           </app-button>
@@ -71,14 +65,14 @@
             [styleType]="viewMode === 'list' ? 'solid' : 'ghost'"
             customClass="!p-1"
             (click)="setView('list')">
-            <svg width="24" height="24">
+            <svg class="w-6 h-6">
               <use xlink:href="/assets/icons/outline/text.svg#list" />
             </svg>
           </app-button>
         </div>
       </div>
 
-      <p class="text-base font-normal text-main-blue1h leading-[18px]">
+      <p class="text-base font-normal text-main-blue1h leading-[1.125rem]">
         Tienes convenios activos con las siguientes compañías. Haz clic en
         alguna para cargar o actualizar tu información.
       </p>
@@ -105,7 +99,7 @@
                 'w-full object-cover': viewMode === 'list',
               }" />
           </div>
-          <div class="text-base leading-[18px] font-semibold"
+          <div class="text-base leading-[1.125rem] font-semibold"
             [ngClass]="{
               'text-center': viewMode === 'grid'
             }">
@@ -163,7 +157,7 @@
     class="hidden md:block rounded-md"
   />
   <div class="flex justify-between items-center gap-2">
-    <span class="text-base leading-5 md:leading-[18px] font-normal text-main-blue1h whitespace-nowrap">2 de 3</span>
+    <span class="text-base leading-5 md:leading-[1.125rem] font-normal text-main-blue1h whitespace-nowrap">2 de 3</span>
     <div class="flex gap-2 md:hidden">
       <app-button
         (click)="backTutorialStep()"
@@ -217,17 +211,17 @@
 
   <div class="flex flex-col gap-1">
     <div class="flex items-center justify-between">
-      <h3 class="text-base font-semibold leading-[18px] text-main-blue1h dark:text-white">
+      <h3 class="text-base font-semibold leading-[1.125rem] text-main-blue1h dark:text-white">
         Mantén tus datos al día
       </h3>
       <app-button (click)="reminderModal.close()" variant="primary" size="sm" styleType="ghost" class="md:hidden">
-        <svg width="16" height="16">
+        <svg class="w-4 h-4">
           <use xlink:href="/assets/icons/outline/general.svg#close" />
         </svg>
       </app-button>
     </div>
 
-    <p class="text-main-blue1h text-base font-normal leading-[18px]">
+    <p class="text-main-blue1h text-base font-normal leading-[1.125rem]">
       Así aseguras tu visibilidad en los directorios médicos.
     </p>
   </div>

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { City } from 'src/app/models/city.interface';
-import { DocumentType } from 'src/app/models/document-type.interface';
+import { City } from 'src/app/interfaces/city.interface';
+import { DocumentType } from 'src/app/interfaces/document-type.interface';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { CatalogService } from 'src/app/services/catalog/catalog.service';
 import { ContactsProviderService } from 'src/app/services/contacts-provider/contacts-provider.service';

@@ -114,7 +114,6 @@ export class ModalComponent implements OnInit, AfterViewInit {
 
   @HostListener('document:keydown.escape', ['$event'])
   handleEscape(event: Event) {
-    const keyboardEvent = event as KeyboardEvent;
     const isTopModal = ModalComponent.stack[ModalComponent.stack.length - 1] === this;
     if (this.isOpen && this.closeOnEscape && isTopModal) {
       this.close();

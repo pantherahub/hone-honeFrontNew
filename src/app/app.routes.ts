@@ -3,20 +3,20 @@ import { HomeComponent } from './modules/private/home/home.component';
 import { LoginComponent } from './modules/public/login/login.component';
 import { authGuard } from './guards/auth.guard';
 import { PageNotFoundComponent } from './modules/public/page-not-found/page-not-found.component';
-import { ListDocumentsComponent } from './modules/private/documents/list-documents/list-documents.component';
+import { DocumentsComponent } from './modules/private/documents/documents.component';
 import { NgModule } from '@angular/core';
-import { PrivateLayoutComponent } from './layouts/private-layout/private-layout.component';
+import { PrivateLayoutComponent } from './layout/private-layout/private-layout.component';
 import { UpdateDataComponent } from './modules/private/update-data/update-data.component';
 import { canDeactivateGuard } from './guards/can-deactivate.guard';
 import { TestsComponent } from './modules/public/tests/tests.component';
 import { SupportTicketComponent } from './shared/support-ticket/support-ticket.component';
-import { PublicLayoutComponent } from './layouts/public-layout/public-layout.component';
+import { PublicLayoutComponent } from './layout/public-layout/public-layout.component';
 import { noauthGuard } from './guards/noauth.guard';
-import { ServiceLayoutComponent } from './layouts/service-layout/service-layout.component';
+import { ServiceLayoutComponent } from './layout/service-layout/service-layout.component';
 import { clientSelectedGuard } from './guards/client-selected.guard';
 import { RatesComponent } from './modules/private/rates/rates.component';
 import { serviceAccessGuard } from './guards/service-access.guard';
-import { SERVICES_CONFIG } from './config/client-services.config';
+import { SERVICES_CONFIG } from './config/service-navigation.config';
 
 export const routes: Routes = [
   //   PUBLIC ROUTES
@@ -82,7 +82,7 @@ export const routes: Routes = [
         children: [
           {
             path: 'documentation',
-            component: ListDocumentsComponent,
+            component: DocumentsComponent,
             canActivate: [serviceAccessGuard],
             data: {
               disclaimerKey: 'Documentos',
@@ -94,6 +94,7 @@ export const routes: Routes = [
           //   component: RatesComponent,
           //   canActivate: [serviceAccessGuard],
           //   data: {
+          //     disclaimerKey: 'Tarifas',
           //     serviceKey: SERVICES_CONFIG.rates.key
           //   },
           // },
@@ -127,4 +128,4 @@ export const routes: Routes = [
   ],
   exports: [RouterModule]
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

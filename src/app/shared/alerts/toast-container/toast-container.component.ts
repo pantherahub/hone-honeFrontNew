@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Toast } from 'src/app/models/toast.interface';
+import { Toast } from 'src/app/interfaces/toast.interface';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ToastComponent } from '../toast/toast.component';
 

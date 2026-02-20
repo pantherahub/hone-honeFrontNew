@@ -57,7 +57,7 @@ export class DrawerComponent implements OnInit, OnDestroy {
   }
 
   @HostListener('document:keydown.escape', ['$event'])
-  onEsc(event: KeyboardEvent) {
+  onEsc(event: Event) {
     if (this.closeOnEscape && this.isOpen) {
       this.close();
     }

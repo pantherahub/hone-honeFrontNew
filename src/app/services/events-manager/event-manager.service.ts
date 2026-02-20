@@ -1,9 +1,10 @@
 import { Injectable, signal } from '@angular/core';
-import { UserInterface } from '../../models/user.interface';
-import { ClientInterface } from 'src/app/models/client.interface';
+import { UserInterface } from 'src/app/interfaces/user.interface';
+import { ClientInterface } from 'src/app/interfaces/client.interface';
+import { StorageKey } from 'src/app/enums/storage-key.enum';
 
 @Injectable({
-   providedIn: 'root'
+  providedIn: 'root'
 })
 export class EventManagerService {
 
@@ -14,9 +15,9 @@ export class EventManagerService {
 
   isEditingProvider = signal<boolean>(false);
 
-  private readonly viewModeKey = 'clientViewMode';
-  private readonly userKey = 'userLogged';
-  private readonly clientKey = 'clientSelected';
+  private readonly USER_KEY = StorageKey.UserLogged;
+  private readonly CLIENT_KEY = StorageKey.ClientSelected;
+  private readonly VIEW_MODE_KEY = StorageKey.ViewMode;
 
   constructor() {
     this.initFromStorage();
@@ -25,21 +26,24 @@ export class EventManagerService {
   /** Initializes all signals from localStorage if they exist */
   private initFromStorage(): void {
     // User
-    const savedUser = localStorage.getItem(this.userKey);
+    const savedUser = localStorage.getItem(this.USER_KEY);
     if (savedUser) {
       this.userLogged.set(JSON.parse(savedUser));
     }
 
     // Selected client
-    const savedClient = localStorage.getItem(this.clientKey);
+    const savedClient = localStorage.getItem(this.CLIENT_KEY);
     if (savedClient) {
       this.clientSelected.set(JSON.parse(savedClient));
     }
 
     // Client view mode
-    const savedViewMode = localStorage.getItem(this.viewModeKey) as 'grid' | 'list' | null;
-    if (savedViewMode) {
-      this.viewMode.set(savedViewMode);
+    const allowedModes = ['grid', 'list'];
+    const savedViewMode = localStorage.getItem(this.VIEW_MODE_KEY);
+    if (savedViewMode && allowedModes.includes(savedViewMode)) {
+      this.viewMode.set(savedViewMode as 'grid' | 'list');
+    } else {
+      this.viewMode.set(null);
     }
   }
 
@@ -47,31 +51,31 @@ export class EventManagerService {
   // User
   setUser(user: UserInterface) {
     this.userLogged.set(user);
-    localStorage.setItem(this.userKey, JSON.stringify(user));
+    localStorage.setItem(this.USER_KEY, JSON.stringify(user));
   }
   clearUser() {
     this.userLogged.set({});
-    localStorage.removeItem(this.userKey);
+    localStorage.removeItem(this.USER_KEY);
   }
 
   // Selected client
   setClient(client: ClientInterface) {
     this.clientSelected.set(client);
-    localStorage.setItem(this.clientKey, JSON.stringify(client));
+    localStorage.setItem(this.CLIENT_KEY, JSON.stringify(client));
   }
   clearClient() {
     this.clientSelected.set({});
-    localStorage.removeItem(this.clientKey);
+    localStorage.removeItem(this.CLIENT_KEY);
   }
 
   // Selected client view mode in home
   setViewMode(mode: 'grid' | 'list') {
     this.viewMode.set(mode);
-    localStorage.setItem(this.viewModeKey, mode);
+    localStorage.setItem(this.VIEW_MODE_KEY, mode);
   }
   clearViewMode() {
     this.viewMode.set(null);
-    localStorage.removeItem(this.viewModeKey);
+    localStorage.removeItem(this.VIEW_MODE_KEY);
   }
 
   // Status of a form update in the update-data module
