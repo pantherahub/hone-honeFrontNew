@@ -166,9 +166,9 @@ export class FormUtilsService {
   validateDateRange(
     startField: string,
     endField: string,
-    errorPrefix: string = '',
     bothRequired: boolean = false,
     untilToday: boolean = false,
+    errorPrefix: string = '',
   ) {
     return (formGroup: AbstractControl): ValidationErrors | null => {
       const startDateControl = formGroup.get(startField);

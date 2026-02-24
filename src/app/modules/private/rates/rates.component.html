@@ -1,10 +1,4 @@
-@if (loading) {
-  <div class="absolute inset-0 z-50 bg-gray-50/60 flex items-center justify-center">
-    <svg class="w-7 h-7 text-main-blue1h animate-spin fill-gray-200">
-      <use xlink:href="/assets/icons/extras/animations.svg#spin" />
-    </svg>
-  </div>
-}
+<app-loader [visible]="loading" />
 
 <div class="flex flex-col gap-6 pb-20">
 
@@ -138,7 +132,7 @@
                 {{
                   !rate.currentRate || rate.currentRate?.rateStatus === 'PENDIENTE POR CARGAR'
                     ? 'N/A'
-                    : rate.currentRate.updateAt | date: 'mediumDate'
+                    : rate.currentRate.updatedAt | date: 'mediumDate'
                 }}
               </td>
               <td class="px-4 py-[10.5px] text-left">

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { DropdownTriggerDirective } from 'src/app/directives/dropdown-trigger.directive';
 import { FileSelectDirective } from 'src/app/directives/file-select.directive';
 import { PipesModule } from 'src/app/pipes/pipes.module';
@@ -15,11 +15,12 @@ import { ActivatedRoute } from '@angular/router';
 import { Disclaimer } from 'src/app/interfaces/disclaimer.interface';
 import { ModalService } from 'src/app/services/modal/modal.service';
 import { DisclaimerFormComponent } from 'src/app/shared/modals/disclaimer-form/disclaimer-form.component';
+import { LoaderComponent } from 'src/app/shared/components/loader/loader.component';
 
 @Component({
   selector: 'app-rates',
   standalone: true,
-  imports: [CommonModule, PipesModule, ButtonComponent, DropdownTriggerDirective, FileSelectDirective, RateManagementComponent],
+  imports: [CommonModule, PipesModule, ButtonComponent, DropdownTriggerDirective, FileSelectDirective, RateManagementComponent, LoaderComponent],
   templateUrl: './rates.component.html',
   styleUrl: './rates.component.scss'
 })
@@ -83,7 +84,10 @@ export class RatesComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.loading = true;
     this.getProviderDisclaimer$()
-      .pipe(finalize(() => this.loading = false))
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => this.loading = false)
+      )
       .subscribe(() => {
         this.disclaimerReady$.next();
       });

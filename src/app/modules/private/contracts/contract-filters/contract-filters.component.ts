@@ -1,0 +1,73 @@
+import { CommonModule } from '@angular/common';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
+import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.component';
+import { InputErrorComponent } from 'src/app/shared/components/input-error/input-error.component';
+import { RadioComponent } from 'src/app/shared/components/radio/radio.component';
+import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
+import { BadgeConfig } from 'src/app/types/badge-config.type';
+
+@Component({
+  selector: 'app-contract-filters',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, DrawerComponent, ButtonComponent, TextInputComponent, InputErrorComponent, RadioComponent],
+  templateUrl: './contract-filters.component.html',
+  styleUrl: './contract-filters.component.scss'
+})
+export class ContractFiltersComponent implements OnInit {
+
+  @Input() ticketStatusList: any[] = [];
+  @Input() statusConfig!: Record<string, BadgeConfig>;
+  @Output() onClose = new EventEmitter<any>();
+
+  tempForm!: FormGroup;
+
+  @ViewChild('filterDrawer') filterDrawer!: DrawerComponent;
+
+  constructor(
+    private fb: FormBuilder,
+    private formUtils: FormUtilsService,
+  ) { }
+
+  ngOnInit(): void {
+    this.tempForm = this.fb.group({
+      expedientNumber: [''],
+      startDate: [null],
+      endDate: [null],
+      idStatus: [null],
+    }, {
+      validators: [this.formUtils.validateDateRange('startDate', 'endDate', true, true)],
+    });
+  }
+
+  open(currentFilters: any) {
+    this.tempForm.reset(currentFilters);
+    // this.tempForm.patchValue(currentFilters);
+    this.filterDrawer.open();
+  }
+
+  cancel() {
+    this.filterDrawer.close();
+  }
+
+  reset() {
+    this.tempForm.reset();
+    this.filterDrawer.close(this.tempForm.value);
+  }
+
+  apply() {
+    const { expedientNumber, ...data } = this.tempForm.value;
+    const filters = {
+      ...data,
+      expedientNumber: expedientNumber.trim() || null,
+    };
+    this.filterDrawer.close(filters);
+  }
+
+  onDrawerInternalClose(filters?: any) {
+    this.onClose.emit(filters);
+  }
+
+}

@@ -7,20 +7,24 @@ import { environment } from 'src/environments/environment';
 @Injectable({
   providedIn: 'root'
 })
-export class ContractService {
+export class TicketService {
 
   url = environment.url;
+  urlBack = environment.urlNewBack;
 
   constructor(private httpClient: HttpClient) { }
 
-  public getContracts(reqData: any): Observable<any> {
-    const url = `${this.url}ContractRequest/GetAll`;
+  getTicketStatus(): Observable<any[]> {
+    return this.httpClient.get<any[]>(`${this.url}Status/GetAll`);
+  }
+
+  getMessagesByTicket(idTicket: number, reqData: any): Observable<any> {
+    const url = `${this.url}Tickets/GetMessagesByTicket/${idTicket}`;
     return this.httpClient.get(url, { params: getHttpParamsByFilters(reqData) });
   }
 
-  getContractById(idContract: number): Observable<any> {
-    const url = `${this.url}ContractRequest/GetOne/${idContract}`;
-    return this.httpClient.get(url);
+  postTicket(idRole: any, payload: any): Observable<any> {
+    return this.httpClient.post(`${this.urlBack}ticket/create`, payload);
   }
 
 }

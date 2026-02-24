@@ -1,0 +1,20 @@
+<app-drawer
+  #contractDrawer
+  placement="right"
+  size="xl"
+  (onClose)="onDrawerInternalClose()">
+
+  <ng-container drawer-header>
+    <h2 class="text-lg font-black text-main-blue1h leading-5">
+      Contrato
+    </h2>
+  </ng-container>
+
+  <app-loader [visible]="loading" [fullscreen]="false" />
+
+  @if (contract) {
+    <section class="flex flex-col gap-6">
+    </section>
+  }
+
+</app-drawer>
