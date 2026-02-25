@@ -55,8 +55,8 @@ export class ContractsComponent implements OnInit, AfterViewInit, OnDestroy {
       label: 'En trámite'
     },
     'PENDIENTE': {
-      bgClass: 'bg-blue-100',
-      textClass: 'text-blue-800',
+      bgClass: 'bg-gray-100',
+      textClass: 'text-gray-900',
       icon: 'cloud-arrow-up',
       label: 'Pendiente'
     },

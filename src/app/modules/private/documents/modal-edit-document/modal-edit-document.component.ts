@@ -17,7 +17,6 @@ import { FileDropDirective } from 'src/app/directives/file-drop.directive';
 import { City } from 'src/app/interfaces/city.interface';
 import { AlertComponent } from 'src/app/shared/components/alert/alert.component';
 
-
 @Component({
   selector: 'app-modal-edit-document',
   standalone: true,

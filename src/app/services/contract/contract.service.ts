@@ -15,12 +15,24 @@ export class ContractService {
 
   public getContracts(reqData: any): Observable<any> {
     const url = `${this.url}ContractRequest/GetAll`;
-    return this.httpClient.get(url, { params: getHttpParamsByFilters(reqData) });
+    const params = {
+      isManagerActive: true, // See current ticket manager, no history
+      ...reqData,
+    };
+    return this.httpClient.get(url, { params: getHttpParamsByFilters(params) });
   }
 
   getContractById(idContract: number): Observable<any> {
     const url = `${this.url}ContractRequest/GetOne/${idContract}`;
-    return this.httpClient.get(url);
+    const params = {
+      isManagerActive: true // See current ticket manager, no history
+    };
+    return this.httpClient.get(url, { params: getHttpParamsByFilters(params) });
+  }
+
+  sendContractTicketMessage(idContract: number, reqData: any): Observable<any> {
+    const url = `${this.url}ContractRequest/CreateMessage/${idContract}`;
+    return this.httpClient.post(url, reqData);
   }
 
 }

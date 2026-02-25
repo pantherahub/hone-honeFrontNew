@@ -14,17 +14,22 @@ export class TicketService {
 
   constructor(private httpClient: HttpClient) { }
 
+  postTicket(idRole: any, payload: any): Observable<any> {
+    return this.httpClient.post(`${this.urlBack}ticket/create`, payload);
+  }
+
   getTicketStatus(): Observable<any[]> {
     return this.httpClient.get<any[]>(`${this.url}Status/GetAll`);
   }
 
   getMessagesByTicket(idTicket: number, reqData: any): Observable<any> {
     const url = `${this.url}Tickets/GetMessagesByTicket/${idTicket}`;
-    return this.httpClient.get(url, { params: getHttpParamsByFilters(reqData) });
+    return this.httpClient.post(url, reqData);
   }
 
-  postTicket(idRole: any, payload: any): Observable<any> {
-    return this.httpClient.post(`${this.urlBack}ticket/create`, payload);
+  updateTicketMessage(idMessage: number, reqData: any): Observable<any> {
+    const url = `${this.url}Tickets/UpdateMessage/${idMessage}`;
+    return this.httpClient.put(url, reqData);
   }
 
 }

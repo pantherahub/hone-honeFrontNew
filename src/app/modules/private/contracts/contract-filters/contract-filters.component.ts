@@ -40,6 +40,18 @@ export class ContractFiltersComponent implements OnInit {
     }, {
       validators: [this.formUtils.validateDateRange('startDate', 'endDate', true, true)],
     });
+
+    this.tempForm.get('startDate')?.valueChanges.subscribe(() => {
+      this.onStartDateChange();
+    });
+  }
+
+  onStartDateChange(): void {
+    const startControl = this.tempForm.get('startDate');
+    const endControl = this.tempForm.get('endDate');
+
+    // set endDate one month after startDate automatically
+    this.formUtils.updateEndDateRange(startControl, endControl, 'months', 1);
   }
 
   open(currentFilters: any) {
@@ -61,7 +73,7 @@ export class ContractFiltersComponent implements OnInit {
     const { expedientNumber, ...data } = this.tempForm.value;
     const filters = {
       ...data,
-      expedientNumber: expedientNumber.trim() || null,
+      expedientNumber: expedientNumber?.trim() || null,
     };
     this.filterDrawer.close(filters);
   }

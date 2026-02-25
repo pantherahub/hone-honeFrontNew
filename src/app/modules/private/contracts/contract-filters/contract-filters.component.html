@@ -89,7 +89,7 @@
     </section>
 
     <ng-container drawer-footer>
-      <div class="flex justify-end gap-3 w-full">
+      <div class="flex flex-col-reverse sm:flex-row gap-4">
         <app-button
           (onClick)="reset()"
           variant="gray"
@@ -100,7 +100,6 @@
           Limpiar todo
         </app-button>
         <app-button
-          (onClick)="apply()"
           [type]="'submit'"
           variant="primary"
           styleType="solid"

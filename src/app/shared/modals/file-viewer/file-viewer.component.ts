@@ -89,4 +89,5 @@ export class FileViewerComponent implements OnInit {
   openDoc() {
     window.open(this.previewFile, '_blank');
   }
+
 }

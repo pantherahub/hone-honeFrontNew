@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AbstractControl, FormArray, FormControl, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { calculateMaxDate } from 'src/app/utils/string-utils';
 import { isAlphanumeric, isAlphanumericWithSpaces, isEmail, isNumeral, isNumeric, isTelephoneNumber, isUrl } from 'src/app/utils/validation-utils';
 
 @Injectable({
@@ -153,6 +154,36 @@ export class FormUtilsService {
       return new FormControl(control.value);
     }
     throw new Error('Unsupported control type');
+  }
+
+  /**
+   * Apply an automatic end date based on the start date.
+   * Adding months, years, or days.
+   */
+  updateEndDateRange(
+    startControl: AbstractControl | null,
+    endControl: AbstractControl | null,
+    unit: 'months' | 'years' | 'days' = 'months',
+    amount: number = 1,
+    limitToToday: boolean = true
+  ): void {
+    if (!startControl || !endControl) return;
+
+    const startValue = startControl.value;
+    if (!startValue || startValue === '') {
+      startControl.setValue(null, { emitEvent: false });
+      return;
+    }
+
+    const startDate = new Date(startValue + 'T00:00:00');
+    if (isNaN(startDate.getTime()) || startDate.getFullYear() < 1900) {
+      return;
+    }
+
+    if (!endControl.value) {
+      const maxEndDate = calculateMaxDate(startValue, unit, amount, limitToToday);
+      endControl.setValue(maxEndDate, { emitEvent: false });
+    }
   }
 
   /**

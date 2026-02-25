@@ -129,3 +129,42 @@ export function decodeJwtPayload(token: string) {
   );
   return JSON.parse(json);
 }
+
+/**
+ * Calculates a new date based on a starting date.
+ * Months, years or days can be added to the initial date.
+ */
+export function calculateMaxDate(
+  baseDate: string | Date,
+  unit: 'months' | 'years' | 'days' = 'months',
+  amount: number = 1,
+  limitToToday: boolean = true
+): string {
+  const initialDate =
+    typeof baseDate === 'string'
+      ? new Date(baseDate + 'T00:00:00')
+      : new Date(baseDate.getTime());
+  initialDate.setHours(0, 0, 0, 0);
+
+  let result = new Date(initialDate);
+
+  if (unit === 'months') {
+    result.setMonth(result.getMonth() + amount);
+  } else if (unit === 'years') {
+    result.setFullYear(result.getFullYear() + amount);
+  } else if (unit === 'days') {
+    result.setDate(result.getDate() + amount);
+  }
+  result.setHours(0, 0, 0, 0);
+
+  if (limitToToday) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (result > today) {
+      result = today;
+    }
+  }
+
+  // ISO format (AAAA-MM-DD)
+  return result.toISOString().split('T')[0];
+}
