@@ -356,7 +356,7 @@
       </ng-container>
     } @else {
       <div [innerHTML]="msg.message | safeHtml"
-        class="text-sm leading-4 text-main-blue1h max-h-72 overflow-auto">
+        class="text-sm leading-relaxed text-main-blue1h max-h-72 overflow-auto break-words [&_p]:m-0 [&_p:not(:last-child)]:mb-2">
       </div>
 
       @if (getMessageFile(msg); as msgFile) {

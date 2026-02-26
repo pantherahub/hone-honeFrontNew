@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer } from '@angular/platform-browser';
 import { filter, finalize, firstValueFrom, interval, Subscription, switchMap, tap } from 'rxjs';
 import { FileDropDirective } from 'src/app/directives/file-drop.directive';
 import { FileSelectDirective } from 'src/app/directives/file-select.directive';
