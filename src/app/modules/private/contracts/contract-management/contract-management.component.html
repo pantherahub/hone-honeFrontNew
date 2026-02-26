@@ -19,7 +19,7 @@
       <!-- Data header -->
       <div class="flex flex-col gap-6">
 
-        <div class="flex gap-6">
+        <div class="flex gap-6 flex-wrap">
           <div class="flex-1 flex flex-col gap-2.5 text-sm leading-4">
             <span class="font-semibold text-gray-900">Contrato</span>
             <span class="text-gray-500">
@@ -44,13 +44,13 @@
           </div>
         </div>
 
-        @if (getFixedMessage('Init')) {
+        @if (getFixedMessage('Init'); as initMsg) {
           <div class="flex flex-col gap-2.5 text-sm leading-4">
             <span class="font-semibold text-gray-900">Reporte</span>
             <p class="text-gray-500">
-              {{ getFixedMessage('Init').message }}
+              {{ initMsg.message }}
             </p>
-            @if (getMessageFile(getFixedMessage('Init'))) {
+            @if (getMessageFile(initMsg)) {
               <div class="flex-1 flex items-center gap-2 flex-wrap">
                 <div class="rounded-lg p-3 bg-blue1h-50 text-main-blue1h">
                   <svg class="w-5 h-5">
@@ -59,9 +59,9 @@
                 </div>
                 <div class="flex-1 flex flex-col gap-1 text-gray-900 text-sm leading-4 min-w-[6.25rem]">
                   <span class="font-semibold truncate block">
-                    {{ getMessageFile(getFixedMessage('Init')).nameOriginal }}
+                    {{ getMessageFile(initMsg).nameOriginal }}
                   </span>
-                  <span>{{ getMessageFile(getFixedMessage('Init')).size | formatFileBytes }}</span>
+                  <span>{{ getMessageFile(initMsg).size | formatFileBytes }}</span>
                 </div>
                 <app-tooltip
                   [id]="'download-contract'"
@@ -71,7 +71,7 @@
                   styleType="light">
                   <app-button
                     customClass="w-full flex justify-center sm:whitespace-nowrap leading-4"
-                    (onClick)="downloadFile(getFixedMessage('Init'))"
+                    (onClick)="downloadFile(initMsg)"
                     variant="primary"
                     [styleType]="isGhostFormatButton ? 'ghost' : 'soft'"
                     size="sm"
@@ -90,7 +90,7 @@
       </div>
 
       <!-- Upload -->
-      @if (getLastMessage()?.createdBy === 'HoneSolutions' && contract.Ticket?.Status?.isClosed === false) {
+      @if (getLastMessage()?.createdBy === 'HoneSolutions' && contract.Ticket.Status?.isClosed === false) {
         <div class="p-4 bg-gray-50 rounded-xl ring-[1px] ring-inset ring-gray-200">
           <ng-container
             *ngTemplateOutlet="messageFormTemplate; context: {
@@ -101,20 +101,20 @@
       }
 
       <!-- Messages -->
-      @if (messageList && messageList.length || true) {
+      @if (messageList && messageList.length) {
         <div class="flex flex-col gap-6">
           <div class="relative flex items-center">
             <div class="flex-grow border-t border-gray-300"></div>
-            <span class="flex-shrink mx-4 text-gray-500 text-sm leading-4"> <!-- tracking-wider -->
-              Discusión
+            <span class="flex-shrink mx-4 text-gray-500 text-sm leading-4 text-center">
+              Historial de observaciones
             </span>
             <div class="flex-grow border-t border-gray-300"></div>
           </div>
 
-          @if (getFixedMessage('Closed')) {
+          @if (getFixedMessage('Closed'); as closedMsg) {
             <ng-container
               *ngTemplateOutlet="messageTemplate; context: {
-                message: getFixedMessage('Closed'),
+                message: closedMsg,
                 lastMessage: getLastMessage(),
               }">
             </ng-container>
@@ -172,12 +172,9 @@
 
 <ng-template #messageFormTemplate let-isNew="isNew">
   <form [formGroup]="form" (ngSubmit)="submitMessage(isNew)" class="flex flex-col gap-4">
-    <div class="flex flex-col gap-2.5">
-      <label class="text-sm font-semibold leading-4 text-gray-900">Observaciones</label>
-      <div>
-        <app-text-input [id]="'message'" formControlName="message" label="Escribe aquí tus observaciones" [isTextarea]="true" />
-        <app-input-error [control]="form.get('message')" />
-      </div>
+    <div>
+      <app-text-input [id]="'message'" formControlName="message" label="Escribe aquí tus observaciones" [isTextarea]="true" />
+      <app-input-error [control]="form.get('message')" />
     </div>
     <div class="xs:ps-3 flex gap-4 max-w-full">
       <div class="hidden xs:block w-[3px] rounded-3xl bg-gray-200 shrink-0"></div>
@@ -256,17 +253,19 @@
         Solo podrás modificar este contenido dentro de los primeros 15 minutos.
       </div>
     }
-    <div class="flex flex-wrap-reverse gap-4">
-      <app-button
-        (onClick)="closeEditingMessage()"
-        variant="gray"
-        styleType="soft"
-        size="lg"
-        class="flex-1"
-        customClass="w-full flex justify-center leading-[1.125rem]">
-        Cancelar
-      </app-button>
-      @if (form.get('message')?.dirty || selectedFormFile || !isNew) {
+    @if (form.get('message')?.dirty || selectedFormFile || !isNew) {
+      <div class="flex flex-wrap-reverse gap-4">
+        @if (!isNew) {
+          <app-button
+            (onClick)="closeEditingMessage()"
+            variant="gray"
+            styleType="soft"
+            size="lg"
+            class="flex-1"
+            customClass="w-full flex justify-center leading-[1.125rem]">
+            Cancelar
+          </app-button>
+        }
         <app-button
           [type]="'submit'"
           variant="primary"
@@ -276,19 +275,19 @@
           customClass="w-full flex justify-center leading-[1.125rem]">
           Enviar
         </app-button>
-      }
-    </div>
+      </div>
+    }
   </form>
 </ng-template>
 
 
 <ng-template #messageTemplate let-msg="message" let-lastMsg="lastMessage">
-  <div class="flex flex-col gap-4 p-4 rounded-xl ring-[1px] ring-inset ring-gray-200"
+  <div class="flex flex-col gap-4 p-4 rounded-xl ring-[1px] ring-inset "
     [ngClass]="{
-      'bg-white': msg.createdBy === 'Provider',
-      'bg-gray-50': msg.createdBy !== 'Provider',
+      'bg-white ring-gray-200': msg.createdBy === 'Provider',
+      'bg-blue1h-50 ring-blue1h-500': msg.createdBy !== 'Provider',
     }">
-    <div class="flex justify-between gap-4">
+    <div class="flex flex-col xs:flex-row justify-between gap-4 flex-wrap">
       <div class="flex flex-col gap-1 text-sm leading-4">
         <p class="text-gray-900">
           De <span class="font-semibold">{{
@@ -297,46 +296,56 @@
               : msg.Provider?.razonSocial
           }}</span>
         </p>
-        <span class="text-gray-500 first-letter:uppercase">{{ msg.createdAt | timeAgo }}</span>
+        <span class="text-gray-500">Enviado {{ msg.createdAt | timeAgo }}</span>
       </div>
-      <div class="flex items-center gap-3">
-        @if (lastMsg?.idMessage === msg.idMessage && msg.createdBy !== 'Provider') {
-          <div
-            class="inline-flex items-center gap-1 py-1.5 px-2.5 rounded-full text-xs font-semibold whitespace-nowrap bg-blue1h-100 text-main-blue1h">
-            <svg class="w-4 h-4">
-              <use xlink:href="/assets/icons/solid/general.svg#clock" />
-            </svg>
-            {{ lastMsg.type === 'Closed' ? 'Último mensaje' : 'Más reciente' }}
-          </div>
-        }
-        @if (msgStatusConfig[getMessageStatus({})] && msg.createdBy === 'Provider') {
-          <ng-container
-            *ngTemplateOutlet="contractStatusTemplate; context: {
-              badgeConfig: msgStatusConfig[getMessageStatus({})]
-            }">
-          </ng-container>
-        }
-        @if (
-          lastMsg?.idMessage === msg.idMessage &&
-          msg.type !== 'Closed' &&
-          msg.createdBy === 'Provider' &&
-          this.editingMessageId !== msg.idMessage &&
-          !msg.isViewedByHone &&
-          canEdit(msg.createdAt)
-        ) {
-          <app-button
-            (onClick)="editMessage(msg)"
-            variant="gray"
-            styleType="soft"
-            size="xs"
-          >
-            <svg class="w-4 h-4">
-              <use xlink:href="/assets/icons/outline/general.svg#pen" />
-            </svg>
-            Editar
-          </app-button>
-        }
-      </div>
+      @if (hasMessageActions(msg, lastMsg)) {
+        <div class="flex items-center gap-3 flex-wrap w-full xs:w-auto">
+          @if (isLastMessageOfThread(msg, lastMsg)) {
+            <div
+              class="inline-flex items-center gap-1 py-1.5 px-2.5 rounded-full text-xs font-semibold whitespace-nowrap bg-blue1h-100 text-main-blue1h">
+              <svg class="w-4 h-4">
+                <use xlink:href="/assets/icons/solid/general.svg#clock" />
+              </svg>
+              {{ lastMsg.type === 'Closed' ? 'Último mensaje' : 'Más reciente' }}
+            </div>
+          }
+          @if (hasDisplayableStatus(msg)) {
+            <ng-container
+              *ngTemplateOutlet="contractStatusTemplate; context: {
+                badgeConfig: msgStatusConfig[getMessageStatus(msg)]
+              }">
+            </ng-container>
+          }
+          @if (canModifyMessage(msg, lastMsg)) {
+            <div class="flex items-center gap-3 flex-wrap grow">
+              <app-button
+                (onClick)="editMessage(msg)"
+                variant="gray"
+                styleType="soft"
+                size="xs"
+                class="grow"
+                customClass="w-full flex justify-center">
+                <svg class="w-4 h-4">
+                  <use xlink:href="/assets/icons/outline/general.svg#pen" />
+                </svg>
+                Editar
+              </app-button>
+              <app-button
+                (onClick)="deleteMessage(msg.idMessage)"
+                variant="red"
+                styleType="soft"
+                size="xs"
+                class="grow"
+                customClass="w-full flex justify-center">
+                <svg class="w-4 h-4">
+                  <use xlink:href="/assets/icons/outline/general.svg#trash-bin" />
+                </svg>
+                Eliminar
+              </app-button>
+            </div>
+          }
+        </div>
+      }
     </div>
 
     @if (editingMessageId === msg.idMessage) {
@@ -348,20 +357,29 @@
     } @else {
       <div [innerHTML]="msg.message" class="text-sm leading-4 text-main-blue1h"></div>
 
-      @if (getMessageFile(msg)) {
-        <div class="xs:ps-3 flex gap-4 max-w-full">
-          <div class="hidden xs:block w-[3px] rounded-3xl bg-gray-200 shrink-0"></div>
-          <div class="max-w-full min-w-0 flex-1 p-4 flex items-center gap-2 rounded-md ring-[1px] ring-inset ring-gray-200 bg-gray-50">
+      @if (getMessageFile(msg); as msgFile) {
+        <div class="flex gap-4 max-w-full"
+          [ngClass]="{
+            'xs:ps-3': msg.createdBy === 'Provider',
+          }">
+          @if (msg.createdBy === 'Provider') {
+            <div class="hidden xs:block w-[3px] rounded-3xl bg-gray-200 shrink-0"></div>
+          }
+          <div class="max-w-full min-w-0 flex-1 p-4 flex items-center gap-2 flex-wrap rounded-md ring-[1px] ring-inset ring-gray-200"
+            [ngClass]="{
+              'bg-gray-50': msg.createdBy === 'Provider',
+              'bg-white': msg.createdBy !== 'Provider',
+            }">
             <div class="rounded-lg p-3 bg-blue1h-50 text-main-blue1h">
               <svg class="w-5 h-5">
                 <use xlink:href="/assets/icons/outline/files-folders.svg#file-lines" />
               </svg>
             </div>
-            <div class="flex-1 flex flex-col gap-1 text-gray-900 text-sm leading-4 min-w-0">
+            <div class="flex-1 flex flex-col gap-1 text-gray-900 text-sm leading-4 min-w-[6.25rem]">
               <span class="font-semibold truncate block">
-                {{ getMessageFile(msg).nameOriginal }}
+                {{ msgFile.nameOriginal }}
               </span>
-              <span>{{ getMessageFile(msg).size | formatFileBytes }}</span>
+              <span>{{ msgFile.size | formatFileBytes }}</span>
             </div>
 
             @if (msg.createdBy === 'Provider') {

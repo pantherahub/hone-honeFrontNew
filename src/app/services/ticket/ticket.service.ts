@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { getHttpParamsByFilters } from 'src/app/utils/http-utils';
+import { DeleteTicketMessagePayload, MessagesFilters, UpdateTicketMessagePayload } from 'src/app/interfaces/ticket.interface';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -22,14 +22,21 @@ export class TicketService {
     return this.httpClient.get<any[]>(`${this.url}Status/GetAll`);
   }
 
-  getMessagesByTicket(idTicket: number, reqData: any): Observable<any> {
+  getMessagesByTicket(idTicket: number, reqData: MessagesFilters): Observable<any> {
     const url = `${this.url}Tickets/GetMessagesByTicket/${idTicket}`;
     return this.httpClient.post(url, reqData);
   }
 
-  updateTicketMessage(idMessage: number, reqData: any): Observable<any> {
+  updateTicketMessage(idMessage: number, reqData: UpdateTicketMessagePayload): Observable<any> {
     const url = `${this.url}Tickets/UpdateMessage/${idMessage}`;
     return this.httpClient.put(url, reqData);
+  }
+
+  deleteTicketMessage(idMessage: number, reqData: DeleteTicketMessagePayload): Observable<any> {
+    const url = `${this.url}Tickets/DeleteMessage/${idMessage}`;
+    return this.httpClient.delete(url, {
+      body: reqData
+    });
   }
 
 }

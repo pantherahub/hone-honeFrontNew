@@ -2,10 +2,11 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { firstValueFrom, interval, Subscription } from 'rxjs';
+import { filter, finalize, firstValueFrom, interval, Subscription, switchMap, tap } from 'rxjs';
 import { FileDropDirective } from 'src/app/directives/file-drop.directive';
 import { FileSelectDirective } from 'src/app/directives/file-select.directive';
-import { MessageStatus, TicketMessagePayload } from 'src/app/interfaces/ticket.interface';
+import { Contract } from 'src/app/interfaces/contract.interface';
+import { DeleteTicketMessagePayload, MessagesFilters, MessageStatus, TicketMessage, TicketMessagePayload, UpdateTicketMessagePayload } from 'src/app/interfaces/ticket.interface';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { ContractService } from 'src/app/services/contract/contract.service';
@@ -53,9 +54,9 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
   clientSelected: any = this.eventManager.clientSelected();
   loading: boolean = false;
   idContract: any = null;
-  contract: any = null;
+  contract: Contract | null = null;
 
-  messageList: any[] = [];
+  messageList: TicketMessage[] = [];
   currentMsgPage: number = 1;
   meesagePageSize: number = 3;
   totalMsgPages: number = 0;
@@ -82,10 +83,10 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
       label: 'Anulado'
     },
     // 'In process': {
-    //   bgClass: 'bg-blue-100',
-    //   textClass: 'text-blue-800',
-    //   icon: 'cloud-arrow-up',
-    //   label: 'Pendiente'
+    //   bgClass: 'bg-yellow-100',
+    //   textClass: 'text-yellow-800',
+    //   icon: 'clock',
+    //   label: 'En trámite'
     // },
   };
 
@@ -165,7 +166,7 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
     this.contractService.getContractById(this.idContract).subscribe({
       next: (res: any) => {
         this.contract = res.data;
-        this.loading = false;
+        // this.loading = false;
         this.refreshMessages();
       },
       error: (err: any) => {
@@ -177,17 +178,18 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
     });
   }
 
-  loadMessages() {
-    if (this.loadingMessages || (
+  loadMessages(isRefresh: boolean = false) {
+    if (this.loadingMessages || !this.contract || (
       this.totalMsgPages > 0 && this.currentMsgPage > this.totalMsgPages)
     ) return;
 
-    const payload = {
+    const payload: MessagesFilters = {
       type: 'Message',
       showToProvider: true,
       page: this.currentMsgPage,
       limit: this.meesagePageSize,
     };
+    if (isRefresh) this.loading = true;
     this.loadingMessages = true;
     this.ticketService.getMessagesByTicket(this.contract.idTicket, payload).subscribe({
       next: (res: any) => {
@@ -196,6 +198,7 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
 
         this.messageList = [...this.messageList, ...res.data];
         this.loadingMessages = false;
+        if (isRefresh) this.loading = false;
       },
       error: (err: any) => {
         const errorData = err.error;
@@ -210,6 +213,7 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
           console.error(err);
         }
         this.loadingMessages = false;
+        if (isRefresh) this.loading = false;
       },
     });
   }
@@ -222,7 +226,7 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
 
   refreshMessages() {
     this.clearMessages();
-    this.loadMessages();
+    this.loadMessages(true);
   }
 
   nextMessagesPage() {
@@ -230,7 +234,7 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
     this.loadMessages();
   }
 
-  getContractStatus(contract: any): string {
+  getContractStatus(contract: Contract): string {
     const status = contract.Ticket?.Status?.status;
     if (!status) return 'PENDIENTE';
 
@@ -239,7 +243,7 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
     return status;
   }
 
-  getMessageStatus(message: any): MessageStatus {
+  getMessageStatus(message: TicketMessage): MessageStatus {
     const status = message.MessageStatus?.name;
     if (!status) return 'In process';
 
@@ -249,14 +253,14 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
   }
 
   getTicketManager(): any | null {
-    const ticketProviders = this.contract.Ticket?.Providers;
+    const ticketProviders = this.contract?.Ticket?.Providers;
     if (!ticketProviders || !Array.isArray(ticketProviders) || ticketProviders.length === 0) {
       return null;
     }
     return ticketProviders.find(prov => prov.TicketManager?.isActive) ?? null;
   }
 
-  getFixedMessage(type: 'Init' | 'Closed'): any | null {
+  getFixedMessage(type: 'Init' | 'Closed'): TicketMessage | null {
     const messages = this.contract?.Ticket?.Messages;
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return null;
@@ -265,12 +269,12 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
     return messages.find(msg => msg.type === type) ?? null;
   }
 
-  getLastMessage(): any | null {
+  getLastMessage(): TicketMessage | null {
     let lastMsg = this.getFixedMessage('Closed');
     if (!lastMsg && this.messageList?.length) {
       lastMsg = this.messageList[0];
     }
-    return lastMsg
+    return lastMsg;
   }
 
   getObservationsHtml(observations: string): SafeHtml {
@@ -323,13 +327,51 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
     messageControl?.updateValueAndValidity();
   }
 
-  getMessageFile(messageObj: any): any | null {
+  /* Message badges and actions validations */
+  hasMessageActions(msg: TicketMessage, lastMsg: TicketMessage): boolean {
+    return (
+      this.isLastMessageOfThread(msg, lastMsg) ||
+      this.hasDisplayableStatus(msg) ||
+      this.canModifyMessage(msg, lastMsg)
+    );
+  }
+  isLastMessageOfThread(msg: TicketMessage, lastMsg: TicketMessage): boolean {
+    return lastMsg?.idMessage === msg.idMessage && msg.createdBy !== 'Provider';
+  }
+  hasDisplayableStatus(msg: TicketMessage): boolean {
+    return !!this.msgStatusConfig[this.getMessageStatus(msg)] &&
+          msg.createdBy === 'Provider';
+  }
+  canModifyMessage(msg: TicketMessage, lastMsg: TicketMessage): boolean {
+    return (
+      lastMsg?.idMessage === msg.idMessage &&
+      msg.type !== 'Closed' &&
+      msg.createdBy === 'Provider' &&
+      this.editingMessageId !== msg.idMessage &&
+      !msg.isViewedByHone &&
+      this.isMessageEditWindowOpen(msg.createdAt)
+    );
+  }
+
+  isMessageEditWindowOpen(createdAt: string | Date): boolean {
+    if (!createdAt) return false;
+
+    const createdDate = new Date(createdAt).getTime();
+    const now = new Date().getTime();
+
+    const minutesAllowed = 15;
+    const minutesInMs = minutesAllowed * 60 * 1000;
+
+    return (now - createdDate) < minutesInMs;
+  }
+
+  getMessageFile(messageObj: TicketMessage): any | null {
     const file = messageObj?.Files?.[0];
     if (!file || !file.url) return null;
     return file;
   }
 
-  downloadFile(messageObj: any) {
+  downloadFile(messageObj: TicketMessage) {
     const file = messageObj?.Files?.[0];
     if (!file || !file.url) return;
 
@@ -340,7 +382,7 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
     window.open(file.url, '_blank');
   }
 
-  viewFile(messageObj: any) {
+  viewFile(messageObj: TicketMessage) {
     const file = messageObj?.Files?.[0];
     if (!file || !file.url) return;
 
@@ -361,19 +403,7 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
     this.refreshList.emit();
   }
 
-  canEdit(createdAt: string | Date): boolean {
-    if (!createdAt) return false;
-
-    const createdDate = new Date(createdAt).getTime();
-    const now = new Date().getTime();
-
-    const minutesAllowed = 15;
-    const minutesInMs = minutesAllowed * 60 * 1000;
-
-    return (now - createdDate) < minutesInMs;
-  }
-
-  editMessage(msg: any) {
+  editMessage(msg: TicketMessage) {
     this.editingMessageId = msg.idMessage;
     this.backendError = null;
 
@@ -416,7 +446,7 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
     }
 
     const { message } = this.form.value;
-    const payload: any = {
+    const payload: UpdateTicketMessagePayload = {
       message: message || 'Archivo subido.',
       createIn: 'Provider',
     };
@@ -445,6 +475,7 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
             errorData.message
           );
           this.getContract();
+          return;
         }
         console.error(err);
         this.alertService.error();
@@ -453,6 +484,8 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
   }
 
   createMessage() {
+    if (!this.contract) return;
+
     const { idProvider } = this.clientSelected;
     const { message, file } = this.form.value;
     const managerEmail = this.getTicketManager().email;
@@ -476,8 +509,8 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
     Object.entries(rawData).forEach(([key, value]) => {
       if (value instanceof File) {
         payload.append(key, value, value.name);
-      } else {
-        payload.append(key, value.toString());
+      } else if (value != null && value.toString().trim() != '') {
+        payload.append(key, value.toString().trim());
       }
     });
 
@@ -500,6 +533,47 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
           this.backendError = err.error;
           return;
         }
+        console.error(err);
+        this.alertService.error();
+      }
+    });
+  }
+
+  deleteMessage(idMessage: number) {
+    const { idProvider } = this.clientSelected;
+    const payload: DeleteTicketMessagePayload = {
+      createIn: 'Provider',
+      idProviderLogin: idProvider,
+    };
+
+    this.alertService.confirmDelete(
+      '¿Estas seguro de eliminar el mensaje?',
+      'En caso de eliminarlo se perderá y no podrá recuperarse'
+    ).pipe(
+      filter(confirmed => confirmed),
+      tap(() => this.loading = true),
+      switchMap(() =>
+        this.ticketService.deleteTicketMessage(idMessage, payload)
+      ),
+      finalize(() => this.loading = false)
+    )
+    .subscribe({
+      next: () => {
+        this.getContract();
+        this.alertService.success(
+          '¡Mensaje eliminado!',
+          'Se ha eliminado exitosamente.'
+        );
+      },
+      error: (err) => {
+        const errorData = err.error;
+
+        if (err.status === 400 && errorData?.message) {
+          this.alertService.error('Ups...', errorData.message);
+          this.getContract();
+          return;
+        }
+
         console.error(err);
         this.alertService.error();
       }

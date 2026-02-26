@@ -31,3 +31,10 @@ export interface CompanyInterface {
   createdAt?: string;
   updatedAt?: string;
 }
+
+export interface ClientBasicInfo {
+  idClientHoneSolutions: number;
+  clientHoneSolutions: string;
+  urlImagenClientHoneSolutions: string;
+  urlHeader: string;
+}

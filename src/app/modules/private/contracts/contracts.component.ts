@@ -2,10 +2,9 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { catchError, debounceTime, distinctUntilChanged, finalize, Observable, of, ReplaySubject, Subject, takeUntil, tap } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, finalize, Observable, of, ReplaySubject, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { Disclaimer } from 'src/app/interfaces/disclaimer.interface';
 import { PipesModule } from 'src/app/pipes/pipes.module';
-import { AlertService } from 'src/app/services/alert/alert.service';
 import { ContractService } from 'src/app/services/contract/contract.service';
 import { DisclaimerService } from 'src/app/services/disclaimer/disclaimer.service';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
@@ -18,6 +17,9 @@ import { ContractFiltersComponent } from './contract-filters/contract-filters.co
 import { TicketService } from 'src/app/services/ticket/ticket.service';
 import { ContractManagementComponent } from './contract-management/contract-management.component';
 import { LoaderComponent } from 'src/app/shared/components/loader/loader.component';
+import { TicketStatus } from 'src/app/interfaces/ticket.interface';
+import { Contract, ContractsFilters } from 'src/app/interfaces/contract.interface';
+import { ToastService } from 'src/app/services/toast/toast.service';
 
 @Component({
   selector: 'app-contracts',
@@ -34,7 +36,7 @@ export class ContractsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   providerDisclaimer: Disclaimer | null = null;
 
-  statusList: any[] = [];
+  statusList: TicketStatus[] = [];
   statusConfig: Record<string, BadgeConfig> = {
     'GESTIONADO': {
       bgClass: 'bg-green-100',
@@ -63,15 +65,15 @@ export class ContractsComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   filterForm!: FormGroup;
-  appliedFiltersValue: any;
+  appliedFiltersValue: Partial<ContractsFilters> = {};
 
   totalItems: number = 0;
-  itemsPerPage: number = 10;
+  itemsPerPage: number = 5;
   currentPage: number = 1;
 
   loadingContracts: boolean = false;
-  contractList: any[] = [];
-  selectedContract: any = null;
+  contractList: Contract[] = [];
+  private loadContracts$ = new Subject<ContractsFilters>();
 
   private destroy$ = new Subject<void>();
   private disclaimerReady$ = new ReplaySubject<void>(1);
@@ -81,18 +83,18 @@ export class ContractsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private eventManager: EventManagerService,
-    private alertService: AlertService,
     private contractService: ContractService,
     private disclaimerService: DisclaimerService,
     private route: ActivatedRoute,
     private modalService: ModalService,
     private fb: FormBuilder,
     private ticketService: TicketService,
-  ) {
-    this.initForm();
-  }
+    private toastService: ToastService,
+  ) { }
 
   ngOnInit(): void {
+    this.initForm();
+    this.initDataStream();
     this.getTicketStatusList();
     this.loadContracts();
 
@@ -168,11 +170,51 @@ export class ContractsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.filterForm.get('expedientNumber')?.valueChanges
       .pipe(
         debounceTime(400),
-        distinctUntilChanged()
+        distinctUntilChanged(),
+        takeUntil(this.destroy$)
       )
       .subscribe(() => {
         this.applyFilters();
       });
+  }
+
+  get appliedFiltersCount(): number {
+    const { expedientNumber, startDate, endDate, idStatus } = this.appliedFiltersValue;
+    let count = 0;
+
+    if (expedientNumber?.trim()) count++;
+    if (startDate && endDate === '') count++;
+    if (idStatus != null) count++;
+
+    return count;
+  }
+
+  private initDataStream() {
+    this.loadContracts$.pipe(
+      takeUntil(this.destroy$),
+      switchMap((payload) => {
+        this.loadingContracts = true;
+        return this.contractService.getContracts(payload).pipe(
+          catchError((err: any) => {
+            const errorData = err.error;
+            if (err.status === 404 && errorData) {
+              return of(errorData);
+            }
+            console.error(err);
+            this.toastService.error('Algo salió mal.');
+            return of({ data: [], currentPage: 1, totalItems: 0 });
+          }),
+          finalize(() => this.loadingContracts = false)
+        );
+      }),
+    ).subscribe({
+      next: (res: any) => {
+        if (!res) return;
+        this.contractList = res.data;
+        this.currentPage = res.currentPage;
+        this.totalItems = res.totalItems;
+      }
+    });
   }
 
   getTicketStatusList() {
@@ -180,7 +222,7 @@ export class ContractsComponent implements OnInit, AfterViewInit, OnDestroy {
       next: (res: any) => {
         // Filter status list by contract status config
         const allowedKeys = Object.keys(this.statusConfig);
-        this.statusList = res.filter((item: any) =>
+        this.statusList = res.filter((item: TicketStatus) =>
           allowedKeys.includes(item.status)
         );
       },
@@ -190,7 +232,7 @@ export class ContractsComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  getContractStatus(contract: any): string {
+  getContractStatus(contract: Contract): string {
     const contractStatus = contract.Ticket?.Status?.status;
     if (!contractStatus) return 'PENDIENTE';
 
@@ -200,7 +242,7 @@ export class ContractsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openFiltersModal() {
-    this.filterDrawer.open(this.filterForm.value);
+    this.filterDrawer.open(this.appliedFiltersValue);
   }
 
   onFilterDrawerClose(newFilters?: any) {
@@ -209,19 +251,24 @@ export class ContractsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.applyFilters();
   }
 
+  clearFilters() {
+    this.filterForm.reset({}, { emitEvent: false });
+    this.applyFilters();
+  }
+
   applyFilters() {
     let filterData = this.filterForm.value;
     filterData.expedientNumber = filterData.expedientNumber?.trim() || null;
 
     this.appliedFiltersValue = filterData;
+    this.currentPage = 1;
     this.loadContracts();
   }
 
   loadContracts() {
-    this.loadingContracts = true;
     const params = this.appliedFiltersValue;
     const { idProvider, idClientHoneSolutions, identificacion } = this.clientSelected;
-    const payload = {
+    const payload: ContractsFilters = {
       idProvider,
       idClientHoneSolutions,
       identification: identificacion,
@@ -229,25 +276,7 @@ export class ContractsComponent implements OnInit, AfterViewInit, OnDestroy {
       limit: this.itemsPerPage,
       ...params,
     };
-    this.contractService.getContracts(payload).subscribe({
-      next: (res: any) => {
-        this.contractList = res.data;
-        this.currentPage = res.currentPage;
-        this.totalItems = res.totalItems;
-        this.loadingContracts = false;
-      },
-      error: (err: any) => {
-        const errorData = err.error;
-        if (err.status === 404 && errorData) {
-          this.contractList = errorData.data;
-          this.currentPage = errorData.currentPage;
-          this.totalItems = errorData.totalItems;
-        } else {
-          console.error(err);
-        }
-        this.loadingContracts = false;
-      },
-    });
+    this.loadContracts$.next(payload);
   }
 
   get totalPages(): number {

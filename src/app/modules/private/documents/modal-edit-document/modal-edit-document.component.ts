@@ -565,7 +565,7 @@ export class ModalEditDocumentComponent implements OnInit {
     }
 
     for (const [key, value] of Object.entries(unifiedData)) {
-      dataToUpload.append(key, String(value));
+      dataToUpload.append(key, String(value).trim());
     }
 
     // Add the separate file (binary only)

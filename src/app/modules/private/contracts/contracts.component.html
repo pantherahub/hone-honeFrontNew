@@ -25,16 +25,37 @@
         iconSizeClass="w-4 h-4"
       >
       </app-text-input>
-      <app-button
-        (onClick)="openFiltersModal()"
-        variant="gray"
-        styleType="soft"
-        size="xs">
-        <svg class="w-4 h-4">
-          <use xlink:href="/assets/icons/outline/general.svg#filter" />
-        </svg>
-        Filtro
-      </app-button>
+      @if (appliedFiltersCount === 0) {
+        <app-button
+          (onClick)="openFiltersModal()"
+          variant="gray"
+          styleType="soft"
+          size="xs">
+          <svg class="w-4 h-4">
+            <use xlink:href="/assets/icons/outline/general.svg#filter" />
+          </svg>
+          Filtro
+        </app-button>
+      } @else {
+        <app-button
+          (onClick)="openFiltersModal()"
+          variant="gray"
+          styleType="soft"
+          size="xs"
+          customClass="!bg-blue3h-100 !text-blue3h-600 ring-[1px] ring-inset ring-blue3h-400">
+          <svg class="w-4 h-4">
+            <use xlink:href="/assets/icons/solid/general.svg#filter" />
+          </svg>
+          <div class="whitespace-nowrap">
+            Filtro <span class="hidden xs:inline">({{ appliedFiltersCount }})</span>
+          </div>
+          <button (click)="clearFilters()" class="bg-transparent hover:text-blue3h-800">
+            <svg class="w-4 h-4">
+              <use xlink:href="/assets/icons/outline/general.svg#close" />
+            </svg>
+          </button>
+        </app-button>
+      }
     </div>
 
     <!-- Table -->
