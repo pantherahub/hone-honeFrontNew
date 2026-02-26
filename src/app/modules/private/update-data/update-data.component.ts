@@ -657,9 +657,11 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
       deletedContacts: this.fb.array([])
     });
 
-    this.providerForm.get('idTypeDocument')?.valueChanges.subscribe(value => {
-      if (value === 6) this.providerForm.patchValue({ dv: null });
-    });
+    this.providerForm.get('idTypeDocument')?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(value => {
+        if (value === 6) this.providerForm.patchValue({ dv: null });
+      });
   }
 
   dvValidator(control: AbstractControl) {

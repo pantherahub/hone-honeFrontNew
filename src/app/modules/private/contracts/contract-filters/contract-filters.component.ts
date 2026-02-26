@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Subject, takeUntil } from 'rxjs';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.component';
@@ -16,13 +17,15 @@ import { BadgeConfig } from 'src/app/types/badge-config.type';
   templateUrl: './contract-filters.component.html',
   styleUrl: './contract-filters.component.scss'
 })
-export class ContractFiltersComponent implements OnInit {
+export class ContractFiltersComponent implements OnInit, OnDestroy {
 
   @Input() ticketStatusList: any[] = [];
   @Input() statusConfig!: Record<string, BadgeConfig>;
   @Output() onClose = new EventEmitter<any>();
 
   tempForm!: FormGroup;
+
+  private destroy$ = new Subject<void>();
 
   @ViewChild('filterDrawer') filterDrawer!: DrawerComponent;
 
@@ -41,9 +44,16 @@ export class ContractFiltersComponent implements OnInit {
       validators: [this.formUtils.validateDateRange('startDate', 'endDate', true, true)],
     });
 
-    this.tempForm.get('startDate')?.valueChanges.subscribe(() => {
-      this.onStartDateChange();
-    });
+    this.tempForm.get('startDate')?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.onStartDateChange();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   onStartDateChange(): void {

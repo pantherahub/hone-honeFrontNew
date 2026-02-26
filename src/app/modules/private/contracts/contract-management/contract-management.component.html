@@ -355,7 +355,9 @@
         }">
       </ng-container>
     } @else {
-      <div [innerHTML]="msg.message" class="text-sm leading-4 text-main-blue1h"></div>
+      <div [innerHTML]="msg.message | safeHtml"
+        class="text-sm leading-4 text-main-blue1h max-h-72 overflow-auto">
+      </div>
 
       @if (getMessageFile(msg); as msgFile) {
         <div class="flex gap-4 max-w-full"

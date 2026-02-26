@@ -277,17 +277,6 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
     return lastMsg;
   }
 
-  getObservationsHtml(observations: string): SafeHtml {
-    const isHtml = /<(?!\/?(iframe|strong)\b)[a-z][\s\S]*?>/i.test(observations);
-    if (!isHtml) {
-      observations = observations.replace(/(\r\n|\n|\r)/g, '<br>');
-    }
-
-    return this.sanitizer.bypassSecurityTrustHtml(
-      observations
-    );
-  }
-
   get isGhostFormatButton(): boolean {
     const lastMsg = this.getLastMessage();
     return !!(
@@ -507,11 +496,21 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
 
     const payload = new FormData();
     Object.entries(rawData).forEach(([key, value]) => {
+      if (value == null) return;
+
       if (value instanceof File) {
         payload.append(key, value, value.name);
-      } else if (value != null && value.toString().trim() != '') {
-        payload.append(key, value.toString().trim());
+        return;
       }
+
+      let formattedValue: string;
+      if (typeof value === 'string') {
+        formattedValue = value.trim();
+        if (formattedValue === '') return;
+      } else {
+        formattedValue = String(value);
+      }
+      payload.append(key, formattedValue);
     });
 
     this.loading = true;

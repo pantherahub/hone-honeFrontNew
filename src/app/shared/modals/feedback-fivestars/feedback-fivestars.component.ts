@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
@@ -12,6 +12,7 @@ import { TooltipComponent } from '../../components/tooltip/tooltip.component';
 import { TextInputComponent } from '../../components/text-input/text-input.component';
 import { InputErrorComponent } from '../../components/input-error/input-error.component';
 import { RadioComponent } from '../../components/radio/radio.component';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-feedback-fivestars',
@@ -20,7 +21,7 @@ import { RadioComponent } from '../../components/radio/radio.component';
   templateUrl: './feedback-fivestars.component.html',
   styleUrl: './feedback-fivestars.component.scss'
 })
-export class FeedbackFivestarsComponent {
+export class FeedbackFivestarsComponent implements OnDestroy {
 
   form: FormGroup;
   user = this.eventManager.userLogged();
@@ -31,6 +32,8 @@ export class FeedbackFivestarsComponent {
   stars = ['Muy mala', 'Mala', 'Regular', 'Buena', 'Excelente'];
 
   private fb = inject(FormBuilder);
+
+  private destroy$ = new Subject<void>();
 
   constructor(
     private modalRef: ModalComponent,
@@ -47,26 +50,35 @@ export class FeedbackFivestarsComponent {
       phoneNumber: [null]
     });
 
-    this.form.get('rating')?.valueChanges.subscribe((value: number) => {
-      const commentsControl = this.form.get('comments');
-      if (value != null && value < 5) {
-        commentsControl?.setValidators([Validators.required]);
-      } else {
-        commentsControl?.clearValidators();
-      }
-      commentsControl?.updateValueAndValidity();
-    });
+    this.form.get('rating')?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((value: number) => {
+        const commentsControl = this.form.get('comments');
+        if (value != null && value < 5) {
+          commentsControl?.setValidators([Validators.required]);
+        } else {
+          commentsControl?.clearValidators();
+        }
+        commentsControl?.updateValueAndValidity();
+      });
 
-    this.form.get('canContact')?.valueChanges.subscribe((value: boolean) => {
-      const phoneControl = this.form.get('phoneNumber');
-      if (value) {
-        phoneControl?.setValidators([Validators.required, this.formUtils.numeric]);
-      } else {
-        phoneControl?.clearValidators();
-        phoneControl?.reset();
-      }
-      phoneControl?.updateValueAndValidity();
-    });
+    this.form.get('canContact')?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((value: boolean) => {
+        const phoneControl = this.form.get('phoneNumber');
+        if (value) {
+          phoneControl?.setValidators([Validators.required, this.formUtils.numeric]);
+        } else {
+          phoneControl?.clearValidators();
+          phoneControl?.reset();
+        }
+        phoneControl?.updateValueAndValidity();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   get selectedRating() {
