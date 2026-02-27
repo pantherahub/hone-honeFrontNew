@@ -90,15 +90,15 @@ export const routes: Routes = [
               serviceKey: SERVICES_CONFIG.documentation.key,
             },
           },
-          {
-            path: 'rates',
-            component: RatesComponent,
-            canActivate: [serviceAccessGuard],
-            data: {
-              disclaimerKey: 'Tarifas',
-              serviceKey: SERVICES_CONFIG.rates.key
-            },
-          },
+          // {
+          //   path: 'rates',
+          //   component: RatesComponent,
+          //   canActivate: [serviceAccessGuard],
+          //   data: {
+          //     disclaimerKey: 'Tarifas',
+          //     serviceKey: SERVICES_CONFIG.rates.key
+          //   },
+          // },
           {
             path: 'contracts',
             component: ContractsComponent,

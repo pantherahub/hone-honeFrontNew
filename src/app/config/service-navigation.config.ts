@@ -5,12 +5,12 @@ export const SERVICES_CONFIG = {
     label: 'Documentación',
     tab: 'Documentos',
   },
-  rates: {
-    key: 'rates',
-    path: '/service/rates',
-    label: 'Tarifas',
-    tab: 'Tarifas',
-  },
+  // rates: {
+  //   key: 'rates',
+  //   path: '/service/rates',
+  //   label: 'Tarifas',
+  //   tab: 'Tarifas',
+  // },
   // billing: {
   //   key: 'billing',
   //   path: '/service/billling',
@@ -37,7 +37,7 @@ export type ServiceConfig = (typeof SERVICES_CONFIG)[ServiceKey];
 // Order in which services appear in the navigation UI
 export const SERVICES_ORDER: readonly ServiceKey[] = [
   'documentation',
-  'rates',
+  // 'rates',
   // 'billing',
   // 'rips',
   'contracts',
