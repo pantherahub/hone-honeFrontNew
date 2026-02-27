@@ -2,25 +2,6 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import DOMPurify from 'dompurify';
 
-// DOMPurify.addHook('afterSanitizeAttributes', (node) => {
-//   if (node instanceof HTMLElement && node.hasAttribute('style')) {
-//     const style = node.getAttribute('style')?.toLowerCase();
-//     if (!style) return;
-
-//     if (style.includes('position')) {
-//       node.removeAttribute('style');
-//       return;
-//     }
-
-//     const dangerousCoords = /(^|[;]\s*)(top|left|right|bottom)\s*:/i;
-//     if (dangerousCoords.test(style)) {
-//       if (!style.includes('border-')) {
-//         node.removeAttribute('style');
-//       }
-//     }
-//   }
-// });
-
 DOMPurify.addHook('afterSanitizeAttributes', (node) => {
   if (node instanceof HTMLElement && node.hasAttribute('style')) {
     const style = node.getAttribute('style')?.toLowerCase();
@@ -31,18 +12,6 @@ DOMPurify.addHook('afterSanitizeAttributes', (node) => {
       node.removeAttribute('style');
       return;
     }
-
-    // Remove styles for negative coordinates and margins
-    // const dangerousPattern = /(^|[;]\s*)(top|left|right|bottom|margin|margin-top|margin-left|margin-right|margin-bottom)\s*:\s*[-]/i;
-    // if (dangerousPattern.test(style)) {
-    //    node.removeAttribute('style');
-    // }
-
-    // // Remove styles for positive coordinates
-    // const coordProperty = /(^|[;]\s*)(top|left|right|bottom)\s*:/i;
-    // if (coordProperty.test(style) && !style.includes('border-')) {
-    //    node.removeAttribute('style');
-    // }
 
     // Remove styles for coordinates and negative margins
     const isCoord = /(^|[;]\s*)(top|left|right|bottom)\s*:/i.test(style);
