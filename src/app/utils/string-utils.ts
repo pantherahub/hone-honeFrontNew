@@ -168,3 +168,11 @@ export function calculateMaxDate(
   // ISO format (AAAA-MM-DD)
   return result.toISOString().split('T')[0];
 }
+
+/**
+ * Get short text by a max length.
+ */
+export function getShortText(text: string, maxLength: number = 100): string {
+  if (!text) return '';
+  return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
+}

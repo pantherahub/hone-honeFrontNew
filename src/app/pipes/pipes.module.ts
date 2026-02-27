@@ -6,6 +6,7 @@ import { PluralizePipe } from './pluralize.pipe';
 import { FormatFileBytesPipe } from './format-file-bytes.pipe';
 import { TimeAgoPipe } from './time-ago.pipe';
 import { SafeHtmlPipe } from './safe-html.pipe';
+import { ShortTextPipe } from './short-text.pipe';
 
 @NgModule({
   declarations: [
@@ -15,6 +16,7 @@ import { SafeHtmlPipe } from './safe-html.pipe';
     FormatFileBytesPipe,
     TimeAgoPipe,
     SafeHtmlPipe,
+    ShortTextPipe,
   ],
   imports: [
     CommonModule
@@ -26,6 +28,7 @@ import { SafeHtmlPipe } from './safe-html.pipe';
     FormatFileBytesPipe,
     TimeAgoPipe,
     SafeHtmlPipe,
+    ShortTextPipe,
   ]
 })
 export class PipesModule { }

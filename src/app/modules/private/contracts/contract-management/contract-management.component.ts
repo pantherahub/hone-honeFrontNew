@@ -17,6 +17,7 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { BackendErrorsComponent } from 'src/app/shared/components/backend-errors/backend-errors.component';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.component';
+import { HtmlRendererComponent } from 'src/app/shared/components/html-renderer/html-renderer.component';
 import { InputErrorComponent } from 'src/app/shared/components/input-error/input-error.component';
 import { LoaderComponent } from 'src/app/shared/components/loader/loader.component';
 import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
@@ -40,7 +41,8 @@ import { BadgeConfig } from 'src/app/types/badge-config.type';
     BackendErrorsComponent,
     FileSelectDirective,
     FileDropDirective,
-    PipesModule
+    PipesModule,
+    HtmlRendererComponent,
   ],
   templateUrl: './contract-management.component.html',
   styleUrl: './contract-management.component.scss'
