@@ -1,5 +1,5 @@
 export type MessageStatus = 'Approved' | 'Disapproved' | 'In process';
-export type TicketMessageCreateIn = 'Lissom' | 'Provider' | 'Mixed';
+export type TicketMessageCreatedIn = 'Lissom' | 'Provider' | 'Mixed';
 export type TicketMessageCreateBy = 'HoneSolutions' | 'Provider' | 'Client';
 export type TicketMessageStatusRef = 'In process' | 'Approved' | 'Disapproved';
 
@@ -76,14 +76,14 @@ export interface TicketMessagePayload {
   email: string;
   showToClient: boolean;
   showToProvider: boolean;
-  createIn: TicketMessageCreateIn;
+  createdIn: TicketMessageCreatedIn;
   createdBy: 'HoneSolutions' | 'Provider' | 'Client';
 }
 export interface UpdateTicketMessagePayload {
   message: string;
-  createIn: TicketMessageCreateIn;
+  createdIn: TicketMessageCreatedIn;
 }
 export interface DeleteTicketMessagePayload {
-  createIn: TicketMessageCreateIn;
+  createdIn: TicketMessageCreatedIn;
   idProviderLogin: number;
 }

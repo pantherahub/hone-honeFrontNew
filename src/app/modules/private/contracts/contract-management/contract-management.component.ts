@@ -439,7 +439,7 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
     const { message } = this.form.value;
     const payload: UpdateTicketMessagePayload = {
       message: message || 'Archivo subido.',
-      createIn: 'Provider',
+      createdIn: 'Provider',
     };
 
     this.loading = true;
@@ -492,7 +492,7 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
       email: managerEmail,
       showToClient: true,
       showToProvider: true,
-      createIn: 'Provider',
+      createdIn: 'Provider',
       createdBy: 'Provider',
     };
 
@@ -543,7 +543,7 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
   deleteMessage(idMessage: number) {
     const { idProvider } = this.clientSelected;
     const payload: DeleteTicketMessagePayload = {
-      createIn: 'Provider',
+      createdIn: 'Provider',
       idProviderLogin: idProvider,
     };
 
