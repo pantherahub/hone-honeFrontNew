@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { DeleteTicketMessagePayload, MessagesFilters, TicketStatus, UpdateTicketMessagePayload } from 'src/app/interfaces/ticket.interface';
+import { DeleteTicketMessagePayload, MessageFilters, TicketStatus, UpdateTicketMessagePayload } from 'src/app/interfaces/ticket.interface';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -14,6 +14,7 @@ export class TicketService {
 
   constructor(private httpClient: HttpClient) { }
 
+  /* First version ticket creation */
   postTicket(idRole: any, payload: any): Observable<any> {
     return this.httpClient.post(`${this.urlBack}ticket/create`, payload);
   }
@@ -22,7 +23,12 @@ export class TicketService {
     return this.httpClient.get<TicketStatus[]>(`${this.url}Status/GetAll`);
   }
 
-  getMessagesByTicket(idTicket: number, reqData: MessagesFilters): Observable<any> {
+  sendMessageByTicket(idTicket: number, reqData: FormData): Observable<any> {
+    const url = `${this.url}Tickets/CreateMessageByTicket/${idTicket}`;
+    return this.httpClient.post(url, reqData);
+  }
+
+  getMessagesByTicket(idTicket: number, reqData: MessageFilters): Observable<any> {
     const url = `${this.url}Tickets/GetMessagesByTicket/${idTicket}`;
     return this.httpClient.post(url, reqData);
   }
@@ -37,6 +43,11 @@ export class TicketService {
     return this.httpClient.delete(url, {
       body: reqData
     });
+  }
+
+  markMessagesViewed(idTicket: number, idProviderLogin: number) {
+    const url = `${this.url}Tickets/MarkMessagesViewed/${idTicket}/${idProviderLogin}`;
+    return this.httpClient.put(url, {});
   }
 
 }

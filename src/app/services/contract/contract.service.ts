@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ContractsFilters } from 'src/app/interfaces/contract.interface';
+import { ContractFilters } from 'src/app/interfaces/contract.interface';
 import { getHttpParamsByFilters } from 'src/app/utils/http-utils';
 import { environment } from 'src/environments/environment';
 
@@ -14,7 +14,7 @@ export class ContractService {
 
   constructor(private httpClient: HttpClient) { }
 
-  public getContracts(reqData: ContractsFilters): Observable<any> {
+  public getContracts(reqData: ContractFilters): Observable<any> {
     const url = `${this.url}ContractRequest/GetAll`;
     const params = {
       isManagerActive: true, // See current ticket manager, no history
@@ -29,11 +29,6 @@ export class ContractService {
       isManagerActive: true // See current ticket manager, no history
     };
     return this.httpClient.get(url, { params: getHttpParamsByFilters(params) });
-  }
-
-  sendContractTicketMessage(idContract: number, reqData: FormData): Observable<any> {
-    const url = `${this.url}ContractRequest/CreateMessage/${idContract}`;
-    return this.httpClient.post(url, reqData);
   }
 
 }

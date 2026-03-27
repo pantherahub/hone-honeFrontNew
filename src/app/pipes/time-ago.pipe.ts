@@ -29,7 +29,10 @@ export class TimeAgoPipe implements PipeTransform, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.timer) clearInterval(this.timer);
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
   }
 
 }

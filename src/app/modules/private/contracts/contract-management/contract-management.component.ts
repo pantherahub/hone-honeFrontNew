@@ -1,12 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { DomSanitizer } from '@angular/platform-browser';
 import { filter, finalize, firstValueFrom, interval, Subscription, switchMap, tap } from 'rxjs';
 import { FileDropDirective } from 'src/app/directives/file-drop.directive';
 import { FileSelectDirective } from 'src/app/directives/file-select.directive';
 import { Contract } from 'src/app/interfaces/contract.interface';
-import { DeleteTicketMessagePayload, MessagesFilters, MessageStatus, TicketMessage, TicketMessagePayload, UpdateTicketMessagePayload } from 'src/app/interfaces/ticket.interface';
+import { DeleteTicketMessagePayload, MessageFilters, MessageStatus, TicketMessage, TicketMessagePayload, UpdateTicketMessagePayload } from 'src/app/interfaces/ticket.interface';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { ContractService } from 'src/app/services/contract/contract.service';
@@ -82,14 +81,14 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
       bgClass: 'bg-red-100',
       textClass: 'text-red-800',
       icon: 'close',
-      label: 'Anulado'
+      label: 'Desaprobado'
     },
-    // 'In process': {
-    //   bgClass: 'bg-yellow-100',
-    //   textClass: 'text-yellow-800',
-    //   icon: 'clock',
-    //   label: 'En trámite'
-    // },
+    'In process': {
+      bgClass: 'bg-yellow-100',
+      textClass: 'text-yellow-800',
+      icon: 'clock',
+      label: 'Pendiente'
+    },
   };
 
   private refreshSubscription?: Subscription;
@@ -103,7 +102,6 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
     private ticketService: TicketService,
     private alertService: AlertService,
     private toastService: ToastService,
-    private sanitizer: DomSanitizer,
     private modalService: ModalService,
     private cd: ChangeDetectorRef,
   ) { }
@@ -169,6 +167,7 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
       next: (res: any) => {
         this.contract = res.data;
         // this.loading = false;
+        this.markMessagesViewed();
         this.refreshMessages();
       },
       error: (err: any) => {
@@ -180,14 +179,28 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
     });
   }
 
+  markMessagesViewed() {
+    if (!this.contract) return;
+    const { idProvider } = this.clientSelected;
+    this.ticketService.markMessagesViewed(
+      this.contract.idTicket,
+      idProvider
+    ).subscribe({
+      error: (err) => {
+        if (err.status !== 404) {
+          console.error('Error al marcar visto:', err);
+        }
+      }
+    });
+  }
+
   loadMessages(isRefresh: boolean = false) {
     if (this.loadingMessages || !this.contract || (
       this.totalMsgPages > 0 && this.currentMsgPage > this.totalMsgPages)
     ) return;
 
-    const payload: MessagesFilters = {
+    const payload: MessageFilters = {
       type: 'Message',
-      showToProvider: true,
       page: this.currentMsgPage,
       limit: this.meesagePageSize,
     };
@@ -249,13 +262,13 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
     const status = message.MessageStatus?.name;
     if (!status) return 'In process';
 
-    const config = this.statusConfig[status];
+    const config = this.msgStatusConfig[status];
     if (!config) return 'In process';
     return status;
   }
 
   getTicketManager(): any | null {
-    const ticketProviders = this.contract?.Ticket?.Providers;
+    const ticketProviders = this.contract?.Ticket?.Managers;
     if (!ticketProviders || !Array.isArray(ticketProviders) || ticketProviders.length === 0) {
       return null;
     }
@@ -272,10 +285,14 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
   }
 
   getLastMessage(): TicketMessage | null {
+    const firstMsg = this.getFixedMessage('Init');
     let lastMsg = this.getFixedMessage('Closed');
+
     if (!lastMsg && this.messageList?.length) {
       lastMsg = this.messageList[0];
     }
+
+    if (!lastMsg) lastMsg = firstMsg;
     return lastMsg;
   }
 
@@ -283,6 +300,7 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
     const lastMsg = this.getLastMessage();
     return !!(
       lastMsg?.createdBy === 'HoneSolutions' &&
+      lastMsg?.type !== 'Init' &&
       lastMsg?.Files?.length &&
       (lastMsg?.idMessage !== this.lastSeenDocumentMessageId)
     );
@@ -321,12 +339,12 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
   /* Message badges and actions validations */
   hasMessageActions(msg: TicketMessage, lastMsg: TicketMessage): boolean {
     return (
-      this.isLastMessageOfThread(msg, lastMsg) ||
+      this.lastMessageReceived(msg, lastMsg) ||
       this.hasDisplayableStatus(msg) ||
       this.canModifyMessage(msg, lastMsg)
     );
   }
-  isLastMessageOfThread(msg: TicketMessage, lastMsg: TicketMessage): boolean {
+  lastMessageReceived(msg: TicketMessage, lastMsg: TicketMessage): boolean {
     return lastMsg?.idMessage === msg.idMessage && msg.createdBy !== 'Provider';
   }
   hasDisplayableStatus(msg: TicketMessage): boolean {
@@ -436,10 +454,12 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const { idProvider } = this.clientSelected;
     const { message } = this.form.value;
     const payload: UpdateTicketMessagePayload = {
       message: message || 'Archivo subido.',
       createdIn: 'Provider',
+      idProviderLogin: idProvider,
     };
 
     this.loading = true;
@@ -490,8 +510,6 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
       idMessageStatus: inProcessStatusId,
       sendEmail: true,
       email: managerEmail,
-      showToClient: true,
-      showToProvider: true,
       createdIn: 'Provider',
       createdBy: 'Provider',
     };
@@ -516,9 +534,9 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
     });
 
     this.loading = true;
-    this.contractService.sendContractTicketMessage(this.contract.idContract, payload).subscribe({
+    this.ticketService.sendMessageByTicket(this.contract.idTicket, payload).subscribe({
       next: (res) => {
-        this.contract = res.data;
+        // this.contract = res.data;
         // this.refreshContractList();
         this.getContract();
         this.resetForm();

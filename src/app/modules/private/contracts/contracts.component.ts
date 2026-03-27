@@ -18,7 +18,7 @@ import { TicketService } from 'src/app/services/ticket/ticket.service';
 import { ContractManagementComponent } from './contract-management/contract-management.component';
 import { LoaderComponent } from 'src/app/shared/components/loader/loader.component';
 import { TicketStatus } from 'src/app/interfaces/ticket.interface';
-import { Contract, ContractsFilters } from 'src/app/interfaces/contract.interface';
+import { Contract, ContractFilters } from 'src/app/interfaces/contract.interface';
 import { ToastService } from 'src/app/services/toast/toast.service';
 
 @Component({
@@ -65,7 +65,7 @@ export class ContractsComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   filterForm!: FormGroup;
-  appliedFiltersValue: Partial<ContractsFilters> = {};
+  appliedFiltersValue: Partial<ContractFilters> = {};
 
   totalItems: number = 0;
   itemsPerPage: number = 5;
@@ -73,7 +73,7 @@ export class ContractsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   loadingContracts: boolean = false;
   contractList: Contract[] = [];
-  private loadContracts$ = new Subject<ContractsFilters>();
+  private loadContracts$ = new Subject<ContractFilters>();
 
   private destroy$ = new Subject<void>();
   private disclaimerReady$ = new ReplaySubject<void>(1);
@@ -268,7 +268,7 @@ export class ContractsComponent implements OnInit, AfterViewInit, OnDestroy {
   loadContracts() {
     const params = this.appliedFiltersValue;
     const { idProvider, idClientHoneSolutions, identificacion } = this.clientSelected;
-    const payload: ContractsFilters = {
+    const payload: ContractFilters = {
       idProvider,
       idClientHoneSolutions,
       identification: identificacion,

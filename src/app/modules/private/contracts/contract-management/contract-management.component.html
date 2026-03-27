@@ -111,22 +111,24 @@
             <div class="flex-grow border-t border-gray-300"></div>
           </div>
 
-          @if (getFixedMessage('Closed'); as closedMsg) {
-            <ng-container
-              *ngTemplateOutlet="messageTemplate; context: {
-                message: closedMsg,
-                lastMessage: getLastMessage(),
-              }">
-            </ng-container>
-          }
+          @if (getLastMessage(); as lastMsg) {
+            @if (getFixedMessage('Closed'); as closedMsg) {
+              <ng-container
+                *ngTemplateOutlet="messageTemplate; context: {
+                  message: closedMsg,
+                  lastMessage: lastMsg,
+                }">
+              </ng-container>
+            }
 
-          @for (message of messageList; track message.idMessage) {
-            <ng-container
-              *ngTemplateOutlet="messageTemplate; context: {
-                message,
-                lastMessage: getLastMessage(),
-              }">
-            </ng-container>
+            @for (message of messageList; track message.idMessage) {
+              <ng-container
+                *ngTemplateOutlet="messageTemplate; context: {
+                  message,
+                  lastMessage: lastMsg,
+                }">
+              </ng-container>
+            }
           }
         </div>
       }
@@ -300,7 +302,7 @@
       </div>
       @if (hasMessageActions(msg, lastMsg)) {
         <div class="flex items-center gap-3 flex-wrap w-full xs:w-auto">
-          @if (isLastMessageOfThread(msg, lastMsg)) {
+          @if (lastMessageReceived(msg, lastMsg)) {
             <div
               class="inline-flex items-center gap-1 py-1.5 px-2.5 rounded-full text-xs font-semibold whitespace-nowrap bg-blue1h-100 text-main-blue1h">
               <svg class="w-4 h-4">

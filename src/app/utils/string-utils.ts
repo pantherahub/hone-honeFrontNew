@@ -18,30 +18,27 @@ export function formatListWithY(list: string[]): string {
 
 
 /**
- * Capitalize connectors in string.
+ * Capitalize text.
  */
-export function capitalizeWords(value: string): string {
-  const connectors = [
-    'de',
-    'del',
-    'la',
-    'las',
-    'los',
-    'y',
-    'a',
-    'en',
-    'el',
-    'al',
-    'por',
-    'para',
-    'con',
-    'o'
-  ];
-  if (typeof value != 'string') return value;
+export function capitalizeWords(
+  value: string,
+  capitalizeOnlyFirst: boolean = false
+): string {
 
-  return value
-    .toLowerCase()
-    .split(' ')
+  const connectors = [
+    'de','del','la','las','los','y','a','en','el','al','por','para','con','o'
+  ];
+
+  if (typeof value !== 'string') return value;
+
+  const text = value.trim().toLowerCase();
+
+  if (capitalizeOnlyFirst) {
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  }
+
+  return text
+    .split(/\s+/)
     .map((word, index) => {
       if (index !== 0 && connectors.includes(word)) {
         return word;

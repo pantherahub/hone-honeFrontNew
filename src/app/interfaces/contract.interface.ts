@@ -19,7 +19,7 @@ export interface Contract {
   Ticket: Ticket;
 }
 
-export interface ContractsFilters {
+export interface ContractFilters {
   idProvider: number;
   idClientHoneSolutions: number;
   identification: number;
