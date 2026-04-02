@@ -1,3 +1,5 @@
+import { StoredFile } from "./file.interface";
+
 export type MessageStatus = 'Approved' | 'Disapproved' | 'In process';
 export type TicketMessageCreatedIn = 'Lissom' | 'Provider' | 'Mixed';
 export type TicketMessageCreateBy = 'HoneSolutions' | 'Provider' | 'Client' | 'AnonimClient' | 'AnonimProvider';
@@ -44,7 +46,7 @@ export interface TicketMessage {
   updatedAt: string;
 
   MessageHasEmails: MessageEmail[];
-  Files: any[];
+  Files: StoredFile[];
   MessageStatus: TicketMessageStatus;
   Provider: any;
   Tickets: Ticket[];
@@ -85,8 +87,6 @@ export interface MessageFilters {
 export interface TicketMessagePayload {
   idMessageStatus: number;
   message: string;
-  sendEmail: boolean;
-  email: string;
   archivo: File;
   idProviderLogin: number;
   createdIn: TicketMessageCreatedIn;

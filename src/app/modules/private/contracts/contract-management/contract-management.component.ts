@@ -499,7 +499,6 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
 
     const { idProvider } = this.clientSelected;
     const { message, file } = this.form.value;
-    const managerEmail = this.getTicketManager().email;
 
     const inProcessStatusId = 1;
 
@@ -508,8 +507,6 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
       archivo: file,
       idProviderLogin: idProvider,
       idMessageStatus: inProcessStatusId,
-      sendEmail: true,
-      email: managerEmail,
       createdIn: 'Provider',
       createdBy: 'Provider',
     };
