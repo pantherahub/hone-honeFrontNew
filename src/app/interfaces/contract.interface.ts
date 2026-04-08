@@ -14,9 +14,29 @@ export interface Contract {
   updatedAt: string;
 
   Client: ClientBasicInfo;
-  ContractType: any;
+  ContractType: ContractType;
   Provider: any;
   Ticket: Ticket;
+}
+
+export interface ContractType {
+  idContractType: number;
+  idClientHoneSolutions: number;
+  name: string;
+  nameTemplate: string;
+  withRates: boolean;
+  isActive: boolean;
+  Attributes: ContractAttribute[];
+}
+
+export interface ContractAttribute {
+  idAttribute: number;
+  attributeLabel: string;
+  attributeName: string;
+  attributeTableAliases: string | null;
+  attributeAutoComplete: string | null;
+  attributeType: 'string' | 'number' | 'date' | 'boolean' | 'email' | 'select';
+  isActive: boolean;
 }
 
 export interface ContractFilters {
