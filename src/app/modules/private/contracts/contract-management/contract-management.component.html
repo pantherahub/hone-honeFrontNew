@@ -44,7 +44,7 @@
           </div>
         </div>
 
-        @if (getFixedMessage('Init'); as initMsg) {
+        @if (initMsg) {
           <div class="flex flex-col gap-2.5 text-sm leading-4">
             <span class="font-semibold text-gray-900">Reporte</span>
             <p class="text-gray-500">
@@ -89,30 +89,32 @@
 
       </div>
 
-      <!-- Upload -->
-      @if (getLastMessage()?.createdBy === 'HoneSolutions' && contract.Ticket.Status?.isClosed === false) {
-        <div class="p-4 bg-gray-50 rounded-xl ring-[1px] ring-inset ring-gray-200">
-          <ng-container
-            *ngTemplateOutlet="messageFormTemplate; context: {
-              isNew: true,
-            }">
-          </ng-container>
-        </div>
-      }
 
-      <!-- Messages -->
-      @if (messageList && messageList.length) {
-        <div class="flex flex-col gap-6">
-          <div class="relative flex items-center">
-            <div class="flex-grow border-t border-gray-300"></div>
-            <span class="flex-shrink mx-4 text-gray-500 text-sm leading-4 text-center">
-              Historial de observaciones
-            </span>
-            <div class="flex-grow border-t border-gray-300"></div>
+      @if (lastMsg) {
+
+        <!-- Upload -->
+        @if (lastMsg.createdBy === 'HoneSolutions' && isClosedTicket === false) {
+          <div class="p-4 bg-gray-50 rounded-xl ring-[1px] ring-inset ring-gray-200">
+            <ng-container
+              *ngTemplateOutlet="messageFormTemplate; context: {
+                isNew: true,
+              }">
+            </ng-container>
           </div>
+        }
 
-          @if (getLastMessage(); as lastMsg) {
-            @if (getFixedMessage('Closed'); as closedMsg) {
+        <!-- Messages -->
+        @if (messageList.length || isClosedTicket) {
+          <div class="flex flex-col gap-6">
+            <div class="relative flex items-center">
+              <div class="flex-grow border-t border-gray-300"></div>
+              <span class="flex-shrink mx-4 text-gray-500 text-sm leading-4 text-center">
+                Historial de observaciones
+              </span>
+              <div class="flex-grow border-t border-gray-300"></div>
+            </div>
+
+            @if (closedMsg) {
               <ng-container
                 *ngTemplateOutlet="messageTemplate; context: {
                   message: closedMsg,
@@ -129,25 +131,26 @@
                 }">
               </ng-container>
             }
-          }
-        </div>
-      }
+          </div>
 
-      @if (currentMsgPage < totalMsgPages) {
-        <app-button
-          (onClick)="nextMessagesPage()"
-          [loading]="loadingMessages"
-          variant="gray"
-          styleType="ghost"
-          size="xs"
-          customClass="w-full flex justify-center">
-          @if (!loadingMessages) {
-            <svg class="w-4 h-4">
-              <use xlink:href="/assets/icons/outline/arrows.svg#arrow-down" />
-            </svg>
+          @if (currentMsgPage < totalMsgPages) {
+            <app-button
+              (onClick)="nextMessagesPage()"
+              [loading]="loadingMessages"
+              variant="gray"
+              styleType="ghost"
+              size="xs"
+              customClass="w-full flex justify-center">
+              @if (!loadingMessages) {
+                <svg class="w-4 h-4">
+                  <use xlink:href="/assets/icons/outline/arrows.svg#arrow-down" />
+                </svg>
+              }
+              Ver mensajes anteriores
+            </app-button>
           }
-          Ver mensajes anteriores
-        </app-button>
+        }
+
       }
 
     </section>

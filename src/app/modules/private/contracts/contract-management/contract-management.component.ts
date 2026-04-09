@@ -65,6 +65,11 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
 
   lastSeenDocumentMessageId: number | null = null;
 
+  lastMsg: TicketMessage | null = null;
+  initMsg: TicketMessage | null = null;
+  closedMsg: TicketMessage | null = null;
+  isGhostFormatButton: boolean = false;
+
   form!: FormGroup;
   backendError: any = null;
 
@@ -167,6 +172,7 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
       next: (res: any) => {
         this.contract = res.data;
         // this.loading = false;
+        this.refreshMessageLogic();
         this.markMessagesViewed();
         this.refreshMessages();
       },
@@ -212,6 +218,7 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
         this.totalMsgPages = res.totalPages;
 
         this.messageList = [...this.messageList, ...res.data];
+        this.refreshMessageLogic();
         this.loadingMessages = false;
         if (isRefresh) this.loading = false;
       },
@@ -219,6 +226,7 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
         const errorData = err.error;
         if (err.status === 404) {
           this.clearMessages();
+          this.refreshMessageLogic();
         // if (err.status === 404 && errorData) {
         //   this.messageList = errorData.data;
         //   this.currentMsgPage = errorData.currentPage;
@@ -249,6 +257,33 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
     this.loadMessages();
   }
 
+  private refreshMessageLogic(): void {
+    const messages = this.contract?.Ticket?.Messages || [];
+
+    // Get fixed messages
+    this.initMsg = messages.find(
+      (msg: TicketMessage) => msg.type === 'Init'
+    ) ?? null;
+    this.closedMsg = messages.find(
+      (msg: TicketMessage) => msg.type === 'Closed'
+    ) ?? null;
+
+    // Get last message
+    let last = this.closedMsg;
+    if (!last && this.messageList?.length) {
+      last = this.messageList[0];
+    }
+    this.lastMsg = last || this.initMsg;
+
+    // Is ghost format button
+    this.isGhostFormatButton = !!(
+      this.lastMsg?.createdBy === 'HoneSolutions' &&
+      this.lastMsg?.type !== 'Init' &&
+      this.lastMsg?.Files?.length &&
+      (this.lastMsg?.idMessage !== this.lastSeenDocumentMessageId)
+    );
+  }
+
   getContractStatus(contract: Contract): string {
     const status = contract.Ticket?.Status?.status;
     if (!status) return 'PENDIENTE';
@@ -273,37 +308,6 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
       return null;
     }
     return ticketProviders.find(prov => prov.TicketManager?.isActive) ?? null;
-  }
-
-  getFixedMessage(type: 'Init' | 'Closed'): TicketMessage | null {
-    const messages = this.contract?.Ticket?.Messages;
-    if (!messages || !Array.isArray(messages) || messages.length === 0) {
-      return null;
-    }
-
-    return messages.find(msg => msg.type === type) ?? null;
-  }
-
-  getLastMessage(): TicketMessage | null {
-    const firstMsg = this.getFixedMessage('Init');
-    let lastMsg = this.getFixedMessage('Closed');
-
-    if (!lastMsg && this.messageList?.length) {
-      lastMsg = this.messageList[0];
-    }
-
-    if (!lastMsg) lastMsg = firstMsg;
-    return lastMsg;
-  }
-
-  get isGhostFormatButton(): boolean {
-    const lastMsg = this.getLastMessage();
-    return !!(
-      lastMsg?.createdBy === 'HoneSolutions' &&
-      lastMsg?.type !== 'Init' &&
-      lastMsg?.Files?.length &&
-      (lastMsg?.idMessage !== this.lastSeenDocumentMessageId)
-    );
   }
 
   /* Message form methods */
@@ -334,6 +338,12 @@ export class ContractManagementComponent implements OnInit, OnDestroy {
     const messageControl = this.form.get('message');
     messageControl?.setValidators([Validators.required]);
     messageControl?.updateValueAndValidity();
+  }
+
+  get isClosedTicket(): boolean {
+    const ticketStatus = this.contract?.Ticket?.Status;
+    if (!ticketStatus) return false;
+    return ticketStatus.isClosed;
   }
 
   /* Message badges and actions validations */
