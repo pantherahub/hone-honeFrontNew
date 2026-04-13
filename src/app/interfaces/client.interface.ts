@@ -9,6 +9,7 @@ export interface ClientInterface {
    typeProvider?: string;
    idTypeProvider?: number;
    email?: string;
+   withContract?: boolean;
 }
 
 export interface DocumentInterface {
