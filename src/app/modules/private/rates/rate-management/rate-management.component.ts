@@ -11,7 +11,6 @@ import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.compone
 import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
 import { BadgeConfig } from 'src/app/types/badge-config.type';
 
-
 @Component({
   selector: 'app-rate-management',
   standalone: true,

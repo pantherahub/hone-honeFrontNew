@@ -36,7 +36,7 @@
     <input
       #inputRef
       [attr.id]="id"
-      [attr.name]="name"
+      [attr.name]="name || null"
       [type]="type === 'date' ? 'text' : actualInputType"
       placeholder=" "
       [disabled]="disabled"
@@ -51,12 +51,12 @@
       [attr.max]="type === 'number' ? max : null"
       [attr.autocomplete]="type === 'date' ? 'off' : autocomplete"
       [readonly]="readonly"
-      class="block px-2.5 pb-2 pt-2.5 w-full text-sm text-gray-500 focus:text-gray-900 bg-white rounded-lg border appearance-none dark:text-white focus:outline-none focus:ring-0 peer autofill:shadow-[inset_0_0_0_1000px_white]
+      class="block px-2.5 pb-2 pt-2.5 w-full text-sm text-gray-500 focus:text-gray-900 bg-white rounded-lg appearance-none dark:text-white peer focus:outline-none border-0 ring-1 ring-inset autofill:shadow-[inset_0_0_0_1000px_white]
       disabled:text-gray-400 dark:disabled:bg-gray-800 disabled:cursor-not-allowed"
       [ngClass]="{
-        'border-gray-300 dark:border-gray-600 focus:border-blue1h-600':
+        'ring-gray-300 dark:ring-gray-600 focus:ring-blue1h-600':
           !showError,
-        'bg-red-50 border-red-600 dark:border-red-500 focus:border-red-600 dark:focus:border-red-500':
+        'bg-red-50 ring-red-600 dark:ring-red-500 focus:ring-red-600 dark:focus:ring-red-500':
           showError,
         'pe-10': !disabled && ((type === 'password' && togglePassword) || (clearable && value)),
         'ps-10': searcher,

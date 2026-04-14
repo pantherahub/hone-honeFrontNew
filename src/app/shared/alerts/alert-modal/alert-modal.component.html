@@ -27,13 +27,13 @@
         {{ title }}
       </h5>
       @if (isTemplateRef(message)) {
-        <div class="text-gray-500 font-normal">
+        <div class="text-gray-500 font-normal w-full">
           <ng-container *ngTemplateOutlet="message"></ng-container>
         </div>
       } @else if (messageHTML) {
-        <p class="text-gray-500 font-normal" [innerHTML]="messageHTML"></p>
+        <p class="text-gray-500 font-normal w-full" [innerHTML]="messageHTML"></p>
       } @else if (message) {
-        <p class="text-gray-500 font-normal">
+        <p class="text-gray-500 font-normal w-full">
           {{ message }}
         </p>
       }

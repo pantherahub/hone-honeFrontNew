@@ -1,10 +1,4 @@
-@if (loading) {
-  <div class="absolute inset-0 z-50 bg-gray-50/60 flex items-center justify-center">
-    <svg class="w-7 h-7 text-main-blue1h animate-spin fill-gray-200">
-      <use xlink:href="/assets/icons/extras/animations.svg#spin" />
-    </svg>
-  </div>
-}
+<app-loader [visible]="loading" />
 
 <div class="flex flex-col gap-6 pb-20">
 
@@ -20,7 +14,7 @@
 
     <app-button
       appDropdownTrigger="dropdown-formats"
-      [dropdownPlacement]="isSmall ? 'bottom' : 'bottom-end'"
+      [dropdownPlacement]="isMobile ? 'bottom' : 'bottom-end'"
       variant="primary"
       styleType="soft"
       size="md"
@@ -96,6 +90,14 @@
               </div>
             </td>
           </tr>
+        } @else if (!rateList.length) {
+          <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+            <td colspan="6" class="px-4 h-[54px] text-left">
+              <div class="text-md text-main-blue1h leading-4 flex items-center gap-2">
+                Sin resultados.
+              </div>
+            </td>
+          </tr>
         } @else {
           @for (rate of rateList; track rate.idRateType) {
             <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
@@ -130,7 +132,7 @@
                 {{
                   !rate.currentRate || rate.currentRate?.rateStatus === 'PENDIENTE POR CARGAR'
                     ? 'N/A'
-                    : rate.currentRate.updateAt | date: 'mediumDate'
+                    : rate.currentRate.updatedAt | date: 'mediumDate'
                 }}
               </td>
               <td class="px-4 py-[10.5px] text-left">
@@ -181,8 +183,7 @@
                     (onClick)="openRateDetail(rate)"
                     variant="gray"
                     styleType="soft"
-                    size="xs"
-                    class="hidden sm:block">
+                    size="xs">
                     <svg class="w-4 h-4">
                       <use xlink:href="/assets/icons/outline/general.svg#close-sidebar" />
                     </svg>
@@ -282,4 +283,3 @@
   </div>
 
 </ng-template>
-

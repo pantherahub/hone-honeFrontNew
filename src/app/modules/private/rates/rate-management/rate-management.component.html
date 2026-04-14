@@ -26,7 +26,7 @@
           <div class="flex-1 flex flex-col gap-2.5 text-sm leading-4">
             <span class="font-semibold text-gray-900">Última modificación</span>
             <span class="text-gray-500">
-              {{ selectedRate.currentRate.updateAt | date: 'mediumDate' }}
+              {{ selectedRate.currentRate.updatedAt | date: 'mediumDate' }}
             </span>
           </div>
         </div>
@@ -60,7 +60,7 @@
 
           <div class="p-4 flex flex-col sm:flex-row sm:items-center gap-2 rounded-md ring-[1px] ring-inset ring-gray-200">
 
-            <div class="flex-1 flex items-center gap-2">
+            <div class="flex-1 flex items-center gap-2 min-w-0">
               <div class="rounded-lg p-3 bg-blue1h-50 text-main-blue1h">
                 <svg class="w-5 h-5">
                   <use xlink:href="/assets/icons/outline/files-folders.svg#file-lines" />
@@ -208,15 +208,15 @@
 
           @if (!isPending && selectedRate.rateHistory) {
             <div class="xs:ps-3 flex gap-4 max-w-full">
-              <div class="hidden xs:block w-[3px] rounded-3xl bg-gray-200"></div>
-              <div class="flex-1 flex flex-col gap-2.5 max-w-full">
+              <div class="hidden xs:block w-[3px] rounded-3xl bg-gray-200 shrink-0"></div>
+              <div class="flex-1 flex flex-col gap-2.5 max-w-full min-w-0">
                 <span class="text-sm font-semibold leading-4 text-gray-900">
                   Historial
                 </span>
                 @for (prevRate of selectedRate.rateHistory; track $index) {
                   <div class="p-4 flex flex-col sm:flex-row sm:items-center gap-2 rounded-md ring-[1px] ring-inset ring-gray-200 bg-white">
 
-                    <div class="flex-1 flex items-center gap-2">
+                    <div class="flex-1 flex items-center gap-2 min-w-0">
                       <div class="rounded-lg p-3 bg-blue1h-50 text-main-blue1h">
                         <svg class="w-5 h-5">
                           <use xlink:href="/assets/icons/outline/files-folders.svg#file-lines" />

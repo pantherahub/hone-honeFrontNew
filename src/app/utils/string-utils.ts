@@ -18,30 +18,27 @@ export function formatListWithY(list: string[]): string {
 
 
 /**
- * Capitalize connectors in string.
+ * Capitalize text.
  */
-export function capitalizeWords(value: string): string {
-  const connectors = [
-    'de',
-    'del',
-    'la',
-    'las',
-    'los',
-    'y',
-    'a',
-    'en',
-    'el',
-    'al',
-    'por',
-    'para',
-    'con',
-    'o'
-  ];
-  if (typeof value != 'string') return value;
+export function capitalizeWords(
+  value: string,
+  capitalizeOnlyFirst: boolean = false
+): string {
 
-  return value
-    .toLowerCase()
-    .split(' ')
+  const connectors = [
+    'de','del','la','las','los','y','a','en','el','al','por','para','con','o'
+  ];
+
+  if (typeof value !== 'string') return value;
+
+  const text = value.trim().toLowerCase();
+
+  if (capitalizeOnlyFirst) {
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  }
+
+  return text
+    .split(/\s+/)
     .map((word, index) => {
       if (index !== 0 && connectors.includes(word)) {
         return word;
@@ -128,4 +125,51 @@ export function decodeJwtPayload(token: string) {
       .join('')
   );
   return JSON.parse(json);
+}
+
+/**
+ * Calculates a new date based on a starting date.
+ * Months, years or days can be added to the initial date.
+ */
+export function calculateMaxDate(
+  baseDate: string | Date,
+  unit: 'months' | 'years' | 'days' = 'months',
+  amount: number = 1,
+  limitToToday: boolean = true
+): string {
+  const initialDate =
+    typeof baseDate === 'string'
+      ? new Date(baseDate + 'T00:00:00')
+      : new Date(baseDate.getTime());
+  initialDate.setHours(0, 0, 0, 0);
+
+  let result = new Date(initialDate);
+
+  if (unit === 'months') {
+    result.setMonth(result.getMonth() + amount);
+  } else if (unit === 'years') {
+    result.setFullYear(result.getFullYear() + amount);
+  } else if (unit === 'days') {
+    result.setDate(result.getDate() + amount);
+  }
+  result.setHours(0, 0, 0, 0);
+
+  if (limitToToday) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (result > today) {
+      result = today;
+    }
+  }
+
+  // ISO format (AAAA-MM-DD)
+  return result.toISOString().split('T')[0];
+}
+
+/**
+ * Get short text by a max length.
+ */
+export function getShortText(text: string, maxLength: number = 100): string {
+  if (!text) return '';
+  return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
 }
