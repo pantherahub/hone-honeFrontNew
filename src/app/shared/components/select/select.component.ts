@@ -229,9 +229,14 @@ export class SelectComponent implements ControlValueAccessor, OnInit {
   }
 
   // Closes if clicked outside
-  @HostListener('document:mousedown', ['$event.target'])
-  onClickOutside(target: HTMLElement) {
-    if (!this.dropdownRef?.nativeElement.contains(target)) {
+  @HostListener('document:mousedown', ['$event'])
+  onClickOutside(event: MouseEvent) {
+    const target = event.target;
+
+    if (
+      target instanceof Node &&
+      !this.dropdownRef?.nativeElement.contains(target)
+    ) {
       this.closeDropdown();
     }
   }

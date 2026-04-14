@@ -4,7 +4,6 @@ import { createPopper, Instance, Placement } from '@popperjs/core';
 import { ButtonComponent } from '../button/button.component';
 import { OverlayStateService } from 'src/app/services/overlay-state/overlay-state.service';
 
-
 @Component({
   selector: 'app-popover',
   standalone: true,
@@ -49,9 +48,10 @@ export class PopoverComponent implements OnInit, AfterViewInit, OnChanges, OnDes
   private isHovering = false;
   private hoverTimeout: any;
 
-
   private backdropMouseDown: boolean = false;
   private isLeftClick: boolean = false;
+
+  private hasBeenOpened = false;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -152,6 +152,8 @@ export class PopoverComponent implements OnInit, AfterViewInit, OnChanges, OnDes
     if (!popover) return;
 
     if (isVisible) {
+      this.hasBeenOpened = true;
+
       if (this.highlighted) {
         this.overlayStateService.addOverlay();
       }
@@ -171,7 +173,7 @@ export class PopoverComponent implements OnInit, AfterViewInit, OnChanges, OnDes
       }, 50);
 
     } else {
-      if (this.highlighted) {
+      if (this.highlighted && this.hasBeenOpened) {
         this.overlayStateService.removeOverlay();
       }
       this.popperInstance?.update();
@@ -223,7 +225,7 @@ export class PopoverComponent implements OnInit, AfterViewInit, OnChanges, OnDes
   }
 
   @HostListener('document:keydown.escape', ['$event'])
-  handleEscape(event: KeyboardEvent) {
+  handleEscape(event: Event) {
     if (this.visible && this.closeOnEscape) this.close();
   }
 

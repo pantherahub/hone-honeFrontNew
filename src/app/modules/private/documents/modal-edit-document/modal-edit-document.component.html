@@ -339,7 +339,7 @@
             (click)="amountPolicyInfoAlert()"
             class="mt-1 inline-flex gap-1 items-center text-xs text-blue-600 dark:text-blue-500 hover:underline"
           >
-            <svg width="16" height="16">
+            <svg class="w-4 h-4">
               <use xlink:href="/assets/icons/outline/general.svg#info-circle" />
             </svg>
             <span>Información importante</span>
@@ -365,16 +365,15 @@
         class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer border-gray-300 bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
       >
         <div
-          class="flex flex-col items-center justify-center pt-5 pb-6 text-gray-500 dark:text-gray-400 gap-[7px]"
+          class="flex flex-col items-center justify-center pt-5 pb-6 px-1 text-gray-500 dark:text-gray-400 gap-[7px]"
         >
           <svg class="w-8 h-8 text-gray-400">
             <use xlink:href="/assets/icons/outline/general.svg#upload" />
           </svg>
-          <p class="text-sm leading-4">
-            <span class="font-semibold">Haz clic para cargar</span> o arrastra y
-            suelta
+          <p class="text-sm leading-4 text-center">
+            <span class="font-semibold">Haz clic para cargar</span> o arrastra y suelta
           </p>
-          <p class="text-xs leading-[14px]">
+          <p class="text-xs leading-[0.875rem] text-center">
             {{ clientSelected?.idClientHoneSolutions === 13 ? 'Solo PDF' : ''}}
             (Máx. 7 MB)
           </p>
@@ -400,7 +399,7 @@
     </div>
   </div>
 
-  <div class="flex justify-end gap-2">
+  <div class="flex flex-wrap justify-end gap-2">
     <app-button
       (click)="closeModal()"
       variant="gray"

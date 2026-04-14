@@ -58,20 +58,17 @@
 }
 
 .apexcharts-canvas {
-
   .apexcharts-datalabels-group {
     .apexcharts-text.apexcharts-datalabel-value {
       font-size: 1rem !important;
     }
   }
-
   .apexcharts-tooltip {
     .apexcharts-tooltip-text-y-label,
     .apexcharts-tooltip-text-y-value {
       font-size: 0.875rem !important;
     }
   }
-
 }
 
 .ant-input {
@@ -115,4 +112,70 @@
 .datepicker.datepicker-orient-bottom {
   padding-top: 0.5rem;
   padding-bottom: 0;
+}
+
+@media (max-width: 400px) {
+  .datepicker {
+    // width: 215px !important;
+    // min-width: 215px !important;
+    .datepicker-picker {
+      // width: 215px !important;
+      // min-width: 215px !important;
+      padding: 4px !important;
+    }
+
+    .datepicker-header {
+      .datepicker-controls {
+        padding: 2px 0 !important;
+        margin-bottom: 8px !important;
+        .view-switch {
+          font-size: 12px !important;
+          // font-size: 0.75rem !important;
+          font-weight: 600 !important;
+          padding: 10px 20px !important;
+        }
+        .prev-btn, .next-btn {
+          width: 28px !important;
+          height: 28px !important;
+        }
+        button svg {
+          width: 12px !important;
+          height: 12px !important;
+          // width: 0.75rem !important;
+          // height: 0.75rem !important;
+        }
+      }
+    }
+
+    .datepicker-main {
+      padding: 4px !important;
+      .days-of-week {
+        margin-bottom: 4px !important;
+        .dow {
+          height: 24px !important;
+          line-height: 24px !important;
+          width: 28px !important;
+          font-size: 10.4px !important;
+          // font-size: 0.65rem !important;
+        }
+      }
+      .datepicker-grid {
+        width: 256px !important; // Datepicket main width
+        .datepicker-cell {
+          height: 28px !important;
+          line-height: 28px !important;
+          width: 28px !important;
+          font-size: 11px !important;
+          // font-size: 0.7rem !important;
+          padding: 0 !important;
+        }
+      }
+    }
+
+    .datepicker-footer .datepicker-controls .button {
+      font-size: 11px !important;
+      // font-size: 0.7rem !important;
+      padding: 4px 8px !important;
+    }
+  }
 }

@@ -6,13 +6,14 @@ import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.component';
 import { InputErrorComponent } from 'src/app/shared/components/input-error/input-error.component';
+import { LoaderComponent } from 'src/app/shared/components/loader/loader.component';
 import { SelectComponent } from 'src/app/shared/components/select/select.component';
 import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
 
 @Component({
   selector: 'app-schedule-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TextInputComponent, InputErrorComponent, DrawerComponent, ButtonComponent, SelectComponent],
+  imports: [CommonModule, ReactiveFormsModule, TextInputComponent, InputErrorComponent, DrawerComponent, ButtonComponent, SelectComponent, LoaderComponent],
   templateUrl: './schedule-form.component.html',
   styleUrl: './schedule-form.component.scss'
 })
