@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import {
   AbstractControl,
   FormArray,
@@ -9,7 +9,7 @@ import {
   Validators
 } from '@angular/forms';
 import { format } from 'date-fns';
-import { distinctUntilChanged, firstValueFrom } from 'rxjs';
+import { distinctUntilChanged, firstValueFrom, Subject, takeUntil } from 'rxjs';
 import { City } from 'src/app/interfaces/city.interface';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { CatalogService } from 'src/app/services/catalog/catalog.service';
@@ -31,7 +31,7 @@ import { TooltipComponent } from 'src/app/shared/components/tooltip/tooltip.comp
   templateUrl: './contact-form.component.html',
   styleUrl: './contact-form.component.scss'
 })
-export class ContactFormComponent implements OnInit {
+export class ContactFormComponent implements OnInit, OnDestroy {
   @Input() contact: any | null = null;
   @Input() contactModelType: 'Prestador' | 'Sede' = 'Prestador';
   @Input() officeIdCity: number | null = null;
@@ -71,6 +71,8 @@ export class ContactFormComponent implements OnInit {
   cityLabel = (item: City) => `${item.city}, ${item.department}`;
   cityLabelWithIndicative = (item: City) => `${item.city} (${item.indicative}), ${item.department}`;
 
+  private destroy$ = new Subject<void>();
+
   @ViewChild('contactDrawer', { static: false }) contactDrawer!: DrawerComponent;
 
   constructor(
@@ -89,6 +91,11 @@ export class ContactFormComponent implements OnInit {
 
     this.initializeForm();
     this.detectFormChanges();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   isDrawer(): boolean {
@@ -233,11 +240,13 @@ export class ContactFormComponent implements OnInit {
   }
 
   detectFormChanges() {
-    this.contactForm.valueChanges.subscribe(() => {
-      if (this.formInitialized) {
-        this.hasChanges = true;
-      }
-    });
+    this.contactForm.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        if (this.formInitialized) {
+          this.hasChanges = true;
+        }
+      });
   }
 
   initializeForm() {
@@ -265,17 +274,21 @@ export class ContactFormComponent implements OnInit {
       deletedPhones: this.fb.array([])
     });
 
-    this.contactForm
-      .get('idOccupationType')
-      ?.valueChanges.pipe(distinctUntilChanged())
+    this.contactForm.get('idOccupationType')?.valueChanges
+      .pipe(
+        distinctUntilChanged(),
+        takeUntil(this.destroy$)
+      )
       .subscribe(value => {
         if (this.loadingSetupContactData) return;
         this.onChangeContactType(value);
       });
 
-    this.contactForm
-      .get('idOccupation')
-      ?.valueChanges.pipe(distinctUntilChanged())
+    this.contactForm.get('idOccupation')?.valueChanges
+      .pipe(
+        distinctUntilChanged(),
+        takeUntil(this.destroy$)
+      )
       .subscribe(value => {
         if (this.loadingSetupContactData) return;
         this.updateRequiredFlags(value);
@@ -640,9 +653,11 @@ export class ContactFormComponent implements OnInit {
       status: [phone ? phone.status || null : 'created'] // updated, created, null for existing phones
     });
     if (this.officeIdCity && !activeCity) phoneGroup.get('idCity')?.disable();
-    phoneGroup
-      .get('type')
-      ?.valueChanges.pipe(distinctUntilChanged())
+    phoneGroup.get('type')?.valueChanges
+      .pipe(
+        distinctUntilChanged(),
+        takeUntil(this.destroy$)
+      )
       .subscribe(value => {
         const idCityControl = phoneGroup.get('idCity');
         const numberControl = phoneGroup.get('number');

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
+import { Subject, takeUntil } from 'rxjs';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.component';
@@ -16,7 +17,7 @@ import { capitalizeWords, trimObjectStrings } from 'src/app/utils/string-utils';
   templateUrl: './address-form.component.html',
   styleUrl: './address-form.component.scss'
 })
-export class AddressFormComponent implements OnInit {
+export class AddressFormComponent implements OnInit, OnDestroy {
 
   @Input() address: any | null = null;
   @Output() onClose = new EventEmitter<any>();
@@ -49,6 +50,8 @@ export class AddressFormComponent implements OnInit {
     },
   };
 
+  private destroy$ = new Subject<void>();
+
   @ViewChild('addressDrawer', { static: false }) addressDrawer!: DrawerComponent;
 
   constructor(
@@ -59,6 +62,11 @@ export class AddressFormComponent implements OnInit {
   ngOnInit(): void {
     this.allNumberComplementOptions = [...this.complementOptions, ...this.lettersWithBis];
     this.initializeForm();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   open() {
@@ -166,9 +174,11 @@ export class AddressFormComponent implements OnInit {
       [Validators.required]
     );
 
-    this.addressForm.valueChanges.subscribe(() => {
-      this.updateFormattedAddress();
-    });
+    this.addressForm.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.updateFormattedAddress();
+      });
 
     this.loadAddressData();
   }

@@ -3,11 +3,11 @@ import { AfterViewInit, Component, computed, ElementRef, OnDestroy, OnInit, Quer
 import { RouterModule } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { SERVICES_CONFIG, SERVICES_ORDER } from 'src/app/config/service-navigation.config';
-import { clientServicesConfig, defaultServices } from 'src/app/config/client-services.config';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 import { NavigationService } from 'src/app/services/navigation/navigation.service';
 import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbOption } from 'src/app/interfaces/breadcrump';
+import { clientServicesRules, defaultServicesRules } from 'src/app/config/client-services.config';
 
 @Component({
   selector: 'app-service-navigation',
@@ -65,8 +65,13 @@ export class ServiceNavigationComponent implements OnInit, AfterViewInit, OnDest
   }
 
   private loadRoutes(): void {
-    const clientId = this.clientSelected?.idClientHoneSolutions;
-    const allowedKeys = clientServicesConfig[clientId] ?? defaultServices;
+    const client = this.clientSelected;
+    const clientId = client?.idClientHoneSolutions;
+    const rules = clientServicesRules[clientId] ?? defaultServicesRules;
+
+    const allowedKeys = rules
+      .filter(rule => !rule.condition || rule.condition(client))
+      .map(rule => rule.key);
 
     this.serviceRoutes = SERVICES_ORDER
       .filter(key => allowedKeys.includes(key))

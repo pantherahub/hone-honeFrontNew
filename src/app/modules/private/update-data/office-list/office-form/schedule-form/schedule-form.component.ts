@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { distinctUntilChanged } from 'rxjs';
+import { distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.component';
@@ -17,7 +17,7 @@ import { TextInputComponent } from 'src/app/shared/components/text-input/text-in
   templateUrl: './schedule-form.component.html',
   styleUrl: './schedule-form.component.scss'
 })
-export class ScheduleFormComponent implements OnInit {
+export class ScheduleFormComponent implements OnInit, OnDestroy {
 
   @Input() schedule: any | null = null;
   @Input() existingSchedules: any[] = [];
@@ -52,6 +52,8 @@ export class ScheduleFormComponent implements OnInit {
     },
   };
 
+  private destroy$ = new Subject<void>();
+
   @ViewChild('scheduleDrawer', { static: false }) scheduleDrawer!: DrawerComponent;
 
   constructor(
@@ -61,6 +63,11 @@ export class ScheduleFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeForm();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   open(options?: {
@@ -137,13 +144,23 @@ export class ScheduleFormComponent implements OnInit {
 
     this.loadScheduleData();
 
-    this.scheduleForm.get('scheduleType')?.valueChanges.pipe(distinctUntilChanged()).subscribe(value => {
-      this.onScheduleTypeChange(value);
-    });
+    this.scheduleForm.get('scheduleType')?.valueChanges
+      .pipe(
+        distinctUntilChanged(),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(value => {
+        this.onScheduleTypeChange(value);
+      });
 
-    this.scheduleForm.get('startDayRange')?.valueChanges.pipe(distinctUntilChanged()).subscribe(value => {
-      this.updateEndDayOptions(value);
-    });
+    this.scheduleForm.get('startDayRange')?.valueChanges
+      .pipe(
+        distinctUntilChanged(),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(value => {
+        this.updateEndDayOptions(value);
+      });
   }
 
   getDaysRange(startDay: string, endDay: string): number[] {

@@ -7,7 +7,7 @@ import { LANGUAGES } from 'src/app/constants/languages';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { format } from 'date-fns';
 import { BackendErrorsComponent } from 'src/app/shared/components/backend-errors/backend-errors.component';
-import { catchError, debounceTime, finalize, firstValueFrom, fromEvent, Observable, of, tap } from 'rxjs';
+import { catchError, debounceTime, finalize, firstValueFrom, fromEvent, Observable, of, Subject, takeUntil, tap } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
 import { CanComponentDeactivate } from 'src/app/guards/can-deactivate.interface';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -110,6 +110,8 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
 
   progressPercentage: number = 0;
 
+  private destroy$ = new Subject<void>();
+
   @ViewChild('stepsContainer') stepsContainer!: ElementRef<HTMLDivElement>;
   @ViewChildren('stepBtn') stepBtns!: QueryList<ElementRef<HTMLDivElement>>;
 
@@ -140,7 +142,10 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
 
     this.loadingState.start();
     this.getProviderDisclaimer$()
-      .pipe(finalize(() => this.loadingState.stop()))
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => this.loadingState.stop())
+      )
       .subscribe(() => {
         this.startInitialFlow();
       });
@@ -158,6 +163,8 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
 
   ngOnDestroy(): void {
     this.unsubscribeForm();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   async canDeactivate(): Promise<boolean> {
@@ -650,9 +657,11 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
       deletedContacts: this.fb.array([])
     });
 
-    this.providerForm.get('idTypeDocument')?.valueChanges.subscribe(value => {
-      if (value === 6) this.providerForm.patchValue({ dv: null });
-    });
+    this.providerForm.get('idTypeDocument')?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(value => {
+        if (value === 6) this.providerForm.patchValue({ dv: null });
+      });
   }
 
   dvValidator(control: AbstractControl) {

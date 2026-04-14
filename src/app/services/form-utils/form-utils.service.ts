@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AbstractControl, FormArray, FormControl, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { calculateMaxDate } from 'src/app/utils/string-utils';
 import { isAlphanumeric, isAlphanumericWithSpaces, isEmail, isNumeral, isNumeric, isTelephoneNumber, isUrl } from 'src/app/utils/validation-utils';
 
 @Injectable({
@@ -156,6 +157,36 @@ export class FormUtilsService {
   }
 
   /**
+   * Apply an automatic end date based on the start date.
+   * Adding months, years, or days.
+   */
+  updateEndDateRange(
+    startControl: AbstractControl | null,
+    endControl: AbstractControl | null,
+    unit: 'months' | 'years' | 'days' = 'months',
+    amount: number = 1,
+    limitToToday: boolean = true
+  ): void {
+    if (!startControl || !endControl) return;
+
+    const startValue = startControl.value;
+    if (!startValue || startValue === '') {
+      startControl.setValue(null, { emitEvent: false });
+      return;
+    }
+
+    const startDate = new Date(startValue + 'T00:00:00');
+    if (isNaN(startDate.getTime()) || startDate.getFullYear() < 1900) {
+      return;
+    }
+
+    if (!endControl.value) {
+      const maxEndDate = calculateMaxDate(startValue, unit, amount, limitToToday);
+      endControl.setValue(maxEndDate, { emitEvent: false });
+    }
+  }
+
+  /**
    * Validates date ranges.
    * @param startField - The name of the initial date field.
    * @param endField - The name of the final date field.
@@ -166,9 +197,9 @@ export class FormUtilsService {
   validateDateRange(
     startField: string,
     endField: string,
-    errorPrefix: string = '',
     bothRequired: boolean = false,
     untilToday: boolean = false,
+    errorPrefix: string = '',
   ) {
     return (formGroup: AbstractControl): ValidationErrors | null => {
       const startDateControl = formGroup.get(startField);

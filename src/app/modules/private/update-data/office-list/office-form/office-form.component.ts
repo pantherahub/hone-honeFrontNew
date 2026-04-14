@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Subject, takeUntil } from 'rxjs';
 import { CompanyInterface } from 'src/app/interfaces/client.interface';
 import { ShortcutContact } from 'src/app/interfaces/shortcut-contact.interface';
 import { AlertService } from 'src/app/services/alert/alert.service';
@@ -29,7 +29,7 @@ import { City } from 'src/app/interfaces/city.interface';
   templateUrl: './office-form.component.html',
   styleUrl: './office-form.component.scss'
 })
-export class OfficeFormComponent {
+export class OfficeFormComponent implements OnInit, OnDestroy {
 
   @Input() isFirstForm: boolean = true;
   @Input() companyList: CompanyInterface[] = [];
@@ -72,6 +72,8 @@ export class OfficeFormComponent {
 
   cityLabel = (item: City) => `${item.city}, ${item.department}`;
 
+  private destroy$ = new Subject<void>();
+
   @ViewChild('addressDrawer', { static: false }) addressDrawer!: AddressFormComponent;
   @ViewChild('scheduleDrawer', { static: false }) scheduleDrawer!: ScheduleFormComponent;
   @ViewChild('contactDrawer', { static: false }) contactDrawer!: ContactFormComponent;
@@ -94,6 +96,11 @@ export class OfficeFormComponent {
 
     this.initializeForm();
     this.detectFormChanges();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   getCities() {
@@ -179,9 +186,11 @@ export class OfficeFormComponent {
   }
 
   detectFormChanges() {
-    this.officeForm.valueChanges.subscribe(() => {
-      this.hasChanges = true;
-    });
+    this.officeForm.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.hasChanges = true;
+      });
   }
 
   convertDate(date: string) {
