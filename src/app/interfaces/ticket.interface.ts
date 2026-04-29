@@ -42,6 +42,7 @@ export interface TicketMessage {
   isViewedByHone: boolean;
   type: string;
   createdBy: TicketMessageCreateBy;
+  isUpdated: boolean;
   createdAt: string;
   updatedAt: string;
 
