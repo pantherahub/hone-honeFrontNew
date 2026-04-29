@@ -301,7 +301,15 @@
               : msg.Provider?.razonSocial
           }}</span>
         </p>
-        <span class="text-gray-500">Enviado {{ msg.createdAt | timeAgo }}</span>
+        <div class="flex items-center flex-wrap gap-2 text-gray-500">
+          <span>Enviado {{ msg.createdAt | timeAgo }}</span>
+
+          @if (msg.isUpdated) {
+            <span class="font-medium">
+              · Actualizado
+            </span>
+          }
+        </div>
       </div>
       @if (hasMessageActions(msg, lastMsg)) {
         <div class="flex items-center gap-3 flex-wrap w-full xs:w-auto">
