@@ -24,6 +24,7 @@ Cuando agregues o modifiques funcionalidad, conserva este lenguaje de dominio:
 
 - Angular 17.
 - TypeScript 5.2.
+- Componentes Angular standalone como patron principal.
 - Tailwind CSS 3.4.
 - Flowbite 3.1 como referencia visual para varios componentes compartidos.
 - Rutas con hash configuradas en `src/app/app.routes.ts`.
@@ -59,6 +60,8 @@ Los componentes reutilizables viven en `src/app/shared/`, especialmente en `src/
 Al crear o modificar UI:
 
 - Reutiliza componentes existentes de `shared` antes de crear uno nuevo.
+- Antes de escribir controles UI manuales, revisa primero `src/app/shared/components/*` y sus APIs. Usa componentes existentes como `app-button`, `app-text-input`, `app-select`, `app-checkbox`, `app-modal`, `app-drawer`, etc. cuando el caso encaje, incluso si requiere `customClass` para variaciones menores.
+- Solo crea HTML/control manual cuando el componente compartido no represente bien el patron o la interaccion sea realmente distinta. Por ejemplo, una paginacion puede usar botones nativos si su estructura y accesibilidad no encajan con `app-button`.
 - Si necesitas un componente nuevo, manten la misma linea visual de los componentes actuales.
 - No agregues otra libreria de componentes si se puede resolver con Angular, Tailwind y los componentes locales.
 - Usa los colores definidos en `tailwind.config.js`.

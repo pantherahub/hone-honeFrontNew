@@ -1,0 +1,180 @@
+<app-loader [visible]="loading" />
+
+<div class="flex justify-center mx-4">
+  <div class="max-w-screen-xl w-full pt-10 pb-28 md:pt-12 flex flex-col">
+
+    <div class="flex flex-col gap-6 pb-20">
+
+      <div class="flex flex-col gap-2">
+        <h2 class="text-xl font-black leading-[1.375rem] text-main-blue1h">
+          Tickets
+        </h2>
+        <p class="text-gray-600 text-base font-normal leading-[1.125rem]">
+          Consulta tus tickets aquí.
+        </p>
+      </div>
+
+      <div class="flex flex-col gap-4">
+        <!-- Filters -->
+        <div [formGroup]="filterForm" class="flex justify-between gap-4">
+          <app-text-input
+            [id]="'idTicket'"
+            [type]="'number'"
+            formControlName="idTicket"
+            label="Número de ticket"
+            [searcher]="true"
+            [clearable]="true"
+            class="w-full max-w-[364px]"
+            customInputClass="!pt-2 leading-4"
+            iconSizeClass="w-4 h-4"
+          >
+          </app-text-input>
+          <app-filter-button
+            [activeCount]="appliedFiltersCount"
+            (openFilters)="openFiltersModal()"
+            (clearFilters)="clearFilters()">
+          </app-filter-button>
+        </div>
+
+        <!-- Table -->
+        <div class="relative overflow-x-auto overflow-y-hidden rounded-xl shadow-sm">
+          <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <thead class="text-sm leading-4 text-blue1h-950 bg-gray-100 dark:bg-gray-700 dark:text-gray-400 whitespace-nowrap">
+              <tr>
+                <th scope="col" class="px-4 py-3 font-semibold">
+                  Ticket
+                </th>
+                <th scope="col" class="px-4 py-3 font-semibold">
+                  Solicitud
+                </th>
+                <th scope="col" class="px-4 py-3 font-semibold">
+                  Fecha de creación
+                </th>
+                <th scope="col" class="px-4 py-3 font-semibold">
+                  Estado
+                </th>
+                <th scope="col" class="px-4 py-3 font-semibold">
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (loadingTickets) {
+                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+                  <td colspan="6" class="px-4 h-[54px] text-left">
+                    <div class="text-md text-main-blue1h leading-4 flex items-center gap-2">
+                      <svg class="w-5 h-5 text-current animate-spin fill-gray-200">
+                        <use xlink:href="/assets/icons/extras/animations.svg#spin" />
+                      </svg>
+                      Cargando...
+                    </div>
+                  </td>
+                </tr>
+              } @else if (!ticketList.length) {
+                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+                  <td colspan="6" class="px-4 h-[54px] text-left">
+                    <div class="text-md text-main-blue1h leading-4 flex items-center gap-2">
+                      Sin resultados.
+                    </div>
+                  </td>
+                </tr>
+              } @else {
+                @for (ticket of ticketList; track ticket.idTickets) {
+                  <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+                    <td class="px-4 py-[10.5px] text-sm font-normal text-main-blue1h leading-4 dark:text-white">
+                      <div class="flex justify-between items-center gap-2 w-full">
+                        <div class="flex items-center">
+                          {{ ticket.idTickets }}
+                        </div>
+                        <app-button
+                          (onClick)="openTicketModal(ticket.idTickets)"
+                          variant="gray"
+                          styleType="soft"
+                          size="xs"
+                          class="block sm:hidden">
+                          <svg class="w-4 h-4">
+                            <use xlink:href="/assets/icons/outline/general.svg#close-sidebar" />
+                          </svg>
+                          Abrir
+                        </app-button>
+                      </div>
+                    </td>
+                    <td class="px-4 py-[10.5px] min-w-[280px] text-sm font-normal text-main-blue1h leading-4 dark:text-white">
+                      {{ ticket.nombreSolicitud | shortText:25 }}
+                    </td>
+                    <td class="px-4 py-[10.5px] text-sm font-normal text-main-blue1h leading-4 dark:text-white">
+                      {{ ticket.fechaSolicitud | date: 'mediumDate' }}
+                    </td>
+                    <td class="px-4 py-[10.5px]">
+                      <ng-container
+                        *ngTemplateOutlet="ticketStatusTemplate; context: { ticket }">
+                      </ng-container>
+                    </td>
+                    <td class="px-4 py-[10.5px] text-left">
+                      <div class="my-auto flex justify-end gap-2">
+                        <app-button
+                          (onClick)="openTicketModal(ticket.idTickets)"
+                          variant="gray"
+                          styleType="soft"
+                          size="xs"
+                          customClass="whitespace-nowrap">
+                          <svg class="w-4 h-4">
+                            <use xlink:href="/assets/icons/outline/general.svg#close-sidebar" />
+                          </svg>
+                          Abrir ticket
+                        </app-button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <app-pagination
+          [currentPage]="currentPage"
+          [itemsPerPage]="itemsPerPage"
+          [totalItems]="totalItems"
+          (pageChange)="onPageChange($event)">
+        </app-pagination>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+
+
+<ng-template #ticketStatusTemplate let-ticket="ticket">
+  <div
+    class="inline-flex gap-1 py-1.5 px-3 rounded-full text-sm font-semibold leading-4 whitespace-nowrap"
+    [ngClass]="[
+      statusConfig[getTicketStatus(ticket)].bgClass,
+      statusConfig[getTicketStatus(ticket)].textClass
+    ]">
+    @if (statusConfig[getTicketStatus(ticket)].icon) {
+      <svg class="w-4 h-4">
+        <use [attr.xlink:href]="'/assets/icons/outline/general.svg#' + statusConfig[getTicketStatus(ticket)].icon" />
+      </svg>
+    }
+    {{ statusConfig[getTicketStatus(ticket)].label }}
+  </div>
+</ng-template>
+
+
+
+<app-ticket-filters
+  #filterDrawer
+  [ticketStatusList]="statusList"
+  [statusConfig]="statusConfig"
+  (onClose)="onFilterDrawerClose($event)">
+</app-ticket-filters>
+
+<app-ticket-detail
+  #ticketDrawer
+  [statusConfig]="statusConfig"
+  (refreshList)="loadTickets()">
+</app-ticket-detail>

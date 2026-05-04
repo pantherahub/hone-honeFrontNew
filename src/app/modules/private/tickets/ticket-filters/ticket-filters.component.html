@@ -20,12 +20,25 @@
     <section class="flex flex-col gap-6">
       <div>
         <p class="text-sm font-semibold text-gray-900 leading-4 mb-2.5">
-          Buscador
+          Número de ticket
         </p>
         <app-text-input
-          [id]="'contractSearcherFilter'"
-          formControlName="expedientNumber"
-          label="Número de contrato"
+          [id]="'idTicketFilter'"
+          formControlName="idTicket"
+          label="Número"
+          [searcher]="true"
+          [clearable]="true">
+        </app-text-input>
+      </div>
+
+      <div>
+        <p class="text-sm font-semibold text-gray-900 leading-4 mb-2.5">
+          Solicitud
+        </p>
+        <app-text-input
+          [id]="'requestNameFilter'"
+          formControlName="requestName"
+          label="Nombre de solicitud"
           [searcher]="true"
           [clearable]="true">
         </app-text-input>

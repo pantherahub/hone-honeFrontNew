@@ -38,6 +38,10 @@ export class FileValidationService {
     return true;
   }
 
+  validateFiles(files: File[], options?: FileValidatorOptions): boolean {
+    return files.every(file => this.validate(file, options));
+  }
+
   isFileTypeValid(file: File, options?: FileValidatorOptions): boolean {
     const allowedExt = options?.allowedExtensions?.length
       ? options.allowedExtensions

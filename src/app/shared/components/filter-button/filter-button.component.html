@@ -1,0 +1,44 @@
+@if (!hasActiveFilters) {
+  <app-button
+    variant="gray"
+    styleType="soft"
+    size="xs"
+    [disabled]="disabled"
+    (onClick)="onOpenFilters()">
+    <svg class="w-4 h-4">
+      <use xlink:href="/assets/icons/outline/general.svg#filter" />
+    </svg>
+    {{ label }}
+  </app-button>
+} @else {
+  <div
+    class="relative inline-flex"
+    [class.opacity-50]="disabled">
+    <app-button
+      variant="gray"
+      styleType="soft"
+      size="xs"
+      [disabled]="disabled"
+      customClass="!bg-blue3h-100 !text-blue3h-600 ring-[1px] ring-inset ring-blue3h-400 !pr-9 hover:!bg-blue3h-200"
+      (onClick)="onOpenFilters()">
+      <svg class="w-4 h-4">
+        <use xlink:href="/assets/icons/solid/general.svg#filter" />
+      </svg>
+      <span class="whitespace-nowrap">
+        {{ label }} <span class="hidden xs:inline">({{ activeCount }})</span>
+      </span>
+    </app-button>
+    <app-button
+      variant="gray"
+      styleType="soft"
+      size="xs"
+      [disabled]="disabled"
+      customClass="!absolute !right-1.5 !top-1/2 !-translate-y-1/2 !p-1 !rounded-md !bg-transparent !text-blue3h-600 hover:!bg-blue3h-200 hover:!text-blue3h-800"
+      (onClick)="onClearFilters($event)">
+      <svg class="w-4 h-4">
+        <use xlink:href="/assets/icons/outline/general.svg#close" />
+      </svg>
+      <span class="sr-only">Limpiar filtros</span>
+    </app-button>
+  </div>
+}

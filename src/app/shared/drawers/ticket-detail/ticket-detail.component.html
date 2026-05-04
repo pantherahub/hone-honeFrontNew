@@ -1,5 +1,5 @@
 <app-drawer
-  #contractDrawer
+  #ticketDrawer
   placement="right"
   size="xl"
   [beforeClose]="canClose.bind(this)"
@@ -7,13 +7,13 @@
 
   <ng-container drawer-header>
     <h2 class="text-lg font-black text-main-blue1h leading-5">
-      Ticket #{{ contract?.Ticket?.idTickets }}
+      Ticket #{{ ticket?.idTickets }}
     </h2>
   </ng-container>
 
   <app-loader [visible]="loading" [fullscreen]="false" />
 
-  @if (contract) {
+  @if (ticket) {
     <section class="flex flex-col gap-6">
 
       <!-- Data header -->
@@ -23,27 +23,29 @@
           <div class="flex-1 flex flex-col gap-2.5 text-sm leading-4">
             <span class="font-semibold text-gray-900">Solicitud</span>
             <span class="text-gray-500">
-              {{ contract.Ticket.nombreSolicitud | shortText:25 }}
+              {{ ticket.nombreSolicitud | shortText:25 }}
             </span>
           </div>
-          <div class="flex-1 flex flex-col gap-2.5 text-sm leading-4">
-            <span class="font-semibold text-gray-900">Contrato</span>
-            <span class="text-gray-500 break-all">
-              {{ contract.expedientNumber }}
-            </span>
-          </div>
+          @if (isContractTicket && ticket.Contract) {
+            <div class="flex-1 flex flex-col gap-2.5 text-sm leading-4">
+              <span class="font-semibold text-gray-900">Contrato</span>
+              <span class="text-gray-500 break-all">
+                {{ ticket.Contract.expedientNumber }}
+              </span>
+            </div>
+          }
           <div class="flex-1 flex flex-col gap-2.5 text-sm leading-4">
             <span class="font-semibold text-gray-900">Fecha de creación</span>
             <span class="text-gray-500">
-              {{ contract.createdAt | date: 'mediumDate' }}
+              {{ ticket.fechaSolicitud | date: 'mediumDate' }}
             </span>
           </div>
           <div class="flex-1 flex flex-col gap-2.5 text-sm leading-4">
             <span class="font-semibold text-gray-900">Estado</span>
             <div>
               <ng-container
-                *ngTemplateOutlet="contractStatusTemplate; context: {
-                  badgeConfig: statusConfig[getContractStatus(contract)]
+                *ngTemplateOutlet="ticketStatusTemplate; context: {
+                  badgeConfig: statusConfig[getTicketStatus(ticket)]
                 }">
               </ng-container>
             </div>
@@ -70,7 +72,7 @@
                   <span>{{ getMessageFile(initMsg).size | formatFileBytes }}</span>
                 </div>
                 <app-tooltip
-                  [id]="'download-contract'"
+                  [id]="'download-file'"
                   [text]="'Nuevo documento disponible. Revísalo en el mensaje más reciente.'"
                   [isDisabled]="!isGhostFormatButton"
                   position="top"
@@ -85,7 +87,7 @@
                     <svg class="w-4 h-4">
                       <use xlink:href="/assets/icons/outline/general.svg#download" />
                     </svg>
-                    Descargar contrato
+                    Descargar {{ isContractTicket ? 'contrato' : 'archivo' }}
                   </app-button>
                 </app-tooltip>
               </div>
@@ -164,7 +166,7 @@
 
 </app-drawer>
 
-<ng-template #contractStatusTemplate let-config="badgeConfig">
+<ng-template #ticketStatusTemplate let-config="badgeConfig">
   <div
     class="inline-flex gap-1 py-1.5 px-3 rounded-full text-sm font-semibold leading-4 whitespace-nowrap"
     [ngClass]="[
@@ -192,7 +194,7 @@
       <div class="flex-1 flex flex-col gap-2.5 max-w-full min-w-0">
         @if (isNew) {
           <span class="text-sm font-semibold leading-4 text-gray-900">
-            Cargar contrato firmado
+            Cargar {{ isContractTicket ? 'contrato firmado' : 'archivo' }}
           </span>
         }
 
@@ -237,7 +239,7 @@
             class="flex flex-col items-center justify-center w-full h-[4.75rem] border-2 border-dashed rounded-lg cursor-pointer border-blue1h-300 bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600 p-4 text-gray-900 dark:text-gray-400"
           >
             <p class="text-sm leading-4 text-center">
-              Arrastrar y soltar ó elegir <span class="font-semibold">contrato firmado</span> para subir.
+              Arrastrar y soltar ó elegir <span class="font-semibold">{{ isContractTicket ? 'contrato firmado' : 'archivo' }}</span> para subir.
             </p>
           </label>
         }
@@ -330,7 +332,7 @@
           }
           @if (hasDisplayableStatus(msg)) {
             <ng-container
-              *ngTemplateOutlet="contractStatusTemplate; context: {
+              *ngTemplateOutlet="ticketStatusTemplate; context: {
                 badgeConfig: msgStatusConfig[getMessageStatus(msg)]
               }">
             </ng-container>

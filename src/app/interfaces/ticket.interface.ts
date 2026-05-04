@@ -1,12 +1,16 @@
+import { ClientBasicInfo } from "./client.interface";
+import { BaseContract } from "./contract.interface";
 import { StoredFile } from "./file.interface";
 
 export type MessageStatus = 'Approved' | 'Disapproved' | 'In process';
+export type TicketMessageType = 'Init' | 'Notification' | 'Message' | 'Closed';
 export type TicketMessageCreatedIn = 'Lissom' | 'Provider' | 'Mixed';
 export type TicketMessageCreateBy = 'HoneSolutions' | 'Provider' | 'Client' | 'AnonimClient' | 'AnonimProvider';
 export type TicketMessageStatusRef = 'In process' | 'Approved' | 'Disapproved';
 
 export interface Ticket {
   idTickets: number;
+  idTicketParent: number | null;
   idStatus: number;
   idClientHoneSolutions: number;
   idTicketCreator: number;
@@ -23,6 +27,17 @@ export interface Ticket {
   Managers?: any[];
   Status?: TicketStatus;
   TicketCreator?: any;
+  Involved?: any;
+
+  Client?: ClientBasicInfo;
+  RequestType?: TicketRequestType;
+  Contract?: BaseContract;
+}
+
+export interface TicketRequestType {
+  idTiposolicitud: number;
+  nameSolicitud: string;
+  isTicket: boolean;
 }
 
 export interface TicketStatus {
@@ -40,7 +55,7 @@ export interface TicketMessage {
   idProvider: number;
   message: string;
   isViewedByHone: boolean;
-  type: string;
+  type: TicketMessageType;
   createdBy: TicketMessageCreateBy;
   isUpdated: boolean;
   createdAt: string;
@@ -77,8 +92,34 @@ export interface MessageEmail {
 
 
 /* Ticket message payloads */
+export interface TicketFilters {
+  idTicket?: number;
+  idClientHoneSolutions?: number;
+  idStatus?: number;
+  startDate?: string;
+  endDate?: string;
+  requestName?: string;
+
+  idProvider?: number; // DELETE
+  idProviderCreator?: number;
+  isNew?: boolean;
+
+  // withParent?: boolean;
+  // withChildren?: {
+  //   status: boolean;
+  //   last: boolean;
+  // };
+
+  messageOptions: {
+    withMessages: boolean;
+    idMessageStatus?: string;
+    messageType?: TicketMessageType;
+  };
+  page: number;
+  limit: number;
+}
 export interface MessageFilters {
-  type: string;
+  type: TicketMessageType;
   page: number;
   limit: number;
   startDate?: string;

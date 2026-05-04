@@ -18,6 +18,7 @@ import { RatesComponent } from './modules/private/rates/rates.component';
 import { serviceAccessGuard } from './guards/service-access.guard';
 import { SERVICES_CONFIG } from './config/service-navigation.config';
 import { ContractsComponent } from './modules/private/contracts/contracts.component';
+import { TicketsComponent } from './modules/private/tickets/tickets.component';
 
 export const routes: Routes = [
   //   PUBLIC ROUTES
@@ -67,6 +68,13 @@ export const routes: Routes = [
       {
         path: 'support',
         component: SupportTicketComponent
+      },
+      {
+        path: 'tickets',
+        component: TicketsComponent,
+        data: {
+          disclaimerKey: 'Tickets',
+        },
       },
       {
         path: 'update-data',
