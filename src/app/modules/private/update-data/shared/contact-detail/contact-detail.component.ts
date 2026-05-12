@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { City } from 'src/app/interfaces/city.interface';
-import { DocumentType } from 'src/app/interfaces/document-type.interface';
+import { IdentificationType } from 'src/app/interfaces/identification-type.interface';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { CatalogService } from 'src/app/services/catalog/catalog.service';
 import { ContactsProviderService } from 'src/app/services/contacts-provider/contacts-provider.service';
-import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.component';
+import { DrawerComponent } from 'src/app/shared/ui/overlays/drawer/drawer.component';
 
 @Component({
   selector: 'app-contact-detail',
@@ -20,7 +20,7 @@ export class ContactDetailComponent implements OnInit {
   contact: any | null = null;
 
   cities: any[] = [];
-  identificationTypes: any[] = [];
+  identificationTypes: IdentificationType[] = [];
   contactOccupationTypes: any[] = [];
 
   @ViewChild('contactDrawer', { static: false }) contactDrawer!: DrawerComponent;
@@ -86,7 +86,7 @@ export class ContactDetailComponent implements OnInit {
     return this.cities.find(city => city.idCity === id);
   }
 
-  getDocTypeById(id: number): DocumentType | undefined {
+  getDocTypeById(id: number): IdentificationType | undefined {
     return this.identificationTypes.find(
       type => type.idTypeDocument === id
     );

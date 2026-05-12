@@ -5,7 +5,7 @@ import { StoredFile } from "./file.interface";
 export type MessageStatus = 'Approved' | 'Disapproved' | 'In process';
 export type TicketMessageType = 'Init' | 'Notification' | 'Message' | 'Closed';
 export type TicketMessageCreatedIn = 'Lissom' | 'Provider' | 'Mixed';
-export type TicketMessageCreateBy = 'HoneSolutions' | 'Provider' | 'Client' | 'AnonimClient' | 'AnonimProvider';
+export type TicketMessageCreatedBy = 'HoneSolutions' | 'Provider' | 'Client' | 'AnonimClient' | 'AnonimProvider';
 export type TicketMessageStatusRef = 'In process' | 'Approved' | 'Disapproved';
 
 export interface Ticket {
@@ -56,7 +56,7 @@ export interface TicketMessage {
   message: string;
   isViewedByHone: boolean;
   type: TicketMessageType;
-  createdBy: TicketMessageCreateBy;
+  createdBy: TicketMessageCreatedBy;
   isUpdated: boolean;
   createdAt: string;
   updatedAt: string;
@@ -100,7 +100,7 @@ export interface TicketFilters {
   endDate?: string;
   requestName?: string;
 
-  idProvider?: number; // DELETE
+  idProvider?: number;
   idProviderCreator?: number;
   isNew?: boolean;
 
@@ -124,15 +124,37 @@ export interface MessageFilters {
   limit: number;
   startDate?: string;
   endDate?: string;
-  createdBy?: TicketMessageCreateBy;
+  createdBy?: TicketMessageCreatedBy;
+}
+export interface CreateTicketPayload {
+  createdBy: TicketMessageCreatedBy;
+  idProviderManager: number;
+  idProviderLogin?: number;
+  idProvider?: number;
+  idClientHoneSolutions: number;
+  idRequestType: number;
+  requestName: string;
+  message: string;
+  dateMax: string;
+  dataCreator?: {
+    name: string;
+    lastname: string;
+    email: string;
+    phone: string;
+    idTypeDocument: number;
+    identification: string;
+  }; // Anonymous creators
+  // idTicketParent?: number;
+  // copy?: string[];
+  archivo?: File[];
 }
 export interface TicketMessagePayload {
   idMessageStatus: number;
   message: string;
-  archivo: File;
+  archivo: File | File[] | null;
   idProviderLogin: number;
   createdIn: TicketMessageCreatedIn;
-  createdBy: TicketMessageCreateBy;
+  createdBy: TicketMessageCreatedBy;
 }
 export interface UpdateTicketMessagePayload {
   message: string;

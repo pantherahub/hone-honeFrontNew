@@ -2,10 +2,11 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { City } from 'src/app/interfaces/city.interface';
 import { CompanyInterface } from 'src/app/interfaces/client.interface';
+import { IdentificationType } from 'src/app/interfaces/identification-type.interface';
 import { CatalogService } from 'src/app/services/catalog/catalog.service';
 import { ContactsProviderService } from 'src/app/services/contacts-provider/contacts-provider.service';
 import { OfficeDataService } from 'src/app/services/office-data/office-data.service';
-import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.component';
+import { DrawerComponent } from 'src/app/shared/ui/overlays/drawer/drawer.component';
 
 @Component({
   selector: 'app-office-detail',
@@ -27,7 +28,7 @@ export class OfficeDetailComponent implements OnInit {
   loadingContacts: boolean = false;
 
   cities: any[] = [];
-  identificationTypes: any[] = [];
+  identificationTypes: IdentificationType[] = [];
   contactOccupationTypes: any[] = [];
 
   @ViewChild('officeDrawer', { static: false }) officeDrawer!: DrawerComponent;
@@ -99,12 +100,6 @@ export class OfficeDetailComponent implements OnInit {
 
   getCityById(id: number): City | undefined {
     return this.cities.find(city => city.idCity === id);
-  }
-
-  getDocTypeById(id: number): DocumentType | undefined {
-    return this.identificationTypes.find(
-      type => type.idTypeDocument === id
-    );
   }
 
   getOccupationName(contact: any) {

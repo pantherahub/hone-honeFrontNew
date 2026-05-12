@@ -1,19 +1,18 @@
 import { AfterViewInit, Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
-import { InputErrorComponent } from 'src/app/shared/components/input-error/input-error.component';
-import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
-import { SelectComponent } from 'src/app/shared/components/select/select.component';
-import { CheckboxComponent } from 'src/app/shared/components/checkbox/checkbox.component';
-import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { TextInputComponent } from 'src/app/shared/ui/forms/text-input/text-input.component';
+import { CheckboxComponent } from 'src/app/shared/ui/forms/checkbox/checkbox.component';
+import { ButtonComponent } from 'src/app/shared/ui/buttons/button/button.component';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ModalService } from 'src/app/services/modal/modal.service';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { Router } from '@angular/router';
-import { PopoverComponent } from 'src/app/shared/components/popover/popover.component';
-import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.component';
-import { AlertComponent } from 'src/app/shared/components/alert/alert.component';
+import { DrawerComponent } from 'src/app/shared/ui/overlays/drawer/drawer.component';
+import { AlertComponent } from 'src/app/shared/ui/feedback/alert/alert.component';
+import { ModalComponent } from 'src/app/shared/ui/overlays/modal/modal.component';
+import { SelectComponent } from 'src/app/shared/ui/forms/select/select.component';
+import { PopoverComponent } from 'src/app/shared/ui/overlays/popover/popover.component';
 
 @Component({
   selector: 'app-tests',
@@ -23,7 +22,6 @@ import { AlertComponent } from 'src/app/shared/components/alert/alert.component'
     FormsModule,
     ReactiveFormsModule,
     TextInputComponent,
-    InputErrorComponent,
     ModalComponent,
     SelectComponent,
     CheckboxComponent,
@@ -49,7 +47,7 @@ export class TestsComponent implements OnInit, AfterViewInit {
   @ViewChild('testDrawer', { static: false }) testDrawer!: DrawerComponent;
   @ViewChild('test2Drawer', { static: false }) test2Drawer!: DrawerComponent;
 
-  constructor (
+  constructor(
     private toastService: ToastService,
     private modalService: ModalService,
     private alertService: AlertService,
@@ -62,16 +60,16 @@ export class TestsComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     // this.alertService.showAlert({
-      //   title: '¡Atención!',
-      //   message: 'Recuerda actualizar tus datos garantizando así el cumplimiento total de tu gestión contractual.',
-      //   closable: false,
-      //   // variant: 'warning',
-      //   showConfirmBtn: true,
-      //   confirmBtnText: 'Entendido',
-      // }).subscribe(() => {
-        //   this.navigateTo('/update-data');
-        // });
-      }
+    //   title: '¡Atención!',
+    //   message: 'Recuerda actualizar tus datos garantizando así el cumplimiento total de tu gestión contractual.',
+    //   closable: false,
+    //   // variant: 'warning',
+    //   showConfirmBtn: true,
+    //   confirmBtnText: 'Entendido',
+    // }).subscribe(() => {
+    //   this.navigateTo('/update-data');
+    // });
+  }
 
   ngAfterViewInit(): void {
     // this.popover.open();
@@ -154,10 +152,10 @@ export class TestsComponent implements OnInit, AfterViewInit {
   selectedCountry2: any;
 
   options: any[] = [
-    {label: "Opcion 1", value: "Opcion 1 Value"},
-    {label: "Opcion 2", value: "Opcion 2 Value"},
-    {label: "Opcion 3", value: "Opcion 3 Value"},
-    {label: "Opcion 4", value: "Opcion 4 Value"},
+    { label: "Opcion 1", value: "Opcion 1 Value" },
+    { label: "Opcion 2", value: "Opcion 2 Value" },
+    { label: "Opcion 3", value: "Opcion 3 Value" },
+    { label: "Opcion 4", value: "Opcion 4 Value" },
   ];
 
   checkboxStatus: boolean = false;

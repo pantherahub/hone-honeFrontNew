@@ -6,7 +6,7 @@ import { PipesModule } from 'src/app/pipes/pipes.module';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 import { RateService } from 'src/app/services/rate/rate.service';
-import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { ButtonComponent } from 'src/app/shared/ui/buttons/button/button.component';
 import { RateManagementComponent } from './rate-management/rate-management.component';
 import { BadgeConfig } from 'src/app/types/badge-config.type';
 import { catchError, finalize, Observable, of, ReplaySubject, Subject, takeUntil, tap } from 'rxjs';
@@ -14,8 +14,8 @@ import { DisclaimerService } from 'src/app/services/disclaimer/disclaimer.servic
 import { ActivatedRoute } from '@angular/router';
 import { Disclaimer } from 'src/app/interfaces/disclaimer.interface';
 import { ModalService } from 'src/app/services/modal/modal.service';
-import { DisclaimerFormComponent } from 'src/app/shared/modals/disclaimer-form/disclaimer-form.component';
-import { LoaderComponent } from 'src/app/shared/components/loader/loader.component';
+import { DisclaimerFormComponent } from 'src/app/shared/overlays/modals/disclaimer-form/disclaimer-form.component';
+import { LoaderComponent } from 'src/app/shared/ui/feedback/loader/loader.component';
 
 @Component({
   selector: 'app-rates',

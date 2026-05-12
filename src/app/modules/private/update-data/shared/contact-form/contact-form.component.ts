@@ -11,18 +11,19 @@ import {
 import { format } from 'date-fns';
 import { distinctUntilChanged, firstValueFrom, Subject, takeUntil } from 'rxjs';
 import { City } from 'src/app/interfaces/city.interface';
+import { IdentificationType } from 'src/app/interfaces/identification-type.interface';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { CatalogService } from 'src/app/services/catalog/catalog.service';
 import { ContactsProviderService } from 'src/app/services/contacts-provider/contacts-provider.service';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
-import { ButtonComponent } from 'src/app/shared/components/button/button.component';
-import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.component';
-import { InputErrorComponent } from 'src/app/shared/components/input-error/input-error.component';
-import { LoaderComponent } from 'src/app/shared/components/loader/loader.component';
-import { SelectComponent } from 'src/app/shared/components/select/select.component';
-import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
-import { TooltipComponent } from 'src/app/shared/components/tooltip/tooltip.component';
+import { ButtonComponent } from 'src/app/shared/ui/buttons/button/button.component';
+import { DrawerComponent } from 'src/app/shared/ui/overlays/drawer/drawer.component';
+import { InputErrorComponent } from 'src/app/shared/ui/forms/input-error/input-error.component';
+import { LoaderComponent } from 'src/app/shared/ui/feedback/loader/loader.component';
+import { TextInputComponent } from 'src/app/shared/ui/forms/text-input/text-input.component';
+import { TooltipComponent } from 'src/app/shared/ui/overlays/tooltip/tooltip.component';
+import { SelectComponent } from 'src/app/shared/ui/forms/select/select.component';
 
 @Component({
   selector: 'app-contact-form',
@@ -45,7 +46,7 @@ export class ContactFormComponent implements OnInit, OnDestroy {
 
   contactOccupationTypes: any[] = [];
   contactOccupations: any[] = [];
-  identificationTypes: any[] = [];
+  identificationTypes: IdentificationType[] = [];
   cities: any[] = [];
   phoneNumberTypes: string[] = ['Celular', 'Fijo', 'Whatsapp', 'Numeral'];
 

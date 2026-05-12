@@ -82,7 +82,7 @@
                       {{ contract.expedientNumber }}
                     </div>
                     <app-button
-                      (onClick)="openContractModal(contract.idContract)"
+                      (onClick)="openContractModal(contract.idTicket)"
                       variant="gray"
                       styleType="soft"
                       size="xs"
@@ -108,7 +108,7 @@
                 <td class="px-4 py-[10.5px] text-left">
                   <div class="my-auto flex justify-end gap-2">
                     <app-button
-                      (onClick)="openContractModal(contract.idContract)"
+                      (onClick)="openContractModal(contract.idTicket)"
                       variant="gray"
                       styleType="soft"
                       size="xs"
@@ -166,8 +166,8 @@
   (onClose)="onFilterDrawerClose($event)">
 </app-contract-filters>
 
-<app-contract-management
-  #contractDrawer
+<app-ticket-detail
+  #ticketDrawer
   [statusConfig]="statusConfig"
   (refreshList)="loadContracts()">
-</app-contract-management>
+</app-ticket-detail>

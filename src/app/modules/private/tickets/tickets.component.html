@@ -1,16 +1,23 @@
 <app-loader [visible]="loading" />
 
 <div class="flex justify-center mx-4">
-  <div class="max-w-screen-xl w-full pt-10 pb-28 md:pt-12 flex flex-col">
+  <div class="max-w-screen-xl w-full pt-10 pb-28 md:pt-12 flex flex-col gap-3">
+
+    <app-button (onClick)="goBack()" variant="primary" size="sm" styleType="ghost" customClass="leading-4">
+      <svg class="w-4 h-4">
+        <use xlink:href="/assets/icons/outline/arrows.svg#chevron-left" />
+      </svg>
+      Volver
+    </app-button>
 
     <div class="flex flex-col gap-6 pb-20">
 
       <div class="flex flex-col gap-2">
         <h2 class="text-xl font-black leading-[1.375rem] text-main-blue1h">
-          Tickets
+          PQRS - Preguntas, Quejas, Reclamos y Sugerencias
         </h2>
         <p class="text-gray-600 text-base font-normal leading-[1.125rem]">
-          Consulta tus tickets aquí.
+          Consulta tus PQRS aquí.
         </p>
       </div>
 
@@ -21,7 +28,7 @@
             [id]="'idTicket'"
             [type]="'number'"
             formControlName="idTicket"
-            label="Número de ticket"
+            label="Número de PQRS"
             [searcher]="true"
             [clearable]="true"
             class="w-full max-w-[364px]"
@@ -42,7 +49,7 @@
             <thead class="text-sm leading-4 text-blue1h-950 bg-gray-100 dark:bg-gray-700 dark:text-gray-400 whitespace-nowrap">
               <tr>
                 <th scope="col" class="px-4 py-3 font-semibold">
-                  Ticket
+                  PQRS
                 </th>
                 <th scope="col" class="px-4 py-3 font-semibold">
                   Solicitud
@@ -120,7 +127,7 @@
                           <svg class="w-4 h-4">
                             <use xlink:href="/assets/icons/outline/general.svg#close-sidebar" />
                           </svg>
-                          Abrir ticket
+                          Abrir PQRS
                         </app-button>
                       </div>
                     </td>

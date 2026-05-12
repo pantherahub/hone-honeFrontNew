@@ -9,6 +9,7 @@ export class FileDropDirective {
 
   @Input() allowedExtensions: string[] = [];
   @Input() maxFileSizeMB?: number;
+  @Input() maxFiles?: number;
   @Input({ transform: booleanAttribute }) multiple: boolean = false;
   @Output() fileDropped: EventEmitter<File> = new EventEmitter();
   @Output() filesDropped: EventEmitter<File[]> = new EventEmitter();
@@ -56,6 +57,7 @@ export class FileDropDirective {
     const validatorOptions = {
       allowedExtensions: this.allowedExtensions,
       maxFileSizeMB: this.maxFileSizeMB,
+      maxFiles: this.maxFiles,
     };
 
     if (this.multiple) {

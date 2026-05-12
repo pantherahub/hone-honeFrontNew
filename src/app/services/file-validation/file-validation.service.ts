@@ -4,6 +4,7 @@ import { AlertService } from '../alert/alert.service';
 export interface FileValidatorOptions {
   allowedExtensions?: string[];
   maxFileSizeMB?: number;
+  maxFiles?: number;
 }
 
 @Injectable({
@@ -39,7 +40,23 @@ export class FileValidationService {
   }
 
   validateFiles(files: File[], options?: FileValidatorOptions): boolean {
+    if (!this.isFileCountValid(files, options)) {
+      return false;
+    }
+
     return files.every(file => this.validate(file, options));
+  }
+
+  isFileCountValid(files: File[], options?: FileValidatorOptions): boolean {
+    const maxFiles = options?.maxFiles;
+    if (!maxFiles || files.length <= maxFiles) return true;
+
+    this.alertService.showAlert({
+      title: 'Demasiados archivos',
+      message: `Puedes cargar hasta ${maxFiles} archivos.`,
+      variant: 'danger',
+    });
+    return false;
   }
 
   isFileTypeValid(file: File, options?: FileValidatorOptions): boolean {

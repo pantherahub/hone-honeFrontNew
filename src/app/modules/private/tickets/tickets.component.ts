@@ -1,25 +1,26 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, debounceTime, distinctUntilChanged, finalize, Observable, of, ReplaySubject, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { Disclaimer } from 'src/app/interfaces/disclaimer.interface';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { DisclaimerService } from 'src/app/services/disclaimer/disclaimer.service';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 import { ModalService } from 'src/app/services/modal/modal.service';
-import { ButtonComponent } from 'src/app/shared/components/button/button.component';
-import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
-import { DisclaimerFormComponent } from 'src/app/shared/modals/disclaimer-form/disclaimer-form.component';
+import { ButtonComponent } from 'src/app/shared/ui/buttons/button/button.component';
+import { TextInputComponent } from 'src/app/shared/ui/forms/text-input/text-input.component';
+import { DisclaimerFormComponent } from 'src/app/shared/overlays/modals/disclaimer-form/disclaimer-form.component';
 import { BadgeConfig } from 'src/app/types/badge-config.type';
 import { TicketService } from 'src/app/services/ticket/ticket.service';
-import { LoaderComponent } from 'src/app/shared/components/loader/loader.component';
+import { LoaderComponent } from 'src/app/shared/ui/feedback/loader/loader.component';
 import { Ticket, TicketFilters, TicketStatus } from 'src/app/interfaces/ticket.interface';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { PaginationComponent } from 'src/app/shared/components/pagination/pagination.component';
-import { FilterButtonComponent } from 'src/app/shared/components/filter-button/filter-button.component';
+import { PaginationComponent } from 'src/app/shared/ui/feedback/pagination/pagination.component';
 import { TicketFiltersComponent } from './ticket-filters/ticket-filters.component';
-import { TicketDetailComponent } from 'src/app/shared/drawers/ticket-detail/ticket-detail.component';
+import { TicketDetailComponent } from 'src/app/shared/overlays/drawers/ticket-detail/ticket-detail.component';
+import { NavigationService } from 'src/app/services/navigation/navigation.service';
+import { FilterButtonComponent } from 'src/app/shared/ui/buttons/filter-button/filter-button.component';
 
 @Component({
   selector: 'app-tickets',
@@ -83,7 +84,8 @@ export class TicketsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private eventManager: EventManagerService,
-
+    private navigationService: NavigationService,
+    private router: Router,
     private disclaimerService: DisclaimerService,
     private route: ActivatedRoute,
     private modalService: ModalService,
@@ -120,6 +122,12 @@ export class TicketsComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  goBack() {
+    // const backRoute = this.navigationService.getBackRoute();
+    // this.router.navigateByUrl(backRoute);
+    this.router.navigateByUrl('support', { replaceUrl: true });
   }
 
   private getProviderDisclaimer$(): Observable<void> {
@@ -274,8 +282,8 @@ export class TicketsComponent implements OnInit, AfterViewInit, OnDestroy {
       page: this.currentPage,
       limit: this.itemsPerPage,
 
-      idProvider: this.user.id, // DELETE
-      // idProviderCreator: this.user.id,
+      idProvider: this.user.id,
+      idProviderCreator: this.user.id,
       messageOptions: {
         withMessages: false,
       },

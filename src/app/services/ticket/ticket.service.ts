@@ -23,7 +23,17 @@ export class TicketService {
     return this.httpClient.get(url);
   }
 
-  /* First version ticket creation */
+  getTicketByCreator(idTicket: number, identification: string) {
+    const url = `${this.url}Tickets/GetOneByCreator/${idTicket}/${identification}`;
+    return this.httpClient.get(url);
+  }
+
+  createTicket(reqData: FormData): Observable<any> {
+    const url = `${this.url}Tickets/Create`;
+    return this.httpClient.post(url, reqData);
+  }
+
+  /* Old version ticket creation */
   postTicket(idRole: any, payload: any): Observable<any> {
     return this.httpClient.post(`${this.urlBack}ticket/create`, payload);
   }

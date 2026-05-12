@@ -9,6 +9,7 @@ export class FileSelectDirective implements OnInit {
 
   @Input() allowedExtensions: string[] = [];
   @Input() maxFileSizeMB?: number;
+  @Input() maxFiles?: number;
   @Input({ transform: booleanAttribute }) multiple: boolean = false;
   @Output() fileValidated: EventEmitter<File> = new EventEmitter();
   @Output() filesValidated: EventEmitter<File[]> = new EventEmitter();
@@ -33,6 +34,7 @@ export class FileSelectDirective implements OnInit {
     const validatorOptions = {
       allowedExtensions: this.allowedExtensions,
       maxFileSizeMB: this.maxFileSizeMB,
+      maxFiles: this.maxFiles,
     };
 
     if (this.multiple) {

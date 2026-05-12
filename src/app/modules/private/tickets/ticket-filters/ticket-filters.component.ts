@@ -3,11 +3,11 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } 
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
-import { ButtonComponent } from 'src/app/shared/components/button/button.component';
-import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.component';
-import { InputErrorComponent } from 'src/app/shared/components/input-error/input-error.component';
-import { RadioComponent } from 'src/app/shared/components/radio/radio.component';
-import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
+import { ButtonComponent } from 'src/app/shared/ui/buttons/button/button.component';
+import { DrawerComponent } from 'src/app/shared/ui/overlays/drawer/drawer.component';
+import { InputErrorComponent } from 'src/app/shared/ui/forms/input-error/input-error.component';
+import { RadioComponent } from 'src/app/shared/ui/forms/radio/radio.component';
+import { TextInputComponent } from 'src/app/shared/ui/forms/text-input/text-input.component';
 import { BadgeConfig } from 'src/app/types/badge-config.type';
 
 @Component({
