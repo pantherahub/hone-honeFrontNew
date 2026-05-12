@@ -282,7 +282,7 @@ export class TicketsComponent implements OnInit, AfterViewInit, OnDestroy {
       page: this.currentPage,
       limit: this.itemsPerPage,
 
-      idProvider: this.user.id,
+      // idProvider: this.user.id,
       idProviderCreator: this.user.id,
       messageOptions: {
         withMessages: false,
