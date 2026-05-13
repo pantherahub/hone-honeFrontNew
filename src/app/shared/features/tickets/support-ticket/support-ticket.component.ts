@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ButtonComponent } from '../../../ui/buttons/button/button.component';
 import { TextInputComponent } from '../../../ui/forms/text-input/text-input.component';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -47,6 +47,7 @@ export class SupportTicketComponent implements OnInit {
   identificationTypes: IdentificationType[] = [];
 
   @ViewChild('ticketSearchDrawer') ticketSearchDrawer!: DrawerComponent;
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -180,6 +181,14 @@ export class SupportTicketComponent implements OnInit {
     this.ticketForm.patchValue({ files });
     this.ticketForm.get('files')?.markAsDirty();
     this.ticketForm.get('files')?.markAsTouched();
+
+    if (!files && this.fileInput?.nativeElement) {
+      this.fileInput.nativeElement.value = '';
+    }
+  }
+
+  clearFiles(): void {
+    this.updateFiles(null);
   }
 
   onFileChange(file: File[] | null) {
@@ -190,7 +199,7 @@ export class SupportTicketComponent implements OnInit {
 
     if (newFiles) {
       const currentFiles = Array.isArray(filesControl?.value)
-          ? filesControl!.value
+        ? filesControl!.value
         : (filesControl?.value ? [filesControl.value] : []);
       finalFiles = [...currentFiles, ...newFiles];
     }

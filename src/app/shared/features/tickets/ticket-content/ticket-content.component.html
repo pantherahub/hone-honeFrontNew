@@ -210,9 +210,24 @@
       <div class="hidden xs:block w-[3px] rounded-3xl bg-gray-200 shrink-0"></div>
       <div class="flex-1 flex flex-col gap-2.5 max-w-full min-w-0">
         @if (isNew) {
-          <span class="text-sm font-semibold leading-4 text-gray-900">
-            Cargar {{ uploadFileLabel }}
-          </span>
+          <div class="flex items-center justify-between gap-3 flex-wrap">
+            <span class="text-sm font-semibold leading-4 text-gray-900">
+              Cargar {{ uploadFileLabel }}
+            </span>
+            @if (selectedFiles.length) {
+              <app-button
+                (onClick)="clearSelectedFiles()"
+                variant="gray"
+                styleType="soft"
+                size="xs"
+                customClass="whitespace-nowrap">
+                <svg class="w-4 h-4">
+                  <use xlink:href="/assets/icons/outline/general.svg#close" />
+                </svg>
+                Limpiar
+              </app-button>
+            }
+          </div>
         }
 
         @if (selectedFiles.length) {

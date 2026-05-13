@@ -570,6 +570,10 @@ export class TicketContentComponent implements OnInit, OnChanges, OnDestroy {
     this.updateFiles(updatedFiles.length ? updatedFiles : null);
   }
 
+  clearSelectedFiles(): void {
+    this.updateFiles(null);
+  }
+
   private normalizeSelectedFiles(file: File | File[] | null): File[] | null {
     if (!file) return null;
 
@@ -897,28 +901,27 @@ export class TicketContentComponent implements OnInit, OnChanges, OnDestroy {
         this.ticketService.deleteTicketMessage(idMessage, payload)
       ),
       finalize(() => this.loading = false)
-    )
-      .subscribe({
-        next: () => {
+    ).subscribe({
+      next: () => {
+        this.getTicket();
+        this.alertService.success(
+          '¡Mensaje eliminado!',
+          'Se ha eliminado exitosamente.'
+        );
+      },
+      error: (err) => {
+        const errorData = err.error;
+
+        if (err.status === 400 && errorData?.message) {
+          this.alertService.error('Ups...', errorData.message);
           this.getTicket();
-          this.alertService.success(
-            '¡Mensaje eliminado!',
-            'Se ha eliminado exitosamente.'
-          );
-        },
-        error: (err) => {
-          const errorData = err.error;
-
-          if (err.status === 400 && errorData?.message) {
-            this.alertService.error('Ups...', errorData.message);
-            this.getTicket();
-            return;
-          }
-
-          console.error(err);
-          this.alertService.error();
+          return;
         }
-      });
+
+        console.error(err);
+        this.alertService.error();
+      }
+    });
   }
 
 }

@@ -102,14 +102,32 @@
 
             @if (selectedFiles.length) {
               <div class="flex flex-col gap-2">
-                @for (selectedFile of selectedFiles; track selectedFile.name + selectedFile.size + $index) {
-                  <app-file-item
-                    [file]="selectedFile"
-                    [isInteractive]="true"
-                    [isMultipleFiles]="true"
-                    (onRemove)="removeFile($index)">
-                  </app-file-item>
-                }
+                <div class="flex items-center justify-between gap-3 flex-wrap">
+                  <p class="text-sm font-semibold leading-4 text-gray-900">
+                    Archivos seleccionados
+                  </p>
+                  <app-button
+                    (onClick)="clearFiles()"
+                    variant="gray"
+                    styleType="soft"
+                    size="xs"
+                    customClass="whitespace-nowrap">
+                    <svg class="w-4 h-4">
+                      <use xlink:href="/assets/icons/outline/general.svg#close" />
+                    </svg>
+                    Limpiar
+                  </app-button>
+                </div>
+                <div class="flex flex-col gap-1">
+                  @for (selectedFile of selectedFiles; track selectedFile.name + selectedFile.size + $index) {
+                    <app-file-item
+                      [file]="selectedFile"
+                      [isInteractive]="true"
+                      [isMultipleFiles]="true"
+                      (onRemove)="removeFile($index)">
+                    </app-file-item>
+                  }
+                </div>
               </div>
             }
 
