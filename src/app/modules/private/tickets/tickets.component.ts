@@ -1,7 +1,7 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { catchError, debounceTime, distinctUntilChanged, finalize, Observable, of, ReplaySubject, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { Disclaimer } from 'src/app/interfaces/disclaimer.interface';
 import { PipesModule } from 'src/app/pipes/pipes.module';
@@ -19,7 +19,6 @@ import { ToastService } from 'src/app/services/toast/toast.service';
 import { PaginationComponent } from 'src/app/shared/ui/feedback/pagination/pagination.component';
 import { TicketFiltersComponent } from './ticket-filters/ticket-filters.component';
 import { TicketDetailComponent } from 'src/app/shared/overlays/drawers/ticket-detail/ticket-detail.component';
-import { NavigationService } from 'src/app/services/navigation/navigation.service';
 import { FilterButtonComponent } from 'src/app/shared/ui/buttons/filter-button/filter-button.component';
 
 @Component({
@@ -84,14 +83,13 @@ export class TicketsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private eventManager: EventManagerService,
-    private navigationService: NavigationService,
-    private router: Router,
     private disclaimerService: DisclaimerService,
     private route: ActivatedRoute,
     private modalService: ModalService,
     private fb: FormBuilder,
     private ticketService: TicketService,
     private toastService: ToastService,
+    private location: Location,
   ) { }
 
   ngOnInit(): void {
@@ -125,9 +123,7 @@ export class TicketsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   goBack() {
-    // const backRoute = this.navigationService.getBackRoute();
-    // this.router.navigateByUrl(backRoute);
-    this.router.navigateByUrl('support', { replaceUrl: true });
+    this.location.back();
   }
 
   private getProviderDisclaimer$(): Observable<void> {

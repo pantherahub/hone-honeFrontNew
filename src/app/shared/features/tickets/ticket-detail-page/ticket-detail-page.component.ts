@@ -1,9 +1,8 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Ticket } from 'src/app/interfaces/ticket.interface';
 import { AuthService } from 'src/app/services/auth.service';
-import { NavigationService } from 'src/app/services/navigation/navigation.service';
 import { ButtonComponent } from 'src/app/shared/ui/buttons/button/button.component';
 import { TicketContentComponent } from 'src/app/shared/features/tickets/ticket-content/ticket-content.component';
 import { AlertComponent } from 'src/app/shared/ui/feedback/alert/alert.component';
@@ -31,7 +30,7 @@ export class TicketDetailPageComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private authService: AuthService,
-    private navigationService: NavigationService,
+    private location: Location,
   ) { }
 
   ngOnInit(): void {
@@ -46,8 +45,7 @@ export class TicketDetailPageComponent implements OnInit {
   }
 
   goBack() {
-    const backRoute = this.navigationService.getBackRoute('support');
-    this.router.navigateByUrl(backRoute);
+    this.location.back();
   }
 
   goToTickets() {

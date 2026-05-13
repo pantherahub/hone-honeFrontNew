@@ -1,8 +1,7 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ButtonComponent } from '../../../ui/buttons/button/button.component';
 import { TextInputComponent } from '../../../ui/forms/text-input/text-input.component';
-import { NavigationService } from 'src/app/services/navigation/navigation.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { InputErrorComponent } from '../../../ui/forms/input-error/input-error.component';
@@ -50,7 +49,6 @@ export class SupportTicketComponent implements OnInit {
   @ViewChild('ticketSearchDrawer') ticketSearchDrawer!: DrawerComponent;
 
   constructor(
-    private navigationService: NavigationService,
     private formBuilder: FormBuilder,
     private formUtils: FormUtilsService,
     private router: Router,
@@ -60,6 +58,7 @@ export class SupportTicketComponent implements OnInit {
     private catalogService: CatalogService,
     private toastService: ToastService,
     private alertService: AlertService,
+    private location: Location,
   ) {
     this.isLogged = this.authService.isAuthenticated();
   }
@@ -71,12 +70,11 @@ export class SupportTicketComponent implements OnInit {
   }
 
   goBack() {
-    const backRoute = this.navigationService.getBackRoute();
-    this.router.navigateByUrl(backRoute);
+    this.location.back();
   }
 
   goToTickets() {
-    this.router.navigateByUrl('tickets', { replaceUrl: true });
+    this.router.navigateByUrl('tickets');
   }
 
   openTicketSearchDrawer() {
