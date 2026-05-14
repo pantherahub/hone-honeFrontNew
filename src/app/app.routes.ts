@@ -82,10 +82,7 @@ export const routes: Routes = [
       },
       {
         path: 'tickets/:idTicket',
-        component: TicketDetailPageComponent,
-        data: {
-          disclaimerKey: 'Tickets',
-        },
+        component: TicketDetailPageComponent
       },
       {
         path: 'tickets',
