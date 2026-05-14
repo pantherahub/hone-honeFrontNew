@@ -10,7 +10,6 @@ import { environment } from 'src/environments/environment';
 export class TicketService {
 
   url = environment.url;
-  urlBack = environment.urlNewBack;
 
   constructor(private httpClient: HttpClient) { }
 
@@ -31,11 +30,6 @@ export class TicketService {
   createTicket(reqData: FormData): Observable<any> {
     const url = `${this.url}Tickets/Create`;
     return this.httpClient.post(url, reqData);
-  }
-
-  /* Old version ticket creation */
-  postTicket(idRole: any, payload: any): Observable<any> {
-    return this.httpClient.post(`${this.urlBack}ticket/create`, payload);
   }
 
   getTicketStatus(): Observable<TicketStatus[]> {
