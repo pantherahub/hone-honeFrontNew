@@ -127,11 +127,12 @@ export class TicketsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private getProviderDisclaimer$(): Observable<void> {
-    const { idProvider, idClientHoneSolutions } = this.clientSelected;
-    const disclaimerKey = this.route.snapshot.data['disclaimerKey'];
+    const idProvider = this.user?.id;
+    if (!idProvider) return of(void 0);
 
+    const disclaimerKey = this.route.snapshot.data['disclaimerKey'];
     return this.disclaimerService
-      .getDisclaimer(disclaimerKey, idProvider, idClientHoneSolutions)
+      .getDisclaimer(disclaimerKey, idProvider)
       .pipe(
         tap((resp: any) => {
           const data = resp?.data;
