@@ -88,7 +88,7 @@ export const routes: Routes = [
         path: 'tickets',
         component: TicketsComponent,
         data: {
-          disclaimerKey: 'Tickets',
+          disclaimerKey: 'PQRS',
         },
       },
       {
