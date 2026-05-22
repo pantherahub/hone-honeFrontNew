@@ -1,0 +1,128 @@
+<form [formGroup]="tempForm" (ngSubmit)="apply()">
+  <app-drawer
+    #filterDrawer
+    placement="right"
+    size="sm"
+    (onClose)="onDrawerInternalClose($event)"
+    [hasFooter]="true">
+
+    <ng-container drawer-header>
+      <div class="flex flex-col gap-2">
+        <h2 class="text-lg font-black text-main-blue1h leading-5">
+          Filtros Avanzados
+        </h2>
+        <p class="text-sm leading-4 text-gray-600">
+          Personaliza tu búsqueda con los filtros disponibles
+        </p>
+      </div>
+    </ng-container>
+
+    <section class="flex flex-col gap-6">
+      <div>
+        <p class="text-sm font-semibold text-gray-900 leading-4 mb-2.5">
+          Número de PQRS
+        </p>
+        <app-text-input
+          [id]="'idTicketFilter'"
+          formControlName="idTicket"
+          label="Número"
+          [searcher]="true"
+          [clearable]="true">
+        </app-text-input>
+      </div>
+
+      <div>
+        <p class="text-sm font-semibold text-gray-900 leading-4 mb-2.5">
+          Solicitud
+        </p>
+        <app-text-input
+          [id]="'requestNameFilter'"
+          formControlName="requestName"
+          label="Nombre de solicitud"
+          [searcher]="true"
+          [clearable]="true">
+        </app-text-input>
+      </div>
+
+      <div class="flex flex-col gap-2.5">
+        <p class="text-sm font-semibold text-gray-900 leading-4">
+          Rango de fechas
+        </p>
+        <div>
+          <app-text-input
+            [id]="'startDateFilter'"
+            label="Desde"
+            [type]="'date'"
+            formControlName="startDate"
+          />
+          <app-input-error [control]="tempForm.get('startDate')" />
+        </div>
+        <div>
+          <app-text-input
+            [id]="'endDateFilter'"
+            label="Hasta"
+            [type]="'date'"
+            formControlName="endDate"
+          />
+          <app-input-error [control]="tempForm.get('endDate')" />
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2.5">
+        <p class="text-sm font-semibold text-gray-900 leading-4 mb-2.5">
+          Estados
+        </p>
+        <div class="flex flex-col gap-2.5">
+          <div class="flex items-center gap-2">
+            <app-radio
+              [id]="'all-status'"
+              name="statusGroup"
+              [value]="null"
+              formControlName="idStatus">
+            </app-radio>
+            <label for="all-status" class="text-sm text-gray-700 cursor-pointer">
+              Todos
+            </label>
+          </div>
+          @for (item of ticketStatusList; track item.idStatus) {
+            <div class="flex items-center gap-2">
+              <app-radio
+                [id]="'status-' + item.idStatus"
+                name="statusGroup"
+                [value]="item.idStatus"
+                formControlName="idStatus">
+              </app-radio>
+              <label [for]="'status-' + item.idStatus" class="text-sm text-gray-700 cursor-pointer">
+                {{ statusConfig[item.status].label }}
+              </label>
+            </div>
+          }
+        </div>
+      </div>
+
+    </section>
+
+    <ng-container drawer-footer>
+      <div class="flex flex-col-reverse sm:flex-row gap-4">
+        <app-button
+          (onClick)="reset()"
+          variant="gray"
+          styleType="soft"
+          size="md"
+          class="flex-1"
+          customClass="w-full flex justify-center">
+          Limpiar todo
+        </app-button>
+        <app-button
+          [type]="'submit'"
+          variant="primary"
+          styleType="solid"
+          size="md"
+          class="flex-1"
+          customClass="w-full flex justify-center">
+          Aplicar filtros
+        </app-button>
+      </div>
+    </ng-container>
+  </app-drawer>
+</form>

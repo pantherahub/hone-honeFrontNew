@@ -3,8 +3,8 @@ import { CommonModule, Location } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { NgZorroModule } from './ng-zorro.module';
 import { initFlowbite } from 'flowbite';
-import { FloatingActionsComponent } from './shared/widgets/floating-actions/floating-actions.component';
-import { AccessibilityControlsComponent } from './shared/widgets/accessibility-controls/accessibility-controls.component';
+import { FloatingActionsComponent } from './shared/features/widgets/floating-actions/floating-actions.component';
+import { AccessibilityControlsComponent } from './shared/features/widgets/accessibility-controls/accessibility-controls.component';
 
 @Component({
   selector: 'app-root',

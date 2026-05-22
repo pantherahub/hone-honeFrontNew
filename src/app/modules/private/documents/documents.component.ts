@@ -3,15 +3,15 @@ import { EventManagerService } from 'src/app/services/events-manager/event-manag
 import { DocumentInterface } from 'src/app/interfaces/client.interface';
 import { DocumentService } from 'src/app/services/documents/documents.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FeedbackFivestarsComponent } from 'src/app/shared/modals/feedback-fivestars/feedback-fivestars.component';
+import { FeedbackFivestarsComponent } from 'src/app/shared/overlays/modals/feedback-fivestars/feedback-fivestars.component';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { ModalService } from 'src/app/services/modal/modal.service';
-import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { ButtonComponent } from 'src/app/shared/ui/buttons/button/button.component';
 import ApexCharts, { ApexOptions } from 'apexcharts';
 import { PipesModule } from 'src/app/pipes/pipes.module';
-import { FileViewerComponent } from 'src/app/shared/modals/file-viewer/file-viewer.component';
+import { FileViewerComponent } from 'src/app/shared/overlays/modals/file-viewer/file-viewer.component';
 import { CommonModule } from '@angular/common';
-import { TooltipComponent } from 'src/app/shared/components/tooltip/tooltip.component';
+import { TooltipComponent } from 'src/app/shared/ui/overlays/tooltip/tooltip.component';
 import { ModalEditDocumentComponent } from './modal-edit-document/modal-edit-document.component';
 import { DocumentConfig, DownloadService } from 'src/app/services/download/download.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
@@ -19,13 +19,13 @@ import { CompliancePercentInterface, PercentInterface } from 'src/app/interfaces
 import { environment } from 'src/environments/environment';
 import { CatalogService } from 'src/app/services/catalog/catalog.service';
 import { BadgeConfig } from 'src/app/types/badge-config.type';
-import { DisclaimerFormComponent } from 'src/app/shared/modals/disclaimer-form/disclaimer-form.component';
+import { DisclaimerFormComponent } from 'src/app/shared/overlays/modals/disclaimer-form/disclaimer-form.component';
 import { DisclaimerService } from 'src/app/services/disclaimer/disclaimer.service';
 import { Disclaimer } from 'src/app/interfaces/disclaimer.interface';
 import { catchError, finalize, map, Observable, of, ReplaySubject, Subject, switchMap, takeUntil, tap } from 'rxjs';
-import { PopoverComponent } from 'src/app/shared/components/popover/popover.component';
-import { LoaderComponent } from 'src/app/shared/components/loader/loader.component';
+import { LoaderComponent } from 'src/app/shared/ui/feedback/loader/loader.component';
 import { DropdownTriggerDirective } from 'src/app/directives/dropdown-trigger.directive';
+import { PopoverComponent } from 'src/app/shared/ui/overlays/popover/popover.component';
 
 @Component({
   selector: 'app-documents',

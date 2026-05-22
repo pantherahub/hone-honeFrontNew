@@ -6,17 +6,17 @@ import { EventManagerService } from 'src/app/services/events-manager/event-manag
 import { FileSelectDirective } from 'src/app/directives/file-select.directive';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { formatListWithY, pluralize } from 'src/app/utils/string-utils';
-import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
-import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
-import { InputErrorComponent } from 'src/app/shared/components/input-error/input-error.component';
-import { ButtonComponent } from 'src/app/shared/components/button/button.component';
-import { SelectComponent } from 'src/app/shared/components/select/select.component';
+import { TextInputComponent } from 'src/app/shared/ui/forms/text-input/text-input.component';
+import { InputErrorComponent } from 'src/app/shared/ui/forms/input-error/input-error.component';
+import { ButtonComponent } from 'src/app/shared/ui/buttons/button/button.component';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { FileDropDirective } from 'src/app/directives/file-drop.directive';
 import { City } from 'src/app/interfaces/city.interface';
-import { AlertComponent } from 'src/app/shared/components/alert/alert.component';
+import { AlertComponent } from 'src/app/shared/ui/feedback/alert/alert.component';
 import { Subject, takeUntil } from 'rxjs';
+import { SelectComponent } from 'src/app/shared/ui/forms/select/select.component';
+import { ModalComponent } from 'src/app/shared/ui/overlays/modal/modal.component';
 
 @Component({
   selector: 'app-modal-edit-document',

@@ -7,20 +7,20 @@ import { FormGroup, Validators, FormBuilder, ReactiveFormsModule } from '@angula
 import { RecaptchaModule } from 'ng-recaptcha';
 import { environment } from 'src/environments/environment';
 import { TutorialService } from 'src/app/services/tutorial/tutorial.service';
-import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
-import { InputErrorComponent } from 'src/app/shared/components/input-error/input-error.component';
-import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { TextInputComponent } from 'src/app/shared/ui/forms/text-input/text-input.component';
+import { InputErrorComponent } from 'src/app/shared/ui/forms/input-error/input-error.component';
+import { ButtonComponent } from 'src/app/shared/ui/buttons/button/button.component';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { NavigationService } from 'src/app/services/navigation/navigation.service';
 import { AlertService } from 'src/app/services/alert/alert.service';
 
 @Component({
-   selector: 'app-login',
-   standalone: true,
-   imports: [ CommonModule, ReactiveFormsModule, RecaptchaModule, TextInputComponent, InputErrorComponent, ButtonComponent ],
+  selector: 'app-login',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, RecaptchaModule, TextInputComponent, InputErrorComponent, ButtonComponent],
 
-   templateUrl: './login.component.html',
-   styleUrl: './login.component.scss'
+  templateUrl: './login.component.html',
+  styleUrl: './login.component.scss'
 })
 export class LoginComponent implements OnInit {
   loader: boolean = false;
@@ -31,7 +31,7 @@ export class LoginComponent implements OnInit {
   siteKey = environment.PUBLIC_PASS_KEY;
   loginForm!: FormGroup;
 
-  constructor (
+  constructor(
     private authService: AuthService,
     public router: Router,
     private formBuilder: FormBuilder,
@@ -62,8 +62,8 @@ export class LoginComponent implements OnInit {
 
   createForm() {
     this.loginForm = this.formBuilder.nonNullable.group({
-      email: [ '', [ Validators.required ] ],
-      password: [ '', [ Validators.required ] ]
+      email: ['', [Validators.required]],
+      password: ['', [Validators.required]]
     });
   }
 

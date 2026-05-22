@@ -5,11 +5,11 @@ import { DropdownTriggerDirective } from 'src/app/directives/dropdown-trigger.di
 import { FileSelectDirective } from 'src/app/directives/file-select.directive';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { AlertService } from 'src/app/services/alert/alert.service';
-import { BackendErrorsComponent } from 'src/app/shared/components/backend-errors/backend-errors.component';
-import { ButtonComponent } from 'src/app/shared/components/button/button.component';
-import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.component';
-import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
+import { ButtonComponent } from 'src/app/shared/ui/buttons/button/button.component';
+import { DrawerComponent } from 'src/app/shared/ui/overlays/drawer/drawer.component';
+import { TextInputComponent } from 'src/app/shared/ui/forms/text-input/text-input.component';
 import { BadgeConfig } from 'src/app/types/badge-config.type';
+import { BackendErrorsComponent } from 'src/app/shared/ui/feedback/backend-errors/backend-errors.component';
 
 @Component({
   selector: 'app-rate-management',

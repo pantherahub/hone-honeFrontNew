@@ -9,22 +9,24 @@ import { ContractService } from 'src/app/services/contract/contract.service';
 import { DisclaimerService } from 'src/app/services/disclaimer/disclaimer.service';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 import { ModalService } from 'src/app/services/modal/modal.service';
-import { ButtonComponent } from 'src/app/shared/components/button/button.component';
-import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
-import { DisclaimerFormComponent } from 'src/app/shared/modals/disclaimer-form/disclaimer-form.component';
+import { ButtonComponent } from 'src/app/shared/ui/buttons/button/button.component';
+import { TextInputComponent } from 'src/app/shared/ui/forms/text-input/text-input.component';
+import { DisclaimerFormComponent } from 'src/app/shared/overlays/modals/disclaimer-form/disclaimer-form.component';
 import { BadgeConfig } from 'src/app/types/badge-config.type';
 import { ContractFiltersComponent } from './contract-filters/contract-filters.component';
 import { TicketService } from 'src/app/services/ticket/ticket.service';
-import { ContractManagementComponent } from './contract-management/contract-management.component';
-import { LoaderComponent } from 'src/app/shared/components/loader/loader.component';
+import { LoaderComponent } from 'src/app/shared/ui/feedback/loader/loader.component';
 import { TicketStatus } from 'src/app/interfaces/ticket.interface';
 import { Contract, ContractFilters } from 'src/app/interfaces/contract.interface';
 import { ToastService } from 'src/app/services/toast/toast.service';
+import { PaginationComponent } from 'src/app/shared/ui/feedback/pagination/pagination.component';
+import { FilterButtonComponent } from 'src/app/shared/ui/buttons/filter-button/filter-button.component';
+import { TicketDetailComponent } from 'src/app/shared/overlays/drawers/ticket-detail/ticket-detail.component';
 
 @Component({
   selector: 'app-contracts',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, PipesModule, ButtonComponent, TextInputComponent, ContractFiltersComponent, ContractManagementComponent, LoaderComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, PipesModule, ButtonComponent, TextInputComponent, ContractFiltersComponent, LoaderComponent, PaginationComponent, FilterButtonComponent, TicketDetailComponent],
   templateUrl: './contracts.component.html',
   styleUrl: './contracts.component.scss'
 })
@@ -79,7 +81,7 @@ export class ContractsComponent implements OnInit, AfterViewInit, OnDestroy {
   private disclaimerReady$ = new ReplaySubject<void>(1);
 
   @ViewChild('filterDrawer', { static: false }) filterDrawer!: ContractFiltersComponent;
-  @ViewChild('contractDrawer', { static: false }) contractDrawer!: ContractManagementComponent;
+  @ViewChild('ticketDrawer', { static: false }) ticketDrawer!: TicketDetailComponent;
 
   constructor(
     private eventManager: EventManagerService,
@@ -279,31 +281,13 @@ export class ContractsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.loadContracts$.next(payload);
   }
 
-  get totalPages(): number {
-    return Math.max(1, Math.ceil(this.totalItems / this.itemsPerPage));
-  }
-  get middlePages(): number[] {
-    const pages = new Set<number>();
-    if (this.totalItems === 0) return [1];
-
-    pages.add(1); // Fist
-    pages.add(this.currentPage); // Current
-    pages.add(this.totalPages); // Last
-    return Array.from(pages).sort((a, b) => a - b);
-  }
-  get endRange(): number {
-    return Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
+  onPageChange(page: number) {
+    this.currentPage = page;
+    this.loadContracts();
   }
 
-  goToPage(page: number) {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-      this.loadContracts();
-    }
-  }
-
-  openContractModal(idContract: number) {
-    this.contractDrawer.open(idContract);
+  openContractModal(idTicket: number) {
+    this.ticketDrawer.open(idTicket);
   }
 
 }

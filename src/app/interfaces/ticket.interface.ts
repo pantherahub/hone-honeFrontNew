@@ -1,12 +1,16 @@
+import { ClientBasicInfo } from "./client.interface";
+import { BaseContract } from "./contract.interface";
 import { StoredFile } from "./file.interface";
 
 export type MessageStatus = 'Approved' | 'Disapproved' | 'In process';
+export type TicketMessageType = 'Init' | 'Notification' | 'Message' | 'Closed';
 export type TicketMessageCreatedIn = 'Lissom' | 'Provider' | 'Mixed';
-export type TicketMessageCreateBy = 'HoneSolutions' | 'Provider' | 'Client' | 'AnonimClient' | 'AnonimProvider';
+export type TicketMessageCreatedBy = 'HoneSolutions' | 'Provider' | 'Client' | 'AnonimClient' | 'AnonimProvider';
 export type TicketMessageStatusRef = 'In process' | 'Approved' | 'Disapproved';
 
 export interface Ticket {
   idTickets: number;
+  idTicketParent: number | null;
   idStatus: number;
   idClientHoneSolutions: number;
   idTicketCreator: number;
@@ -23,6 +27,17 @@ export interface Ticket {
   Managers?: any[];
   Status?: TicketStatus;
   TicketCreator?: any;
+  Involved?: any;
+
+  Client?: ClientBasicInfo;
+  RequestType?: TicketRequestType;
+  Contract?: BaseContract;
+}
+
+export interface TicketRequestType {
+  idTiposolicitud: number;
+  nameSolicitud: string;
+  isTicket: boolean;
 }
 
 export interface TicketStatus {
@@ -40,8 +55,8 @@ export interface TicketMessage {
   idProvider: number;
   message: string;
   isViewedByHone: boolean;
-  type: string;
-  createdBy: TicketMessageCreateBy;
+  type: TicketMessageType;
+  createdBy: TicketMessageCreatedBy;
   isUpdated: boolean;
   createdAt: string;
   updatedAt: string;
@@ -77,21 +92,69 @@ export interface MessageEmail {
 
 
 /* Ticket message payloads */
+export interface TicketFilters {
+  idTicket?: number;
+  idClientHoneSolutions?: number;
+  idStatus?: number;
+  startDate?: string;
+  endDate?: string;
+  requestName?: string;
+
+  idProvider?: number;
+  idProviderCreator?: number;
+  isNew?: boolean;
+
+  // withParent?: boolean;
+  // withChildren?: {
+  //   status: boolean;
+  //   last: boolean;
+  // };
+
+  messageOptions: {
+    withMessages: boolean;
+    idMessageStatus?: string;
+    messageType?: TicketMessageType;
+  };
+  page: number;
+  limit: number;
+}
 export interface MessageFilters {
-  type: string;
+  type: TicketMessageType;
   page: number;
   limit: number;
   startDate?: string;
   endDate?: string;
-  createdBy?: TicketMessageCreateBy;
+  createdBy?: TicketMessageCreatedBy;
+}
+export interface CreateTicketPayload {
+  createdBy: TicketMessageCreatedBy;
+  idProviderManager: number;
+  idProviderLogin?: number;
+  idProvider?: number;
+  idClientHoneSolutions: number;
+  idRequestType: number;
+  requestName: string;
+  message: string;
+  dateMax: string;
+  dataCreator?: {
+    name: string;
+    lastname: string;
+    email: string;
+    phone: string;
+    idTypeDocument: number;
+    identification: string;
+  }; // Anonymous creators
+  // idTicketParent?: number;
+  // copy?: string[];
+  archivo?: File[];
 }
 export interface TicketMessagePayload {
   idMessageStatus: number;
   message: string;
-  archivo: File;
+  archivo: File | File[] | null;
   idProviderLogin: number;
   createdIn: TicketMessageCreatedIn;
-  createdBy: TicketMessageCreateBy;
+  createdBy: TicketMessageCreatedBy;
 }
 export interface UpdateTicketMessagePayload {
   message: string;
