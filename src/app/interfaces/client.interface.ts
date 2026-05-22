@@ -9,6 +9,7 @@ export interface ClientInterface {
    typeProvider?: string;
    idTypeProvider?: number;
    email?: string;
+   withContract?: boolean;
 }
 
 export interface DocumentInterface {
@@ -30,4 +31,11 @@ export interface CompanyInterface {
   name: string;
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface ClientBasicInfo {
+  idClientHoneSolutions: number;
+  clientHoneSolutions: string;
+  urlImagenClientHoneSolutions: string;
+  urlHeader: string;
 }

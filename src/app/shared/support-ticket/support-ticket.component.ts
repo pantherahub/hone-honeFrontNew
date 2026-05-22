@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { ButtonComponent } from '../components/button/button.component';
 import { TextInputComponent } from '../components/text-input/text-input.component';
 import { NavigationService } from 'src/app/services/navigation/navigation.service';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { InputErrorComponent } from '../components/input-error/input-error.component';
 import { Router } from '@angular/router';
@@ -11,9 +11,9 @@ import { EventManagerService } from 'src/app/services/events-manager/event-manag
 import { sanitizeString } from 'src/app/utils/string-utils';
 import { AuthService } from 'src/app/services/auth.service';
 import { REGEX_PATTERNS } from 'src/app/constants/regex-patterns';
-import { TicketsService } from 'src/app/services/tickets/tickets.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { AlertService } from 'src/app/services/alert/alert.service';
+import { TicketService } from 'src/app/services/ticket/ticket.service';
 
 @Component({
   selector: 'app-support-ticket',
@@ -37,7 +37,7 @@ export class SupportTicketComponent implements OnInit {
     private router: Router,
     private eventManager: EventManagerService,
     private authService: AuthService,
-    private ticketService: TicketsService,
+    private ticketService: TicketService,
     private toastService: ToastService,
     private alertService: AlertService,
   ) { }

@@ -1,0 +1,237 @@
+<app-loader [visible]="loading" />
+
+<div class="flex flex-col gap-6 pb-20">
+
+  <div class="flex flex-col gap-2">
+    <h2 class="text-xl font-black leading-[1.375rem] text-main-blue1h">
+      Contratos
+    </h2>
+    <p class="text-gray-600 text-base font-normal leading-[1.125rem]">
+      Consulta tus contratos aquí. Descarga los contratos pendientes, fírmalo y vuelve a subirlo.
+    </p>
+  </div>
+
+  <div class="flex flex-col gap-4">
+    <!-- Filters -->
+    <div [formGroup]="filterForm" class="flex justify-between gap-4">
+      <app-text-input
+        [id]="'contractSearcher'"
+        formControlName="expedientNumber"
+        label="Número de contrato"
+        [searcher]="true"
+        [clearable]="true"
+        class="w-full max-w-[364px]"
+        customInputClass="!pt-2 leading-4"
+        iconSizeClass="w-4 h-4"
+      >
+      </app-text-input>
+      @if (appliedFiltersCount === 0) {
+        <app-button
+          (onClick)="openFiltersModal()"
+          variant="gray"
+          styleType="soft"
+          size="xs">
+          <svg class="w-4 h-4">
+            <use xlink:href="/assets/icons/outline/general.svg#filter" />
+          </svg>
+          Filtro
+        </app-button>
+      } @else {
+        <app-button
+          (onClick)="openFiltersModal()"
+          variant="gray"
+          styleType="soft"
+          size="xs"
+          customClass="!bg-blue3h-100 !text-blue3h-600 ring-[1px] ring-inset ring-blue3h-400">
+          <svg class="w-4 h-4">
+            <use xlink:href="/assets/icons/solid/general.svg#filter" />
+          </svg>
+          <div class="whitespace-nowrap">
+            Filtro <span class="hidden xs:inline">({{ appliedFiltersCount }})</span>
+          </div>
+          <button (click)="clearFilters()" class="bg-transparent hover:text-blue3h-800">
+            <svg class="w-4 h-4">
+              <use xlink:href="/assets/icons/outline/general.svg#close" />
+            </svg>
+          </button>
+        </app-button>
+      }
+    </div>
+
+    <!-- Table -->
+    <div class="relative overflow-x-auto overflow-y-hidden rounded-xl shadow-sm">
+      <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead class="text-sm leading-4 text-blue1h-950 bg-gray-100 dark:bg-gray-700 dark:text-gray-400 whitespace-nowrap">
+          <tr>
+            <th scope="col" class="px-4 py-3 font-semibold">
+              Contrato
+            </th>
+            <th scope="col" class="px-4 py-3 font-semibold">
+              Fecha de creación
+            </th>
+            <th scope="col" class="px-4 py-3 font-semibold">
+              Última modificación
+            </th>
+            <th scope="col" class="px-4 py-3 font-semibold">
+              Estado
+            </th>
+            <th scope="col" class="px-4 py-3 font-semibold">
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loadingContracts) {
+            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+              <td colspan="6" class="px-4 h-[54px] text-left">
+                <div class="text-md text-main-blue1h leading-4 flex items-center gap-2">
+                  <svg class="w-5 h-5 text-current animate-spin fill-gray-200">
+                    <use xlink:href="/assets/icons/extras/animations.svg#spin" />
+                  </svg>
+                  Cargando...
+                </div>
+              </td>
+            </tr>
+          } @else if (!contractList.length) {
+            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+              <td colspan="6" class="px-4 h-[54px] text-left">
+                <div class="text-md text-main-blue1h leading-4 flex items-center gap-2">
+                  Sin resultados.
+                </div>
+              </td>
+            </tr>
+          } @else {
+            @for (contract of contractList; track contract.idContract) {
+              <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+                <td class="px-4 py-[10.5px] text-sm font-normal text-main-blue1h leading-4 dark:text-white min-w-[280px]">
+                  <div class="flex justify-between items-center gap-2 w-full">
+                    <div class="flex items-center">
+                      {{ contract.expedientNumber }}
+                    </div>
+                    <app-button
+                      (onClick)="openContractModal(contract.idContract)"
+                      variant="gray"
+                      styleType="soft"
+                      size="xs"
+                      class="block sm:hidden">
+                      <svg class="w-4 h-4">
+                        <use xlink:href="/assets/icons/outline/general.svg#close-sidebar" />
+                      </svg>
+                      Abrir
+                    </app-button>
+                  </div>
+                </td>
+                <td class="px-4 py-[10.5px] text-sm font-normal text-main-blue1h leading-4 dark:text-white">
+                  {{ contract.createdAt | date: 'mediumDate' }}
+                </td>
+                <td class="px-4 py-[10.5px] text-sm font-normal text-main-blue1h leading-4 dark:text-white">
+                  {{ contract.updatedAt | date: 'mediumDate' }}
+                </td>
+                <td class="px-4 py-[10.5px]">
+                  <ng-container
+                    *ngTemplateOutlet="contractStatusTemplate; context: { contract }">
+                  </ng-container>
+                </td>
+                <td class="px-4 py-[10.5px] text-left">
+                  <div class="my-auto flex justify-end gap-2">
+                    <app-button
+                      (onClick)="openContractModal(contract.idContract)"
+                      variant="gray"
+                      styleType="soft"
+                      size="xs"
+                      customClass="whitespace-nowrap">
+                      <svg class="w-4 h-4">
+                        <use xlink:href="/assets/icons/outline/general.svg#close-sidebar" />
+                      </svg>
+                      Abrir contrato
+                    </app-button>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Page navigation" class="flex items-center justify-between gap-4 flex-col xs:flex-row">
+      <span class="text-sm text-gray-500 dark:text-gray-400">
+        <ng-container *ngIf="totalItems > 0; else noItems">
+          Mostrando
+          <span class="font-semibold text-gray-900 dark:text-white">
+            {{ (currentPage - 1) * itemsPerPage + 1 }}-{{ endRange }}
+          </span>
+          de
+          <span class="font-semibold text-gray-900 dark:text-white">{{ totalItems }}</span>
+        </ng-container>
+        <ng-template #noItems>Mostrando 0</ng-template>
+      </span>
+
+      <ul class="inline-flex -space-x-px w-full xs:w-auto">
+        <li class="grow">
+          <a (click)="goToPage(currentPage - 1)"
+            [class.pointer-events-none]="currentPage === 1"
+            [class.opacity-50]="currentPage === 1"
+            class="cursor-pointer flex items-center justify-center font-medium text-sm leading-4 py-1.5 px-3 text-gray-500 bg-white rounded-s-xl hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700">
+            Anterior
+          </a>
+        </li>
+
+        <li *ngFor="let page of middlePages">
+          <a (click)="goToPage(page)"
+            [ngClass]="{
+              'text-blue-600 bg-blue-50 dark:bg-gray-700 dark:text-white hover:bg-blue-200 hover:text-blue-700': page === currentPage,
+              'text-gray-500 bg-white dark:bg-gray-800 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700': page !== currentPage
+            }"
+            class="cursor-pointer hidden sm:flex items-center justify-center font-medium text-sm leading-4 py-1.5 px-3">
+            {{ page }}
+          </a>
+        </li>
+
+        <li class="grow">
+          <a (click)="goToPage(currentPage + 1)"
+            [class.pointer-events-none]="currentPage === totalPages"
+            [class.opacity-50]="currentPage === totalPages"
+            class="cursor-pointer flex items-center justify-center font-medium text-sm leading-4 py-1.5 px-3 text-gray-500 bg-white rounded-e-xl hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700">
+            Siguiente
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+  </div>
+
+</div>
+
+
+
+<ng-template #contractStatusTemplate let-contract="contract">
+  <div
+    class="inline-flex gap-1 py-1.5 px-3 rounded-full text-sm font-semibold leading-4 whitespace-nowrap"
+    [ngClass]="[
+      statusConfig[getContractStatus(contract)].bgClass,
+      statusConfig[getContractStatus(contract)].textClass
+    ]">
+    @if (statusConfig[getContractStatus(contract)].icon) {
+      <svg class="w-4 h-4">
+        <use [attr.xlink:href]="'/assets/icons/outline/general.svg#' + statusConfig[getContractStatus(contract)].icon" />
+      </svg>
+    }
+    {{ statusConfig[getContractStatus(contract)].label }}
+  </div>
+</ng-template>
+
+
+
+<app-contract-filters
+  #filterDrawer
+  [ticketStatusList]="statusList"
+  [statusConfig]="statusConfig"
+  (onClose)="onFilterDrawerClose($event)">
+</app-contract-filters>
+
+<app-contract-management
+  #contractDrawer
+  [statusConfig]="statusConfig"
+  (refreshList)="loadContracts()">
+</app-contract-management>

@@ -23,6 +23,12 @@ export const SERVICES_CONFIG = {
   //   label: 'Rips',
   //   tab: 'RIPS',
   // },
+  contracts: {
+    key: 'contracts',
+    path: '/service/contracts',
+    label: 'Contratos',
+    tab: 'Contratos',
+  },
 } as const;
 
 export type ServiceKey = keyof typeof SERVICES_CONFIG;
@@ -34,4 +40,5 @@ export const SERVICES_ORDER: readonly ServiceKey[] = [
   // 'rates',
   // 'billing',
   // 'rips',
+  'contracts',
 ];
