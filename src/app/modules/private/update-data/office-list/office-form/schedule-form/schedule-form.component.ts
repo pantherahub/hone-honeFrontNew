@@ -3,12 +3,12 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } 
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
-import { ButtonComponent } from 'src/app/shared/components/button/button.component';
-import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.component';
-import { InputErrorComponent } from 'src/app/shared/components/input-error/input-error.component';
-import { LoaderComponent } from 'src/app/shared/components/loader/loader.component';
-import { SelectComponent } from 'src/app/shared/components/select/select.component';
-import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
+import { ButtonComponent } from 'src/app/shared/ui/buttons/button/button.component';
+import { DrawerComponent } from 'src/app/shared/ui/overlays/drawer/drawer.component';
+import { InputErrorComponent } from 'src/app/shared/ui/forms/input-error/input-error.component';
+import { LoaderComponent } from 'src/app/shared/ui/feedback/loader/loader.component';
+import { TextInputComponent } from 'src/app/shared/ui/forms/text-input/text-input.component';
+import { SelectComponent } from 'src/app/shared/ui/forms/select/select.component';
 
 @Component({
   selector: 'app-schedule-form',
@@ -277,10 +277,10 @@ export class ScheduleFormComponent implements OnInit, OnDestroy {
             (scheduleParts.length === 2 && getDaysRange(scheduleParts[0], scheduleParts[1]).includes(getDaysRange(day, day)[0])) ||
             (s.schedule === day)
           ) &&
-          (
-            (form.value?.idTemporalSchedule && s.idTemporalSchedule !== form.value.idTemporalSchedule) ||
-            (!form.value?.idTemporalSchedule && s.idAddedTemporal !== form.value?.idAddedTemporal)
-          )
+            (
+              (form.value?.idTemporalSchedule && s.idTemporalSchedule !== form.value.idTemporalSchedule) ||
+              (!form.value?.idTemporalSchedule && s.idAddedTemporal !== form.value?.idAddedTemporal)
+            )
         });
         if (dayInRange) {
           overlappingError = true;

@@ -12,15 +12,15 @@ import { AddressFormComponent } from './address-form/address-form.component';
 import { ScheduleFormComponent } from './schedule-form/schedule-form.component';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ContactFormComponent } from '../../shared/contact-form/contact-form.component';
-import { ButtonComponent } from 'src/app/shared/components/button/button.component';
-import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
-import { InputErrorComponent } from 'src/app/shared/components/input-error/input-error.component';
-import { SelectComponent } from 'src/app/shared/components/select/select.component';
+import { ButtonComponent } from 'src/app/shared/ui/buttons/button/button.component';
+import { TextInputComponent } from 'src/app/shared/ui/forms/text-input/text-input.component';
+import { InputErrorComponent } from 'src/app/shared/ui/forms/input-error/input-error.component';
 import { DropdownTriggerDirective } from 'src/app/directives/dropdown-trigger.directive';
 import { CatalogService } from 'src/app/services/catalog/catalog.service';
 import { ContactDetailComponent } from '../../shared/contact-detail/contact-detail.component';
 import { OfficeDataService } from 'src/app/services/office-data/office-data.service';
 import { City } from 'src/app/interfaces/city.interface';
+import { SelectComponent } from 'src/app/shared/ui/forms/select/select.component';
 
 @Component({
   selector: 'app-office-form',

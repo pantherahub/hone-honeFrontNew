@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder } from '@angular/forms';
-import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { ButtonComponent } from 'src/app/shared/ui/buttons/button/button.component';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { DropdownTriggerDirective } from 'src/app/directives/dropdown-trigger.directive';
 import { firstValueFrom } from 'rxjs';

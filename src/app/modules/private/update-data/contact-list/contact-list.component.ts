@@ -3,7 +3,7 @@ import { FormArray, FormBuilder } from '@angular/forms';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { ContactFormComponent } from '../shared/contact-form/contact-form.component';
 import { CommonModule } from '@angular/common';
-import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { ButtonComponent } from 'src/app/shared/ui/buttons/button/button.component';
 import { DropdownTriggerDirective } from 'src/app/directives/dropdown-trigger.directive';
 import { firstValueFrom } from 'rxjs';
 import { ToastService } from 'src/app/services/toast/toast.service';

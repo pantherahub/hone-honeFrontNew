@@ -1,8 +1,8 @@
 import { Component, Input, TemplateRef } from '@angular/core';
-import { ModalComponent } from '../../components/modal/modal.component';
 import { CommonModule } from '@angular/common';
-import { ButtonComponent } from '../../components/button/button.component';
+import { ButtonComponent } from '../../ui/buttons/button/button.component';
 import { AlertVariant } from 'src/app/interfaces/alert.interface';
+import { ModalComponent } from '../../ui/overlays/modal/modal.component';
 
 @Component({
   selector: 'app-alert-modal',

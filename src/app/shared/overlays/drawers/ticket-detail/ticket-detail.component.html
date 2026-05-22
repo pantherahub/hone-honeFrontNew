@@ -1,0 +1,22 @@
+<app-drawer
+  #ticketDrawer
+  placement="right"
+  size="xl"
+  [beforeClose]="canClose.bind(this)"
+  (onClose)="onDrawerInternalClose()">
+
+  <ng-container drawer-header>
+    <h2 class="text-lg font-black text-main-blue1h leading-5">
+      PQRS #{{ ticket?.idTickets ?? idTicket }}
+    </h2>
+  </ng-container>
+
+  <app-ticket-content
+    #ticketContent
+    [autoLoad]="false"
+    [statusConfig]="statusConfig"
+    (ticketChange)="onTicketChange($event)"
+    (loadError)="onLoadError()">
+  </app-ticket-content>
+
+</app-drawer>

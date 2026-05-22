@@ -6,7 +6,6 @@ import { ClientProviderService } from 'src/app/services/client-provider/client-p
 import { LANGUAGES } from 'src/app/constants/languages';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { format } from 'date-fns';
-import { BackendErrorsComponent } from 'src/app/shared/components/backend-errors/backend-errors.component';
 import { catchError, debounceTime, finalize, firstValueFrom, fromEvent, Observable, of, Subject, takeUntil, tap } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
 import { CanComponentDeactivate } from 'src/app/guards/can-deactivate.interface';
@@ -14,8 +13,8 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { NavigationService } from 'src/app/services/navigation/navigation.service';
 import { isEmail } from 'src/app/utils/validation-utils';
 import { ClientInterface } from 'src/app/interfaces/client.interface';
-import { ButtonComponent } from 'src/app/shared/components/button/button.component';
-import { AlertComponent } from 'src/app/shared/components/alert/alert.component';
+import { ButtonComponent } from 'src/app/shared/ui/buttons/button/button.component';
+import { AlertComponent } from 'src/app/shared/ui/feedback/alert/alert.component';
 import { ProviderFormComponent } from './provider-form/provider-form.component';
 import { OfficeListComponent } from './office-list/office-list.component';
 import { ContactListComponent } from './contact-list/contact-list.component';
@@ -27,10 +26,12 @@ import { TempProviderDataValidation } from 'src/app/interfaces/temporal-provider
 import { DisclaimerService } from 'src/app/services/disclaimer/disclaimer.service';
 import { Disclaimer } from 'src/app/interfaces/disclaimer.interface';
 import { ModalService } from 'src/app/services/modal/modal.service';
-import { DisclaimerFormComponent } from 'src/app/shared/modals/disclaimer-form/disclaimer-form.component';
-import { LoaderComponent } from 'src/app/shared/components/loader/loader.component';
+import { DisclaimerFormComponent } from 'src/app/shared/overlays/modals/disclaimer-form/disclaimer-form.component';
+import { LoaderComponent } from 'src/app/shared/ui/feedback/loader/loader.component';
 import { LoadingCounter } from 'src/app/helpers/loading-counter';
 import { StorageKey } from 'src/app/enums/storage-key.enum';
+import { IdentificationType } from 'src/app/interfaces/identification-type.interface';
+import { BackendErrorsComponent } from 'src/app/shared/ui/feedback/backend-errors/backend-errors.component';
 
 @Component({
   selector: 'app-update-data',
@@ -48,7 +49,7 @@ export class UpdateDataComponent implements OnInit, AfterViewInit, OnDestroy, Ca
   private readonly FORM_STORAGE_KEY = StorageKey.UpdateDataFormState;
 
   languages: any[] = LANGUAGES;
-  identificationTypes: any[] = [];
+  identificationTypes: IdentificationType[] = [];
   providerCompanies: any[] = [];
   providerDisclaimer: Disclaimer | null = null;
 

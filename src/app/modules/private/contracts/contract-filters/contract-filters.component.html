@@ -8,7 +8,9 @@
 
     <ng-container drawer-header>
       <div class="flex flex-col gap-2">
-        <h2 class="text-lg font-black text-main-blue1h leading-5">Filtros Avanzados</h2>
+        <h2 class="text-lg font-black text-main-blue1h leading-5">
+          Filtros Avanzados
+        </h2>
         <p class="text-sm leading-4 text-gray-600">
           Personaliza tu búsqueda con los filtros disponibles
         </p>
@@ -28,7 +30,6 @@
           [clearable]="true">
         </app-text-input>
       </div>
-
 
       <div class="flex flex-col gap-2.5">
         <p class="text-sm font-semibold text-gray-900 leading-4">
@@ -61,7 +62,7 @@
         <div class="flex flex-col gap-2.5">
           <div class="flex items-center gap-2">
             <app-radio
-              id="all-status"
+              [id]="'all-status'"
               name="statusGroup"
               [value]="null"
               formControlName="idStatus">

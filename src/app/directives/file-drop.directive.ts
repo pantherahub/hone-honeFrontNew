@@ -1,4 +1,4 @@
-import { Directive, ElementRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
+import { Directive, ElementRef, EventEmitter, HostListener, Input, Output, booleanAttribute } from '@angular/core';
 import { FileValidationService } from '../services/file-validation/file-validation.service';
 
 @Directive({
@@ -9,7 +9,10 @@ export class FileDropDirective {
 
   @Input() allowedExtensions: string[] = [];
   @Input() maxFileSizeMB?: number;
+  @Input() maxFiles?: number;
+  @Input({ transform: booleanAttribute }) multiple: boolean = false;
   @Output() fileDropped: EventEmitter<File> = new EventEmitter();
+  @Output() filesDropped: EventEmitter<File[]> = new EventEmitter();
 
   private dragCounter = 0;
 
@@ -48,13 +51,23 @@ export class FileDropDirective {
     this.dragCounter = 0;
     this.el.nativeElement.classList.remove('dragover');
 
-    const file = event.dataTransfer?.files?.[0];
-    if (!file) return;
+    const files = Array.from(event.dataTransfer?.files ?? []);
+    if (!files.length) return;
 
-    const isFileValid: boolean = this.validator.validate(file, {
+    const validatorOptions = {
       allowedExtensions: this.allowedExtensions,
       maxFileSizeMB: this.maxFileSizeMB,
-    });
+      maxFiles: this.maxFiles,
+    };
+
+    if (this.multiple) {
+      const areFilesValid: boolean = this.validator.validateFiles(files, validatorOptions);
+      if (areFilesValid) this.filesDropped.emit(files);
+      return;
+    }
+
+    const file = files[0];
+    const isFileValid: boolean = this.validator.validate(file, validatorOptions);
     if (isFileValid) this.fileDropped.emit(file);
   }
 

@@ -2,14 +2,15 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { LANGUAGES } from 'src/app/constants/languages';
+import { IdentificationType } from 'src/app/interfaces/identification-type.interface';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { ProviderService } from 'src/app/services/provider/provider.service';
-import { ButtonComponent } from 'src/app/shared/components/button/button.component';
-import { InputErrorComponent } from 'src/app/shared/components/input-error/input-error.component';
-import { SelectComponent } from 'src/app/shared/components/select/select.component';
-import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
+import { ButtonComponent } from 'src/app/shared/ui/buttons/button/button.component';
+import { InputErrorComponent } from 'src/app/shared/ui/forms/input-error/input-error.component';
+import { SelectComponent } from 'src/app/shared/ui/forms/select/select.component';
+import { TextInputComponent } from 'src/app/shared/ui/forms/text-input/text-input.component';
 
 @Component({
   selector: 'app-provider-form',
@@ -24,7 +25,7 @@ export class ProviderFormComponent {
   @Input() form!: FormGroup;
 
   @Input() providerFormFields: string[] = [];
-  @Input() identificationTypes: any[] = [];
+  @Input() identificationTypes: IdentificationType[] = [];
 
   @Input() validateProviderForm!: (form?: FormGroup) => Promise<boolean>;
 
