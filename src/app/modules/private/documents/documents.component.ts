@@ -15,14 +15,14 @@ import { TooltipComponent } from 'src/app/shared/ui/overlays/tooltip/tooltip.com
 import { ModalEditDocumentComponent } from './modal-edit-document/modal-edit-document.component';
 import { DocumentConfig, DownloadService } from 'src/app/services/download/download.service';
 import { ToastService } from 'src/app/services/toast/toast.service';
-import { CompliancePercentInterface, PercentInterface } from 'src/app/interfaces/doc-percent.interface';
+import { CompliancePercentInterface, LoadedPercentInterface, PercentInterface } from 'src/app/interfaces/doc-percent.interface';
 import { environment } from 'src/environments/environment';
 import { CatalogService } from 'src/app/services/catalog/catalog.service';
 import { BadgeConfig } from 'src/app/types/badge-config.type';
 import { DisclaimerFormComponent } from 'src/app/shared/overlays/modals/disclaimer-form/disclaimer-form.component';
 import { DisclaimerService } from 'src/app/services/disclaimer/disclaimer.service';
 import { Disclaimer } from 'src/app/interfaces/disclaimer.interface';
-import { catchError, finalize, map, Observable, of, ReplaySubject, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { catchError, finalize, forkJoin, map, Observable, of, ReplaySubject, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { LoaderComponent } from 'src/app/shared/ui/feedback/loader/loader.component';
 import { DropdownTriggerDirective } from 'src/app/directives/dropdown-trigger.directive';
 import { PopoverComponent } from 'src/app/shared/ui/overlays/popover/popover.component';
@@ -45,6 +45,7 @@ export class DocumentsComponent implements OnInit, AfterViewInit, OnDestroy {
   loadManualDownload: boolean = false;
 
   percentData: CompliancePercentInterface | undefined;
+  approvedPercentData: LoadedPercentInterface | undefined;
   docList: any[] = [];
   citiesList: any[] = [];
   providerDisclaimer: Disclaimer | null = null;
@@ -119,12 +120,14 @@ export class DocumentsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.getCities();
-    this.getDocuments();
 
     this.loading = true;
     this.getProviderDisclaimer$()
       .pipe(
-        switchMap(() => this.getDocumentPercent$()),
+        switchMap(() => forkJoin([
+          this.getDocumentPercent$(),
+          this.getDocuments$()
+        ])),
         takeUntil(this.destroy$),
         finalize(() => {
           this.loading = false;
@@ -159,18 +162,24 @@ export class DocumentsComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  getDocuments() {
+  getDocuments$(): Observable<any[]> {
     this.loadingDocs = true;
     const { idProvider, idClientHoneSolutions } = this.clientSelected;
-    this.documentService.getDocuments(idProvider, idClientHoneSolutions).subscribe({
-      next: (res: any) => {
+
+    return this.documentService.getDocuments(idProvider, idClientHoneSolutions).pipe(
+      tap((res: any) => {
         this.docList = res.data;
         this.loadingDocs = false;
-      },
-      error: (error: any) => {
+      }),
+      catchError((error: any) => {
         this.loadingDocs = false;
-      },
-    });
+        return of([]);
+      })
+    );
+  }
+
+  getDocuments() {
+    this.getDocuments$().subscribe();
   }
 
   private getProviderDisclaimer$(): Observable<void> {
@@ -208,6 +217,7 @@ export class DocumentsComponent implements OnInit, AfterViewInit, OnDestroy {
         // Efectos visuales / preparación
         tap((percentDataTypes: PercentInterface) => {
           this.percentData = percentDataTypes?.compliance;
+          this.approvedPercentData = percentDataTypes?.loaded;
 
           if (this.chart) {
             this.chart.updateSeries([
@@ -219,7 +229,10 @@ export class DocumentsComponent implements OnInit, AfterViewInit, OnDestroy {
             this.setupChart();
           }
         }),
-
+        catchError((err: any) => {
+          this.loadingPercent = false;
+          return of(null);
+        }),
         finalize(() => {
           this.loadingPercent = false;
         })
@@ -397,6 +410,11 @@ export class DocumentsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private showDataformAlert(): void {
     if (this.dataformAlertShown || (this.user.withData && !this.user.rejected)) {
+      const hasDocsAboutToExpire = this.docList.some(doc => this.isAboutToExpire(doc));
+      if (this.approvedPercentData?.upToDate === 100 && !hasDocsAboutToExpire) {
+        this.showFullApprovalAlert();
+        return;
+      }
       this.showFormatsBtnPopover();
       return;
     }
@@ -414,6 +432,13 @@ export class DocumentsComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  showFullApprovalAlert(): void {
+    this.alertService.success(
+      '¡Cumplimiento exitoso!',
+      'Hemos evidenciado el cumplimiento documental requerido. Valoramos mucho su gestión y quedamos atentos para seguir acompañándolos en cada requerimiento.',
+    );
+  }
+
   showFormatsBtnPopover() {
     if (!this.getCurrentDownloadConfig() || this.formatsBtnPopoverShown) return;
     this.formatsBtnPopoverShown = true;
@@ -425,6 +450,28 @@ export class DocumentsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   navigateTo(url: string): void {
     this.router.navigate([url]);
+  }
+
+  /**
+   * Check if a document is one week or less from expiring.
+   * @param doc The document to evaluate
+   */
+  isAboutToExpire(doc: any): boolean {
+    if (!doc.withExpiration || !doc?.expirationDate) return false;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const expDate = new Date(doc.expirationDate);
+    expDate.setHours(0, 0, 0, 0);
+
+    // Diff in ms
+    const diffTime = expDate.getTime() - today.getTime();
+    // Convert to days
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    // Returns true if there is one week or less left until expiration, or if it has already expired
+    return diffDays <= 7;
   }
 
   viewFile(doc: DocumentInterface) {
