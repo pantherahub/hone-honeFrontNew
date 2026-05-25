@@ -254,37 +254,41 @@
                 </td>
                 <td class="px-4 py-[10.5px] text-left">
                   <div class="my-auto flex justify-end gap-2">
-                    @switch (doc.documentStatus) {
-                      @case ('PENDIENTE') {
-                        <app-button
-                          (onClick)="editDocumentModal(doc, true)"
-                          variant="primary"
-                          styleType="solid"
-                          size="xs"
-                          class="grow"
-                          customClass="w-full flex justify-center">
-                          <svg class="w-4 h-4">
-                            <use xlink:href="/assets/icons/outline/general.svg#upload" />
-                          </svg>
-                          Cargar
-                        </app-button>
-                      }
-                      @case ('VENCIDO') {
+                    @if (doc.documentStatus === 'PENDIENTE') {
+                      <app-button
+                        (onClick)="editDocumentModal(doc, true)"
+                        variant="primary"
+                        styleType="solid"
+                        size="xs"
+                        class="grow"
+                        customClass="w-full flex justify-center">
+                        <svg class="w-4 h-4">
+                          <use xlink:href="/assets/icons/outline/general.svg#upload" />
+                        </svg>
+                        Cargar
+                      </app-button>
+                    } @else if (doc.documentStatus === 'VENCIDO' || isAboutToExpire(doc)) {
+                      <app-tooltip
+                        [id]="'expires-soon-' + doc.idDocumentType"
+                        [text]="doc.documentStatus === 'VENCIDO'
+                          ? 'Este documento está vencido. Por favor, actualízalo para mantener tu cumplimiento al día.'
+                          : 'Este documento está próximo a vencer. Por favor, actualízalo para mantener tu cumplimiento al día.'"
+                        styleType="light"
+                        class="w-full">
                         <app-button
                           (onClick)="editDocumentModal(doc, false)"
                           variant="primary"
                           styleType="solid"
                           size="xs"
                           class="grow"
-                          customClass="w-full">
+                          customClass="w-full flex justify-center">
                           <svg class="w-4 h-4">
                             <use xlink:href="/assets/icons/outline/arrows.svg#refresh" />
                           </svg>
                           Actualizar
                         </app-button>
-                      }
+                      </app-tooltip>
                     }
-
                   </div>
                 </td>
                 <td class="px-4 py-[10.5px] text-left">
@@ -341,17 +345,19 @@
             Ver
           </a>
         </li>
-        <li>
-          <a (click)="editDocumentModal(doc, false)" data-dropdown-close class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-            <svg class="w-[1.125rem] h-[1.125rem] text-gray-500">
-              <use xlink:href="/assets/icons/outline/arrows.svg#refresh" />
-            </svg>
-            Actualizar
-          </a>
-        </li>
+        @if (!doc.isDocApproved ||  isAboutToExpire(doc)) {
+          <li>
+            <a (click)="editDocumentModal(doc, false)" data-dropdown-close class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+              <svg class="w-[1.125rem] h-[1.125rem] text-gray-500">
+                <use xlink:href="/assets/icons/outline/arrows.svg#refresh" />
+              </svg>
+              Actualizar
+            </a>
+          </li>
+        }
       }
     </ul>
-    @if (doc.documentStatus !== 'PENDIENTE') {
+    @if (doc.documentStatus !== 'PENDIENTE' && (!doc.isDocApproved || isAboutToExpire(doc))) {
       <div class="py-1">
         <a (click)="deleteDocument(doc)" data-dropdown-close class="flex items-center gap-3 px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
           <svg class="w-[1.125rem] h-[1.125rem]">
