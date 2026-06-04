@@ -81,4 +81,12 @@ export class TicketService {
     return this.httpClient.put(url, {}, { headers: this.apiKeyHeaders });
   }
 
+  /**
+   * If the ticket has been escalated via a subticket, retrieve the client to whom it was escalated.
+  */
+  getScalingByTicket(idTicket: number): Observable<any> {
+    const url = `${this.baseUrl}/GetScalingById/${idTicket}`;
+    return this.httpClient.get(url, { headers: this.apiKeyHeaders });
+  }
+
 }

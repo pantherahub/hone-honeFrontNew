@@ -92,6 +92,12 @@ export interface MessageEmail {
   TicketEmailTemplate: any;
 }
 
+export interface TicketEscalation {
+  clientHoneSolutions: string;
+  idClientHoneSolutions: number;
+  dateRequest: string;
+}
+
 
 /* Ticket message payloads */
 export interface TicketFilters {

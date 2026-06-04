@@ -39,6 +39,20 @@
         </div>
       </div>
 
+      @if (ticketEscalation) {
+        <div class="flex items-center gap-3 rounded-lg bg-blue1h-50 px-4 py-3 text-main-blue1h ring-[1px] ring-inset ring-blue1h-100">
+          <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white">
+            <svg class="w-5 h-5">
+              <use xlink:href="/assets/icons/outline/general.svg#arrow-up-right-from-square" />
+            </svg>
+          </div>
+          <p class="text-sm leading-4">
+            Escalado a <span class="font-semibold">{{ ticketEscalation.clientHoneSolutions }}</span>
+            &mdash; {{ ticketEscalation.dateRequest | date: 'mediumDate' }}
+          </p>
+        </div>
+      }
+
       @if (initMsg) {
         <div class="flex flex-col gap-2.5 text-sm leading-4">
           <span class="font-semibold text-gray-900">Descripción</span>
