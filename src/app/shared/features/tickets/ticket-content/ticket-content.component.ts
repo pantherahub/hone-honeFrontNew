@@ -25,6 +25,7 @@ import { StoredFile } from 'src/app/interfaces/file.interface';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { BackendErrorsComponent } from '../../../ui/feedback/backend-errors/backend-errors.component';
 import { AlertComponent } from 'src/app/shared/ui/feedback/alert/alert.component';
+import { DropdownTriggerDirective } from "src/app/directives/dropdown-trigger.directive";
 
 type TicketType = 'default' | 'contract' | 'rates';
 
@@ -126,7 +127,8 @@ export const TICKET_STATUS_CONFIG: Record<string, BadgeConfig> = {
     HtmlRendererComponent,
     AlertComponent,
     FileItemComponent,
-  ],
+    DropdownTriggerDirective
+],
   templateUrl: './ticket-content.component.html',
   styleUrl: './ticket-content.component.scss'
 })
@@ -760,7 +762,7 @@ export class TicketContentComponent implements OnInit, OnChanges, OnDestroy {
 
     const idProvider = this.getProviderLoginId();
     if (!idProvider) {
-      this.alertService.error('Ups...', 'Debes iniciar sesion para responder esta PQRS.');
+      this.alertService.error('Ups...', 'Debes iniciar sesion para responder este ticket.');
       return;
     }
 
@@ -808,7 +810,7 @@ export class TicketContentComponent implements OnInit, OnChanges, OnDestroy {
 
     const idProvider = this.getProviderLoginId();
     if (!idProvider) {
-      this.alertService.error('Ups...', 'Debes iniciar sesion para responder esta PQRS.');
+      this.alertService.error('Ups...', 'Debes iniciar sesion para responder este ticket.');
       return;
     }
 
@@ -882,7 +884,7 @@ export class TicketContentComponent implements OnInit, OnChanges, OnDestroy {
   deleteMessage(idMessage: number) {
     const idProvider = this.getProviderLoginId();
     if (!idProvider) {
-      this.alertService.error('Ups...', 'Debes iniciar sesion para responder esta PQRS.');
+      this.alertService.error('Ups...', 'Debes iniciar sesion para responder este ticket.');
       return;
     }
 

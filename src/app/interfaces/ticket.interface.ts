@@ -36,8 +36,10 @@ export interface Ticket {
 
 export interface TicketRequestType {
   idTiposolicitud: number;
+  idRequestType?: number;
   nameSolicitud: string;
   isTicket: boolean;
+  withClient?: boolean;
 }
 
 export interface TicketStatus {

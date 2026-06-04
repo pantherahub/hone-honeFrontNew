@@ -21,15 +21,30 @@
               ¡Bienvenido(a) a tu Portal Transaccional de Gestión de Información y Documentos!
             </span>
           </div>
-          <div class="flex rounded-lg gap-2 py-2.5 px-4 bg-blue2h-50 text-blue2h-950">
-            <div class="py-2">
-              <svg class="w-5 h-5">
-                <use xlink:href="/assets/icons/outline/general.svg#lock" />
+          <div class="flex flex-col gap-2">
+            <div class="flex rounded-lg gap-2 py-2.5 px-4 bg-blue2h-50 text-blue2h-950">
+              <div class="py-2">
+                <svg class="w-5 h-5">
+                  <use xlink:href="/assets/icons/outline/general.svg#lock" />
+                </svg>
+              </div>
+              <div class="text-base font-normal leading-[1.125rem] py-2">
+                Garantizamos la protección de tus datos.
+              </div>
+            </div>
+            <app-button
+              [type]="'submit'"
+              [loading]="loading"
+              variant="gray"
+              size="sm"
+              styleType="ghost"
+              customClass="leading-4"
+              (onClick)="goToTickets()">
+              <svg class="w-4 h-4">
+                <use xlink:href="/assets/icons/outline/general.svg#arrow-up-right-from-square" />
               </svg>
-            </div>
-            <div class="text-base font-normal leading-[1.125rem] py-2">
-              Garantizamos la protección de tus datos.
-            </div>
+              Ver tickets radicados
+            </app-button>
           </div>
         </div>
       </div>

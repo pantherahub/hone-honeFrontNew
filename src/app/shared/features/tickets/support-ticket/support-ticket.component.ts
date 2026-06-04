@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ButtonComponent } from '../../../ui/buttons/button/button.component';
 import { TextInputComponent } from '../../../ui/forms/text-input/text-input.component';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -17,11 +17,14 @@ import { FileDropDirective } from 'src/app/directives/file-drop.directive';
 import { FileSelectDirective } from 'src/app/directives/file-select.directive';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { CatalogService } from 'src/app/services/catalog/catalog.service';
-import { CreateTicketPayload } from 'src/app/interfaces/ticket.interface';
+import { CreateTicketPayload, TicketRequestType } from 'src/app/interfaces/ticket.interface';
 import { DrawerComponent } from '../../../ui/overlays/drawer/drawer.component';
 import { IdentificationType } from 'src/app/interfaces/identification-type.interface';
 import { SelectComponent } from '../../../ui/forms/select/select.component';
 import { FileItemComponent } from 'src/app/shared/ui/display/file-item/file-item.component';
+import { ClientProviderService } from 'src/app/services/client-provider/client-provider.service';
+import { ClientInterface } from 'src/app/interfaces/client.interface';
+import { Subject, takeUntil } from 'rxjs';
 
 const MAX_FILES = 10;
 
@@ -32,7 +35,7 @@ const MAX_FILES = 10;
   templateUrl: './support-ticket.component.html',
   styleUrl: './support-ticket.component.scss'
 })
-export class SupportTicketComponent implements OnInit {
+export class SupportTicketComponent implements OnInit, OnDestroy {
 
   ticketForm!: FormGroup;
   ticketSearchForm!: FormGroup;
@@ -45,6 +48,11 @@ export class SupportTicketComponent implements OnInit {
   isLogged: boolean = false;
 
   identificationTypes: IdentificationType[] = [];
+  requestTypes: TicketRequestType[] = [];
+  clientList: ClientInterface[] = [];
+  showClientSelect: boolean = false;
+
+  private destroy$ = new Subject<void>();
 
   @ViewChild('ticketSearchDrawer') ticketSearchDrawer!: DrawerComponent;
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
@@ -60,14 +68,26 @@ export class SupportTicketComponent implements OnInit {
     private toastService: ToastService,
     private alertService: AlertService,
     private location: Location,
+    private clientService: ClientProviderService,
   ) {
     this.isLogged = this.authService.isAuthenticated();
   }
 
   ngOnInit(): void {
-    this.getIdentificationTypes();
     this.createForm();
     this.createTicketSearchForm();
+
+    this.getIdentificationTypes();
+    this.getRequestTypes();
+
+    if (this.isLogged) {
+      this.getClientList();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   goBack() {
@@ -76,6 +96,43 @@ export class SupportTicketComponent implements OnInit {
 
   goToTickets() {
     this.router.navigateByUrl('tickets');
+  }
+
+  getIdentificationTypes() {
+    this.catalogService.getDocTypes().subscribe({
+      next: (res: any) => {
+        this.identificationTypes = res;
+      },
+      error: (err: any) => {
+        console.error(err);
+      }
+    });
+  }
+
+  getRequestTypes() {
+    this.ticketService.getRequestTypes().subscribe({
+      next: (res: any) => {
+        this.requestTypes = res.data;
+        this.syncClientSelectVisibility();
+      },
+      error: (err: any) => {
+        console.error(err);
+      }
+    });
+  }
+
+  /**
+   * Gets the list of clients of the provider who logs in
+   */
+  getClientList() {
+    this.clientService.getClientListByProviderId(this.user.id).subscribe({
+      next: (res: ClientInterface[]) => {
+        this.clientList = [...res];
+      },
+      error: (err: any) => {
+        console.error(err);
+      }
+    });
   }
 
   openTicketSearchDrawer() {
@@ -108,7 +165,7 @@ export class SupportTicketComponent implements OnInit {
         const ticket = res?.data ?? null;
 
         if (!ticket?.idTickets) {
-          this.alertService.error('Ups...', 'No encontramos una PQRS con los datos ingresados.');
+          this.alertService.error('Ups...', 'No encontramos un ticket con los datos ingresados.');
           return;
         }
 
@@ -122,7 +179,7 @@ export class SupportTicketComponent implements OnInit {
       error: (err: any) => {
         this.loadingTicketSearch = false;
         if (err.status === 404) {
-          this.alertService.error('Ups...', 'No encontramos una PQRS con los datos ingresados.');
+          this.alertService.error('Ups...', 'No encontramos un ticket con los datos ingresados.');
           return;
         }
         const msg = err.error?.message;
@@ -130,17 +187,6 @@ export class SupportTicketComponent implements OnInit {
           'Ups...',
           msg || 'Lo sentimos, hubo un error en el servidor.'
         );
-      }
-    });
-  }
-
-  getIdentificationTypes() {
-    this.catalogService.getDocTypes().subscribe({
-      next: (res: any) => {
-        this.identificationTypes = res;
-      },
-      error: (err: any) => {
-        console.error(err);
       }
     });
   }
@@ -159,10 +205,44 @@ export class SupportTicketComponent implements OnInit {
       identification: ['', [...requiredIfAnonymous, this.formUtils.numeric]],
       email: ['', emailValidators],
       phone: ['', phoneValidators],
+      idRequestType: [this.isLogged ? null : 15, [Validators.required]],
+      idMessageClient: [null],
       requestName: ['', [Validators.required]],
       message: ['', [Validators.required]],
       files: [null],
     });
+
+    this.ticketForm.get('idRequestType')?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.syncClientSelectVisibility());
+  }
+
+  private syncClientSelectVisibility(): void {
+    const clientControl = this.ticketForm.get('idMessageClient');
+    const selectedRequestType = this.getSelectedRequestType();
+    this.showClientSelect = !!selectedRequestType?.withClient;
+
+    if (this.showClientSelect) {
+      clientControl?.setValidators([Validators.required]);
+    } else {
+      clientControl?.setValue(null, { emitEvent: false });
+      clientControl?.clearValidators();
+    }
+
+    clientControl?.updateValueAndValidity({ emitEvent: false });
+  }
+
+  private getSelectedRequestType(): TicketRequestType | null {
+    const selectedRequestTypeId = this.ticketForm.get('idRequestType')?.value;
+    if (selectedRequestTypeId == null) return null;
+
+    return this.requestTypes.find(requestType =>
+      this.getRequestTypeId(requestType) === Number(selectedRequestTypeId)
+    ) ?? null;
+  }
+
+  private getRequestTypeId(requestType: TicketRequestType): number {
+    return requestType.idRequestType ?? requestType.idTiposolicitud;
   }
 
   get selectedFormFiles(): File[] | null {
@@ -245,54 +325,17 @@ export class SupportTicketComponent implements OnInit {
     return !exceedsLimit;
   }
 
-  getObservations(): string {
-    const sanitize = (value: any): string => {
-      return typeof value === 'string'
-        ? sanitizeString(value.trim())
-          .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#39;")
-        : value;
-    };
-    const { name, lastname, identification, email, phone, message } = this.ticketForm.value;
+  private getMessageWithClientPrefix(message: string): string {
+    if (!this.isLogged || !this.showClientSelect) return message;
 
-    const joinWithBr = (lines: string[]): string => lines.map(
-      (line, i) => (i === 0 ? line : `<br>${line}`)
-    ).join('');
-    let observations = '';
+    const idMessageClient = this.ticketForm.get('idMessageClient')?.value;
+    const selectedClient = this.clientList.find(client =>
+      Number(client.idClientHoneSolutions) === Number(idMessageClient)
+    );
 
-    if (this.isLogged) {
-      const userInfo = [
-        '<strong>Información del usuario que genera caso:</strong>',
-        `Nombre: ${this.user.name}`,
-        `Identificacion: ${this.user.identificacion}`,
-      ];
-      if (this.clientSelected?.clientHoneSolutions) {
-        userInfo.push(`Cliente: ${this.clientSelected.clientHoneSolutions}`);
-      }
+    if (!selectedClient?.clientHoneSolutions) return message;
 
-      const reportedData = [
-        '<strong>Datos reportados del usuario:</strong>',
-        `Nombre: ${sanitize(name)}`,
-        `Apellido: ${sanitize(lastname)}`,
-        `Identificación: ${sanitize(identification)}`,
-        `Teléfono: ${sanitize(phone)}`,
-        `Email: ${sanitize(email)}`,
-        `Observaciones: ${sanitize(message)}`,
-      ];
-      observations = joinWithBr(userInfo) + '<br><br>' + joinWithBr(reportedData);
-    } else {
-      const reportedData = [
-        '<strong>Datos reportados del usuario:</strong>',
-        `Nombre: ${sanitize(name)}`,
-        `Apellido: ${sanitize(lastname)}`,
-        `Identificación: ${sanitize(identification)}`,
-        `Teléfono: ${sanitize(phone)}`,
-        `Email: ${sanitize(email)}`,
-        `Observaciones: ${sanitize(message)}`,
-      ];
-      observations = joinWithBr(reportedData);
-    }
-    return observations;
+    return `Aseguradora: ${selectedClient.clientHoneSolutions}\n${message}`;
   }
 
   onSubmit() {
@@ -313,9 +356,11 @@ export class SupportTicketComponent implements OnInit {
       identification,
       email,
       phone,
+      idRequestType,
       requestName,
       message,
     } = this.ticketForm.value;
+    const messageWithClientPrefix = this.getMessageWithClientPrefix(message);
 
     const now = new Date();
     const idClientHone = 7; // Hone Solutions
@@ -332,10 +377,10 @@ export class SupportTicketComponent implements OnInit {
         idProviderLogin: this.user.id,
         idProvider: this.user.id,
         idClientHoneSolutions: idClientHone,
-        idRequestType: 1,
+        idRequestType,
         // requestName: 'Solicitud prestador',
         requestName: requestName,
-        message: message,
+        message: messageWithClientPrefix,
         dateMax: maxDate,
         archivo: this.selectedFormFiles || [],
       };
@@ -344,7 +389,7 @@ export class SupportTicketComponent implements OnInit {
         createdBy: 'AnonimProvider',
         idProviderManager: idProviderManager,
         idClientHoneSolutions: idClientHone,
-        idRequestType: 15,
+        idRequestType,
         // requestName: 'Ingreso erroneo prestador',
         requestName: requestName,
         message: message,
@@ -399,9 +444,9 @@ export class SupportTicketComponent implements OnInit {
         this.alertService.showAlert({
           title: '¡Solicitud recibida!',
           variant: 'success',
-          messageHTML: `Tu PQRS${ticketLabel} ha sido enviada exitosamente. Estaremos revisando tu caso pronto.`,
+          messageHTML: `Tu ticket${ticketLabel} ha sido enviada exitosamente. Estaremos revisando tu caso pronto.`,
           isConfirmation: true,
-          confirmBtnText: 'Ver PQRS',
+          confirmBtnText: 'Ver ticket',
           confirmBtnVariant: 'primary',
           cancelBtnText: 'Cerrar',
           showClose: false,

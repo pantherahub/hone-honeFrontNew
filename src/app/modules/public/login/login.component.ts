@@ -122,4 +122,8 @@ export class LoginComponent implements OnInit {
     console.warn(`reCAPTCHA error encountered`);
   }
 
+  onSupport() {
+    this.router.navigate(['/auth-support']);
+  }
+
 }

@@ -31,7 +31,7 @@
             <svg class="w-4 h-4">
               <use xlink:href="/assets/icons/outline/general.svg#arrow-up-right-from-square" />
             </svg>
-            Ver mis PQRS
+            Ver mis tickets
           </app-button>
         } @else {
           <app-button
@@ -43,7 +43,7 @@
             <svg class="w-4 h-4">
               <use xlink:href="/assets/icons/outline/general.svg#search" />
             </svg>
-            Consultar un PQRS
+            Consultar un ticket
           </app-button>
         }
       </div>
@@ -83,6 +83,30 @@
             <app-text-input [id]="'phone'" formControlName="phone" label="Celular" />
             <app-input-error [control]="ticketForm.get('phone')" />
           </div>
+        }
+        @if (isLogged) {
+          <div>
+            <app-select
+              [items]="requestTypes"
+              bindLabel="nameSolicitud"
+              bindValue="idTiposolicitud"
+              formControlName="idRequestType"
+              placeholder="Tipo de solicitud">
+            </app-select>
+            <app-input-error [control]="ticketForm.get('idRequestType')" />
+          </div>
+          @if (showClientSelect) {
+            <div>
+              <app-select
+                [items]="clientList"
+                bindLabel="clientHoneSolutions"
+                bindValue="idClientHoneSolutions"
+                formControlName="idMessageClient"
+                placeholder="Aseguradora relacionada">
+              </app-select>
+              <app-input-error [control]="ticketForm.get('idMessageClient')" />
+            </div>
+          }
         }
         <div>
           <app-text-input [id]="'requestName'" formControlName="requestName" label="Asunto" />
@@ -201,7 +225,7 @@
 
   <ng-container drawer-header>
     <h2 class="text-lg font-black text-main-blue1h leading-5">
-      Consultar PQRS
+      Consultar ticket
     </h2>
   </ng-container>
 
@@ -221,7 +245,7 @@
         [id]="'ticket-search-id'"
         [type]="'number'"
         formControlName="idTicket"
-        label="Número de PQRS"
+        label="Número de ticket"
         autocomplete="off">
       </app-text-input>
       <app-input-error [control]="ticketSearchForm.get('idTicket')" />
