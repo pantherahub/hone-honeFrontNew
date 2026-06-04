@@ -127,7 +127,11 @@
             <span class="text-xl leading-[1.375rem] font-black">
               Tickets
             </span>
-            <span class="text-sm leading-4 font-normal text-gray-600">
+            <span
+              class="text-sm leading-4 font-normal text-gray-600"
+              [ngClass]="{
+                'hidden sm:block': viewMode === 'list'
+              }">
               Consulta tus solicitudes radicadas, revisa respuestas y mantén el seguimiento en un solo lugar.
             </span>
           </div>
