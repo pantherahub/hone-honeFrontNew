@@ -108,6 +108,42 @@
         </div>
       </ng-template>
 
+      <ng-template #ticketCardTemplate>
+        <div
+          (click)="goToTickets()"
+          class="flex p-4 rounded-lg cursor-pointer bg-gray-100 text-main-blue1h hover:bg-gray-50 hover:ring-[1px] hover:ring-inset hover:ring-blue1h-600 hover:shadow-[0px_16px_44px_0px_#0D0F1C1A] transition-shadow"
+          [ngClass]="{
+            'min-h-[300px] xs:min-h-[204px] sm:min-h-[221px] flex-col justify-between gap-4': viewMode === 'grid',
+            'h-[98.95px] items-center justify-between gap-4': viewMode === 'list',
+          }">
+          <div class="flex flex-col gap-2"
+            [ngClass]="{
+              'h-full justify-center': viewMode === 'grid',
+              'min-w-0': viewMode === 'list',
+            }">
+            <span class="text-xs leading-4 font-semibold uppercase text-blue1h-700">
+              Soporte Hone
+            </span>
+            <span class="text-xl leading-[1.375rem] font-black">
+              Tickets
+            </span>
+            <span
+              class="text-sm leading-4 font-normal text-gray-600"
+              [ngClass]="{
+                'hidden sm:block': viewMode === 'list'
+              }">
+              Consulta tus solicitudes radicadas, revisa respuestas y mantén el seguimiento en un solo lugar.
+            </span>
+          </div>
+          <div class="inline-flex items-center gap-2 text-sm leading-4 font-semibold">
+            Ver solicitudes
+            <svg class="w-4 h-4">
+              <use xlink:href="/assets/icons/outline/arrows.svg#arrow-right" />
+            </svg>
+          </div>
+        </div>
+      </ng-template>
+
       @if (loadingClients) {
         <div class="flex items-center gap-3 text-main-blue1h text-base">
           <svg class="w-5 h-5 text-current animate-spin fill-gray-200">
@@ -143,6 +179,7 @@
               <ng-container *ngTemplateOutlet="clientCardTemplate; context: { $implicit: item }"></ng-container>
             }
           }
+          <ng-container *ngTemplateOutlet="ticketCardTemplate"></ng-container>
         </div>
       }
     </div>

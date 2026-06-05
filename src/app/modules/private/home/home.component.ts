@@ -105,8 +105,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-  * Gets the list of clients of the provider who logs in
-  */
+   * Gets the list of clients of the provider who logs in
+   */
   getClientList() {
     this.loadingClients = true;
     this.clientService.getClientListByProviderId(this.user.id).subscribe({
@@ -200,6 +200,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
           this.startTutorial(step);
         }
       });
+  }
+
+  goToTickets() {
+    this.router.navigateByUrl('tickets');
   }
 
   setView(mode: 'grid' | 'list') {

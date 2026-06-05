@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { filter, finalize, firstValueFrom, interval, Subscription, switchMap, tap } from 'rxjs';
 import { FileDropDirective } from 'src/app/directives/file-drop.directive';
 import { FileSelectDirective } from 'src/app/directives/file-select.directive';
-import { DeleteTicketMessagePayload, MessageFilters, MessageStatus, Ticket, TicketMessage, TicketMessagePayload, UpdateTicketMessagePayload } from 'src/app/interfaces/ticket.interface';
+import { DeleteTicketMessagePayload, MessageFilters, MessageStatus, Ticket, TicketEscalation, TicketMessage, TicketMessagePayload, UpdateTicketMessagePayload } from 'src/app/interfaces/ticket.interface';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { AuthService } from 'src/app/services/auth.service';
@@ -126,7 +126,7 @@ export const TICKET_STATUS_CONFIG: Record<string, BadgeConfig> = {
     HtmlRendererComponent,
     AlertComponent,
     FileItemComponent,
-  ],
+],
   templateUrl: './ticket-content.component.html',
   styleUrl: './ticket-content.component.scss'
 })
@@ -151,6 +151,8 @@ export class TicketContentComponent implements OnInit, OnChanges, OnDestroy {
   uploadFileLabel: string = TICKET_CONFIG.default.uploadPluralLabel;
   maxFiles: number | undefined = TICKET_CONFIG.default.maxFiles;
   uploadAllowedExtensions: string[] = [];
+
+  ticketEscalation: TicketEscalation | null = null;
 
   messageList: TicketMessage[] = [];
   currentMsgPage: number = 1;
@@ -245,6 +247,7 @@ export class TicketContentComponent implements OnInit, OnChanges, OnDestroy {
     this.initMsg = null;
     this.closedMsg = null;
     this.isGhostFormatButton = false;
+    this.ticketEscalation = null;
     this.backendError = null;
     this.hasLoadError = false;
 
@@ -314,6 +317,8 @@ export class TicketContentComponent implements OnInit, OnChanges, OnDestroy {
         // this.loading = false;
         this.refreshMessageLogic();
         this.markMessagesViewed();
+
+        this.getScalingInfo();
         this.refreshMessages();
       },
       error: (err: any) => {
@@ -339,6 +344,30 @@ export class TicketContentComponent implements OnInit, OnChanges, OnDestroy {
       error: (err) => {
         if (err.status !== 404) {
           console.error('Error al marcar visto:', err);
+        }
+      }
+    });
+  }
+
+  getScalingInfo() {
+    if (!this.ticket) return;
+    this.ticketService.getScalingByTicket(this.ticket.idTickets).subscribe({
+      next: (res: any) => {
+        const data = res?.data;
+        if (data) {
+          this.ticketEscalation = {
+            clientHoneSolutions: data.clientHoneSolutions,
+            idClientHoneSolutions: data.idClientHoneSolutions,
+            dateRequest: data.dateRequest,
+          };
+          return;
+        }
+        this.ticketEscalation = null;
+      },
+      error: (err: any) => {
+        this.ticketEscalation = null;
+        if (err.status !== 404) {
+          console.error(err);
         }
       }
     });
@@ -760,7 +789,7 @@ export class TicketContentComponent implements OnInit, OnChanges, OnDestroy {
 
     const idProvider = this.getProviderLoginId();
     if (!idProvider) {
-      this.alertService.error('Ups...', 'Debes iniciar sesion para responder esta PQRS.');
+      this.alertService.error('Ups...', 'Debes iniciar sesion para responder este ticket.');
       return;
     }
 
@@ -808,7 +837,7 @@ export class TicketContentComponent implements OnInit, OnChanges, OnDestroy {
 
     const idProvider = this.getProviderLoginId();
     if (!idProvider) {
-      this.alertService.error('Ups...', 'Debes iniciar sesion para responder esta PQRS.');
+      this.alertService.error('Ups...', 'Debes iniciar sesion para responder este ticket.');
       return;
     }
 
@@ -882,7 +911,7 @@ export class TicketContentComponent implements OnInit, OnChanges, OnDestroy {
   deleteMessage(idMessage: number) {
     const idProvider = this.getProviderLoginId();
     if (!idProvider) {
-      this.alertService.error('Ups...', 'Debes iniciar sesion para responder esta PQRS.');
+      this.alertService.error('Ups...', 'Debes iniciar sesion para responder este ticket.');
       return;
     }
 

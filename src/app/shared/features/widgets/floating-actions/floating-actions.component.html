@@ -14,37 +14,21 @@
 
     <ng-template #triggerTemplate>
       <div class="flex flex-wrap sm:flex-col sm:justify-end gap-2">
-        @if (showSupportAction) {
-          <app-button variant="white" size="md" styleType="solid" class="flex-1 sm:flex-auto min-w-[193px] sm:min-w-0" customClass="ms-auto w-full sm:w-auto flex justify-center" (onClick)="onSupport()">
-            Soporte
-            <svg class="w-5 h-5">
-              <use xlink:href="/assets/icons/outline/e-commerce.svg#user-headset" />
-            </svg>
-          </app-button>
-        }
-        @if (showMeetingAction) {
-          <app-button variant="white" size="md" styleType="solid" class="flex-1 sm:flex-auto min-w-[193px] sm:min-w-0" customClass="ms-auto w-full sm:w-auto flex justify-center" (onClick)="onMeeting()">
-            Agendar reunión
-            <svg class="w-5 h-5">
-              <use xlink:href="/assets/icons/outline/general.svg#calendar-week" />
-            </svg>
-          </app-button>
-        }
-        @if (showTutorialAction) {
-          <app-button variant="white" size="md" styleType="solid" class="flex-1 sm:flex-auto min-w-[193px] sm:min-w-0" customClass="ms-auto w-full sm:w-auto flex justify-center" (onClick)="onTutorial()">
-            Visita guiada
-            <svg class="w-5 h-5">
-              <use xlink:href="/assets/icons/outline/media.svg#clapperboard-play" />
-            </svg>
-          </app-button>
-        }
-        @if (showTutorialVideoAction) {
-          <app-button variant="white" size="md" styleType="solid" class="flex-1 sm:flex-auto min-w-[193px] sm:min-w-0" customClass="ms-auto w-full sm:w-auto flex justify-center" (onClick)="onTutorialVideo()">
-            Video tutorial
-            <svg class="w-5 h-5">
-              <use xlink:href="/assets/icons/outline/media.svg#clapperboard-play" />
-            </svg>
-          </app-button>
+        @for (action of floatingActions; track action.key) {
+          @if (action.isVisible()) {
+            <app-button
+              variant="white"
+              size="md"
+              styleType="solid"
+              class="flex-1 sm:flex-auto min-w-[193px] sm:min-w-0"
+              customClass="ms-auto w-full sm:w-auto flex justify-center"
+              (onClick)="action.onClick()">
+              {{ action.label }}
+              <svg class="w-5 h-5">
+                <use [attr.xlink:href]="action.iconHref" />
+              </svg>
+            </app-button>
+          }
         }
       </div>
     </ng-template>

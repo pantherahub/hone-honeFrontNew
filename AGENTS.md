@@ -51,7 +51,7 @@ Scripts utiles:
 - `src/app/shared/ui/overlays/*`: marcos genericos de overlays, como `tooltip`, `popover`, `modal` y `drawer`.
 - `src/app/shared/ui/display/*`: componentes de visualizacion, como `html-renderer` y futuros `badges`, `cards` o `avatars`.
 - `src/app/shared/features/*`: componentes reutilizables con logica de negocio.
-- `src/app/shared/features/tickets/*`: componentes de PQRS/tickets, como `ticket-content`, `support-ticket` y `ticket-detail-page`.
+- `src/app/shared/features/tickets/*`: componentes de tickets, como `ticket-content`, `support-ticket` y `ticket-detail-page`.
 - `src/app/shared/features/widgets/*`: widgets reutilizables, como `accessibility-controls` y `floating-actions`.
 - `src/app/shared/alerts/*`: logica y componentes de alertas/toasts, como `alert-modal`, `toast` y `toast-container`.
 - `src/app/shared/overlays/*`: instancias especificas de modales y drawers.
@@ -70,13 +70,13 @@ Scripts utiles:
 
 Los componentes reutilizables viven en `src/app/shared/`, organizados por responsabilidad. Los componentes UI base estan en `src/app/shared/ui/*`; la mayoria se construyo tomando el HTML base de Flowbite y encapsulandolo en componentes Angular con inputs, outputs y clases propias.
 
-Usa `src/app/shared/features/*` para piezas reutilizables que ya incluyen logica de negocio, especialmente flujos de tickets/PQRS o widgets compartidos. Usa `src/app/shared/overlays/*` para instancias concretas de modales o drawers, y deja `src/app/shared/ui/overlays/*` solo para los marcos genericos (`app-modal`, `app-drawer`, `tooltip`, `popover`, etc.).
+Usa `src/app/shared/features/*` para piezas reutilizables que ya incluyen logica de negocio, especialmente flujos de tickets o widgets compartidos. Usa `src/app/shared/overlays/*` para instancias concretas de modales o drawers, y deja `src/app/shared/ui/overlays/*` solo para los marcos genericos (`app-modal`, `app-drawer`, `tooltip`, `popover`, etc.).
 
 Al crear o modificar UI:
 
 - Reutiliza componentes existentes de `shared` antes de crear uno nuevo.
 - Antes de escribir controles UI manuales, revisa primero `src/app/shared/ui/*` y sus APIs. Usa componentes existentes como `app-button`, `app-text-input`, `app-select`, `app-checkbox`, `app-modal`, `app-drawer`, etc. cuando el caso encaje, incluso si requiere `customClass` para variaciones menores.
-- Para componentes reutilizables con logica de negocio, revisa primero `src/app/shared/features/*`. En soporte/PQRS, reutiliza piezas como `ticket-content` antes de duplicar vistas para drawer y pagina.
+- Para componentes reutilizables con logica de negocio, revisa primero `src/app/shared/features/*`. En soporte/Tickets, reutiliza piezas como `ticket-content` antes de duplicar vistas para drawer y pagina.
 - Para instancias concretas de modales o drawers, usa `src/app/shared/overlays/modals/*` o `src/app/shared/overlays/drawers/*`. Para el contenedor generico, usa `src/app/shared/ui/overlays/*`.
 - Para toasts, alertas centradas y sus contenedores visuales, revisa `src/app/shared/alerts/*` antes de crear otra solucion.
 - Si necesitas un componente base nuevo, ubicalo bajo la subcarpeta correspondiente de `src/app/shared/ui/*`. Si contiene reglas de negocio reutilizables, ubicalo bajo `src/app/shared/features/*`.
