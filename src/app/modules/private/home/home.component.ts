@@ -6,18 +6,18 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TutorialService } from 'src/app/services/tutorial/tutorial.service';
 import { catchError, finalize, Observable, of, ReplaySubject, Subject, takeUntil, tap } from 'rxjs';
-import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
-import { ButtonComponent } from 'src/app/shared/components/button/button.component';
-import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
+import { TextInputComponent } from 'src/app/shared/ui/forms/text-input/text-input.component';
+import { ButtonComponent } from 'src/app/shared/ui/buttons/button/button.component';
 import { NavigationService } from 'src/app/services/navigation/navigation.service';
-import { PopoverComponent } from 'src/app/shared/components/popover/popover.component';
 import { ModalService } from 'src/app/services/modal/modal.service';
 import { FormsModule } from '@angular/forms';
-import { TutorialVideoComponent } from 'src/app/shared/modals/tutorial-video/tutorial-video.component';
+import { TutorialVideoComponent } from 'src/app/shared/overlays/modals/tutorial-video/tutorial-video.component';
 import { DisclaimerService } from 'src/app/services/disclaimer/disclaimer.service';
 import { Disclaimer } from 'src/app/interfaces/disclaimer.interface';
-import { DisclaimerFormComponent } from 'src/app/shared/modals/disclaimer-form/disclaimer-form.component';
-import { LoaderComponent } from 'src/app/shared/components/loader/loader.component';
+import { DisclaimerFormComponent } from 'src/app/shared/overlays/modals/disclaimer-form/disclaimer-form.component';
+import { LoaderComponent } from 'src/app/shared/ui/feedback/loader/loader.component';
+import { PopoverComponent } from 'src/app/shared/ui/overlays/popover/popover.component';
+import { ModalComponent } from 'src/app/shared/ui/overlays/modal/modal.component';
 
 @Component({
   selector: 'app-home',

@@ -1,19 +1,27 @@
 import { ClientBasicInfo } from "./client.interface";
 import { Ticket } from "./ticket.interface";
 
-export interface Contract {
+export interface BaseContract {
   idContract: number;
   idContractType: number;
-  idTicket: number;
-  idProvider: number;
-  idClientHoneSolutions: number;
   expedientNumber: string;
   dateSignatureByClient: string | null;
   dateSignatureByProvider: string | null;
+
+  Client: ClientBasicInfo;
+  ContractType?: {
+    idContractType: number;
+    name: string;
+  };
+}
+
+export interface Contract extends BaseContract {
+  idTicket: number;
+  idProvider: number;
+  idClientHoneSolutions: number;
   createdAt: string;
   updatedAt: string;
 
-  Client: ClientBasicInfo;
   ContractType: ContractType;
   Provider: any;
   Ticket: Ticket;

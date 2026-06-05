@@ -1,0 +1,44 @@
+@if (file) {
+  <div [ngClass]="containerClasses">
+    <div
+      class="rounded-lg bg-blue1h-50 text-main-blue1h"
+      [ngClass]="isMultipleFiles ? 'p-2.5' : 'p-3'">
+      <svg [ngClass]="isMultipleFiles ? 'w-4 h-4' : 'w-5 h-5'">
+        <use xlink:href="/assets/icons/outline/files-folders.svg#file-lines" />
+      </svg>
+    </div>
+    <div class="flex-1 flex flex-col gap-1 text-gray-900 text-sm leading-4 min-w-0">
+      <span class="font-semibold truncate block" [title]="fileName">
+        {{ fileName }}
+      </span>
+      @if (shouldShowSize) {
+        <span>{{ fileSize! | formatFileBytes }}</span>
+      }
+    </div>
+
+    @if (isInteractive) {
+      @if (!isMultipleFiles) {
+        <app-button
+          (onClick)="emitChange()"
+          variant="gray"
+          styleType="soft"
+          size="xs">
+          <svg class="w-4 h-4">
+            <use xlink:href="/assets/icons/outline/arrows.svg#refresh" />
+          </svg>
+        </app-button>
+      }
+      <app-button
+        (onClick)="emitRemove()"
+        variant="gray"
+        styleType="ghost"
+        size="xs">
+        <svg class="w-4 h-4">
+          <use xlink:href="/assets/icons/outline/general.svg#close" />
+        </svg>
+      </app-button>
+    }
+
+    <ng-content select="[file-actions]"></ng-content>
+  </div>
+}

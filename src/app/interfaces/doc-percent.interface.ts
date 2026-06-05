@@ -1,3 +1,4 @@
+// Percentage of compliance per document upload
 export interface CompliancePercentInterface {
    uploaded: number;
    expired: number;
@@ -5,6 +6,7 @@ export interface CompliancePercentInterface {
    total: number;
 }
 
+// Hone approval rating
 export interface LoadedPercentInterface {
    upToDate: number;
    expired: number;

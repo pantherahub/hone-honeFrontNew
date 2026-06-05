@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { DeleteTicketMessagePayload, MessageFilters, TicketStatus, UpdateTicketMessagePayload } from 'src/app/interfaces/ticket.interface';
+import { DeleteTicketMessagePayload, MessageFilters, TicketFilters, TicketStatus, UpdateTicketMessagePayload } from 'src/app/interfaces/ticket.interface';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -10,13 +10,26 @@ import { environment } from 'src/environments/environment';
 export class TicketService {
 
   url = environment.url;
-  urlBack = environment.urlNewBack;
 
   constructor(private httpClient: HttpClient) { }
 
-  /* First version ticket creation */
-  postTicket(idRole: any, payload: any): Observable<any> {
-    return this.httpClient.post(`${this.urlBack}ticket/create`, payload);
+  getTickets(reqData: TicketFilters): Observable<any> {
+    return this.httpClient.post(`${this.url}Tickets/GetAll`, reqData);
+  }
+
+  getTicketById(idTicket: number) {
+    const url = `${this.url}Tickets/GetById/${idTicket}`;
+    return this.httpClient.get(url);
+  }
+
+  getTicketByCreator(idTicket: number, identification: string) {
+    const url = `${this.url}Tickets/GetOneByCreator/${idTicket}/${identification}`;
+    return this.httpClient.get(url);
+  }
+
+  createTicket(reqData: FormData): Observable<any> {
+    const url = `${this.url}Tickets/Create`;
+    return this.httpClient.post(url, reqData);
   }
 
   getTicketStatus(): Observable<TicketStatus[]> {
