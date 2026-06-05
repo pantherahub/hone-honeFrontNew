@@ -12,13 +12,27 @@
 
     <div class="flex flex-col gap-6 pb-20">
 
-      <div class="flex flex-col gap-2">
-        <h2 class="text-xl font-black leading-[1.375rem] text-main-blue1h">
-          PQRS - Preguntas, Quejas, Reclamos y Sugerencias
-        </h2>
-        <p class="text-gray-600 text-base font-normal leading-[1.125rem]">
-          Consulta tus PQRS aquí.
-        </p>
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div class="flex flex-col gap-2">
+          <h2 class="text-xl font-black leading-[1.375rem] text-main-blue1h">
+            Tickets de soporte
+          </h2>
+          <p class="text-gray-600 text-base font-normal leading-[1.125rem]">
+            Consulta tus tickets aquí.
+          </p>
+        </div>
+
+        <app-button
+          [routerLink]="['/support']"
+          variant="primary"
+          size="sm"
+          styleType="soft"
+          customClass="justify-center whitespace-nowrap">
+          <svg class="w-5 h-5">
+            <use xlink:href="/assets/icons/outline/general.svg#plus" />
+          </svg>
+          Radicar nuevo ticket
+        </app-button>
       </div>
 
       <div class="flex flex-col gap-4">
@@ -28,7 +42,7 @@
             [id]="'idTicket'"
             [type]="'number'"
             formControlName="idTicket"
-            label="Número de PQRS"
+            label="Número de ticket"
             [searcher]="true"
             [clearable]="true"
             class="w-full max-w-[364px]"
@@ -49,7 +63,7 @@
             <thead class="text-sm leading-4 text-blue1h-950 bg-gray-100 dark:bg-gray-700 dark:text-gray-400 whitespace-nowrap">
               <tr>
                 <th scope="col" class="px-4 py-3 font-semibold">
-                  PQRS
+                  Ticket
                 </th>
                 <th scope="col" class="px-4 py-3 font-semibold">
                   Solicitud
@@ -127,7 +141,7 @@
                           <svg class="w-4 h-4">
                             <use xlink:href="/assets/icons/outline/general.svg#close-sidebar" />
                           </svg>
-                          Abrir PQRS
+                          Abrir ticket
                         </app-button>
                       </div>
                     </td>

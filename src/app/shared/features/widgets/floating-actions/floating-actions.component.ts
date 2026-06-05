@@ -17,6 +17,14 @@ interface CustomerSchedulingData {
   schedulingLink: string;
 }
 
+interface FloatingAction {
+  key: string;
+  label: string;
+  iconHref: string;
+  isVisible: () => boolean;
+  onClick: () => void;
+}
+
 @Component({
   selector: 'app-floating-actions',
   standalone: true,
@@ -30,6 +38,37 @@ export class FloatingActionsComponent implements OnInit, OnDestroy {
   showTutorialAction: boolean = false;
   showMeetingAction: boolean = false;
   showTutorialVideoAction: boolean = false;
+
+  readonly floatingActions: FloatingAction[] = [
+    {
+      key: 'support',
+      label: 'Soporte',
+      iconHref: '/assets/icons/outline/e-commerce.svg#user-headset',
+      isVisible: () => this.showSupportAction,
+      onClick: () => this.onSupport(),
+    },
+    {
+      key: 'meeting',
+      label: 'Agendar reunión',
+      iconHref: '/assets/icons/outline/general.svg#calendar-week',
+      isVisible: () => this.showMeetingAction,
+      onClick: () => this.onMeeting(),
+    },
+    {
+      key: 'tutorial',
+      label: 'Visita guiada',
+      iconHref: '/assets/icons/outline/media.svg#clapperboard-play',
+      isVisible: () => this.showTutorialAction,
+      onClick: () => this.onTutorial(),
+    },
+    {
+      key: 'tutorialVideo',
+      label: 'Video tutorial',
+      iconHref: '/assets/icons/outline/media.svg#clapperboard-play',
+      isVisible: () => this.showTutorialVideoAction,
+      onClick: () => this.onTutorialVideo(),
+    },
+  ];
 
   excludedRoutes: string[] = [
     'page-not-found',
