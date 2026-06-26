@@ -25,6 +25,7 @@ import { FileItemComponent } from 'src/app/shared/ui/display/file-item/file-item
 import { ClientProviderService } from 'src/app/services/client-provider/client-provider.service';
 import { ClientInterface } from 'src/app/interfaces/client.interface';
 import { Subject, takeUntil } from 'rxjs';
+import { HttpResponse } from '@angular/common/http';
 
 const MAX_FILES = 10;
 
@@ -110,15 +111,36 @@ export class SupportTicketComponent implements OnInit, OnDestroy {
   }
 
   getRequestTypes() {
-    this.ticketService.getRequestTypes().subscribe({
-      next: (res: any) => {
-        this.requestTypes = res.data;
-        this.syncClientSelectVisibility();
+    if (this.isLogged) {
+      this.ticketService.getRequestTypes().subscribe({
+        next: (res: any) => {
+          this.requestTypes = res.data;
+          this.syncClientSelectVisibility();
+        },
+        error: (err: any) => {
+          console.error(err);
+        }
+      });
+      return;
+    }
+
+    // Request types for anonymous users (not logged in)
+    this.requestTypes = [
+      {
+        idTiposolicitud: 15,
+        nameSolicitud: 'Recuperación de contraseña',
+        isTicket: true,
+        withClient: false,
+        isProvider: false
       },
-      error: (err: any) => {
-        console.error(err);
+      {
+        idTiposolicitud: 24,
+        nameSolicitud: 'PQRS',
+        isTicket: true,
+        withClient: false,
+        isProvider: true
       }
-    });
+    ];
   }
 
   /**
@@ -212,9 +234,18 @@ export class SupportTicketComponent implements OnInit, OnDestroy {
       files: [null],
     });
 
+    this.syncRequestName();
+
     this.ticketForm.get('idRequestType')?.valueChanges
       .pipe(takeUntil(this.destroy$))
-      .subscribe(() => this.syncClientSelectVisibility());
+      .subscribe(() => {
+        this.syncClientSelectVisibility();
+        this.syncRequestName();
+      });
+  }
+
+  get isPasswordRecovery(): boolean {
+    return Number(this.ticketForm.get('idRequestType')?.value) === 15;
   }
 
   private syncClientSelectVisibility(): void {
@@ -230,6 +261,21 @@ export class SupportTicketComponent implements OnInit, OnDestroy {
     }
 
     clientControl?.updateValueAndValidity({ emitEvent: false });
+  }
+
+  private syncRequestName(): void {
+    const requestNameControl = this.ticketForm.get('requestName');
+    const idRequestType = this.ticketForm.get('idRequestType')?.value;
+
+    if (Number(idRequestType) === 15) {
+      requestNameControl?.setValue('Recuperación de contraseña', { emitEvent: false });
+      requestNameControl?.clearValidators();
+    } else {
+      requestNameControl?.setValue('', { emitEvent: false });
+      requestNameControl?.setValidators([Validators.required]);
+    }
+
+    requestNameControl?.updateValueAndValidity({ emitEvent: false });
   }
 
   private getSelectedRequestType(): TicketRequestType | null {
@@ -437,14 +483,36 @@ export class SupportTicketComponent implements OnInit, OnDestroy {
 
     this.loading = true;
     this.ticketService.createTicket(payload).subscribe({
-      next: (res: any) => {
+      next: (res: HttpResponse<any>) => {
         this.loading = false;
-        const ticketId = this.getCreatedTicketId(res);
+        const resBody = res.body ?? {};
+
+        if (res.status === 200) {
+          this.alertService.showAlert({
+            title: '¡Solicitud recibida!',
+            variant: 'success',
+            message: resBody.message || 'Tu ticket ha sido enviado exitosamente. Estaremos revisando tu caso pronto.',
+            isConfirmation: true,
+            confirmBtnText: 'Aceptar',
+            confirmBtnVariant: 'primary',
+            cancelBtnText: null,
+            showClose: false,
+          }).subscribe(() => {
+            if (this.isLogged) {
+              this.router.navigate(['tickets']);
+              return;
+            }
+            this.router.navigate(['login']);
+          });
+          return;
+        }
+
+        const ticketId = this.getCreatedTicketId(resBody);
         const ticketLabel = ticketId ? ` <b>#${ticketId}</b>` : '';
         this.alertService.showAlert({
           title: '¡Solicitud recibida!',
           variant: 'success',
-          messageHTML: `Tu ticket${ticketLabel} ha sido enviada exitosamente. Estaremos revisando tu caso pronto.`,
+          messageHTML: `Tu ticket${ticketLabel} ha sido enviado exitosamente. Estaremos revisando tu caso pronto.`,
           isConfirmation: true,
           confirmBtnText: 'Ver ticket',
           confirmBtnVariant: 'primary',
