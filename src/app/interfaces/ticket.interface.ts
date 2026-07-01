@@ -36,8 +36,10 @@ export interface Ticket {
 
 export interface TicketRequestType {
   idTiposolicitud: number;
+  idRequestType?: number;
   nameSolicitud: string;
   isTicket: boolean;
+  withClient?: boolean;
 }
 
 export interface TicketStatus {
@@ -88,6 +90,12 @@ export interface MessageEmail {
     isActive: boolean;
   };
   TicketEmailTemplate: any;
+}
+
+export interface TicketEscalation {
+  clientHoneSolutions: string;
+  idClientHoneSolutions: number;
+  dateRequest: string;
 }
 
 
