@@ -34,7 +34,10 @@ export class TicketService {
 
   createTicket(reqData: FormData): Observable<any> {
     const url = `${this.baseUrl}/Create`;
-    return this.httpClient.post(url, reqData, { headers: this.apiKeyHeaders });
+    return this.httpClient.post(url, reqData, {
+      headers: this.apiKeyHeaders,
+      observe: 'response'
+    });
   }
 
   getTicketStatus(): Observable<TicketStatus[]> {
