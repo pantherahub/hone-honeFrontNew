@@ -40,6 +40,7 @@ export interface TicketRequestType {
   nameSolicitud: string;
   isTicket: boolean;
   withClient?: boolean;
+  isProvider?: boolean;
 }
 
 export interface TicketStatus {
