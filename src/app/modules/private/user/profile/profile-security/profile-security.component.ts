@@ -3,7 +3,7 @@ import { Component, OnInit, Type } from '@angular/core';
 import { Router } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
-import { AuthInfo } from 'src/app/models/auth.interface';
+import { AuthInfo } from 'src/app/interfaces/auth.interface';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { AuthService } from 'src/app/services/auth.service';
 import { UpdatePasswordComponent } from '../../modals/update-password/update-password.component';

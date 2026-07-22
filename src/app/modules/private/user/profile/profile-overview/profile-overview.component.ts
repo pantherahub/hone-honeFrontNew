@@ -4,11 +4,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { format } from 'date-fns';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { UserState } from 'src/app/models/user-state.interface';
+import { UserState } from 'src/app/interfaces/user-state.interface';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { AuthService } from 'src/app/services/auth.service';
-import { ClientProviderService } from 'src/app/services/clients/client-provider.service';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
+import { ProviderService } from 'src/app/services/provider/provider.service';
 
 @Component({
   selector: 'app-profile-overview',
@@ -28,7 +28,7 @@ export class ProfileOverviewComponent implements OnInit {
     private fb: FormBuilder,
     private formUtils: FormUtilsService,
     private authService: AuthService,
-    private clientProviderService: ClientProviderService,
+    private providerService: ProviderService,
     private router: Router,
     private messageService: NzMessageService,
   ) { }
@@ -56,7 +56,7 @@ export class ProfileOverviewComponent implements OnInit {
   }
 
   getIdentificationTypes() {
-    this.clientProviderService.getIdentificationTypes().subscribe({
+    this.providerService.getIdentificationTypes().subscribe({
       next: (res: any) => {
         this.identificationTypes = res;
       },
@@ -123,7 +123,7 @@ export class ProfileOverviewComponent implements OnInit {
     });
 
     // const data = this.form.value;
-    // this.clientProviderService.updateUserProfile(data).subscribe({
+    // this.providerService.updateUserProfile(data).subscribe({
     //   next: () => {
     //     this.messageService.success('Información actualizada correctamente.');
     //     this.getUserData(); // Refrescar datos

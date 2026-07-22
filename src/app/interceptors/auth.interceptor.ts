@@ -4,7 +4,7 @@ import { AuthService } from '../services/auth.service';
 import { HttpErrorResponse, HttpRequest, HttpEvent } from '@angular/common/http';
 import { Observable, BehaviorSubject, throwError, EMPTY } from 'rxjs';
 import { catchError, filter, switchMap, take } from 'rxjs/operators';
-import { RefreshTokenResponse } from '../models/auth.interface';
+import { RefreshTokenResponse } from '../interfaces/auth.interface';
 import { Router } from '@angular/router';
 
 const excludedUrls = ['/Auth/Login', '/Auth/UpdateTokens'];

@@ -4,7 +4,7 @@ import { ActivatedRoute, NavigationEnd, Router, RouterModule, RouterOutlet } fro
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { filter } from 'rxjs';
-import { UserState } from 'src/app/models/user-state.interface';
+import { UserState } from 'src/app/interfaces/user-state.interface';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { AuthService } from 'src/app/services/auth.service';
 

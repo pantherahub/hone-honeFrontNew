@@ -3,7 +3,7 @@ import { Component, Input, OnInit, Optional } from '@angular/core';
 import { Router } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalRef } from 'ng-zorro-antd/modal';
-import { TemporalLoginData, VerifyEmailReq } from 'src/app/models/auth.interface';
+import { TemporalLoginData, VerifyEmailReq } from 'src/app/interfaces/auth.interface';
 import { NgZorroModule } from 'src/app/ng-zorro.module';
 import { AuthService } from 'src/app/services/auth.service';
 import { VerificationCodeFormComponent } from 'src/app/shared/forms/verification-code-form/verification-code-form.component';

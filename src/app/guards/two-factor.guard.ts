@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { catchError, map, of } from 'rxjs';
-import { AuthInfo } from '../models/auth.interface';
+import { AuthInfo } from '../interfaces/auth.interface';
 
 export const twoFactorGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
