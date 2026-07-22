@@ -9,8 +9,8 @@ import {
 } from '@angular/core';
 import { NavigationStart, Router } from '@angular/router';
 import { filter, Subject, Subscription, take } from 'rxjs';
-import { ModalRef } from 'src/app/models/modal.interface';
-import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
+import { ModalRef } from 'src/app/interfaces/modal.interface';
+import { ModalComponent } from 'src/app/shared/ui/overlays/modal/modal.component';
 
 @Injectable({
   providedIn: 'root'

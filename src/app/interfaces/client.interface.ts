@@ -1,0 +1,41 @@
+export interface ClientInterface {
+   clientHoneSolutions?: string;
+   idClientHoneSolutions?: number;
+   url?: string;
+   urlHeader?: string;
+   idProvider?: number;
+   identificacion?: string;
+   razonSocial?: string;
+   typeProvider?: string;
+   idTypeProvider?: number;
+   email?: string;
+   withContract?: boolean;
+}
+
+export interface DocumentInterface {
+   idProvider?: string;
+   typeDocument?: string;
+   UrlDocument?: string;
+   nameDocument?: string;
+   idTypeProvider?: number;
+   // idDocument?: number;
+   idDocumentType?: number;
+   idClientHoneSolutions?: number;
+   dateAdd?: string;
+   expirationDate?: string;
+}
+
+export interface CompanyInterface {
+  idCompany: number;
+  idClientHoneSolutions?: number | null;
+  name: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ClientBasicInfo {
+  idClientHoneSolutions: number;
+  clientHoneSolutions: string;
+  urlImagenClientHoneSolutions: string;
+  urlHeader: string;
+}

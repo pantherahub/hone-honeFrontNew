@@ -1,14 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder } from '@angular/forms';
-import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { ButtonComponent } from 'src/app/shared/ui/buttons/button/button.component';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { DropdownTriggerDirective } from 'src/app/directives/dropdown-trigger.directive';
 import { firstValueFrom } from 'rxjs';
 import { OfficeFormComponent } from './office-form/office-form.component';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { OfficeDetailComponent } from './office-detail/office-detail.component';
-import { CompanyInterface } from 'src/app/models/client.interface';
+import { CompanyInterface } from 'src/app/interfaces/client.interface';
 import { ClientProviderService } from 'src/app/services/client-provider/client-provider.service';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 

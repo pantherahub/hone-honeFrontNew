@@ -4,20 +4,13 @@
   <div class="max-w-screen-xl w-full pt-10 pb-32 sm:pb-20 md:pt-6 flex flex-col gap-9">
     <div class="rounded-xl bg-blue2h-100">
       <div class="w-full max-w-[821px] mx-auto flex">
-        <div class="hidden md:block px-4 pt-4 flex-shrink-0">
-          <img
-            src="assets/img/home/welcome.webp"
-            alt="Imagen decorativa"
-            width="183" height="220"
-          />
-        </div>
 
         <div class="flex flex-col justify-center gap-4 p-4 md:ps-0">
           <div class="flex flex-col gap-2 text-xl">
-            <span class="font-semibold leading-[22px]">
+            <span class="font-semibold leading-[1.375rem]">
               Estimado Prestador {{ user.name }}
             </span>
-            <span class="font-black leading-[22px]">
+            <span class="font-black leading-[1.375rem]">
               ¡Bienvenido(a) a tu Portal Transaccional de Gestión de Información y Documentos!
             </span>
           </div>
@@ -27,11 +20,20 @@
                 <use xlink:href="/assets/icons/outline/general.svg#lock" />
               </svg>
             </div>
-            <div class="text-base font-normal leading-[18px] py-2">
+            <div class="text-base font-normal leading-[1.125rem] py-2">
               Garantizamos la protección de tus datos.
             </div>
           </div>
         </div>
+
+        <div class="hidden md:block px-4 pt-4 flex-shrink-0">
+          <img
+            src="assets/img/home/welcome.webp"
+            alt="Imagen decorativa"
+            height="220"
+          />
+        </div>
+
       </div>
     </div>
 
@@ -72,7 +74,7 @@
         </div>
       </div>
 
-      <p class="text-base font-normal text-main-blue1h leading-[18px]">
+      <p class="text-base font-normal text-main-blue1h leading-[1.125rem]">
         Tienes convenios activos con las siguientes compañías. Haz clic en
         alguna para cargar o actualizar tu información.
       </p>
@@ -86,7 +88,7 @@
             'h-[98.95px] items-center gap-4': viewMode === 'list',
           }">
           <div
-            class="overflow-hidden bg-gray-0 rounded-lg"
+            class="overflow-hidden bg-white rounded-lg"
             [ngClass]="{
               'p-3.5 h-[300px] xs:h-[149.13px] sm:h-[167.03px]': viewMode === 'grid',
               'p-2 w-[67.3px] h-[67.3px] flex justify-center items-center': viewMode === 'list',
@@ -99,11 +101,47 @@
                 'w-full object-cover': viewMode === 'list',
               }" />
           </div>
-          <div class="text-base leading-[18px] font-semibold"
+          <div class="text-base leading-[1.125rem] font-semibold"
             [ngClass]="{
               'text-center': viewMode === 'grid'
             }">
             {{ item.clientHoneSolutions }}
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template #ticketCardTemplate>
+        <div
+          (click)="goToTickets()"
+          class="flex p-4 rounded-lg cursor-pointer bg-gray-100 text-main-blue1h hover:bg-gray-50 hover:ring-[1px] hover:ring-inset hover:ring-blue1h-600 hover:shadow-[0px_16px_44px_0px_#0D0F1C1A] transition-shadow"
+          [ngClass]="{
+            'min-h-[300px] xs:min-h-[204px] sm:min-h-[221px] flex-col justify-between gap-4': viewMode === 'grid',
+            'h-[98.95px] items-center justify-between gap-4': viewMode === 'list',
+          }">
+          <div class="flex flex-col gap-2"
+            [ngClass]="{
+              'h-full justify-center': viewMode === 'grid',
+              'min-w-0': viewMode === 'list',
+            }">
+            <span class="text-xs leading-4 font-semibold uppercase text-blue1h-700">
+              Soporte Hone
+            </span>
+            <span class="text-xl leading-[1.375rem] font-black">
+              Tickets
+            </span>
+            <span
+              class="text-sm leading-4 font-normal text-gray-600"
+              [ngClass]="{
+                'hidden sm:block': viewMode === 'list'
+              }">
+              Consulta tus solicitudes radicadas, revisa respuestas y mantén el seguimiento en un solo lugar.
+            </span>
+          </div>
+          <div class="inline-flex items-center gap-2 text-sm leading-4 font-semibold">
+            Ver solicitudes
+            <svg class="w-4 h-4">
+              <use xlink:href="/assets/icons/outline/arrows.svg#arrow-right" />
+            </svg>
           </div>
         </div>
       </ng-template>
@@ -143,6 +181,7 @@
               <ng-container *ngTemplateOutlet="clientCardTemplate; context: { $implicit: item }"></ng-container>
             }
           }
+          <ng-container *ngTemplateOutlet="ticketCardTemplate"></ng-container>
         </div>
       }
     </div>
@@ -157,7 +196,7 @@
     class="hidden md:block rounded-md"
   />
   <div class="flex justify-between items-center gap-2">
-    <span class="text-base leading-5 md:leading-[18px] font-normal text-main-blue1h whitespace-nowrap">2 de 3</span>
+    <span class="text-base leading-5 md:leading-[1.125rem] font-normal text-main-blue1h whitespace-nowrap">2 de 3</span>
     <div class="flex gap-2 md:hidden">
       <app-button
         (click)="backTutorialStep()"
@@ -211,7 +250,7 @@
 
   <div class="flex flex-col gap-1">
     <div class="flex items-center justify-between">
-      <h3 class="text-base font-semibold leading-[18px] text-main-blue1h dark:text-white">
+      <h3 class="text-base font-semibold leading-[1.125rem] text-main-blue1h dark:text-white">
         Mantén tus datos al día
       </h3>
       <app-button (click)="reminderModal.close()" variant="primary" size="sm" styleType="ghost" class="md:hidden">
@@ -221,7 +260,7 @@
       </app-button>
     </div>
 
-    <p class="text-main-blue1h text-base font-normal leading-[18px]">
+    <p class="text-main-blue1h text-base font-normal leading-[1.125rem]">
       Así aseguras tu visibilidad en los directorios médicos.
     </p>
   </div>

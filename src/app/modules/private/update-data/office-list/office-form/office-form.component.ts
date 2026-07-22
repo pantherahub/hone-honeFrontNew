@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { firstValueFrom } from 'rxjs';
-import { CompanyInterface } from 'src/app/models/client.interface';
-import { ShortcutContact } from 'src/app/models/shortcut-contact.interface';
+import { firstValueFrom, Subject, takeUntil } from 'rxjs';
+import { CompanyInterface } from 'src/app/interfaces/client.interface';
+import { ShortcutContact } from 'src/app/interfaces/shortcut-contact.interface';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { ContactsProviderService } from 'src/app/services/contacts-provider/contacts-provider.service';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
@@ -12,15 +12,15 @@ import { AddressFormComponent } from './address-form/address-form.component';
 import { ScheduleFormComponent } from './schedule-form/schedule-form.component';
 import { ToastService } from 'src/app/services/toast/toast.service';
 import { ContactFormComponent } from '../../shared/contact-form/contact-form.component';
-import { ButtonComponent } from 'src/app/shared/components/button/button.component';
-import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
-import { InputErrorComponent } from 'src/app/shared/components/input-error/input-error.component';
-import { SelectComponent } from 'src/app/shared/components/select/select.component';
+import { ButtonComponent } from 'src/app/shared/ui/buttons/button/button.component';
+import { TextInputComponent } from 'src/app/shared/ui/forms/text-input/text-input.component';
+import { InputErrorComponent } from 'src/app/shared/ui/forms/input-error/input-error.component';
 import { DropdownTriggerDirective } from 'src/app/directives/dropdown-trigger.directive';
 import { CatalogService } from 'src/app/services/catalog/catalog.service';
 import { ContactDetailComponent } from '../../shared/contact-detail/contact-detail.component';
 import { OfficeDataService } from 'src/app/services/office-data/office-data.service';
-import { City } from 'src/app/models/city.interface';
+import { City } from 'src/app/interfaces/city.interface';
+import { SelectComponent } from 'src/app/shared/ui/forms/select/select.component';
 
 @Component({
   selector: 'app-office-form',
@@ -29,7 +29,7 @@ import { City } from 'src/app/models/city.interface';
   templateUrl: './office-form.component.html',
   styleUrl: './office-form.component.scss'
 })
-export class OfficeFormComponent {
+export class OfficeFormComponent implements OnInit, OnDestroy {
 
   @Input() isFirstForm: boolean = true;
   @Input() companyList: CompanyInterface[] = [];
@@ -72,6 +72,8 @@ export class OfficeFormComponent {
 
   cityLabel = (item: City) => `${item.city}, ${item.department}`;
 
+  private destroy$ = new Subject<void>();
+
   @ViewChild('addressDrawer', { static: false }) addressDrawer!: AddressFormComponent;
   @ViewChild('scheduleDrawer', { static: false }) scheduleDrawer!: ScheduleFormComponent;
   @ViewChild('contactDrawer', { static: false }) contactDrawer!: ContactFormComponent;
@@ -94,6 +96,11 @@ export class OfficeFormComponent {
 
     this.initializeForm();
     this.detectFormChanges();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   getCities() {
@@ -179,9 +186,11 @@ export class OfficeFormComponent {
   }
 
   detectFormChanges() {
-    this.officeForm.valueChanges.subscribe(() => {
-      this.hasChanges = true;
-    });
+    this.officeForm.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.hasChanges = true;
+      });
   }
 
   convertDate(date: string) {

@@ -1,6 +1,6 @@
 import { ApplicationRef, ComponentRef, createComponent, EmbeddedViewRef, Injectable, Injector } from '@angular/core';
 import { Subject } from 'rxjs';
-import { Toast } from 'src/app/models/toast.interface';
+import { Toast } from 'src/app/interfaces/toast.interface';
 import { ToastContainerComponent } from 'src/app/shared/alerts/toast-container/toast-container.component';
 
 @Injectable({

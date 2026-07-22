@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { DocumentService } from 'src/app/services/documents/documents.service';
@@ -6,17 +6,17 @@ import { EventManagerService } from 'src/app/services/events-manager/event-manag
 import { FileSelectDirective } from 'src/app/directives/file-select.directive';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
 import { formatListWithY, pluralize } from 'src/app/utils/string-utils';
-import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
-import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
-import { InputErrorComponent } from 'src/app/shared/components/input-error/input-error.component';
-import { ButtonComponent } from 'src/app/shared/components/button/button.component';
-import { SelectComponent } from 'src/app/shared/components/select/select.component';
+import { TextInputComponent } from 'src/app/shared/ui/forms/text-input/text-input.component';
+import { InputErrorComponent } from 'src/app/shared/ui/forms/input-error/input-error.component';
+import { ButtonComponent } from 'src/app/shared/ui/buttons/button/button.component';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { AlertService } from 'src/app/services/alert/alert.service';
 import { FileDropDirective } from 'src/app/directives/file-drop.directive';
-import { City } from 'src/app/models/city.interface';
-import { AlertComponent } from 'src/app/shared/components/alert/alert.component';
-
+import { City } from 'src/app/interfaces/city.interface';
+import { AlertComponent } from 'src/app/shared/ui/feedback/alert/alert.component';
+import { Subject, takeUntil } from 'rxjs';
+import { SelectComponent } from 'src/app/shared/ui/forms/select/select.component';
+import { ModalComponent } from 'src/app/shared/ui/overlays/modal/modal.component';
 
 @Component({
   selector: 'app-modal-edit-document',
@@ -36,7 +36,7 @@ import { AlertComponent } from 'src/app/shared/components/alert/alert.component'
   templateUrl: './modal-edit-document.component.html',
   styleUrl: './modal-edit-document.component.scss'
 })
-export class ModalEditDocumentComponent implements OnInit {
+export class ModalEditDocumentComponent implements OnInit, OnDestroy {
   loader: boolean = false;
   documentForm!: FormGroup;
 
@@ -169,6 +169,8 @@ export class ModalEditDocumentComponent implements OnInit {
 
   cityLabel = (item: City) => `${item.city}, ${item.department}`;
 
+  private destroy$ = new Subject<void>();
+
   @ViewChild('dateInput', { static: true }) dateInputRef!: ElementRef;
 
   constructor(
@@ -183,6 +185,11 @@ export class ModalEditDocumentComponent implements OnInit {
   ngOnInit(): void {
     this.getTypePolicyProviderOpts();
     this.createForm();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   closeModal(response: boolean = false): void {
@@ -243,12 +250,16 @@ export class ModalEditDocumentComponent implements OnInit {
     // Update validity statuses
     this.documentForm.updateValueAndValidity();
 
-    this.documentForm.get('idCity')?.valueChanges.subscribe(() => {
-      this.documentForm.get('amountPolicy')?.updateValueAndValidity();
-    });
-    this.documentForm.get('typePolicyProvider')?.valueChanges.subscribe(() => {
-      this.documentForm.get('amountPolicy')?.updateValueAndValidity();
-    });
+    this.documentForm.get('idCity')?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.documentForm.get('amountPolicy')?.updateValueAndValidity();
+      });
+    this.documentForm.get('typePolicyProvider')?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.documentForm.get('amountPolicy')?.updateValueAndValidity();
+      });
 
     if (this.currentDoc && !this.isNew) this.patchForm();
   }
@@ -536,10 +547,10 @@ export class ModalEditDocumentComponent implements OnInit {
 
   createFormData(): FormData {
     const dataToUpload = new FormData();
-    const unifiedData: any = {};
+    const unifiedData: Record<string, any> = {};
 
     if (this.loadedFile) {
-      unifiedData['nameDocument'] = this.loadedFile.name;
+      unifiedData['nameDocument'] = this.loadedFile.name.trim();
     }
 
     const { idProvider, idClientHoneSolutions } = this.clientSelected;
@@ -548,21 +559,29 @@ export class ModalEditDocumentComponent implements OnInit {
 
     // Add form data
     const docForm = { ...this.documentForm.value };
+
     for (const [key, value] of Object.entries(docForm)) {
-      if (value && value instanceof Date) {
-        unifiedData[key] = value.toString().split('T')[0];
-      } else if (value != null && value.toString().trim() != '') {
-        let appendValue: any = value;
-        if (key === 'amountPolicy') {
-          appendValue = this.formUtils.sanitizeToNumeric(
-            value.toString(),
-            true
-          );
-        }
-        unifiedData[key] = appendValue;
-      } else {
-        // unifiedData[key] = '';
+      if (value == null) continue;
+
+      if (value instanceof Date) {
+        unifiedData[key] = value.toISOString().split('T')[0];
+        continue;
       }
+
+      if (typeof value === 'string') {
+        const trimmed = value.trim();
+        if (trimmed === '') continue;
+
+        if (key === 'amountPolicy') {
+          const sanitized = this.formUtils.sanitizeToNumeric(trimmed, true);
+          if (sanitized) unifiedData[key] = sanitized;
+        } else {
+          unifiedData[key] = trimmed;
+        }
+        continue;
+      }
+
+      unifiedData[key] = value;
     }
 
     for (const [key, value] of Object.entries(unifiedData)) {

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { catchError, map, Observable, of, shareReplay, startWith } from 'rxjs';
-import { City } from 'src/app/models/city.interface';
-import { DocumentType } from 'src/app/models/document-type.interface';
+import { City } from 'src/app/interfaces/city.interface';
+import { IdentificationType } from 'src/app/interfaces/identification-type.interface';
 import { CitiesService } from '../cities/cities.service';
 import { ProviderService } from '../provider/provider.service';
 
@@ -11,7 +11,7 @@ import { ProviderService } from '../provider/provider.service';
 export class CatalogService {
 
   private cities$?: Observable<City[]>;
-  private docucmentTypes$?: Observable<DocumentType[]>;
+  private documentTypes$?: Observable<IdentificationType[]>;
 
   constructor(
     private citiesService: CitiesService,
@@ -45,21 +45,21 @@ export class CatalogService {
   // -------------------
   // Document Types
   // -------------------
-  getDocTypes(): Observable<DocumentType[]> {
-    if (!this.docucmentTypes$) {
-      this.docucmentTypes$ = this.providerService.getIdentificationTypes().pipe(
+  getDocTypes(): Observable<IdentificationType[]> {
+    if (!this.documentTypes$) {
+      this.documentTypes$ = this.providerService.getIdentificationTypes().pipe(
         catchError(err => {
-          this.docucmentTypes$ = undefined;
-          return of([] as DocumentType[]);
+          this.documentTypes$ = undefined;
+          return of([] as IdentificationType[]);
         }),
         shareReplay({ bufferSize: 1, refCount: true })
       );
     }
-    return this.docucmentTypes$;
+    return this.documentTypes$;
   }
 
-  refreshDocTypes(): Observable<DocumentType[]> {
-    this.docucmentTypes$ = undefined;
+  refreshDocTypes(): Observable<IdentificationType[]> {
+    this.documentTypes$ = undefined;
     return this.getDocTypes();
   }
 }

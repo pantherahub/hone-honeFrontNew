@@ -4,19 +4,17 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { DropdownTriggerDirective } from 'src/app/directives/dropdown-trigger.directive';
 import { FileSelectDirective } from 'src/app/directives/file-select.directive';
 import { PipesModule } from 'src/app/pipes/pipes.module';
-import { ButtonComponent } from 'src/app/shared/components/button/button.component';
-import { DrawerComponent } from 'src/app/shared/components/drawer/drawer.component';
-import { TextInputComponent } from 'src/app/shared/components/text-input/text-input.component';
-
-export interface RateFormData {
-  file: File;
-  observations?: string | null;
-}
+import { AlertService } from 'src/app/services/alert/alert.service';
+import { ButtonComponent } from 'src/app/shared/ui/buttons/button/button.component';
+import { DrawerComponent } from 'src/app/shared/ui/overlays/drawer/drawer.component';
+import { TextInputComponent } from 'src/app/shared/ui/forms/text-input/text-input.component';
+import { BadgeConfig } from 'src/app/types/badge-config.type';
+import { BackendErrorsComponent } from 'src/app/shared/ui/feedback/backend-errors/backend-errors.component';
 
 @Component({
   selector: 'app-rate-management',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, DrawerComponent, TextInputComponent, ButtonComponent, PipesModule, FileSelectDirective, DropdownTriggerDirective],
+  imports: [CommonModule, ReactiveFormsModule, DrawerComponent, TextInputComponent, ButtonComponent, PipesModule, FileSelectDirective, DropdownTriggerDirective, BackendErrorsComponent],
   templateUrl: './rate-management.component.html',
   styleUrl: './rate-management.component.scss'
 })
@@ -25,18 +23,19 @@ export class RateManagementComponent implements OnInit, OnChanges {
   @Input() isOpen: boolean = false;
   @Input() selectedRate!: any;
   @Input() initialFile: File | null = null;
-  @Input() statusConfig!: Record<string, { bg: string; text: string; icon?: string; label: string }>;
-  @Input() submitRate!: (data: RateFormData) => Promise<boolean>;
+  @Input() statusConfig!: Record<string, BadgeConfig>;
 
   @Output() isOpenChange = new EventEmitter<boolean>();
 
   rateForm!: FormGroup;
+  backendError: any = null;
 
   @ViewChild('rateDrawer', { static: false }) rateDrawer!: DrawerComponent;
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   constructor(
     private fb: FormBuilder,
+    private alertService: AlertService,
   ) { }
 
   ngOnInit(): void {
@@ -83,9 +82,14 @@ export class RateManagementComponent implements OnInit, OnChanges {
     this.updateFile(null);
   }
 
+  getRateStatus(rate: any): string {
+    if (!rate) return 'PENDIENTE POR CARGAR';
+    return rate.rateStatus;
+  }
+
   /* Rate states */
   get isPending(): boolean {
-    return this.selectedRate?.currentRate?.rateStatus === 'PENDIENTE POR CARGAR';
+    return !this.selectedRate?.currentRate || this.selectedRate?.currentRate?.rateStatus === 'PENDIENTE POR CARGAR';
   }
   get isRejected(): boolean {
     return this.selectedRate?.currentRate?.rateStatus === 'RECHAZADO';
@@ -104,11 +108,7 @@ export class RateManagementComponent implements OnInit, OnChanges {
   }
 
   close() {
-    this.isOpen = false;
-    this.isOpenChange.emit(this.isOpen);
-  }
-
-  onDrawerClose() {
+    this.backendError = null;
     this.rateForm.reset();
     this.isOpen = false;
     this.isOpenChange.emit(this.isOpen);
@@ -133,8 +133,33 @@ export class RateManagementComponent implements OnInit, OnChanges {
   }
 
   async onSubmit() {
-    const ok = await this.submitRate(this.rateForm.value);
-    if (ok) this.rateDrawer.close();
+    this.backendError = null;
+    if (!this.selectedRate) return;
+
+    const file = this.rateForm.get('file')?.value;
+    const observations = this.rateForm.get('observations')?.value;
+
+    if (!file) {
+      this.alertService.warning(
+        '¡Acción requerida!',
+        'Debes seleccionar un documento.',
+      );
+      return;
+    }
+
+    const reqData = new FormData();
+    reqData.append('archivo', file, file.name);
+    if (observations) reqData.append('observations', observations);
+
+    this.rateDrawer.close();
+    // this.rateService.uploadRate(formData).subscribe({
+    //   next: (res) => {
+    //     this.rateDrawer.close();
+    //   },
+    //   error: (err) => {
+    //     if (err.status == 422) this.backendError = err.error;
+    //   }
+    // });
   }
 
 }

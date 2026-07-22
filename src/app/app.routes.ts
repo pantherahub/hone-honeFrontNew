@@ -3,9 +3,9 @@ import { HomeComponent } from './modules/private/home/home.component';
 import { LoginComponent } from './modules/public/login/login.component';
 import { authGuard } from './guards/auth.guard';
 import { PageNotFoundComponent } from './modules/public/page-not-found/page-not-found.component';
-import { ListDocumentsComponent } from './modules/private/documents/list-documents/list-documents.component';
+import { DocumentsComponent } from './modules/private/documents/documents.component';
 import { NgModule } from '@angular/core';
-import { PrivateLayoutComponent } from './layout/private-layout/private-layout.component';
+import { PrivateLayoutComponent } from './layouts/private-layout/private-layout.component';
 import { UpdateDataComponent } from './modules/private/update-data/update-data.component';
 import { UserManagementComponent } from './modules/private/user/user-management/user-management.component';
 import { UpdatePasswordComponent } from './modules/private/user/modals/update-password/update-password.component';
@@ -22,13 +22,16 @@ import { ProfileOverviewComponent } from './modules/private/user/profile/profile
 import { ProfileSecurityComponent } from './modules/private/user/profile/profile-security/profile-security.component';
 import { canDeactivateGuard } from './guards/can-deactivate.guard';
 import { TestsComponent } from './modules/public/tests/tests.component';
-import { SupportTicketComponent } from './shared/support-ticket/support-ticket.component';
-import { PublicLayoutComponent } from './layout/public-layout/public-layout.component';
-import { ServiceLayoutComponent } from './layout/service-layout/service-layout.component';
+import { SupportTicketComponent } from './shared/features/tickets/support-ticket/support-ticket.component';
+import { PublicLayoutComponent } from './layouts/public-layout/public-layout.component';
+import { ServiceLayoutComponent } from './layouts/service-layout/service-layout.component';
 import { clientSelectedGuard } from './guards/client-selected.guard';
 import { RatesComponent } from './modules/private/rates/rates.component';
 import { serviceAccessGuard } from './guards/service-access.guard';
 import { SERVICES_CONFIG } from './config/service-navigation.config';
+import { ContractsComponent } from './modules/private/contracts/contracts.component';
+import { TicketsComponent } from './modules/private/tickets/tickets.component';
+import { TicketDetailPageComponent } from './shared/features/tickets/ticket-detail-page/ticket-detail-page.component';
 
 export const routes: Routes = [
   //   PUBLIC ROUTES
@@ -53,6 +56,16 @@ export const routes: Routes = [
     ]
   },
 
+  {
+    path: '',
+    component: PublicLayoutComponent,
+    children: [
+      {
+        path: 'ticket/:idTicket',
+        component: TicketDetailPageComponent
+      }
+    ]
+  },
   {
     path: 'page-not-found',
     component: PageNotFoundComponent
@@ -106,6 +119,17 @@ export const routes: Routes = [
         component: SupportTicketComponent
       },
       {
+        path: 'tickets/:idTicket',
+        component: TicketDetailPageComponent
+      },
+      {
+        path: 'tickets',
+        component: TicketsComponent,
+        data: {
+          disclaimerKey: 'Tickets',
+        },
+      },
+      {
         path: 'update-data',
         component: UpdateDataComponent,
         canDeactivate: [canDeactivateGuard],
@@ -132,17 +156,13 @@ export const routes: Routes = [
         component: UpdatePasswordComponent
       },
       {
-        path: 'cargar-documentos/:id',
-        component: ListDocumentsComponent
-      },
-      {
         path: 'service',
         component: ServiceLayoutComponent,
         canActivate: [clientSelectedGuard],
         children: [
           {
             path: 'documentation',
-            component: ListDocumentsComponent,
+            component: DocumentsComponent,
             canActivate: [serviceAccessGuard],
             data: {
               disclaimerKey: 'Documentos',
@@ -158,6 +178,15 @@ export const routes: Routes = [
           //     serviceKey: SERVICES_CONFIG.rates.key
           //   },
           // },
+          {
+            path: 'contracts',
+            component: ContractsComponent,
+            canActivate: [serviceAccessGuard],
+            data: {
+              disclaimerKey: 'Contratos',
+              serviceKey: SERVICES_CONFIG.contracts.key
+            },
+          },
         ],
       },
 		]

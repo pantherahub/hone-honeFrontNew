@@ -30,7 +30,7 @@
   </div>
 
   <div class="flex flex-col gap-2 p-4 rounded-xl bg-gray-100">
-    <h4 class="text-base font-semibold leading-[18px] text-main-blue1h">
+    <h4 class="text-base font-semibold leading-[1.125rem] text-main-blue1h">
       Ubicación
     </h4>
     <div>
@@ -101,7 +101,7 @@
 
   <div class="flex flex-col gap-4 p-4 rounded-xl bg-gray-100">
     <div class="flex flex-wrap items-center justify-between gap-4 text-main-blue1h">
-      <h4 class="text-base font-semibold leading-[18px]">
+      <h4 class="text-base font-semibold leading-[1.125rem]">
         Horario de atención
       </h4>
       <app-button
@@ -176,7 +176,7 @@
                       </svg>
                     </app-button>
                   </div>
-                  <div [id]="'dropdown-schedule-opts-' + i" class="z-30 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-[136px] dark:bg-gray-700 dark:divide-gray-600">
+                  <div [id]="'dropdown-schedule-opts-' + i" class="z-30 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-[8.5rem] dark:bg-gray-700 dark:divide-gray-600">
                     <ul class="py-1 text-sm text-gray-700 dark:text-gray-200">
                       <li>
                         <a (click)="openScheduleForm(i)"
@@ -208,7 +208,7 @@
 
   <div class="flex flex-col gap-4 p-4 rounded-xl bg-gray-100">
     <div class="flex flex-wrap items-center justify-between gap-4 text-main-blue1h">
-      <h4 class="text-base font-semibold leading-[18px]">Información de contacto</h4>
+      <h4 class="text-base font-semibold leading-[1.125rem]">Información de contacto</h4>
       <app-button
         (onClick)="openContactForm()"
         variant="primary"
@@ -279,7 +279,7 @@
                       </svg>
                     </app-button>
                   </div>
-                  <div [id]="'dropdown-contact-opts-' + i" class="z-30 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-[136px] dark:bg-gray-700 dark:divide-gray-600">
+                  <div [id]="'dropdown-contact-opts-' + i" class="z-30 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-[8.5rem] dark:bg-gray-700 dark:divide-gray-600">
                     <ul class="py-1 text-sm text-gray-700 dark:text-gray-200">
                       <li>
                         <a (click)="viewContact(i)" data-dropdown-close class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">

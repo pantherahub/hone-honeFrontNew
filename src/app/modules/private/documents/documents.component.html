@@ -1,0 +1,371 @@
+<app-loader [visible]="loading" />
+
+<div class="flex flex-col gap-6 pb-24 sm:pb-20">
+
+  <div class="flex flex-col sm:flex-row justify-between gap-6 sm:gap-4 flex-wrap">
+    <div class="flex flex-col gap-2">
+      <div class="flex items-center gap-2 text-main-blue1h">
+        <h2 class="text-xl font-black leading-[1.375rem]">
+          Documentación – {{ clientSelected.typeProvider ?? '' }}
+        </h2>
+        <app-tooltip
+          [id]="'doc-container'"
+          [text]="'Carga los siguientes documentos. Asegúrate de que cada archivo esté completo, sea legible y no esté protegido por contraseña antes de subirlo.'"
+          position="top"
+          styleType="light">
+          <svg class="w-5 h-5">
+            <use xlink:href="/assets/icons/outline/general.svg#info-circle" />
+          </svg>
+        </app-tooltip>
+      </div>
+
+      <p class="text-gray-600 text-base font-normal leading-[1.125rem]">
+        Asegúrate de que estén completos, actualizados y legibles. Súbelos para validación.
+      </p>
+    </div>
+    @if (getCurrentDownloadConfig()) {
+      <div class="flex flex-col justify-end">
+        <app-popover
+          [title]="'Formatos e instructivos'"
+          [text]="'Para avanzar correctamente, descarga aquí los formatos requeridos y los instructivos necesarios para el envío correcto de documentos.'"
+          [placement]="'right'"
+          [triggerType]="'manual'"
+          [highlighted]="true"
+          [(visible)]="formatsBtnPopoverVisible"
+          [contentTemplate]="popoverContent"
+          customTriggerClass="w-full sm:w-fit"
+          extraPopoverClass="max-w-[330px] md:max-w-[400px]"
+          [autoScrollOnOpen]="true"
+          (onClose)="closeFormatsBtnPopover()"
+        >
+          <ng-template #triggerTemplate>
+            <app-button
+              customClass="w-full flex justify-center sm:whitespace-nowrap leading-4"
+              (onClick)="downloadClientDocs()"
+              variant="primary"
+              styleType="soft"
+              size="sm"
+              [loading]="loadManualDownload"
+            >
+              @if (!loadManualDownload) {
+                <svg class="w-4 h-4">
+                  <use xlink:href="/assets/icons/outline/general.svg#download" />
+                </svg>
+              }
+              Descargar documentos
+            </app-button>
+          </ng-template>
+        </app-popover>
+
+        <ng-template #popoverContent>
+          <div class="flex justify-end items-center gap-2">
+            <div class="flex gap-2 md:hidden">
+              <app-button
+                (click)="closeFormatsBtnPopover()"
+                variant="primary"
+                styleType="soft"
+                size="sm"
+                customClass="leading-4">
+                Entendido
+              </app-button>
+            </div>
+            <div class="hidden md:flex gap-2">
+              <app-button
+                (click)="closeFormatsBtnPopover()"
+                variant="primary"
+                styleType="soft"
+                size="md"
+                customClass="leading-4">
+                Entendido
+              </app-button>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+    }
+  </div>
+
+  <div class="flex flex-col gap-4">
+
+    <div class="flex flex-col sm:flex-row items-center bg-gray-100 rounded-xl p-4 gap-6">
+      <div #donutChart class=" min-w-[162px] h-[162px]"></div>
+
+      <div class="w-full">
+        <div class="flex items-center gap-2 py-1.5 text-sm font-semibold leading-4 text-main-blue1h">
+          <h5 class="text-main-blue1h">Estado de cumplimiento</h5>
+          <app-tooltip
+            [id]="'compliance-graph'"
+            [text]="'Este gráfico solo tiene en cuenta los documentos requeridos.'"
+            position="top"
+            styleType="light">
+            <svg class="w-4 h-4">
+              <use xlink:href="/assets/icons/outline/general.svg#info-circle" />
+            </svg>
+          </app-tooltip>
+          <span class="ml-auto">%</span>
+        </div>
+        <hr class="h-px bg-gray-300 border-0 dark:bg-gray-700">
+        <div class="flex items-center gap-3 py-1.5"
+          (mouseenter)="highlightSeries('Cargados')"
+          (mouseleave)="clearHighlight()">
+          <span class="w-3 h-3 rounded-full bg-green-500"></span>
+          <span class="text-sm font-semibold leading-4 text-main-blue1h dark:text-gray-300">Cargados</span>
+          <span class="ml-auto text-sm font-semibold leading-4 text-main-blue1h dark:text-gray-300">
+            @if (loadingPercent || !percentData) {
+              <ng-container *ngTemplateOutlet="loadingPercentTemplate"></ng-container>
+            } @else {
+              {{ percentData.uploaded }}%
+            }
+          </span>
+        </div>
+        <div class="flex items-center gap-3 py-1.5"
+          (mouseenter)="highlightSeries('Pendientes')"
+          (mouseleave)="clearHighlight()">
+          <span class="w-3 h-3 rounded-full bg-yellow-400"></span>
+          <span class="text-sm font-semibold leading-4 text-main-blue1h dark:text-gray-300">Pendientes</span>
+          <span class="ml-auto text-sm font-semibold leading-4 text-main-blue1h dark:text-gray-300">
+            @if (loadingPercent || !percentData) {
+              <ng-container *ngTemplateOutlet="loadingPercentTemplate"></ng-container>
+            } @else {
+              {{ percentData.remaining }}%
+            }
+          </span>
+        </div>
+        <div class="flex items-center gap-3 py-1.5"
+          (mouseenter)="highlightSeries('Vencidos')"
+          (mouseleave)="clearHighlight()">
+          <span class="w-3 h-3 rounded-full bg-red-500"></span>
+          <span class="text-sm font-semibold leading-4 text-main-blue1h dark:text-gray-300">Vencidos</span>
+          <span class="ml-auto text-sm font-semibold leading-4 text-main-blue1h dark:text-gray-300">
+            @if (loadingPercent || !percentData) {
+              <ng-container *ngTemplateOutlet="loadingPercentTemplate"></ng-container>
+            } @else {
+              {{ percentData.expired }}%
+            }
+          </span>
+        </div>
+
+        <ng-template #loadingPercentTemplate>
+          <svg class="w-4 h-4 text-main-blue1h animate-spin fill-gray-200">
+            <use xlink:href="/assets/icons/extras/animations.svg#spin" />
+          </svg>
+        </ng-template>
+      </div>
+    </div>
+
+    <div class="relative overflow-x-auto rounded-xl shadow-sm">
+      <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead class="text-sm font-semibold leading-4 text-blue1h-950 bg-gray-100 dark:bg-gray-700 dark:text-gray-400 whitespace-nowrap">
+          <tr>
+            <th scope="col" class="px-4 py-3 font-semibold">
+              Nombre
+            </th>
+            <th scope="col" class="px-4 py-3 font-semibold">
+              Estado de carga
+            </th>
+            <th scope="col" class="px-4 py-3 font-semibold">
+              Fecha de carga
+            </th>
+            <th scope="col" class="px-4 py-3 font-semibold">
+              Requerido
+            </th>
+            <th scope="col" class="px-4 py-3 font-semibold">
+              Aprobación
+            </th>
+            <th scope="col" class="px-4 py-3 font-semibold">
+              Acciones
+            </th>
+            <th scope="col" class="px-4 py-3 font-semibold">
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loadingDocs) {
+            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+              <td colspan="6" class="px-4 h-[54px] text-left">
+                <div class="text-md text-main-blue1h leading-4 flex items-center gap-2">
+                  <svg class="w-5 h-5 text-current animate-spin fill-gray-200">
+                    <use xlink:href="/assets/icons/extras/animations.svg#spin" />
+                  </svg>
+                  Cargando documentos...
+                </div>
+              </td>
+            </tr>
+          } @else {
+            @for (doc of docList; track doc.idDocumentType) {
+              <!-- min-h-[54px] px-4 -->
+              <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+                <td class="px-4 py-[10.5px] text-sm font-normal text-main-blue1h leading-4 dark:text-white min-w-[320px]">
+                  <div class="flex justify-between items-center gap-2 w-full">
+                    <div>
+                      {{ doc.typeDocument | formatNameDoc:doc.idDocumentType }}
+                      @if (!doc.required) {
+                        <span class="font-semibold">(Opcional)</span>
+                      }
+                    </div>
+                    <div class="block sm:hidden">
+                      <ng-container
+                        *ngTemplateOutlet="documentActions; context: {
+                          doc,
+                          id: 'doc-start-drop-' + doc.idDocumentType,
+                          dropPlacement: 'bottom-start'
+                        }">
+                      </ng-container>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-[10.5px]">
+                  <div class="inline-flex gap-1 py-1.5 px-3 rounded-full text-sm font-semibold leading-4 whitespace-nowrap"
+                    [ngClass]="[statusConfig[doc.documentStatus].bgClass, statusConfig[doc.documentStatus].textClass]">
+                    <svg class="w-4 h-4">
+                      <use [attr.xlink:href]="'/assets/icons/outline/general.svg#' + statusConfig[doc.documentStatus].icon" />
+                    </svg>
+                    {{ statusConfig[doc.documentStatus].label }}
+                  </div>
+                </td>
+                <td class="px-4 py-[10.5px] text-sm font-normal text-main-blue1h leading-4 dark:text-white">
+                  {{ doc.documentStatus === 'PENDIENTE' ? 'N/A' : doc.dateAdd | date: 'mediumDate' }}
+                </td>
+                <td class="px-4 py-[10.5px] text-sm font-normal text-main-blue1h leading-4 dark:text-white">
+                  {{ doc.required ? 'Sí' : 'No' }}
+                </td>
+                <td class="px-4 py-[10.5px]">
+                  @if (doc.documentStatus !== 'AL DIA') {
+                    N/A
+                  } @else {
+                    @if (doc.isDocApproved) {
+                      <!-- bg-green-100 text-green-800 -->
+                      <div class="inline-flex gap-1 py-1.5 rounded-full text-green-600 text-sm font-semibold leading-4">
+                        <svg class="w-4 h-4">
+                          <use xlink:href="/assets/icons/outline/general.svg#check" />
+                        </svg>
+                        Aprobado
+                      </div>
+                    } @else {
+                      <!-- bg-yellow-100 text-yellow-800 -->
+                      <div class="inline-flex gap-1 py-1.5 rounded-full text-yellow-600 text-sm font-semibold leading-4">
+                        <svg class="w-4 h-4">
+                          <use xlink:href="/assets/icons/outline/general.svg#clock" />
+                        </svg>
+                        Pendiente
+                      </div>
+                    }
+                  }
+                </td>
+                <td class="px-4 py-[10.5px] text-left">
+                  <div class="my-auto flex justify-end gap-2">
+                    @if (doc.documentStatus === 'PENDIENTE') {
+                      <app-button
+                        (onClick)="editDocumentModal(doc, true)"
+                        variant="primary"
+                        styleType="solid"
+                        size="xs"
+                        class="grow"
+                        customClass="w-full flex justify-center">
+                        <svg class="w-4 h-4">
+                          <use xlink:href="/assets/icons/outline/general.svg#upload" />
+                        </svg>
+                        Cargar
+                      </app-button>
+                    } @else if (doc.documentStatus === 'VENCIDO' || isAboutToExpire(doc)) {
+                      <app-tooltip
+                        [id]="'expires-soon-' + doc.idDocumentType"
+                        [text]="doc.documentStatus === 'VENCIDO'
+                          ? 'Este documento está vencido. Por favor, actualízalo para mantener tu cumplimiento al día.'
+                          : 'Este documento está próximo a vencer. Por favor, actualízalo para mantener tu cumplimiento al día.'"
+                        styleType="light"
+                        class="w-full">
+                        <app-button
+                          (onClick)="editDocumentModal(doc, false)"
+                          variant="primary"
+                          styleType="solid"
+                          size="xs"
+                          class="grow"
+                          customClass="w-full flex justify-center">
+                          <svg class="w-4 h-4">
+                            <use xlink:href="/assets/icons/outline/arrows.svg#refresh" />
+                          </svg>
+                          Actualizar
+                        </app-button>
+                      </app-tooltip>
+                    }
+                  </div>
+                </td>
+                <td class="px-4 py-[10.5px] text-left">
+                  @if (doc.documentStatus !== 'PENDIENTE') {
+                    <ng-container
+                      *ngTemplateOutlet="documentActions; context: {
+                        doc,
+                        id: 'doc-end-drop-' + doc.idDocumentType
+                      }">
+                    </ng-container>
+                  }
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>
+
+
+<ng-template #documentActions let-doc="doc" let-id="id" let-placement="dropPlacement">
+  <app-button
+    [appDropdownTrigger]="id"
+    [dropdownPlacement]="placement || 'bottom-end'"
+    variant="gray"
+    styleType="soft"
+    size="xs">
+    <svg class="w-4 h-4">
+      <use xlink:href="/assets/icons/outline/general.svg#dots-horizontal" />
+    </svg>
+  </app-button>
+
+  <div [id]="id" class="z-30 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-[8.5rem] dark:bg-gray-700 dark:divide-gray-600">
+    <ul class="py-1 text-sm text-gray-700 dark:text-gray-200">
+      @if (doc.documentStatus === 'PENDIENTE') {
+        <li>
+          <a (click)="editDocumentModal(doc, true)" data-dropdown-close class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+            <svg class="w-[1.125rem] h-[1.125rem] text-gray-500">
+              <use xlink:href="/assets/icons/outline/general.svg#upload" />
+            </svg>
+            Cargar
+          </a>
+        </li>
+      } @else {
+        <li>
+          <a (click)="viewFile(doc)" data-dropdown-close class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+            <svg class="w-[1.125rem] h-[1.125rem] text-gray-500">
+              <use xlink:href="/assets/icons/outline/general.svg#eye" />
+            </svg>
+            Ver
+          </a>
+        </li>
+        @if (!doc.isDocApproved ||  isAboutToExpire(doc)) {
+          <li>
+            <a (click)="editDocumentModal(doc, false)" data-dropdown-close class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+              <svg class="w-[1.125rem] h-[1.125rem] text-gray-500">
+                <use xlink:href="/assets/icons/outline/arrows.svg#refresh" />
+              </svg>
+              Actualizar
+            </a>
+          </li>
+        }
+      }
+    </ul>
+    @if (doc.documentStatus !== 'PENDIENTE' && (!doc.isDocApproved || isAboutToExpire(doc))) {
+      <div class="py-1">
+        <a (click)="deleteDocument(doc)" data-dropdown-close class="flex items-center gap-3 px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
+          <svg class="w-[1.125rem] h-[1.125rem]">
+            <use xlink:href="/assets/icons/outline/general.svg#trash-bin" />
+          </svg>
+          Eliminar
+        </a>
+      </div>
+    }
+  </div>
+</ng-template>

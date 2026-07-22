@@ -152,7 +152,7 @@
 
         <div class="flex flex-col gap-2" formArrayName="Emails">
           <div class="flex items-center justify-between">
-            <h4 class="text-base font-semibold leading-[18px]">Correos</h4>
+            <h4 class="text-base font-semibold leading-[1.125rem]">Correos</h4>
             <app-button
               (onClick)="addEmail()"
               [disabled]="emailsArray.length >= 5"
@@ -217,7 +217,7 @@
 
         <div class="flex flex-col gap-2" formArrayName="Phones">
           <div class="flex items-center justify-between">
-            <h4 class="text-base font-semibold leading-[18px]">Teléfonos</h4>
+            <h4 class="text-base font-semibold leading-[1.125rem]">Teléfonos</h4>
             <app-button
               (onClick)="addPhone()"
               [disabled]="phonesArray.length >= 5"
@@ -322,7 +322,7 @@
           styleType="soft"
           size="lg"
           class="flex-1"
-          customClass="leading-[18px] w-full flex justify-center">
+          customClass="leading-[1.125rem] w-full flex justify-center">
           Cancelar
         </app-button>
         <app-button
@@ -331,7 +331,7 @@
           styleType="solid"
           size="lg"
           class="flex-1"
-          customClass="leading-[18px] w-full flex justify-center">
+          customClass="leading-[1.125rem] w-full flex justify-center">
           Guardar
         </app-button>
       </div>

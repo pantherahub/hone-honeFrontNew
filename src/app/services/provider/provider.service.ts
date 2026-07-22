@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { DocumentType } from 'src/app/models/document-type.interface';
-import { TempProviderDataValidation } from 'src/app/models/temporal-provider.interface';
+import { IdentificationType } from 'src/app/interfaces/identification-type.interface';
+import { TempProviderDataValidation } from 'src/app/interfaces/temporal-provider.interface';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -14,8 +14,8 @@ export class ProviderService {
 
   constructor(private httpClient: HttpClient) { }
 
-  getIdentificationTypes(): Observable<DocumentType[]> {
-    return this.httpClient.get<DocumentType[]>(this.url + "getTypeDocument");
+  getIdentificationTypes(): Observable<IdentificationType[]> {
+    return this.httpClient.get<IdentificationType[]>(this.url + "getTypeDocument");
   }
 
   getTemporalProviderData(idProvider: any): Observable<any> {
