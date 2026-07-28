@@ -84,34 +84,34 @@
             <app-input-error [control]="ticketForm.get('phone')" />
           </div>
         }
-        @if (isLogged) {
+        <div>
+          <app-select
+            [items]="requestTypes"
+            bindLabel="nameSolicitud"
+            bindValue="idTiposolicitud"
+            formControlName="idRequestType"
+            placeholder="Tipo de solicitud">
+          </app-select>
+          <app-input-error [control]="ticketForm.get('idRequestType')" />
+        </div>
+        @if (isLogged && showClientSelect) {
           <div>
             <app-select
-              [items]="requestTypes"
-              bindLabel="nameSolicitud"
-              bindValue="idTiposolicitud"
-              formControlName="idRequestType"
-              placeholder="Tipo de solicitud">
+              [items]="clientList"
+              bindLabel="clientHoneSolutions"
+              bindValue="idClientHoneSolutions"
+              formControlName="idMessageClient"
+              placeholder="Aseguradora relacionada">
             </app-select>
-            <app-input-error [control]="ticketForm.get('idRequestType')" />
+            <app-input-error [control]="ticketForm.get('idMessageClient')" />
           </div>
-          @if (showClientSelect) {
-            <div>
-              <app-select
-                [items]="clientList"
-                bindLabel="clientHoneSolutions"
-                bindValue="idClientHoneSolutions"
-                formControlName="idMessageClient"
-                placeholder="Aseguradora relacionada">
-              </app-select>
-              <app-input-error [control]="ticketForm.get('idMessageClient')" />
-            </div>
-          }
         }
-        <div>
-          <app-text-input [id]="'requestName'" formControlName="requestName" label="Asunto" />
-          <app-input-error [control]="ticketForm.get('requestName')" />
-        </div>
+        @if (!isPasswordRecovery) {
+          <div>
+            <app-text-input [id]="'requestName'" formControlName="requestName" label="Asunto" />
+            <app-input-error [control]="ticketForm.get('requestName')" />
+          </div>
+        }
         <div>
           <app-text-input [id]="'message'" formControlName="message" label="Descripción detallada" [isTextarea]="true" />
           <app-input-error [control]="ticketForm.get('message')" />
