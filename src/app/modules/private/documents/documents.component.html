@@ -345,7 +345,7 @@
             Ver
           </a>
         </li>
-        @if (!doc.isDocApproved ||  isAboutToExpire(doc)) {
+        @if (canUpdateDocument(doc)) {
           <li>
             <a (click)="editDocumentModal(doc, false)" data-dropdown-close class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
               <svg class="w-[1.125rem] h-[1.125rem] text-gray-500">

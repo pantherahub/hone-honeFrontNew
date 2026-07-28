@@ -102,6 +102,11 @@ export class DocumentsComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   };
 
+  private readonly documentIdsAlwaysUpdatable: number[] = [
+    134, // RUT [SURA]
+    139, // Camara de comercio [SURA]
+  ];
+
   private destroy$ = new Subject<void>();
   private disclaimerReady$ = new ReplaySubject<void>(1);
 
@@ -472,6 +477,15 @@ export class DocumentsComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Returns true if there is one week or less left until expiration, or if it has already expired
     return diffDays <= 7;
+  }
+
+  /**
+   * Determines whether the update action should be enabled for a document.
+   * Documents in the `documentIdsAlwaysUpdatable` list are always updatable regardless of approval/expiration status.
+   */
+  canUpdateDocument(doc: any): boolean {
+    if (this.documentIdsAlwaysUpdatable.includes(doc.idDocumentType)) return true;
+    return doc.documentStatus === 'VENCIDO' || this.isAboutToExpire(doc) || !doc.isDocApproved;
   }
 
   viewFile(doc: DocumentInterface) {
