@@ -103,6 +103,8 @@ export class DocumentsComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   private readonly documentIdsAlwaysUpdatable: number[] = [
+    8, // Habilitación (REPS)
+    132, // Registro especial de habilitacion (REPS) [SURA]
     134, // RUT [SURA]
     139, // Camara de comercio [SURA]
   ];
