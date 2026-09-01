@@ -263,7 +263,7 @@
             for="dropzone-file"
             appFileDrop
             [allowedExtensions]="uploadAllowedExtensions"
-            [maxFileSizeMB]="7"
+            [maxFileSizeMB]="20"
             [multiple]="ticketConfig.allowsMultipleFiles"
             (fileDropped)="onFileChange($event)"
             (filesDropped)="onFileChange($event)"
@@ -283,7 +283,7 @@
           class="hidden"
           appFileSelect
           [allowedExtensions]="uploadAllowedExtensions"
-          [maxFileSizeMB]="7"
+          [maxFileSizeMB]="20"
           [multiple]="ticketConfig.allowsMultipleFiles"
           (fileValidated)="onFileChange($event)"
           (filesValidated)="onFileChange($event)"
