@@ -158,7 +158,7 @@
             <label
               for="dropzone-file"
               appFileDrop
-              [maxFileSizeMB]="7"
+              [maxFileSizeMB]="15"
               multiple
               (filesDropped)="onFileChange($event)"
               class="flex flex-col items-center justify-center gap-1.5 w-full border-2 border-dashed rounded-lg cursor-pointer border-gray-200 bg-white hover:bg-gray-50 p-6 text-gray-500"
@@ -177,7 +177,7 @@
               type="file"
               class="hidden"
               appFileSelect
-              [maxFileSizeMB]="7"
+              [maxFileSizeMB]="15"
               multiple
               (filesValidated)="onFileChange($event)"
             />
