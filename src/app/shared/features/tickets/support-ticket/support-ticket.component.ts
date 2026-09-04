@@ -53,6 +53,9 @@ export class SupportTicketComponent implements OnInit, OnDestroy {
   clientList: ClientInterface[] = [];
   showClientSelect: boolean = false;
 
+  private readonly PASSWORD_RECOVERY_REQUEST_TYPE_ID = 15;
+  private readonly PQRS_REQUEST_TYPE_ID = 24;
+
   private destroy$ = new Subject<void>();
 
   @ViewChild('ticketSearchDrawer') ticketSearchDrawer!: DrawerComponent;
@@ -127,14 +130,14 @@ export class SupportTicketComponent implements OnInit, OnDestroy {
     // Request types for anonymous users (not logged in)
     this.requestTypes = [
       {
-        idTiposolicitud: 15,
+        idTiposolicitud: this.PASSWORD_RECOVERY_REQUEST_TYPE_ID,
         nameSolicitud: 'Recuperación de contraseña',
         isTicket: true,
         withClient: false,
         isProvider: false
       },
       {
-        idTiposolicitud: 24,
+        idTiposolicitud: this.PQRS_REQUEST_TYPE_ID,
         nameSolicitud: 'PQRS',
         isTicket: true,
         withClient: false,
@@ -227,7 +230,7 @@ export class SupportTicketComponent implements OnInit, OnDestroy {
       identification: ['', [...requiredIfAnonymous, this.formUtils.numeric]],
       email: ['', emailValidators],
       phone: ['', phoneValidators],
-      idRequestType: [this.isLogged ? null : 15, [Validators.required]],
+      idRequestType: [this.isLogged ? null : this.PASSWORD_RECOVERY_REQUEST_TYPE_ID, [Validators.required]],
       idMessageClient: [null],
       requestName: ['', [Validators.required]],
       message: ['', [Validators.required]],
@@ -238,14 +241,47 @@ export class SupportTicketComponent implements OnInit, OnDestroy {
 
     this.ticketForm.get('idRequestType')?.valueChanges
       .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
+      .subscribe((value) => {
         this.syncClientSelectVisibility();
         this.syncRequestName();
+
+        if (!this.isLogged && Number(value) === this.PQRS_REQUEST_TYPE_ID) {
+          this.warnAboutPasswordRecovery();
+        }
       });
   }
 
   get isPasswordRecovery(): boolean {
-    return Number(this.ticketForm.get('idRequestType')?.value) === 15;
+    return Number(this.ticketForm.get('idRequestType')?.value) === this.PASSWORD_RECOVERY_REQUEST_TYPE_ID;
+  }
+
+  /**
+   * Warns anonymous users who pick "PQRS" that password recovery has its own
+   * dedicated option, offering to switch the field for them.
+   */
+  private warnAboutPasswordRecovery(): void {
+    const passwordRecoveryName = this.getRequestTypeName(this.PASSWORD_RECOVERY_REQUEST_TYPE_ID)
+      ?? 'Recuperación de contraseña';
+    const selectedRequestTypeName = this.getSelectedRequestType()?.nameSolicitud
+      ?? 'esta opción';
+
+    this.alertService.showAlert({
+      title: '¿Olvidaste tu contraseña?',
+      message: `Usa la opción "${passwordRecoveryName}". El canal de "${selectedRequestTypeName}" no gestiona solicitudes de acceso.`,
+      variant: 'warning',
+      isConfirmation: true,
+      confirmBtnText: 'Recuperar contraseña',
+      cancelBtnText: 'Mantener selección',
+      showClose: false,
+    }).subscribe((switchToPasswordRecovery) => {
+      if (switchToPasswordRecovery) {
+        this.ticketForm.get('idRequestType')?.setValue(this.PASSWORD_RECOVERY_REQUEST_TYPE_ID);
+      }
+    });
+  }
+
+  private getRequestTypeName(id: number): string | undefined {
+    return this.requestTypes.find(requestType => this.getRequestTypeId(requestType) === id)?.nameSolicitud;
   }
 
   private syncClientSelectVisibility(): void {
@@ -267,7 +303,7 @@ export class SupportTicketComponent implements OnInit, OnDestroy {
     const requestNameControl = this.ticketForm.get('requestName');
     const idRequestType = this.ticketForm.get('idRequestType')?.value;
 
-    if (Number(idRequestType) === 15) {
+    if (Number(idRequestType) === this.PASSWORD_RECOVERY_REQUEST_TYPE_ID) {
       requestNameControl?.setValue('Recuperación de contraseña', { emitEvent: false });
       requestNameControl?.clearValidators();
     } else {
