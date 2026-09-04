@@ -245,7 +245,7 @@ export class SupportTicketComponent implements OnInit, OnDestroy {
         this.syncClientSelectVisibility();
         this.syncRequestName();
 
-        if (!this.isLogged && Number(value) === this.PQRS_REQUEST_TYPE_ID) {
+        if (!this.isLogged && value != null && Number(value) !== this.PASSWORD_RECOVERY_REQUEST_TYPE_ID) {
           this.warnAboutPasswordRecovery();
         }
       });
@@ -256,8 +256,9 @@ export class SupportTicketComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Warns anonymous users who pick "PQRS" that password recovery has its own
-   * dedicated option, offering to switch the field for them.
+   * Warns anonymous users who pick any request type other than password
+   * recovery that it has its own dedicated option, offering to switch the
+   * field for them.
    */
   private warnAboutPasswordRecovery(): void {
     const passwordRecoveryName = this.getRequestTypeName(this.PASSWORD_RECOVERY_REQUEST_TYPE_ID)
