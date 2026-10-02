@@ -25,7 +25,7 @@ COMPILED_FOLDER="$USER_DIR/www/hone-solutions-repos/fronts-compiled"
 TARGET_DIR="$COMPILED_FOLDER/$APP_FOLDER/$ENVIRONMENT"
 
 # Usar nvm para seleccionar la versión de Node.js
-NODE_VERSION="22.23.0"
+NODE_VERSION="18"
 NVM_DIR_PATH=$(cygpath -u "${NVM_HOME:-$USER_DIR/AppData/Local/nvm}")
 export PATH="$NVM_DIR_PATH/v$NODE_VERSION:$PATH"
 nvm use "$NODE_VERSION"
