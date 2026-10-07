@@ -74,6 +74,8 @@ export class ModalEditDocumentComponent implements OnInit, OnDestroy {
     'Ipsa',
     'Otro'
   ];
+  readonly softwareOtherOption = 'Otro';
+  readonly softwareOtherMaxLength = 30;
   suraArlEntities: string[] = [
     'ARL COLSANITAS',
     'ALFATEP',
@@ -207,6 +209,10 @@ export class ModalEditDocumentComponent implements OnInit, OnDestroy {
   createForm() {
     this.documentForm = this.formBuilder.nonNullable.group({
       software: ['', [Validators.required]],
+      softwareOther: [{ value: '', disabled: true }, [
+        Validators.required,
+        Validators.maxLength(this.softwareOtherMaxLength)
+      ]],
       dateExpedition: ['', [
         Validators.required,
         this.dateExpeditionValidator.bind(this)
@@ -250,6 +256,18 @@ export class ModalEditDocumentComponent implements OnInit, OnDestroy {
     // Update validity statuses
     this.documentForm.updateValueAndValidity();
 
+    this.documentForm.get('software')?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(value => {
+        const softwareOther = this.documentForm.get('softwareOther');
+        if (value === this.softwareOtherOption) {
+          softwareOther?.enable();
+        } else {
+          softwareOther?.reset('');
+          softwareOther?.disable();
+        }
+      });
+
     this.documentForm.get('idCity')?.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
@@ -272,6 +290,7 @@ export class ModalEditDocumentComponent implements OnInit, OnDestroy {
     if (!item.showInProviderSystem) return false;
     const documentValidationMap: any = {
       software: item.withSoftwareMedicalRecord,
+      softwareOther: item.withSoftwareMedicalRecord,
       dateExpedition: item.withExpedition,
       dateDiligence: item.withDateDiligence,
       dateSignature: item.withDateSignature,
@@ -406,8 +425,15 @@ export class ModalEditDocumentComponent implements OnInit, OnDestroy {
   patchForm() {
     const item = this.currentDoc;
 
+    // Case-sensitive match: a value not in the list came from the "Otro" free field
+    const savedSoftware: string = item.software?.trim() || '';
+    const isListedSoftware = this.suraSoftwareTypes.includes(savedSoftware);
+    const software = !savedSoftware
+      ? null
+      : isListedSoftware ? savedSoftware : this.softwareOtherOption;
+
     this.documentForm.patchValue({
-      software: this.sanitizeWithOptions(item.software, this.suraSoftwareTypes),
+      software,
       consultationDate: this.convertDate(item.consultationDate),
       dateDiligence: this.convertDate(item.dateDiligence),
       dateSignature: this.convertDate(item.dateSignature),
@@ -441,6 +467,11 @@ export class ModalEditDocumentComponent implements OnInit, OnDestroy {
       amountPolicy: this.formUtils.formatCurrency(item.amountPolicy),
       idDocumentType: item.idDocumentType
     });
+
+    // software valueChanges enabled the control only when "Otro" was selected
+    if (savedSoftware && !isListedSoftware) {
+      this.documentForm.get('softwareOther')?.setValue(savedSoftware);
+    }
   }
 
   onAmountPolicyChange(): void {
@@ -559,6 +590,13 @@ export class ModalEditDocumentComponent implements OnInit, OnDestroy {
 
     // Add form data
     const docForm = { ...this.documentForm.value };
+
+    // "Otro" free text replaces software and is sent in uppercase
+    const softwareOther = String(docForm['softwareOther'] ?? '').trim();
+    delete docForm['softwareOther'];
+    if (docForm['software'] === this.softwareOtherOption && softwareOther) {
+      docForm['software'] = softwareOther.toUpperCase();
+    }
 
     for (const [key, value] of Object.entries(docForm)) {
       if (value == null) continue;
