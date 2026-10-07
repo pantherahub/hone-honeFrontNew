@@ -24,11 +24,22 @@ USER_DIR=$(echo "$HOME" | sed 's/\\/\\\\/g') # Escapar caracteres en Windows
 COMPILED_FOLDER="$USER_DIR/www/hone-solutions-repos/fronts-compiled"
 TARGET_DIR="$COMPILED_FOLDER/$APP_FOLDER/$ENVIRONMENT"
 
-# Usar nvm para seleccionar la versión de Node.js
+# Usar nvm para seleccionar la versión de Node.js.
+# nvm-windows instala en v18.20.4, no en una carpeta v18.
+# `nvm use` recrea el symlink de "C:\Program Files\nodejs" y, en el
+# mismo proceso de Git Bash, npm deja de verse ahí. El binario real
+# va primero en PATH para que npm y node se resuelvan igual.
 NODE_VERSION="18"
-NVM_DIR_PATH=$(cygpath -u "${NVM_HOME:-$USER_DIR/AppData/Local/nvm}")
-export PATH="$NVM_DIR_PATH/v$NODE_VERSION:$PATH"
+NVM_DIR_PATH=$(cygpath -u "${NVM_HOME:-$HOME/AppData/Roaming/nvm}")
+NODE_BIN_DIR=$(command ls -d "$NVM_DIR_PATH"/v"$NODE_VERSION".* 2>/dev/null | sort -V | tail -n 1 || true)
+if [ -z "$NODE_BIN_DIR" ] || [ ! -x "$NODE_BIN_DIR/npm" ]; then
+  echo "Error: no se encontró Node.js $NODE_VERSION en $NVM_DIR_PATH"
+  exit 1
+fi
+export PATH="$NODE_BIN_DIR:$PATH"
+hash -r
 nvm use "$NODE_VERSION"
+hash -r
 
 # Cambiar al directorio de la aplicación
 cd "$APP_DIR"
@@ -60,4 +71,5 @@ mkdir -p "$TARGET_DIR"
 echo "Copiando al directorio $TARGET_DIR..."
 cp -r "$BUILD_DIR" "$TARGET_DIR"
 
+nvm use 22
 echo "Completo!"
