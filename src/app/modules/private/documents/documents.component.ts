@@ -99,7 +99,13 @@ export class DocumentsComponent implements OnInit, AfterViewInit, OnDestroy {
         { url: `${environment.s3AssetsHost}carta_mipres.pdf`, name: 'Carta_Mipres.pdf' }
       ],
       displayName: 'Carta Mipres a diligenciar',
-    }
+    },
+    '15-3': {
+      files: [
+        { url: `${environment.s3AssetsHost}documentos-prestadores-ips-colsanitas.zip`, name: 'Documentos para diligenciar colsanitas.zip' }
+      ],
+      displayName: 'Documentos obligatorios a diligenciar',
+    },
   };
 
   private readonly documentIdsAlwaysUpdatable: number[] = [
