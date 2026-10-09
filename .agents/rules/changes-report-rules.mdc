@@ -1,0 +1,41 @@
+---
+description: Organiza planes y reportes de cada cambio del proyecto.
+alwaysApply: true
+---
+
+# Planes y reportes de cambios
+
+Después de completar cualquier cambio en el proyecto, crea un reporte final. No
+borres reportes ni planes existentes.
+
+## Dónde va cada cosa
+
+- Los **planes** se crean y trabajan en `.plans/context/`.
+- Cuando un plan queda completamente implementado, muévelo a
+  `.plans/context/complete/`, si el plan está en una carpeta pásalo con carpeta y todo.
+- Si el trabajo proviene de un plan, guarda el reporte en
+  `.plans/results/<modulo-del-plan>/`.
+- Si es un cambio pequeño que no parte de un plan, guárdalo en
+  `.plans/results/small/`.
+- Cuando el agente termine con el plan en el texto final de conclusión di donde quedo el reporte y como se debe de leer.
+
+Usa nombres de archivos y carpetas en **kebab-case**. El módulo debe describir
+el tema del plan, por ejemplo: `.plans/results/gestion-de-usuarios/`.
+
+## Contenido obligatorio del reporte
+
+El reporte debe ser robusto, preciso y fácil de entender para una persona de
+15 años y para el siguiente agente. Incluye:
+
+0. Ruta del plan que se utilizó o prompt inicial.
+1. Qué se pidió, qué se hizo y por qué.
+2. Archivos creados, editados, movidos o eliminados, indicando su propósito.
+3. Funciones, rutas, validaciones, migraciones o componentes relevantes y cómo
+   cambian el comportamiento.
+4. Pruebas, comandos o verificaciones realizadas y su resultado.
+5. Pendientes, limitaciones, riesgos y el punto exacto desde donde continuar.
+6. Otra sección donde ya no sea para una persona de 15 años, sino para la misma IA siendo más específico y técnico en lo que se hizo.
+
+Si una sección no aplica, escribe `Ninguno`. No inventes cambios. Escribe el
+reporte al terminar la tarea, con base solo en lo que realmente se modificó.
+

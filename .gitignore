@@ -42,3 +42,10 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# IA Agents
+.plans/resource
+/.cursor
+/.codex
+/.claude
+/.ai
