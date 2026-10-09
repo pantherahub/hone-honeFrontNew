@@ -8,12 +8,16 @@ export interface ServiceRule {
 }
 
 
+// Documentation always, contracts only when the client has them enabled
+const documentationAndContractsRules: ServiceRule[] = [
+  { key: 'documentation' }, // Always allowed
+  { key: 'contracts', condition: (c) => !!c?.withContract }
+];
+
 // Configuring access to services by client
 export const clientServicesRules: Record<number, ServiceRule[]> = {
-  8: [ // Axa
-    { key: 'documentation' }, // Always allowed
-    { key: 'contracts', condition: (c) => !!c?.withContract }
-  ],
+  8: documentationAndContractsRules, // Axa
+  15: documentationAndContractsRules, // Colsanitas
 };
 // 8: ['documentation', 'rates', 'contracts'],        // Axa rates
 // 12: ['documentation', 'billing', 'rips'],          // BMI

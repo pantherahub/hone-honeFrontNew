@@ -33,3 +33,10 @@ Ninguno. Si los nombres de Colsanitas llegan con otro formato (p. ej. `[Colsanit
 - Regex: `/\s*\[(?:SURA|COLSANITAS)\]$/`, sensible a mayúsculas, anclado al final, como el original.
 - `launch.json` usa `autoPort: true`, así que el puerto efectivo puede cambiar si 4200 está ocupado.
 - `.gitignore` ya estaba modificado antes de esta tarea; no se tocó.
+
+## Adenda: servicios de Colsanitas (cliente 15)
+- Pedido: habilitar documentos y contratos para el cliente 15.
+- `src/app/config/client-services.config.ts`: se extrajo `documentationAndContractsRules` (documentación siempre; contratos si `client.withContract`) y se usa para Axa (8) y Colsanitas (15).
+- `clientServicesRules` es el único sitio que decide el acceso: lo leen `service-access.guard.ts` y `service-navigation.component.ts`. Las rutas y `SERVICES_CONFIG` ya incluyen `contracts`.
+- Verificación: `tsc --noEmit -p tsconfig.app.json` sin errores. No se probó en el navegador (requiere login y backend).
+- Supuesto: el backend devuelve `withContract: true` para Colsanitas; sin eso la pestaña Contratos no aparece.
