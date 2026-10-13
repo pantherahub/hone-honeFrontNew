@@ -153,6 +153,24 @@
       </div>
     </div>
 
+    @if (getCurrentDownloadConfig() && !loading && hasPendingDocsAction) {
+      <!-- Recuerda el botón "Descargar documentos"; solo se muestra cuando el popover se lanza solo (hay pendientes) -->
+      <app-alert
+        variant="info"
+        title="Descarga los formatos e instructivos">
+        <p extra-content class="text-sm leading-4">
+          Con el botón
+          <button
+            type="button"
+            (click)="openFormatsBtnPopover()"
+            class="font-semibold underline hover:text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue1h-300 rounded-sm">
+            «Descargar documentos»
+          </button>
+          puedes bajar los formatos necesarios para diligenciar tus documentos y algunos manuales o instructivos.
+        </p>
+      </app-alert>
+    }
+
     <div class="relative overflow-x-auto rounded-xl shadow-sm">
       <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
         <thead class="text-sm font-semibold leading-4 text-blue1h-950 bg-gray-100 dark:bg-gray-700 dark:text-gray-400 whitespace-nowrap">
