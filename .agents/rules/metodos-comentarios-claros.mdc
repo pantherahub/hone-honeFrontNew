@@ -1,0 +1,40 @@
+---
+description: Estándar de comentarios para métodos/funciones (claros, cortos, solo lo no obvio)
+alwaysApply: false
+---
+
+# Comentarios para código nuevo o modificado
+
+Este proyecto es Angular 17 con TypeScript — no uses PHPDoc. Escribe los comentarios en español,
+en el mismo tono que el código existente.
+
+## Métodos públicos (los que usa OTRO archivo)
+
+Servicios (`services/`), pipes, guards, interceptors, utilidades compartidas y métodos públicos de
+componentes consumidos desde su template o desde otro archivo: si algo de su comportamiento no es
+obvio con solo leer la firma (un gotcha del backend, una decisión de diseño, un edge case, un
+"por qué así y no de otra forma"), agrega un JSDoc corto **antes** del método:
+
+- 1 línea si alcanza (`/** Quita el sufijo del cliente ("[SURA]", "[COLSANITAS]") del nombre. */`).
+- Hasta ~6 líneas si hace falta explicar un gotcha real.
+- Nunca una plantilla fija de secciones (parámetros uno por uno, retorno campo por campo, quién
+  llama/a quién llama) — eso duplica lo que ya dicen los tipos y se desactualiza solo. Explica lo
+  que el código no puede explicarse solo.
+- Si el método no tiene ningún comportamiento no obvio, no le pongas comentario — el nombre y los
+  tipos ya bastan (por ejemplo, los métodos que solo envuelven una llamada `HttpClient`).
+
+## Métodos privados / internos
+
+No llevan comentario salvo que hagan algo genuinamente no obvio — y ahí una sola línea `//` arriba,
+nunca un bloque JSDoc.
+
+## Constantes y configuración
+
+Una constante con valores "mágicos" (IDs de backend, listas de clientes, regex) lleva una línea
+que diga qué representa o por qué existe, sobre todo si hay que mantenerla al día (ej. al entrar un
+cliente nuevo).
+
+## Regla general
+
+Explica el porqué, no el qué. Si al borrar el comentario un lector con el código delante seguiría
+entendiendo todo, el comentario sobra.
