@@ -27,6 +27,17 @@
         >
         </app-select>
         <app-input-error [control]="documentForm.get('software')" />
+        @if (documentForm.get('software')?.value === softwareOtherOption) {
+          <div class="mt-4">
+            <app-text-input
+              [id]="'softwareOther'"
+              formControlName="softwareOther"
+              label="¿Cuál software?"
+              [maxlength]="softwareOtherMaxLength.toString()"
+            />
+            <app-input-error [control]="documentForm.get('softwareOther')" />
+          </div>
+        }
       </div>
     }
 

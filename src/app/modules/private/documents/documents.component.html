@@ -167,6 +167,9 @@
               Fecha de carga
             </th>
             <th scope="col" class="px-4 py-3 font-semibold">
+              Fecha de vencimiento
+            </th>
+            <th scope="col" class="px-4 py-3 font-semibold">
               Requerido
             </th>
             <th scope="col" class="px-4 py-3 font-semibold">
@@ -182,7 +185,7 @@
         <tbody>
           @if (loadingDocs) {
             <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
-              <td colspan="6" class="px-4 h-[54px] text-left">
+              <td colspan="8" class="px-4 h-[54px] text-left">
                 <div class="text-md text-main-blue1h leading-4 flex items-center gap-2">
                   <svg class="w-5 h-5 text-current animate-spin fill-gray-200">
                     <use xlink:href="/assets/icons/extras/animations.svg#spin" />
@@ -225,6 +228,16 @@
                 </td>
                 <td class="px-4 py-[10.5px] text-sm font-normal text-main-blue1h leading-4 dark:text-white">
                   {{ doc.documentStatus === 'PENDIENTE' ? 'N/A' : doc.dateAdd | date: 'mediumDate' }}
+                </td>
+                <td class="px-4 py-[10.5px] text-sm font-normal leading-4 whitespace-nowrap dark:text-white"
+                  [ngClass]="doc.documentStatus === 'VENCIDO'
+                    ? 'text-red-600 font-semibold'
+                    : isAboutToExpire(doc) ? 'text-yellow-600 font-semibold' : 'text-main-blue1h'">
+                  @if (doc.documentStatus !== 'PENDIENTE' && (doc.withExpiration || doc.whitExpirationStatic) && doc.expirationDate) {
+                    {{ doc.expirationDate | date: 'mediumDate' }}
+                  } @else {
+                    N/A
+                  }
                 </td>
                 <td class="px-4 py-[10.5px] text-sm font-normal text-main-blue1h leading-4 dark:text-white">
                   {{ doc.required ? 'Sí' : 'No' }}
