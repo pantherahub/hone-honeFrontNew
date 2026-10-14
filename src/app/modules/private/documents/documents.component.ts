@@ -26,11 +26,12 @@ import { catchError, finalize, forkJoin, map, Observable, of, ReplaySubject, Sub
 import { LoaderComponent } from 'src/app/shared/ui/feedback/loader/loader.component';
 import { DropdownTriggerDirective } from 'src/app/directives/dropdown-trigger.directive';
 import { PopoverComponent } from 'src/app/shared/ui/overlays/popover/popover.component';
+import { AlertComponent } from 'src/app/shared/ui/feedback/alert/alert.component';
 
 @Component({
   selector: 'app-documents',
   standalone: true,
-  imports: [CommonModule, PipesModule, ButtonComponent, TooltipComponent, PopoverComponent, LoaderComponent, DropdownTriggerDirective],
+  imports: [CommonModule, PipesModule, ButtonComponent, TooltipComponent, PopoverComponent, LoaderComponent, DropdownTriggerDirective, AlertComponent],
   templateUrl: './documents.component.html',
   styleUrl: './documents.component.scss'
 })
@@ -99,7 +100,13 @@ export class DocumentsComponent implements OnInit, AfterViewInit, OnDestroy {
         { url: `${environment.s3AssetsHost}carta_mipres.pdf`, name: 'Carta_Mipres.pdf' }
       ],
       displayName: 'Carta Mipres a diligenciar',
-    }
+    },
+    '15-3': {
+      files: [
+        { url: `${environment.s3AssetsHost}documentos-prestadores-ips-colsanitas.zip`, name: 'Documentos para diligenciar colsanitas.zip' }
+      ],
+      displayName: 'Documentos obligatorios a diligenciar',
+    },
   };
 
   private readonly documentIdsAlwaysUpdatable: number[] = [
@@ -417,8 +424,7 @@ export class DocumentsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private showDataformAlert(): void {
     if (this.dataformAlertShown || (this.user.withData && !this.user.rejected)) {
-      const hasDocsAboutToExpire = this.docList.some(doc => this.isAboutToExpire(doc));
-      if (this.approvedPercentData?.upToDate === 100 && !hasDocsAboutToExpire) {
+      if (!this.hasPendingDocsAction) {
         this.showFullApprovalAlert();
         return;
       }
@@ -439,6 +445,15 @@ export class DocumentsComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  /**
+   * True si hay documentos por cargar, renovar o por vencer. Es la misma regla que decide si el
+   * popover de formatos se lanza solo, y por eso también define el estilo del alert que lo recuerda.
+   */
+  get hasPendingDocsAction(): boolean {
+    const hasDocsAboutToExpire = this.docList.some(doc => this.isAboutToExpire(doc));
+    return this.approvedPercentData?.upToDate !== 100 || hasDocsAboutToExpire;
+  }
+
   showFullApprovalAlert(): void {
     this.alertService.success(
       '¡Cumplimiento exitoso!',
@@ -453,6 +468,9 @@ export class DocumentsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   closeFormatsBtnPopover() {
     this.formatsBtnPopoverVisible = false;
+  }
+  openFormatsBtnPopover() {
+    this.formatsBtnPopoverVisible = true;
   }
 
   navigateTo(url: string): void {

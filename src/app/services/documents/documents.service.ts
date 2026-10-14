@@ -15,6 +15,10 @@ export class DocumentService {
     136: 'Rethus-registro Sispro',
   };
 
+  // Sufijos de cliente que el backend agrega al nombre del documento y no se muestran al usuario.
+  // Al entrar un cliente nuevo con este formato, agrégalo aquí.
+  private readonly clientSuffixRegex = /\s*\[(?:SURA|COLSANITAS)\]$/;
+
   constructor(private httpClient: HttpClient) { }
 
   public getPercentDocuments(idProvider: number, idClient: number): Observable<any> {
@@ -45,7 +49,7 @@ export class DocumentService {
       name = this.documentNameOverrides[idDocumentType];
     }
 
-    const formatted = name.replace(/\s*\[SURA\]$/, '');
+    const formatted = name.replace(this.clientSuffixRegex, '');
     return formatted.charAt(0).toUpperCase() + formatted.slice(1);
   }
 
