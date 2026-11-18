@@ -2,6 +2,8 @@ import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@ang
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { DocumentService } from 'src/app/services/documents/documents.service';
+import { DocumentRulesService } from 'src/app/services/documents/document-rules.service';
+import { DocumentRules } from 'src/app/interfaces/document-rules.interface';
 import { EventManagerService } from 'src/app/services/events-manager/event-manager.service';
 import { FileSelectDirective } from 'src/app/directives/file-select.directive';
 import { FormUtilsService } from 'src/app/services/form-utils/form-utils.service';
@@ -60,112 +62,21 @@ export class ModalEditDocumentComponent implements OnInit, OnDestroy {
     },
   };
 
-  suraSoftwareTypes: string[] = [
-    'Evolve Hc',
-    'KloudSolutions',
-    'Medicarte',
-    'Simedica',
-    'Sunube',
-    'HIMED',
-    'Netmedik',
-    'Ekisa',
-    'Medsys',
-    'Luku',
-    'Ipsa',
-    'Otro'
-  ];
-  readonly softwareOtherOption = 'Otro';
-  readonly softwareOtherMaxLength = 30;
-  suraArlEntities: string[] = [
-    'ARL COLSANITAS',
-    'ALFATEP',
-    'ARL SURA',
-    'ARP AURORA',
-    'ARP BOLIVAR',
-    'ARP COLMENA',
-    'ARP COLPATRIA',
-    'LA EQUIDAD SEGUROS DE VIDA S.A',
-    'LIBERTY SEGUROS DE VIDA S.A',
-    'MAPFRE',
-    'POSITIVA ARP',
-    'AXA ARL',
-    'OTRAS'
-  ];
-  policyCompanies: string[] = [
-    'Suramericana',
-    'Seguros del estado',
-    'Mapre',
-    'Seguros Mundial',
-    'HDI',
-    'Axa colpatria',
-    'Aurora',
-    'Chubb',
-    'Previsora',
-    'Seguros Bolivar',
-    'Solidaria',
-    'Otra',
-  ];
-  riskClassifierOptions = ['1', '2', '3', '4', '5'];
-
-  readonly SMLV: number = 1423500;
-  readonly idMainCities: number[] = [
-    88, // Barranquilla
-    107, // Bogota
-    150, // Cali
-    547, // Medellin
-  ];
+  // Reglas de campos (listas, SMLV, pólizas, riesgo) que entrega el API; se llenan en applyRules()
+  suraSoftwareTypes: string[] = [];
+  softwareOtherOption = '';
+  softwareOtherMaxLength = 0;
+  suraArlEntities: string[] = [];
+  policyCompanies: string[] = [];
+  riskClassifierOptions: string[] = [];
+  SMLV = 0;
+  idMainCities: number[] = [];
   mainCities: any[] = [];
-  readonly typePolicyProviderConfig: { [key: string]: any } = {
-    // Juridica
-    'Clinica': {
-      idTypeProvider: 3,
-      smlvMainCities: 420,
-      smlvOtherCities: 370,
-    },
-    'Hospital': {
-      idTypeProvider: 3,
-      smlvMainCities: 420,
-      smlvOtherCities: 370,
-    },
-    'IPS Ambulatoria': {
-      idTypeProvider: 3,
-      smlvMainCities: 370,
-      smlvOtherCities: 230,
-    },
-
-    // Natural
-    'Profesional médico': {
-      idTypeProvider: 7,
-      smlvMainCities: 230,
-      smlvOtherCities: 200,
-    },
-    'Odontologo': {
-      idTypeProvider: 7,
-      smlvMainCities: 230,
-      smlvOtherCities: 200,
-    },
-    'Terapeuta': {
-      idTypeProvider: 7,
-      smlvMainCities: 200,
-      smlvOtherCities: 100,
-    },
-    'Psicólogo': {
-      idTypeProvider: 7,
-      smlvMainCities: 200,
-      smlvOtherCities: 100,
-    },
-    'Fonoaudiólogo': {
-      idTypeProvider: 7,
-      smlvMainCities: 200,
-      smlvOtherCities: 100,
-    },
-    'Nutricionista': {
-      idTypeProvider: 7,
-      smlvMainCities: 200,
-      smlvOtherCities: 100,
-    },
-  };
+  typePolicyProviderConfig: { [key: string]: any } = {};
   typePolicyProviderOptions: string[] = [];
+
+  rulesLoading = true;
+  rulesError = false;
 
   hasShownAmountMessage: boolean = false;
 
@@ -179,14 +90,57 @@ export class ModalEditDocumentComponent implements OnInit, OnDestroy {
     private modalRef: ModalComponent,
     private formBuilder: FormBuilder,
     private documentService: DocumentService,
+    private documentRulesService: DocumentRulesService,
     private eventManager: EventManagerService,
     private alertService: AlertService,
     private formUtils: FormUtilsService
   ) { }
 
   ngOnInit(): void {
-    this.getTypePolicyProviderOpts();
-    this.createForm();
+    this.loadRules();
+  }
+
+  /**
+   * Pide las reglas al API. El formulario solo se crea si llegan; si fallan
+   * se muestra un error con reintento y no se puede guardar.
+   */
+  loadRules(): void {
+    this.rulesLoading = true;
+    this.rulesError = false;
+    this.documentRulesService.getRules('PROVIDER')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: rules => {
+          this.applyRules(rules);
+          this.getTypePolicyProviderOpts();
+          this.createForm();
+          this.rulesLoading = false;
+        },
+        error: () => {
+          this.rulesLoading = false;
+          this.rulesError = true;
+        }
+      });
+  }
+
+  /**
+   * Copia las reglas del API a los campos que usa la plantilla.
+   * El riesgo sale de la lista propia del tipo de documento o de la lista por defecto.
+   */
+  private applyRules(rules: DocumentRules): void {
+    const { lists, policyConfig, riskLevels } = rules;
+    this.suraSoftwareTypes = lists.software;
+    this.softwareOtherOption = lists.softwareOtherOption;
+    this.softwareOtherMaxLength = lists.softwareOtherMaxLength;
+    this.suraArlEntities = lists.arlEntities;
+    this.policyCompanies = lists.policyCompanies;
+    this.idMainCities = lists.mainCityIds;
+    this.SMLV = policyConfig.smlv;
+    this.typePolicyProviderConfig = Object.fromEntries(
+      policyConfig.byProviderType.map(rule => [rule.name, rule])
+    );
+    this.riskClassifierOptions =
+      riskLevels.byDocumentType[this.currentDoc?.idDocumentType] || riskLevels.default;
   }
 
   ngOnDestroy(): void {
