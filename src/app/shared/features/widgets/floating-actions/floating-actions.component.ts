@@ -76,10 +76,10 @@ export class FloatingActionsComponent implements OnInit, OnDestroy {
 
   clientSelected: any;
   customerScheduling = new Map<number, CustomerSchedulingData>([
-    [8, {
-      clientHoneSolutions: 'Axa Colpatria',
-      schedulingLink: 'https://outlook.office.com/book/AgendaAxaColpatria@hone-solutions.com/?ismsaljsauthenabled',
-    }],
+    // [8, {
+    //   clientHoneSolutions: 'Axa Colpatria',
+    //   schedulingLink: 'https://outlook.office.com/book/AgendaAxaColpatria@hone-solutions.com/?ismsaljsauthenabled',
+    // }],
     // [13, {
     //   clientHoneSolutions: 'Sura',
     //   schedulingLink: 'https://outlook.office.com/book/AgendaSura@hone-solutions.com/?ismsaljsauthenabled',
