@@ -1,3 +1,22 @@
+@if (rulesLoading) {
+  <p class="text-sm text-gray-600 py-6 text-center">Cargando formulario...</p>
+} @else if (rulesError) {
+  <div class="flex flex-col gap-4">
+    <app-alert
+      variant="danger"
+      title="No pudimos cargar las opciones del formulario"
+      text="Por favor intenta de nuevo. Si el problema continúa, comunícate con soporte.">
+    </app-alert>
+    <div class="flex flex-wrap justify-end gap-2">
+      <app-button (click)="closeModal()" variant="gray" styleType="soft" size="md" customClass="leading-4">
+        Cerrar
+      </app-button>
+      <app-button (click)="loadRules()" variant="primary" size="md" styleType="solid" customClass="leading-4">
+        Reintentar
+      </app-button>
+    </div>
+  </div>
+} @else {
 <form [formGroup]="documentForm" (ngSubmit)="submitRequest()" class="flex flex-col gap-5">
 
   <div class="flex flex-col gap-3">
@@ -432,3 +451,4 @@
     </app-button>
   </div>
 </form>
+}
