@@ -17,7 +17,7 @@ export class DocumentService {
 
   // Sufijos de cliente que el backend agrega al nombre del documento y no se muestran al usuario.
   // Al entrar un cliente nuevo con este formato, agrégalo aquí.
-  private readonly clientSuffixRegex = /\s*\[(?:SURA|COLSANITAS)\]$/;
+  private readonly clientSuffixRegex = /\s*\[(?:SURA|COLSANITAS|AXA)\]$/;
 
   constructor(private httpClient: HttpClient) { }
 
